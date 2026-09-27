@@ -1,0 +1,255 @@
+@extends('layouts.app')
+
+@section('page-header')
+    <style>
+        .iq-navbar-header {
+            position: relative;
+            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .iq-navbar-header .iq-container {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+    <div class="iq-navbar-header" style="height: 215px;">
+        <div class="container-fluid iq-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
+                        <div>
+                            <h1 class="text-white fw-bold mb-1">Form Pengajuan Permintaan ATK</h1>
+                            <p class="text-white mb-0" style="opacity: 0.9;">
+                                Ajukan kebutuhan Alat Tulis Kantor secara resmi untuk perorangan atau kolektif Subdirektorat.
+                            </p>
+                        </div>
+                        <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-light btn-sm">
+                            &larr; Kembali ke Riwayat
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('content')
+    <div class="container-fluid content-inner mt-n5 py-0">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0 fw-bold">Isi Formulir Permintaan ATK</h5>
+                            <small class="text-muted">Permintaan akan diteruskan ke Kasubag TU untuk persetujuan dan disiapkan oleh PIC Gudang</small>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Mohon perbaiki data pengajuan:</strong>
+                                <ul class="mb-0 mt-1 small">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('pengajuan.store') }}" method="POST" id="formPengajuan">
+                            @csrf
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-secondary">
+                                        Jenis Permintaan <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="type" class="form-select" required>
+                                        <option value="individu" {{ old('type') == 'individu' ? 'selected' : '' }}>
+                                            Individu (Staf / Pegawai)
+                                        </option>
+                                        <option value="subdit" {{ (old('type') == 'subdit' || auth()->user()->role === 'subdit') ? 'selected' : '' }}>
+                                            Subdirektorat (Kolektif Unit Kerja)
+                                        </option>
+                                    </select>
+                                    <small class="text-muted">Pilih "Subdirektorat" jika mewakili kebutuhan kolektif satu unit kerja.</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-secondary">
+                                        Pemohon / Unit Kerja
+                                    </label>
+                                    <input type="text" class="form-control bg-light" 
+                                        value="{{ auth()->user()->name }} ({{ auth()->user()->position ?? 'Pegawai' }})" readonly>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-uppercase text-secondary">
+                                        Keperluan / Catatan Permintaan (Opsional)
+                                    </label>
+                                    <textarea name="notes" class="form-control" rows="2"
+                                        placeholder="Contoh: Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini">{{ old('notes') }}</textarea>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="mb-0 fw-bold">Daftar Barang ATK yang Diminta</h5>
+                                    <small class="text-muted">Tambahkan satu atau beberapa item ATK yang dibutuhkan</small>
+                                </div>
+                                <a href="{{ route('katalog-atk') }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                    Lihat Katalog & Stok
+                                </a>
+                            </div>
+
+                            <div id="product-rows">
+                                <div class="row product-row align-items-center mb-3 p-3 rounded border bg-light">
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <label class="form-label fw-bold small">Pilih Barang ATK <span class="text-danger">*</span></label>
+                                        <select name="product_id[]" class="form-select product-select" required>
+                                            <option value="">-- Pilih Barang dari Gudang --</option>
+                                            @foreach ($products as $product)
+                                                @php
+                                                    $isSelected = (isset($selectedProductId) && $selectedProductId == $product->id);
+                                                @endphp
+                                                <option value="{{ $product->id }}" 
+                                                    data-stock="{{ $product->stock }}"
+                                                    data-unit="{{ $product->unit }}"
+                                                    {{ $isSelected ? 'selected' : '' }}
+                                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
+                                                    {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->stock }} {{ $product->unit }})
+                                                    {{ $product->stock <= 0 ? '- [HABIS]' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <label class="form-label fw-bold small">Jumlah Permintaan <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="number" name="quantity[]" class="form-control quantity-input" min="1"
+                                                value="1" required>
+                                            <span class="input-group-text unit-addon">Pcs</span>
+                                        </div>
+                                        <small class="text-muted stock-info">Pilih barang untuk melihat info stok.</small>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-row w-100"
+                                            disabled>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <button type="button" id="add-row" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Tambah Barang Lain
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                                <a href="{{ route('pengajuan.index') }}" class="btn btn-light border">
+                                    Batal
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    Kirim Pengajuan ke Kasubag TU
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const productRows = document.getElementById('product-rows');
+                const addRowBtn = document.getElementById('add-row');
+
+                function initRow(row) {
+                    const select = row.querySelector('.product-select');
+                    const qtyInput = row.querySelector('.quantity-input');
+                    const unitAddon = row.querySelector('.unit-addon');
+                    const stockInfo = row.querySelector('.stock-info');
+
+                    select.addEventListener('change', function() {
+                        const opt = this.options[this.selectedIndex];
+                        const stock = parseInt(opt.getAttribute('data-stock')) || 0;
+                        const unit = opt.getAttribute('data-unit') || 'Pcs';
+
+                        unitAddon.textContent = unit;
+
+                        if (this.value) {
+                            qtyInput.max = stock;
+                            stockInfo.textContent = 'Maksimal permintaan: ' + stock + ' ' + unit;
+                            if (parseInt(qtyInput.value) > stock) {
+                                qtyInput.value = stock > 0 ? stock : 1;
+                            }
+                        } else {
+                            qtyInput.removeAttribute('max');
+                            stockInfo.textContent = 'Pilih barang untuk melihat info stok.';
+                        }
+                    });
+
+                    // Trigger if already selected
+                    if (select.value) {
+                        select.dispatchEvent(new Event('change'));
+                    }
+                }
+
+                // Init existing rows
+                productRows.querySelectorAll('.product-row').forEach(initRow);
+
+                addRowBtn.addEventListener('click', function() {
+                    const firstRow = productRows.querySelector('.product-row');
+                    const newRow = firstRow.cloneNode(true);
+
+                    // Reset values in new row
+                    const select = newRow.querySelector('select');
+                    select.value = '';
+                    const qty = newRow.querySelector('input[type="number"]');
+                    qty.value = '1';
+                    qty.removeAttribute('max');
+                    newRow.querySelector('.unit-addon').textContent = 'Pcs';
+                    newRow.querySelector('.stock-info').textContent = 'Pilih barang untuk melihat info stok.';
+                    newRow.querySelector('.remove-row').removeAttribute('disabled');
+
+                    productRows.appendChild(newRow);
+                    initRow(newRow);
+                    updateRemoveButtons();
+                });
+
+                productRows.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-row')) {
+                        e.target.closest('.product-row').remove();
+                        updateRemoveButtons();
+                    }
+                });
+
+                function updateRemoveButtons() {
+                    const rows = productRows.querySelectorAll('.product-row');
+                    rows.forEach((row) => {
+                        const removeBtn = row.querySelector('.remove-row');
+                        if (rows.length === 1) {
+                            removeBtn.setAttribute('disabled', 'true');
+                        } else {
+                            removeBtn.removeAttribute('disabled');
+                        }
+                    });
+                }
+            });
+        </script>
+    @endpush
+@endsection
