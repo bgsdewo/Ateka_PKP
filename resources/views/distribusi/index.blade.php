@@ -42,9 +42,27 @@
     <div class="container-fluid content-inner mt-n5 py-0">
         {{-- Flash Messages --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2" role="alert">
+                <div class="d-flex align-items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    @if (session('print_id'))
+                        <a href="{{ route('distribusi.bukti', session('print_id')) }}" target="_blank"
+                            class="btn btn-sm btn-dark text-white d-inline-flex align-items-center gap-1 shadow-sm fw-bold">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Cetak Bukti Serah Terima
+                        </a>
+                    @endif
+                    <button type="button" class="btn-close position-static p-2" data-bs-dismiss="alert"></button>
+                </div>
             </div>
         @endif
         @if (session('error'))
@@ -206,37 +224,91 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h4 class="card-title mb-0 fw-bold">Daftar Penyerahan Barang ke Pemohon</h4>
-                            <small class="text-muted">Data permintaan barang yang telah diverifikasi Kasubag TU dan siap diserahkan oleh PIC Gudang</small>
+                            <small class="text-muted">Data permintaan barang yang telah disetujui Kasubag TU dan siap diserahkan oleh PIC Gudang</small>
                         </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary rounded-pill px-3 py-1.5">
+                                {{ $requests->total() }} Permintaan Ditampilkan
+                            </span>
+                        </div>
+                    </div>
 
-                        {{-- Filter & Pencarian --}}
-                        <form action="{{ route('distribusi.index') }}" method="GET" class="d-flex align-items-center gap-2 flex-wrap">
-                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 170px;">
-                                <option value="ready" {{ $filterStatus === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
-                                <option value="distributed" {{ $filterStatus === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
-                                <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>Semua Status</option>
-                            </select>
-
-                            <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 160px;">
-                                <option value="">Semua Tipe</option>
-                                <option value="subdit" {{ $filterType === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
-                                <option value="individu" {{ $filterType === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
-                            </select>
-
-                            <div class="input-group input-group-sm" style="width: 220px;">
-                                <input type="text" name="search" class="form-control" placeholder="Cari kode/nama..."
-                                    value="{{ $search }}">
-                                <button class="btn btn-outline-secondary" type="submit">Cari</button>
+                    {{-- Filter Bar Status, Tipe, Periode Bulan & Tahun, serta Pencarian --}}
+                    <div class="p-3 bg-light border-bottom">
+                        <form action="{{ route('distribusi.index') }}" method="GET" class="row g-2 align-items-center">
+                            {{-- Filter Status --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                                    <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
+                                    <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
+                                </select>
                             </div>
 
-                            @if ($filterType || $filterStatus !== 'ready' || $search)
-                                <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-light border" title="Reset Filter">
-                                    Reset
-                                </a>
-                            @endif
+                            {{-- Filter Tipe --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">Semua Tipe</option>
+                                    <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                    <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
+                                </select>
+                            </div>
+
+                            {{-- Filter Periode Bulan --}}
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
+                                    @php
+                                        $allMonths = [
+                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                                            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                        ];
+                                    @endphp
+                                    @foreach ($allMonths as $num => $name)
+                                        <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
+                                            {{ $name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Filter Periode Tahun --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                                    @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                        <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
+                                            Tahun {{ $y }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+
+                            {{-- Input Pencarian --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="search" class="form-control" placeholder="Cari..."
+                                        value="{{ $search ?? '' }}">
+                                    <button class="btn btn-primary" type="submit">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Reset Button --}}
+                            <div class="col-12 col-sm-6 col-md-1 text-md-end">
+                                @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
+                                    <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
+                                        Reset
+                                    </a>
+                                @endif
+                            </div>
                         </form>
                     </div>
 
@@ -257,7 +329,7 @@
                                 <tbody>
                                     @forelse ($requests as $index => $req)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
                                             <td>
                                                 <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
                                                 <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
@@ -396,6 +468,17 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @if ($requests->hasPages())
+                            <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 border-top">
+                                <div class="text-muted small">
+                                    Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> data penyerahan
+                                </div>
+                                <div>
+                                    {{ $requests->links() }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

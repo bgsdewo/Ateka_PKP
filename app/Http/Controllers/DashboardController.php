@@ -12,7 +12,15 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $selectedYear = (int) $request->get('year', date('Y'));
+        $yearInput = $request->get('year');
+        $isAllYears = ($yearInput === 'all');
+        if ($isAllYears) {
+            $selectedYear = null;
+        } elseif ($yearInput !== null && $yearInput !== '') {
+            $selectedYear = (int) $yearInput;
+        } else {
+            $selectedYear = (int) date('Y');
+        }
         
         $monthInput = $request->get('month');
         $isAllMonths = ($monthInput === 'all');
@@ -34,7 +42,10 @@ class DashboardController extends Controller
         });
 
         // Transaksi Persediaan berdasarkan Periode yang dipilih
-        $periodTransactionsQuery = StockTransaction::whereYear('transaction_date', $selectedYear);
+        $periodTransactionsQuery = StockTransaction::query();
+        if ($selectedYear) {
+            $periodTransactionsQuery->whereYear('transaction_date', $selectedYear);
+        }
         if ($selectedMonth) {
             $periodTransactionsQuery->whereMonth('transaction_date', $selectedMonth);
         }
@@ -86,15 +97,6 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        // Jika transaksi pada periode kosong, ambil mutasi terkini agar widget tetap terisi informasi
-        if ($latestTransactions->isEmpty()) {
-            $latestTransactions = StockTransaction::with(['product.category', 'user'])
-                ->latest('transaction_date')
-                ->latest('id')
-                ->limit(6)
-                ->get();
-        }
-
         // Grafik Transaksi: Jika bulan dipilih -> per tanggal. Jika 'all' -> per bulan.
         if ($selectedMonth) {
             $monthlyTransactions = StockTransaction::select(
@@ -103,7 +105,7 @@ class DashboardController extends Controller
                 DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
             )
                 ->whereMonth('transaction_date', $selectedMonth)
-                ->whereYear('transaction_date', $selectedYear)
+                ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
                 ->groupBy(DB::raw('DATE(transaction_date)'))
                 ->orderBy('date')
                 ->get();
@@ -117,7 +119,7 @@ class DashboardController extends Controller
                 DB::raw("SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END) as total_in"),
                 DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
             )
-                ->whereYear('transaction_date', $selectedYear)
+                ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
                 ->groupBy(DB::raw('MONTH(transaction_date)'))
                 ->orderBy('month_num')
                 ->get();
@@ -144,26 +146,43 @@ class DashboardController extends Controller
         $readyDistribusiCount = RequestItem::where('status', 'approved')->count();
         $totalDistributedCount = RequestItem::where('status', 'distributed')->count();
 
-        // Data khusus user requester yang sedang login
+        // Data khusus user requester yang sedang login (Subdit / Pegawai)
         $userId = auth()->id();
-        $userRequests = RequestItem::with('details.product')
-            ->where('user_id', $userId)
+        $userRequestsQuery = RequestItem::with('details.product')
+            ->where('user_id', $userId);
+
+        if ($selectedYear) {
+            $userRequestsQuery->whereYear('created_at', $selectedYear);
+        }
+
+        if ($selectedMonth) {
+            $userRequestsQuery->whereMonth('created_at', $selectedMonth);
+        }
+
+        $userRequests = (clone $userRequestsQuery)
             ->latest()
-            ->limit(5)
+            ->limit(10)
             ->get();
-        $userPendingCount = RequestItem::where('user_id', $userId)->where('status', 'pending')->count();
-        $userApprovedCount = RequestItem::where('user_id', $userId)->where('status', 'approved')->count();
-        $userDistributedCount = RequestItem::where('user_id', $userId)->where('status', 'distributed')->count();
-        $userRejectedCount = RequestItem::where('user_id', $userId)->where('status', 'rejected')->count();
+
+        $userPendingCount = (clone $userRequestsQuery)->where('status', 'pending')->count();
+        $userApprovedCount = (clone $userRequestsQuery)->where('status', 'approved')->count();
+        $userDistributedCount = (clone $userRequestsQuery)->where('status', 'distributed')->count();
+        $userRejectedCount = (clone $userRequestsQuery)->where('status', 'rejected')->count();
 
         // Periode text label
         $monthNamesFull = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
             7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
-        $selectedPeriodLabel = $selectedMonth 
-            ? ($monthNamesFull[$selectedMonth] ?? "Bulan $selectedMonth") . " {$selectedYear}"
-            : "Tahun {$selectedYear} (Semua Bulan)";
+        if ($selectedMonth && $selectedYear) {
+            $selectedPeriodLabel = ($monthNamesFull[$selectedMonth] ?? "Bulan $selectedMonth") . " {$selectedYear}";
+        } elseif ($selectedMonth && !$selectedYear) {
+            $selectedPeriodLabel = ($monthNamesFull[$selectedMonth] ?? "Bulan $selectedMonth") . " (Semua Tahun)";
+        } elseif (!$selectedMonth && $selectedYear) {
+            $selectedPeriodLabel = "Tahun {$selectedYear} (Semua Bulan)";
+        } else {
+            $selectedPeriodLabel = "Semua Periode";
+        }
 
         return view('dashboard.index', compact(
             'totalProducts',
@@ -192,7 +211,8 @@ class DashboardController extends Controller
             'selectedMonth',
             'selectedYear',
             'selectedPeriodLabel',
-            'isAllMonths'
+            'isAllMonths',
+            'isAllYears'
         ));
     }
 }

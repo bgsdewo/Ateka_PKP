@@ -76,6 +76,13 @@
                 width: 100%;
                 min-height: auto;
             }
+
+            .badge {
+                background-color: transparent !important;
+                color: #000 !important;
+                border: none !important;
+                padding: 0 !important;
+            }
         }
     </style>
 </head>
@@ -128,7 +135,7 @@
         </div>
 
         <p style="font-size: 13px; line-height: 1.6;" class="mb-3">
-            Pada hari ini, <strong>{{ \Carbon\Carbon::parse($requestItem->distributed_at ?? now())->translatedFormat('l, d F Y') }}</strong>, 
+            Pada hari ini, <strong>{{ \Carbon\Carbon::parse($requestItem->distributed_at ?? now())->locale('id')->translatedFormat('l, d F Y') }}</strong>, 
             telah diserahterimakan kebutuhan Alat Tulis Kantor (ATK) untuk kegiatan operasional kedinasan dengan rincian data sebagai berikut:
         </p>
 
@@ -160,7 +167,11 @@
                 <td><strong>Status Verifikasi</strong></td>
                 <td>:</td>
                 <td>
-                    <span class="badge bg-success">Disetujui Kasubag TU & Telah Didistribusikan</span>
+                    @if ($requestItem->status === 'distributed')
+                        <span class="fw-bold text-dark">Disetujui Kasubag TU &amp; Telah Didistribusikan</span>
+                    @else
+                        <span class="fw-bold text-dark">Disetujui Kasubag TU (Siap Diserahkan)</span>
+                    @endif
                 </td>
             </tr>
         </table>

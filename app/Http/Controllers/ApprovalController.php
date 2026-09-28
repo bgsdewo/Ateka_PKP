@@ -13,8 +13,46 @@ class ApprovalController extends Controller
     public function index(Request $request)
     {
         $statusFilter = $request->get('status');
+        $typeFilter = $request->get('type');
+        $search = $request->get('search');
+        $monthInput = $request->get('month');
+        $yearInput = $request->get('year');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
 
-        $query = RequestItem::with(['user', 'details.product'])->latest();
+        $isAllMonths = ($monthInput === 'all');
+        $selectedMonth = ($isAllMonths || $monthInput === null || $monthInput === '') ? null : (int) $monthInput;
+        $selectedYear = ($yearInput === 'all' || $yearInput === null || $yearInput === '') ? null : (int) $yearInput;
+
+        $baseQuery = RequestItem::query()
+            ->when($typeFilter, function ($q) use ($typeFilter) {
+                $q->where('type', $typeFilter);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('request_code', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%")
+                               ->orWhere('position', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('details.product', function ($pq) use ($search) {
+                            $pq->where('name', 'like', "%{$search}%")
+                               ->orWhere('code', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
+            ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
+            ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate));
+
+        $pendingCount = (clone $baseQuery)->where('status', 'pending')->count();
+        $approvedCount = (clone $baseQuery)->whereIn('status', ['approved', 'distributed'])->count();
+        $rejectedCount = (clone $baseQuery)->where('status', 'rejected')->count();
+        $totalCount = (clone $baseQuery)->count();
+
+        $query = (clone $baseQuery)->with(['user', 'details.product'])->latest('created_at')->latest('id');
 
         if ($statusFilter && $statusFilter !== 'all') {
             if ($statusFilter === 'approved') {
@@ -24,16 +62,18 @@ class ApprovalController extends Controller
             }
         }
 
-        $requests = $query->get();
-
-        $pendingCount = RequestItem::where('status', 'pending')->count();
-        $approvedCount = RequestItem::whereIn('status', ['approved', 'distributed'])->count();
-        $rejectedCount = RequestItem::where('status', 'rejected')->count();
-        $totalCount = RequestItem::count();
+        $requests = $query->paginate(15)->withQueryString();
 
         return view('persetujuan.index', compact(
             'requests',
             'statusFilter',
+            'typeFilter',
+            'search',
+            'selectedMonth',
+            'selectedYear',
+            'startDate',
+            'endDate',
+            'isAllMonths',
             'pendingCount',
             'approvedCount',
             'rejectedCount',

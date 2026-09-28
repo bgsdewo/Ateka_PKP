@@ -64,9 +64,6 @@
                                 <span class="badge {{ $roleBadge }}" style="font-size: 0.68rem; padding: 2px 6px;">
                                     {{ $roleTitle }}
                                 </span>
-                                @if (auth()->user()->position)
-                                    <small class="text-muted" style="font-size: 0.72rem;">&bull; {{ auth()->user()->position }}</small>
-                                @endif
                             </div>
                         </div>
                     </a>

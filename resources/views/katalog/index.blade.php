@@ -26,9 +26,6 @@
                                 Cek ketersediaan stok ATK terkini di gudang sebelum mengajukan permohonan kebutuhan kantor.
                             </p>
                         </div>
-                        <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm">
-                            + Buat Pengajuan ATK
-                        </a>
                     </div>
                 </div>
             </div>
@@ -118,7 +115,7 @@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="small text-muted">Sisa Stok Fisik:</span>
                                     <span class="fw-bold {{ $item->stock <= 0 ? 'text-danger' : 'text-primary' }} fs-5">
-                                        {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">{{ $item->unit }}</small>
+                                        {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">Stok</small>
                                     </span>
                                 </div>
 

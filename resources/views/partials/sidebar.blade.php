@@ -22,7 +22,7 @@
             </div>
             <div class="ms-2">
                 <h5 class="logo-title mb-0 fw-bold" style="color: #144b59;">Inventori ATK</h5>
-                <small class="text-muted" style="font-size: 0.7rem;">Kementerian PKP RI</small>
+                <small class="text-muted sidebar-subtext" style="font-size: 0.7rem; white-space: nowrap;">Kementerian PKP RI</small>
             </div>
         </a>
         <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
@@ -42,12 +42,12 @@
             <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
 
                 {{-- Role Badge Indicator in Sidebar --}}
-                <li class="nav-item mb-2 px-3 pt-3">
-                    <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center gap-2">
-                        <div class="avatar avatar-35 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center">
+                <li class="nav-item mb-2 px-3 pt-3 sidebar-user-item">
+                    <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center gap-2 sidebar-user-card">
+                        <div class="avatar avatar-35 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center sidebar-user-avatar">
                             {{ strtoupper(substr($currentUser->name ?? 'U', 0, 1)) }}
                         </div>
-                        <div style="line-height: 1.2; overflow: hidden;">
+                        <div class="sidebar-user-info" style="line-height: 1.2; overflow: hidden;">
                             <div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">{{ $currentUser->name ?? 'Pengguna' }}</div>
                             <small class="text-primary fw-semibold" style="font-size: 0.72rem;">
                                 @if ($isKasubagTU)

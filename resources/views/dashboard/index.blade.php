@@ -190,7 +190,7 @@
                             <label class="small text-muted mb-0 fw-semibold">Pilih Periode:</label>
                             
                             {{-- Dropdown Bulan --}}
-                            <select name="month" class="form-select form-select-sm" style="width: 155px; border-radius: 8px;">
+                            <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 165px; border-radius: 8px;">
                                 <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                                 @php
                                     $allMonths = [
@@ -206,19 +206,28 @@
                             </select>
 
                             {{-- Dropdown Tahun --}}
-                            <select name="year" class="form-select form-select-sm" style="width: 110px; border-radius: 8px;">
-                                @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                                    <option value="{{ $y }}" {{ ($selectedYear == $y) ? 'selected' : '' }}>
+                            <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 130px; border-radius: 8px;">
+                                @php
+                                    $curY = (int) date('Y');
+                                    $yearList = range($curY - 3, $curY + 2);
+                                    if ($selectedYear && !in_array((int)$selectedYear, $yearList)) {
+                                        $yearList[] = (int) $selectedYear;
+                                        sort($yearList);
+                                    }
+                                @endphp
+                                <option value="all" {{ ($isAllYears ?? false) ? 'selected' : '' }}>Semua Tahun</option>
+                                @foreach ($yearList as $y)
+                                    <option value="{{ $y }}" {{ ((!($isAllYears ?? false)) && ($selectedYear == $y)) ? 'selected' : '' }}>
                                         Tahun {{ $y }}
                                     </option>
-                                @endfor
+                                @endforeach
                             </select>
 
                             <button type="submit" class="btn btn-sm btn-primary shadow-sm px-3 fw-semibold">
                                 Terapkan
                             </button>
 
-                            @if (($selectedMonth != date('n')) || ($selectedYear != date('Y')) || ($isAllMonths ?? false))
+                            @if (($selectedMonth != date('n')) || ($selectedYear != date('Y')) || ($isAllMonths ?? false) || ($isAllYears ?? false))
                                 <a href="{{ route('dashboard') }}" class="btn btn-sm btn-light border px-2.5" title="Kembalikan ke bulan saat ini">
                                     Bulan Ini
                                 </a>
@@ -327,7 +336,7 @@
                                         @empty
                                             <tr>
                                                 <td colspan="6" class="text-center py-4 text-muted">
-                                                    Belum ada riwayat pengajuan. <a href="{{ route('pengajuan.create') }}">Buat pengajuan baru sekarang</a>.
+                                                    Belum ada riwayat pengajuan pada periode {{ $selectedPeriodLabel }}. <a href="{{ route('pengajuan.create') }}">Buat pengajuan baru sekarang</a>.
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -481,7 +490,7 @@
                                 </div>
                             @empty
                                 <div class="text-center text-muted py-4">
-                                    Belum ada transaksi mutasi.
+                                    Belum ada transaksi mutasi pada periode {{ $selectedPeriodLabel }}.
                                 </div>
                             @endforelse
 

@@ -14,6 +14,177 @@
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
     @stack('styles')
+    <style>
+        /* ======================================================== */
+        /* STILISASI SIDEBAR KETIKA DITUTUP (MINI / COLLAPSED)      */
+        /* Semua elemen (Avatar, Divider, Icon Utama, Huruf Subnav) */
+        /* Sejajar lurus di sumbu tengah (vertikal)                 */
+        /* ======================================================== */
+
+        /* 1. Sembunyikan teks label di header & profil */
+        .sidebar.sidebar-mini .navbar-brand small,
+        .sidebar.sidebar-mini .sidebar-subtext,
+        .sidebar.sidebar-mini .sidebar-user-info {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* 2. Profil Avatar Pengguna */
+        .sidebar.sidebar-mini .sidebar-user-item {
+            padding: 0.6rem 0 !important;
+            margin: 0 auto 0.25rem auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+        .sidebar.sidebar-mini .sidebar-user-card {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            justify-content: center !important;
+            width: auto !important;
+            gap: 0 !important;
+            box-shadow: none !important;
+        }
+        .sidebar.sidebar-mini .sidebar-user-avatar {
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px !important;
+            margin: 0 auto !important;
+        }
+
+        /* 3. Garis Pemisah / Static Item Dash (-) */
+        .sidebar.sidebar-mini .nav-item.static-item {
+            padding: 0.25rem 0 !important;
+            margin: 0 auto !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        .sidebar.sidebar-mini .nav-item.static-item .nav-link {
+            padding: 0 !important;
+            margin: 0 auto !important;
+            justify-content: center !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        .sidebar.sidebar-mini .nav-item.static-item .mini-icon {
+            display: block !important;
+            margin: 0 auto !important;
+            text-align: center !important;
+            font-size: 1.1rem !important;
+            line-height: 1 !important;
+            color: #adb5bd !important;
+        }
+
+        /* 4. Menu Utama (Dashboard, Persetujuan, Distribusi, Gudang, dll) */
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            padding: 0 !important;
+            margin: 4px auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 10px !important;
+            box-sizing: border-box !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon {
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 20px !important;
+            height: 20px !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .right-icon,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link > .badge {
+            display: none !important;
+        }
+
+        /* 5. Sub-Menu & Huruf (R, +, K, M, L, dll) agar Sejajar Rapi di Tengah */
+        .sidebar.sidebar-mini .sub-nav {
+            padding: 0.25rem 0 !important;
+            margin: 0 auto !important;
+            width: 100% !important;
+            list-style: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-item {
+            padding: 0 !important;
+            margin: 2px auto !important;
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-link {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 8px !important;
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: none !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-link:hover {
+            background-color: rgba(58, 87, 232, 0.12) !important;
+            color: var(--bs-primary) !important;
+            border-color: rgba(58, 87, 232, 0.25) !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-link.active {
+            background-color: var(--bs-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--bs-primary) !important;
+            box-shadow: 0 2px 6px rgba(58, 87, 232, 0.35) !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-link i.sidenav-mini-icon {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-style: normal !important;
+            font-weight: 700 !important;
+            font-size: 0.82rem !important;
+            line-height: 1 !important;
+            text-align: center !important;
+            color: inherit !important;
+            transform: none !important;
+            -webkit-transform: none !important;
+            opacity: 1 !important;
+        }
+        .sidebar.sidebar-mini .sub-nav .nav-link .icon,
+        .sidebar.sidebar-mini .sub-nav .nav-link .item-name {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class=" ">

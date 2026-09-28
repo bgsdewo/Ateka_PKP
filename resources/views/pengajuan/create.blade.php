@@ -26,9 +26,6 @@
                                 Ajukan kebutuhan Alat Tulis Kantor secara resmi untuk perorangan atau kolektif Subdirektorat.
                             </p>
                         </div>
-                        <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-light btn-sm">
-                            &larr; Kembali ke Riwayat
-                        </a>
                     </div>
                 </div>
             </div>
@@ -120,10 +117,10 @@
                                                 @endphp
                                                 <option value="{{ $product->id }}" 
                                                     data-stock="{{ $product->stock }}"
-                                                    data-unit="{{ $product->unit }}"
+                                                    data-unit="Stok"
                                                     {{ $isSelected ? 'selected' : '' }}
                                                     {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                                    {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->stock }} {{ $product->unit }})
+                                                    {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->stock }} Stok)
                                                     {{ $product->stock <= 0 ? '- [HABIS]' : '' }}
                                                 </option>
                                             @endforeach
@@ -134,13 +131,16 @@
                                         <div class="input-group">
                                             <input type="number" name="quantity[]" class="form-control quantity-input" min="1"
                                                 value="1" required>
-                                            <span class="input-group-text unit-addon">Pcs</span>
+                                            <span class="input-group-text unit-addon">Stok</span>
                                         </div>
                                         <small class="text-muted stock-info">Pilih barang untuk melihat info stok.</small>
                                     </div>
                                     <div class="col-md-2 d-flex align-items-end justify-content-end">
-                                        <button type="button" class="btn btn-outline-danger btn-sm remove-row w-100"
-                                            disabled>
+                                        <button type="button" class="btn btn-outline-danger btn-sm remove-row w-100" title="Hapus atau reset baris barang ini">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
                                             Hapus
                                         </button>
                                     </div>
@@ -187,13 +187,12 @@
                     select.addEventListener('change', function() {
                         const opt = this.options[this.selectedIndex];
                         const stock = parseInt(opt.getAttribute('data-stock')) || 0;
-                        const unit = opt.getAttribute('data-unit') || 'Pcs';
 
-                        unitAddon.textContent = unit;
+                        unitAddon.textContent = 'Stok';
 
                         if (this.value) {
                             qtyInput.max = stock;
-                            stockInfo.textContent = 'Maksimal permintaan: ' + stock + ' ' + unit;
+                            stockInfo.textContent = 'Maksimal permintaan: ' + stock + ' Stok';
                             if (parseInt(qtyInput.value) > stock) {
                                 qtyInput.value = stock > 0 ? stock : 1;
                             }
@@ -222,33 +221,47 @@
                     const qty = newRow.querySelector('input[type="number"]');
                     qty.value = '1';
                     qty.removeAttribute('max');
-                    newRow.querySelector('.unit-addon').textContent = 'Pcs';
+                    newRow.querySelector('.unit-addon').textContent = 'Stok';
                     newRow.querySelector('.stock-info').textContent = 'Pilih barang untuk melihat info stok.';
-                    newRow.querySelector('.remove-row').removeAttribute('disabled');
 
                     productRows.appendChild(newRow);
                     initRow(newRow);
-                    updateRemoveButtons();
                 });
 
-                productRows.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('remove-row')) {
-                        e.target.closest('.product-row').remove();
-                        updateRemoveButtons();
+                // Event delegation untuk tombol Hapus
+                document.addEventListener('click', function(e) {
+                    const removeBtn = e.target.closest('.remove-row');
+                    if (!removeBtn) return;
+
+                    e.preventDefault();
+                    const row = removeBtn.closest('.product-row');
+                    if (!row) return;
+
+                    const allRows = productRows.querySelectorAll('.product-row');
+                    if (allRows.length > 1) {
+                        row.remove();
+                    } else {
+                        // Jika hanya 1 baris, kosongkan kembali
+                        const select = row.querySelector('.product-select');
+                        const qty = row.querySelector('.quantity-input');
+                        if (select) {
+                            select.value = '';
+                            select.dispatchEvent(new Event('change'));
+                        }
+                        if (qty) {
+                            qty.value = '1';
+                            qty.removeAttribute('max');
+                        }
+                        const unitAddon = row.querySelector('.unit-addon');
+                        if (unitAddon) {
+                            unitAddon.textContent = 'Stok';
+                        }
+                        const stockInfo = row.querySelector('.stock-info');
+                        if (stockInfo) {
+                            stockInfo.textContent = 'Pilih barang untuk melihat info stok.';
+                        }
                     }
                 });
-
-                function updateRemoveButtons() {
-                    const rows = productRows.querySelectorAll('.product-row');
-                    rows.forEach((row) => {
-                        const removeBtn = row.querySelector('.remove-row');
-                        if (rows.length === 1) {
-                            removeBtn.setAttribute('disabled', 'true');
-                        } else {
-                            removeBtn.removeAttribute('disabled');
-                        }
-                    });
-                }
             });
         </script>
     @endpush

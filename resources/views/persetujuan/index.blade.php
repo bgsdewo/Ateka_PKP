@@ -122,23 +122,96 @@
 
                         {{-- Tombol Filter Status --}}
                         <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                            <a href="{{ route('persetujuan.index') }}" 
-                                class="btn btn-sm {{ empty($statusFilter) ? 'btn-primary' : 'btn-light border' }} rounded-pill px-3">
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), [])) }}" 
+                                class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-primary' : 'btn-light border' }} rounded-pill px-3">
                                 Semua ({{ $totalCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'pending'])) }}" 
                                 class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Menunggu Verifikasi ({{ $pendingCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', ['status' => 'approved']) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'approved'])) }}" 
                                 class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Disetujui ({{ $approvedCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', ['status' => 'rejected']) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'rejected'])) }}" 
                                 class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Ditolak ({{ $rejectedCount }})
                             </a>
                         </div>
+                    </div>
+
+                    {{-- Filter Bar Periode, Tipe, & Pencarian --}}
+                    <div class="p-3 bg-light border-bottom">
+                        <form action="{{ route('persetujuan.index') }}" method="GET" class="row g-2 align-items-center">
+                            @if ($statusFilter)
+                                <input type="hidden" name="status" value="{{ $statusFilter }}">
+                            @endif
+
+                            {{-- Filter Tipe --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">Semua Tipe</option>
+                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
+                                </select>
+                            </div>
+
+                            {{-- Filter Bulan --}}
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
+                                    @php
+                                        $allMonths = [
+                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                                            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                        ];
+                                    @endphp
+                                    @foreach ($allMonths as $num => $name)
+                                        <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
+                                            {{ $name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Filter Tahun --}}
+                            <div class="col-12 col-sm-6 col-md-2">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                                    @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                        <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
+                                            Tahun {{ $y }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+
+                            {{-- Search Input --}}
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="search" class="form-control" placeholder="Cari kode/pemohon..."
+                                        value="{{ $search ?? '' }}">
+                                    <button class="btn btn-primary" type="submit">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        Cari
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Reset Button --}}
+                            <div class="col-12 col-sm-6 col-md-2 text-md-end">
+                                @if (!empty($typeFilter) || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
+                                    <a href="{{ route('persetujuan.index', !empty($statusFilter) ? ['status' => $statusFilter] : []) }}" 
+                                        class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
+                                        Reset Filter
+                                    </a>
+                                @endif
+                            </div>
+                        </form>
                     </div>
                     <div class="card-body p-4">
                         <div class="table-responsive">
@@ -157,7 +230,7 @@
                                 <tbody>
                                     @forelse($requests as $index => $req)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
                                             <td>
                                                 <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
                                                 <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }} text-capitalize">
@@ -314,6 +387,17 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @if ($requests->hasPages())
+                            <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 border-top">
+                                <div class="text-muted small">
+                                    Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> pengajuan
+                                </div>
+                                <div>
+                                    {{ $requests->links() }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

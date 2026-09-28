@@ -129,7 +129,7 @@
         </div>
 
         <p style="font-size: 12px; line-height: 1.6;" class="mb-2">
-            Pada hari ini, <strong>{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</strong>, 
+            Pada hari ini, <strong>{{ \Carbon\Carbon::now()->locale('id')->translatedFormat('l, d F Y') }}</strong>, 
             telah dilakukan penatausahaan, verifikasi arsip, dan rekapitulasi data mutasi persediaan Alat Tulis Kantor (ATK) 
             berdasarkan dokumen transaksi penerimaan dan pengeluaran barang dengan ringkasan sebagai berikut:
         </p>

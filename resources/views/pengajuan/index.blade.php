@@ -26,14 +26,6 @@
                                 Riwayat dan pemantauan status permohonan Alat Tulis Kantor (Individu & Subdirektorat).
                             </p>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('katalog-atk') }}" class="btn btn-outline-light btn-sm">
-                                Cek Katalog ATK
-                            </a>
-                            <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-dark fw-bold btn-sm shadow-sm">
-                                + Buat Pengajuan Baru
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
