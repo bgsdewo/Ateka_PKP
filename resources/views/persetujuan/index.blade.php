@@ -114,27 +114,29 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div
+                        class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h4 class="card-title mb-0 fw-bold">Daftar Antrean Permintaan Masuk</h4>
-                            <small class="text-muted">Periksa kebutuhan barang, jumlah, dan ketersediaan stok fisik gudang sebelum memberikan persetujuan</small>
+                            <small class="text-muted">Periksa kebutuhan barang, jumlah, dan ketersediaan stok fisik gudang
+                                sebelum memberikan persetujuan</small>
                         </div>
 
                         {{-- Tombol Filter Status --}}
                         <div class="d-flex align-items-center gap-1.5 flex-wrap" id="status-filter-tabs">
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), [])) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), [])) }}"
                                 class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-primary' : 'btn-light border' }} rounded-pill px-3">
                                 Semua ({{ $totalCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'pending'])) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'pending'])) }}"
                                 class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Menunggu Verifikasi ({{ $pendingCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'approved'])) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'approved'])) }}"
                                 class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Disetujui ({{ $approvedCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'rejected'])) }}" 
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['status' => 'rejected'])) }}"
                                 class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
                                 Ditolak ({{ $rejectedCount }})
                             </a>
@@ -143,7 +145,8 @@
 
                     {{-- Filter Bar Periode, Tipe, & Pencarian --}}
                     <div class="p-3 bg-light border-bottom">
-                        <form id="persetujuan-filter-form" action="{{ route('persetujuan.index') }}" method="GET" class="row g-2 align-items-center">
+                        <form id="persetujuan-filter-form" action="{{ route('persetujuan.index') }}" method="GET"
+                            class="row g-2 align-items-center">
                             @if ($statusFilter)
                                 <input type="hidden" name="status" value="{{ $statusFilter }}">
                             @endif
@@ -152,23 +155,37 @@
                             <div class="col-12 col-sm-6 col-md-2">
                                 <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
                                     <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
-                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
+                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit
+                                        (Kolektif)</option>
+                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>
+                                        Individu (Pegawai)</option>
                                 </select>
                             </div>
 
                             {{-- Filter Bulan --}}
                             <div class="col-12 col-sm-6 col-md-3">
                                 <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
+                                    <option value="all" {{ $isAllMonths ?? false ? 'selected' : '' }}>Semua Bulan
+                                        (Setahun)</option>
                                     @php
                                         $allMonths = [
-                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
-                                            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                            1 => 'Januari',
+                                            2 => 'Februari',
+                                            3 => 'Maret',
+                                            4 => 'April',
+                                            5 => 'Mei',
+                                            6 => 'Juni',
+                                            7 => 'Juli',
+                                            8 => 'Agustus',
+                                            9 => 'September',
+                                            10 => 'Oktober',
+                                            11 => 'November',
+                                            12 => 'Desember',
                                         ];
                                     @endphp
                                     @foreach ($allMonths as $num => $name)
-                                        <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
+                                        <option value="{{ $num }}"
+                                            {{ !($isAllMonths ?? false) && ($selectedMonth ?? null) == $num ? 'selected' : '' }}>
                                             {{ $name }}
                                         </option>
                                     @endforeach
@@ -178,9 +195,11 @@
                             {{-- Filter Tahun --}}
                             <div class="col-12 col-sm-6 col-md-2">
                                 <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun
+                                    </option>
                                     @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                                        <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
+                                        <option value="{{ $y }}"
+                                            {{ ($selectedYear ?? null) == $y ? 'selected' : '' }}>
                                             Tahun {{ $y }}
                                         </option>
                                     @endfor
@@ -190,17 +209,23 @@
                             {{-- Search Input --}}
                             <div class="col-12 col-sm-6 col-md-3">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" id="persetujuan-search" name="search" class="form-control" placeholder="Cari kode/pemohon..."
-                                        value="{{ $search ?? '' }}" autocomplete="off">
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <input type="text" id="persetujuan-search" name="search" class="form-control"
+                                        placeholder="Cari kode/pemohon..." value="{{ $search ?? '' }}"
+                                        autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search"
+                                        style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </button>
-                                    <button class="btn btn-primary d-inline-flex align-items-center" id="btn-persetujuan-search" type="submit" title="Cari">
-                                        <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
-                                        <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <button class="btn btn-primary d-inline-flex align-items-center"
+                                        id="btn-persetujuan-search" type="submit" title="Cari">
+                                        <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none"
+                                            role="status"></span>
+                                        <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
@@ -211,8 +236,13 @@
 
                             {{-- Reset Button --}}
                             <div class="col-12 col-sm-6 col-md-2 text-md-end" id="persetujuan-reset-container">
-                                @if (!empty($typeFilter) || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
-                                    <a href="{{ route('persetujuan.index', !empty($statusFilter) ? ['status' => $statusFilter] : []) }}" 
+                                @if (
+                                    !empty($typeFilter) ||
+                                        !empty($search) ||
+                                        !empty($selectedMonth) ||
+                                        !empty($selectedYear) ||
+                                        ($isAllMonths ?? false))
+                                    <a href="{{ route('persetujuan.index', !empty($statusFilter) ? ['status' => $statusFilter] : []) }}"
                                         class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
                                         Reset Filter
                                     </a>
@@ -236,14 +266,19 @@
                                 </thead>
                                 <tbody id="persetujuan-table-body">
                                     @forelse($requests as $index => $req)
-                                        <tr class="persetujuan-row" data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
-                                            <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
+                                        <tr class="persetujuan-row"
+                                            data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
+                                            <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}
+                                            </td>
                                             <td>
-                                                <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }} text-capitalize">
+                                                <strong
+                                                    class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
+                                                <span
+                                                    class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }} text-capitalize">
                                                     {{ $req->type }}
                                                 </span><br>
-                                                <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                <small
+                                                    class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
                                             </td>
                                             <td>
                                                 <strong>{{ $req->user->name ?? '-' }}</strong><br>
@@ -257,10 +292,14 @@
                                                             $isSufficient = $currentStock >= $detail->quantity;
                                                         @endphp
                                                         <li class="mb-1">
-                                                            <strong>{{ $detail->product->name ?? 'Barang Dihapus' }}</strong>: 
-                                                            <span class="badge bg-light text-dark border">{{ $detail->quantity }} Pcs</span>
+                                                            <strong>{{ $detail->product->name ?? 'Barang Dihapus' }}</strong>:
+                                                            <span
+                                                                class="badge bg-light text-dark border">{{ $detail->quantity }}
+                                                                Pcs</span>
                                                             @if ($req->status === 'pending')
-                                                                <span class="badge {{ $isSufficient ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} ms-1" style="font-size: 0.72rem;">
+                                                                <span
+                                                                    class="badge {{ $isSufficient ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} ms-1"
+                                                                    style="font-size: 0.72rem;">
                                                                     (Sisa Stok Gudang: {{ $currentStock }} Pcs)
                                                                 </span>
                                                             @endif
@@ -280,9 +319,11 @@
                                                 @elseif($req->status == 'distributed')
                                                     <span class="badge bg-primary">Selesai Didistribusikan</span>
                                                 @else
-                                                    <span class="badge bg-danger" title="{{ $req->rejection_reason }}">Ditolak</span>
+                                                    <span class="badge bg-danger"
+                                                        title="{{ $req->rejection_reason }}">Ditolak</span>
                                                     @if ($req->rejection_reason)
-                                                        <br><small class="text-danger">"{{ $req->rejection_reason }}"</small>
+                                                        <br><small
+                                                            class="text-danger">"{{ $req->rejection_reason }}"</small>
                                                     @endif
                                                 @endif
                                             </td>
@@ -290,52 +331,85 @@
                                                 @if ($req->status == 'pending')
                                                     <div class="d-flex justify-content-end gap-1.5 flex-nowrap">
                                                         <!-- Tombol Setujui -->
-                                                        <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
-                                                            data-bs-toggle="modal" data-bs-target="#approveModal{{ $req->id }}">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <button type="button"
+                                                            class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#approveModal{{ $req->id }}">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24"
+                                                                fill="none" stroke="currentColor" stroke-width="2">
                                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                                             </svg>
                                                             Setujui
                                                         </button>
 
                                                         <!-- Tombol Tolak -->
-                                                        <button type="button" class="btn btn-danger btn-sm d-inline-flex align-items-center gap-1"
-                                                            data-bs-toggle="modal" data-bs-target="#rejectModal{{ $req->id }}">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm d-inline-flex align-items-center gap-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#rejectModal{{ $req->id }}">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24"
+                                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                                <line x1="18" y1="6" x2="6"
+                                                                    y2="18"></line>
+                                                                <line x1="6" y1="6" x2="18"
+                                                                    y2="18"></line>
                                                             </svg>
                                                             Tolak
                                                         </button>
                                                     </div>
 
                                                     <!-- Modal Konfirmasi Persetujuan -->
-                                                    <div class="modal fade text-start" id="approveModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal fade text-start"
+                                                        id="approveModal{{ $req->id }}" tabindex="-1"
+                                                        aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
-                                                            <form action="{{ route('persetujuan.update', $req->id) }}" method="POST">
+                                                            <form action="{{ route('persetujuan.update', $req->id) }}"
+                                                                method="POST">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <input type="hidden" name="status" value="approved">
-                                                                <div class="modal-content">
+                                                                <div class="modal-content" style="white-space: normal;">
                                                                     <div class="modal-header bg-success text-white">
-                                                                        <h5 class="modal-title text-white">Persetujuan Permintaan ATK</h5>
-                                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                                        <h5 class="modal-title text-white">Persetujuan
+                                                                            Permintaan ATK</h5>
+                                                                        <button type="button"
+                                                                            class="btn-close btn-close-white"
+                                                                            data-bs-dismiss="modal"></button>
                                                                     </div>
                                                                     <div class="modal-body">
-                                                                        <p class="mb-2">Apakah Anda yakin ingin <strong>menyetujui (approve)</strong> pengajuan nomor <strong class="font-monospace">{{ $req->request_code }}</strong>?</p>
-                                                                        
+                                                                        <p class="mb-2">Apakah Anda yakin ingin
+                                                                            <strong>menyetujui (approve)</strong> pengajuan
+                                                                            nomor <strong
+                                                                                class="font-monospace">{{ $req->request_code }}</strong>?
+                                                                        </p>
+
                                                                         <div class="card bg-light border p-2.5 mb-2 small">
-                                                                            <strong>Pemohon:</strong> {{ $req->user->name ?? '-' }} ({{ $req->user->position ?? '-' }})<br>
-                                                                            <strong>Jenis:</strong> {{ ucfirst($req->type) }}
+                                                                            <strong>Pemohon:</strong>
+                                                                            {{ $req->user->name ?? '-' }}
+                                                                            ({{ $req->user->position ?? '-' }})<br>
+                                                                            <strong>Jenis:</strong>
+                                                                            {{ ucfirst($req->type) }}
                                                                         </div>
 
-                                                                        <div class="alert alert-info py-2 small mb-0">
-                                                                            Setelah disetujui, kuota stok gudang akan otomatis terpotong dan tiket diteruskan ke <strong>PIC Distribusi</strong> untuk diserahkan barang fisiknya.
+                                                                        <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2 text-start"
+                                                                            style="border-left: 4px solid #0dcaf0; line-height: 1.4;">
+                                                                            <svg class="text-info flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                                                stroke="currentColor" stroke-width="2">
+                                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                            </svg>
+                                                                            <div style="font-size: 0.8rem;">
+                                                                                <div>Setelah disetujui, stok gudang otomatis terpotong.</div>
+                                                                                <div>Tiket diteruskan ke <strong>PIC Distribusi</strong> untuk serah terima fisik barang.</div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                                        <button type="submit" class="btn btn-success">Ya, Setujui Permintaan</button>
+                                                                        <button type="button" class="btn btn-secondary"
+                                                                            data-bs-dismiss="modal">Batal</button>
+                                                                        <button type="submit" class="btn btn-success">Ya,
+                                                                            Setujui Permintaan</button>
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -343,27 +417,38 @@
                                                     </div>
 
                                                     <!-- Modal Alasan Penolakan -->
-                                                    <div class="modal fade text-start" id="rejectModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal fade text-start"
+                                                        id="rejectModal{{ $req->id }}" tabindex="-1"
+                                                        aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
-                                                            <form action="{{ route('persetujuan.update', $req->id) }}" method="POST">
+                                                            <form action="{{ route('persetujuan.update', $req->id) }}"
+                                                                method="POST">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <input type="hidden" name="status" value="rejected">
-                                                                <div class="modal-content">
+                                                                <div class="modal-content" style="white-space: normal;">
                                                                     <div class="modal-header bg-danger text-white">
-                                                                        <h5 class="modal-title text-white">Tolak Permintaan ATK</h5>
-                                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                                        <h5 class="modal-title text-white">Tolak Permintaan
+                                                                            ATK</h5>
+                                                                        <button type="button"
+                                                                            class="btn-close btn-close-white"
+                                                                            data-bs-dismiss="modal"></button>
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <div class="mb-3">
-                                                                            <label class="form-label fw-bold">Alasan Penolakan (Akan Dilihat oleh Pemohon): <span class="text-danger">*</span></label>
+                                                                            <label class="form-label fw-bold">Alasan
+                                                                                Penolakan (Akan Dilihat oleh Pemohon): <span
+                                                                                    class="text-danger">*</span></label>
                                                                             <textarea name="rejection_reason" class="form-control" rows="3" required
                                                                                 placeholder="Contoh: Stok barang saat ini habis atau permohonan melebihi kuota bulanan unit kerja."></textarea>
                                                                         </div>
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                                        <button type="submit" class="btn btn-danger">Konfirmasi Tolak</button>
+                                                                        <button type="button" class="btn btn-secondary"
+                                                                            data-bs-dismiss="modal">Batal</button>
+                                                                        <button type="submit"
+                                                                            class="btn btn-danger">Konfirmasi
+                                                                            Tolak</button>
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -372,12 +457,14 @@
                                                 @else
                                                     <div class="d-flex justify-content-end gap-1">
                                                         @if (in_array($req->status, ['approved', 'distributed']))
-                                                            <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                                class="btn btn-sm btn-outline-secondary" title="Lihat Bukti Dokumen">
+                                                            <a href="{{ route('distribusi.bukti', $req->id) }}"
+                                                                target="_blank" class="btn btn-sm btn-outline-secondary"
+                                                                title="Lihat Bukti Dokumen">
                                                                 Dokumen
                                                             </a>
                                                         @endif
-                                                        <span class="badge bg-light text-secondary border px-2 py-1.5 small">
+                                                        <span
+                                                            class="badge bg-light text-secondary border px-2 py-1.5 small">
                                                             Selesai Ditinjau
                                                         </span>
                                                     </div>
@@ -396,9 +483,12 @@
                         </div>
 
                         @if ($requests->hasPages())
-                            <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 border-top">
+                            <div
+                                class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 border-top">
                                 <div class="text-muted small">
-                                    Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> pengajuan
+                                    Menampilkan <strong>{{ $requests->firstItem() }}</strong> -
+                                    <strong>{{ $requests->lastItem() }}</strong> dari
+                                    <strong>{{ $requests->total() }}</strong> pengajuan
                                 </div>
                                 <div>
                                     {{ $requests->links() }}
@@ -413,57 +503,57 @@
 @endsection
 
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('persetujuan-search');
-    const clearBtn = document.getElementById('btn-clear-search');
-    const filterForm = document.getElementById('persetujuan-filter-form');
-    const searchSpinner = document.getElementById('search-spinner');
-    const searchIcon = document.getElementById('search-icon');
-    let debounceTimer = null;
-    let abortCtrl = null;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('persetujuan-search');
+            const clearBtn = document.getElementById('btn-clear-search');
+            const filterForm = document.getElementById('persetujuan-filter-form');
+            const searchSpinner = document.getElementById('search-spinner');
+            const searchIcon = document.getElementById('search-icon');
+            let debounceTimer = null;
+            let abortCtrl = null;
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        const d = document.createElement('div');
-        d.textContent = str;
-        return d.innerHTML;
-    }
-
-    // 1. Instant local row filtering (0ms)
-    function filterRowsLocally(keyword) {
-        const rows = document.querySelectorAll('#persetujuan-table-body tr.persetujuan-row');
-        let emptyRow = document.getElementById('no-local-match-row');
-        const initialEmptyRow = document.getElementById('table-initial-empty-row');
-        
-        if (initialEmptyRow) {
-            return;
-        }
-
-        if (!keyword) {
-            rows.forEach(r => r.style.display = '');
-            if (emptyRow) emptyRow.remove();
-            return;
-        }
-
-        let visibleCount = 0;
-        rows.forEach(r => {
-            const rowText = (r.getAttribute('data-search-text') || r.innerText).toLowerCase();
-            if (rowText.includes(keyword)) {
-                r.style.display = '';
-                visibleCount++;
-            } else {
-                r.style.display = 'none';
+            function escapeHtml(str) {
+                if (!str) return '';
+                const d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
             }
-        });
 
-        if (visibleCount === 0) {
-            if (!emptyRow) {
-                const tbody = document.getElementById('persetujuan-table-body');
-                if (tbody) {
-                    emptyRow = document.createElement('tr');
-                    emptyRow.id = 'no-local-match-row';
-                    emptyRow.innerHTML = `
+            // 1. Instant local row filtering (0ms)
+            function filterRowsLocally(keyword) {
+                const rows = document.querySelectorAll('#persetujuan-table-body tr.persetujuan-row');
+                let emptyRow = document.getElementById('no-local-match-row');
+                const initialEmptyRow = document.getElementById('table-initial-empty-row');
+
+                if (initialEmptyRow) {
+                    return;
+                }
+
+                if (!keyword) {
+                    rows.forEach(r => r.style.display = '');
+                    if (emptyRow) emptyRow.remove();
+                    return;
+                }
+
+                let visibleCount = 0;
+                rows.forEach(r => {
+                    const rowText = (r.getAttribute('data-search-text') || r.innerText).toLowerCase();
+                    if (rowText.includes(keyword)) {
+                        r.style.display = '';
+                        visibleCount++;
+                    } else {
+                        r.style.display = 'none';
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    if (!emptyRow) {
+                        const tbody = document.getElementById('persetujuan-table-body');
+                        if (tbody) {
+                            emptyRow = document.createElement('tr');
+                            emptyRow.id = 'no-local-match-row';
+                            emptyRow.innerHTML = `
                         <td colspan="7" class="text-center text-muted py-4">
                             <div class="d-inline-flex align-items-center gap-2">
                                 <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
@@ -471,188 +561,188 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </td>
                     `;
-                    tbody.appendChild(emptyRow);
-                }
-            }
-        } else {
-            if (emptyRow) emptyRow.remove();
-        }
-    }
-
-    // 2. Debounced background AJAX sync to server
-    function performServerSearch(targetUrl = null) {
-        let url = targetUrl;
-        if (!url && filterForm) {
-            const formData = new FormData(filterForm);
-            const params = new URLSearchParams(formData);
-            url = filterForm.action + '?' + params.toString();
-        }
-
-        if (!url) return;
-
-        if (abortCtrl) {
-            abortCtrl.abort();
-        }
-        abortCtrl = new AbortController();
-
-        if (searchSpinner) searchSpinner.classList.remove('d-none');
-        if (searchIcon) searchIcon.classList.add('d-none');
-
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            signal: abortCtrl.signal
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Response error: ' + response.status);
-            return response.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            const newTable = doc.getElementById('table-container');
-            const currentTable = document.getElementById('table-container');
-            if (newTable && currentTable) {
-                currentTable.innerHTML = newTable.innerHTML;
-            }
-
-            const newTabs = doc.getElementById('status-filter-tabs');
-            const currentTabs = document.getElementById('status-filter-tabs');
-            if (newTabs && currentTabs) {
-                currentTabs.innerHTML = newTabs.innerHTML;
-            }
-
-            const newMetrics = doc.getElementById('approval-metrics');
-            const currentMetrics = document.getElementById('approval-metrics');
-            if (newMetrics && currentMetrics) {
-                currentMetrics.innerHTML = newMetrics.innerHTML;
-            }
-
-            const newReset = doc.getElementById('persetujuan-reset-container');
-            const currentReset = document.getElementById('persetujuan-reset-container');
-            if (newReset && currentReset) {
-                currentReset.innerHTML = newReset.innerHTML;
-            }
-
-            // Sync URL in address bar without reload
-            window.history.replaceState(null, '', url);
-
-            // Re-apply local filter if user kept typing while AJAX was in-flight
-            if (searchInput) {
-                const currentVal = searchInput.value.trim().toLowerCase();
-                let searchedVal = '';
-                try {
-                    const urlParams = new URL(url, window.location.origin).searchParams;
-                    searchedVal = (urlParams.get('search') || '').trim().toLowerCase();
-                } catch (e) {}
-
-                if (currentVal !== searchedVal) {
-                    filterRowsLocally(currentVal);
-                }
-            }
-        })
-        .catch(err => {
-            if (err.name !== 'AbortError') {
-                console.error('Error saat sinkronisasi pencarian:', err);
-            }
-        })
-        .finally(() => {
-            if (searchSpinner) searchSpinner.classList.add('d-none');
-            if (searchIcon) searchIcon.classList.remove('d-none');
-        });
-    }
-
-    if (searchInput) {
-        // As-you-type input handler
-        searchInput.addEventListener('input', function(e) {
-            const val = e.target.value;
-            const kw = val.trim().toLowerCase();
-
-            // Toggle clear button
-            if (clearBtn) {
-                clearBtn.style.display = val.length > 0 ? '' : 'none';
-            }
-
-            // Instant local filter (0ms delay)
-            filterRowsLocally(kw);
-
-            // Debounced server sync (350ms)
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                performServerSearch();
-            }, 350);
-        });
-
-        // Clear button click
-        if (clearBtn) {
-            clearBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                this.style.display = 'none';
-                searchInput.focus();
-                filterRowsLocally('');
-                clearTimeout(debounceTimer);
-                performServerSearch();
-            });
-        }
-    }
-
-    // Intercept form submit (Enter key or Cari button click)
-    if (filterForm) {
-        filterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            clearTimeout(debounceTimer);
-            performServerSearch();
-        });
-
-        // Dynamic change for dropdown selects (Tipe, Bulan, Tahun)
-        filterForm.querySelectorAll('select').forEach(select => {
-            select.onchange = function(e) {
-                e.preventDefault();
-                clearTimeout(debounceTimer);
-                performServerSearch();
-            };
-        });
-    }
-
-    // Intercept pagination clicks inside table container
-    const tableContainer = document.getElementById('table-container');
-    if (tableContainer) {
-        tableContainer.addEventListener('click', function(e) {
-            const pageLink = e.target.closest('.pagination a');
-            if (pageLink && pageLink.href) {
-                e.preventDefault();
-                performServerSearch(pageLink.href);
-            }
-        });
-    }
-
-    // Intercept status filter tab clicks
-    const tabsContainer = document.getElementById('status-filter-tabs');
-    if (tabsContainer) {
-        tabsContainer.addEventListener('click', function(e) {
-            const tabLink = e.target.closest('a');
-            if (tabLink && tabLink.href) {
-                e.preventDefault();
-                try {
-                    const urlObj = new URL(tabLink.href, window.location.origin);
-                    const status = urlObj.searchParams.get('status') || '';
-                    
-                    let statusInput = filterForm.querySelector('input[name="status"]');
-                    if (!statusInput) {
-                        statusInput = document.createElement('input');
-                        statusInput.type = 'hidden';
-                        statusInput.name = 'status';
-                        filterForm.appendChild(statusInput);
+                            tbody.appendChild(emptyRow);
+                        }
                     }
-                    statusInput.value = status;
-                } catch (e) {}
+                } else {
+                    if (emptyRow) emptyRow.remove();
+                }
+            }
 
-                performServerSearch(tabLink.href);
+            // 2. Debounced background AJAX sync to server
+            function performServerSearch(targetUrl = null) {
+                let url = targetUrl;
+                if (!url && filterForm) {
+                    const formData = new FormData(filterForm);
+                    const params = new URLSearchParams(formData);
+                    url = filterForm.action + '?' + params.toString();
+                }
+
+                if (!url) return;
+
+                if (abortCtrl) {
+                    abortCtrl.abort();
+                }
+                abortCtrl = new AbortController();
+
+                if (searchSpinner) searchSpinner.classList.remove('d-none');
+                if (searchIcon) searchIcon.classList.add('d-none');
+
+                fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        signal: abortCtrl.signal
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Response error: ' + response.status);
+                        return response.text();
+                    })
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        const newTable = doc.getElementById('table-container');
+                        const currentTable = document.getElementById('table-container');
+                        if (newTable && currentTable) {
+                            currentTable.innerHTML = newTable.innerHTML;
+                        }
+
+                        const newTabs = doc.getElementById('status-filter-tabs');
+                        const currentTabs = document.getElementById('status-filter-tabs');
+                        if (newTabs && currentTabs) {
+                            currentTabs.innerHTML = newTabs.innerHTML;
+                        }
+
+                        const newMetrics = doc.getElementById('approval-metrics');
+                        const currentMetrics = document.getElementById('approval-metrics');
+                        if (newMetrics && currentMetrics) {
+                            currentMetrics.innerHTML = newMetrics.innerHTML;
+                        }
+
+                        const newReset = doc.getElementById('persetujuan-reset-container');
+                        const currentReset = document.getElementById('persetujuan-reset-container');
+                        if (newReset && currentReset) {
+                            currentReset.innerHTML = newReset.innerHTML;
+                        }
+
+                        // Sync URL in address bar without reload
+                        window.history.replaceState(null, '', url);
+
+                        // Re-apply local filter if user kept typing while AJAX was in-flight
+                        if (searchInput) {
+                            const currentVal = searchInput.value.trim().toLowerCase();
+                            let searchedVal = '';
+                            try {
+                                const urlParams = new URL(url, window.location.origin).searchParams;
+                                searchedVal = (urlParams.get('search') || '').trim().toLowerCase();
+                            } catch (e) {}
+
+                            if (currentVal !== searchedVal) {
+                                filterRowsLocally(currentVal);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        if (err.name !== 'AbortError') {
+                            console.error('Error saat sinkronisasi pencarian:', err);
+                        }
+                    })
+                    .finally(() => {
+                        if (searchSpinner) searchSpinner.classList.add('d-none');
+                        if (searchIcon) searchIcon.classList.remove('d-none');
+                    });
+            }
+
+            if (searchInput) {
+                // As-you-type input handler
+                searchInput.addEventListener('input', function(e) {
+                    const val = e.target.value;
+                    const kw = val.trim().toLowerCase();
+
+                    // Toggle clear button
+                    if (clearBtn) {
+                        clearBtn.style.display = val.length > 0 ? '' : 'none';
+                    }
+
+                    // Instant local filter (0ms delay)
+                    filterRowsLocally(kw);
+
+                    // Debounced server sync (350ms)
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        performServerSearch();
+                    }, 350);
+                });
+
+                // Clear button click
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        searchInput.value = '';
+                        this.style.display = 'none';
+                        searchInput.focus();
+                        filterRowsLocally('');
+                        clearTimeout(debounceTimer);
+                        performServerSearch();
+                    });
+                }
+            }
+
+            // Intercept form submit (Enter key or Cari button click)
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    clearTimeout(debounceTimer);
+                    performServerSearch();
+                });
+
+                // Dynamic change for dropdown selects (Tipe, Bulan, Tahun)
+                filterForm.querySelectorAll('select').forEach(select => {
+                    select.onchange = function(e) {
+                        e.preventDefault();
+                        clearTimeout(debounceTimer);
+                        performServerSearch();
+                    };
+                });
+            }
+
+            // Intercept pagination clicks inside table container
+            const tableContainer = document.getElementById('table-container');
+            if (tableContainer) {
+                tableContainer.addEventListener('click', function(e) {
+                    const pageLink = e.target.closest('.pagination a');
+                    if (pageLink && pageLink.href) {
+                        e.preventDefault();
+                        performServerSearch(pageLink.href);
+                    }
+                });
+            }
+
+            // Intercept status filter tab clicks
+            const tabsContainer = document.getElementById('status-filter-tabs');
+            if (tabsContainer) {
+                tabsContainer.addEventListener('click', function(e) {
+                    const tabLink = e.target.closest('a');
+                    if (tabLink && tabLink.href) {
+                        e.preventDefault();
+                        try {
+                            const urlObj = new URL(tabLink.href, window.location.origin);
+                            const status = urlObj.searchParams.get('status') || '';
+
+                            let statusInput = filterForm.querySelector('input[name="status"]');
+                            if (!statusInput) {
+                                statusInput = document.createElement('input');
+                                statusInput.type = 'hidden';
+                                statusInput.name = 'status';
+                                filterForm.appendChild(statusInput);
+                            }
+                            statusInput.value = status;
+                        } catch (e) {}
+
+                        performServerSearch(tabLink.href);
+                    }
+                });
             }
         });
-    }
-});
-</script>
+    </script>
 @endpush

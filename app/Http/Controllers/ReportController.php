@@ -108,12 +108,39 @@ class ReportController extends Controller
     {
         $year = $request->get('year', date('Y'));
         $month = $request->get('month');
+        $type = $request->get('type');
+        $recipientType = $request->get('recipient_type');
 
         // Rekapitulasi per Kategori Barang
-        $categoriesRekap = Category::with(['products.transactions' => function ($q) use ($year, $month) {
+        $categoriesRekap = Category::with(['products.transactions' => function ($q) use ($year, $month, $type, $recipientType) {
             $q->whereYear('transaction_date', $year);
             if ($month) {
                 $q->whereMonth('transaction_date', $month);
+            }
+            if ($type) {
+                $q->where('type', $type);
+            }
+            if ($recipientType) {
+                if ($recipientType === 'subdit') {
+                    $q->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'subdit')
+                              ->orWhere('note', 'like', '%Subdit%')
+                              ->orWhere('uraian', 'like', '%Subdit%');
+                      });
+                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
+                    $q->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'individu')
+                              ->orWhere('note', 'like', '%Individu%')
+                              ->orWhere('note', 'like', '%Pegawai%')
+                              ->orWhere(function ($fallback) {
+                                  $fallback->whereNull('recipient_type')
+                                           ->where('note', 'not like', '%Subdit%')
+                                           ->where('uraian', 'not like', '%Subdit%');
+                              });
+                      });
+                }
             }
         }])->get()->map(function ($cat) {
             $totalIn = 0;
@@ -149,6 +176,8 @@ class ReportController extends Controller
             'categoriesRekap',
             'year',
             'month',
+            'type',
+            'recipientType',
             'totalAllProducts',
             'totalAllStock',
             'totalAllValue'
@@ -162,12 +191,41 @@ class ReportController extends Controller
     {
         $year = $request->get('year', date('Y'));
         $month = $request->get('month');
+        $type = $request->get('type');
+        $recipientType = $request->get('recipient_type');
 
         $query = StockTransaction::with(['product.category', 'user'])
             ->whereYear('transaction_date', $year);
 
         if ($month) {
             $query->whereMonth('transaction_date', $month);
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($recipientType) {
+            if ($recipientType === 'subdit') {
+                $query->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'subdit')
+                              ->orWhere('note', 'like', '%Subdit%')
+                              ->orWhere('uraian', 'like', '%Subdit%');
+                      });
+            } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
+                $query->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'individu')
+                              ->orWhere('note', 'like', '%Individu%')
+                              ->orWhere('note', 'like', '%Pegawai%')
+                              ->orWhere(function ($fallback) {
+                                  $fallback->whereNull('recipient_type')
+                                           ->where('note', 'not like', '%Subdit%')
+                                           ->where('uraian', 'not like', '%Subdit%');
+                              });
+                      });
+            }
         }
 
         $transactions = $query->orderBy('transaction_date', 'asc')->get();
@@ -190,7 +248,9 @@ class ReportController extends Controller
             'totalValue',
             'periodLabel',
             'year',
-            'month'
+            'month',
+            'type',
+            'recipientType'
         ));
     }
 }

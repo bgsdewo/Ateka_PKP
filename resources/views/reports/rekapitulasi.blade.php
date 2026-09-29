@@ -86,44 +86,101 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <form action="{{ route('reports.rekapitulasi') }}" method="GET" class="d-flex align-items-center gap-2 flex-wrap">
-                            <label class="small fw-bold text-secondary text-uppercase mb-0">Periode Rekap:</label>
-                            
-                            <select name="month" class="form-select form-select-sm" style="width: 150px;">
-                                <option value="">Semua Bulan (Tahunan)</option>
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ sprintf('%02d', $m) }}" {{ $month == sprintf('%02d', $m) ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
-                                    </option>
-                                @endfor
-                            </select>
+                    <div class="card-body p-3">
+                        <form action="{{ route('reports.rekapitulasi') }}" method="GET" class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2 flex-wrap flex-grow-1">
+                                {{-- Periode Bulan --}}
+                                <div>
+                                    <label class="small fw-bold text-secondary text-uppercase mb-1 d-block" style="font-size: 0.72rem;">Bulan:</label>
+                                    <select name="month" class="form-select form-select-sm" style="min-width: 140px;">
+                                        <option value="">Semua Bulan (Tahunan)</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ sprintf('%02d', $m) }}" {{ ($month ?? '') == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
 
-                            <select name="year" class="form-select form-select-sm" style="width: 110px;">
-                                @for ($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
-                                    <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                @endfor
-                            </select>
+                                {{-- Periode Tahun --}}
+                                <div>
+                                    <label class="small fw-bold text-secondary text-uppercase mb-1 d-block" style="font-size: 0.72rem;">Tahun:</label>
+                                    <select name="year" class="form-select form-select-sm" style="min-width: 95px;">
+                                        @for ($y = date('Y') - 1; $y <= date('Y') + 1; $y++)
+                                            <option value="{{ $y }}" {{ ($year ?? date('Y')) == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
 
-                            <button type="submit" class="btn btn-sm btn-primary">
-                                Terapkan
-                            </button>
-                            <a href="{{ route('reports.rekapitulasi') }}" class="btn btn-sm btn-light border">
-                                Reset
-                            </a>
+                                {{-- Filter Barang Masuk & Barang Keluar --}}
+                                <div>
+                                    <label class="small fw-bold text-secondary text-uppercase mb-1 d-block" style="font-size: 0.72rem;">Jenis Mutasi:</label>
+                                    <select name="type" id="filter-type" class="form-select form-select-sm" style="min-width: 165px;">
+                                        <option value="">Semua (Masuk & Keluar)</option>
+                                        <option value="masuk" {{ ($type ?? '') == 'masuk' ? 'selected' : '' }}>Hanya Barang Masuk</option>
+                                        <option value="keluar" {{ ($type ?? '') == 'keluar' ? 'selected' : '' }}>Hanya Barang Keluar</option>
+                                    </select>
+                                </div>
+
+                                {{-- Filter Pegawai & Subdit --}}
+                                <div>
+                                    <label class="small fw-bold text-secondary text-uppercase mb-1 d-block" style="font-size: 0.72rem;">Penerima / Pemohon:</label>
+                                    <select name="recipient_type" id="filter-recipient-type" class="form-select form-select-sm" style="min-width: 175px;">
+                                        <option value="">Semua (Pegawai & Subdit)</option>
+                                        <option value="pegawai" {{ in_array(($recipientType ?? ''), ['pegawai', 'individu']) ? 'selected' : '' }}>👤 Pegawai (Individu)</option>
+                                        <option value="subdit" {{ ($recipientType ?? '') == 'subdit' ? 'selected' : '' }}>🏢 Subdit (Kolektif)</option>
+                                    </select>
+                                </div>
+
+                                {{-- Tombol Terapkan & Reset --}}
+                                <div class="d-flex align-items-end gap-1 mt-auto">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-semibold">
+                                        Terapkan
+                                    </button>
+                                    <a href="{{ route('reports.rekapitulasi') }}" class="btn btn-sm btn-light border" title="Reset semua filter">
+                                        Reset
+                                    </a>
+                                </div>
+                            </div>
+
+                            {{-- Tombol Cetak Berita Acara --}}
+                            <div class="d-flex align-items-end mt-auto pt-2 pt-lg-0">
+                                <a href="{{ route('reports.berita-acara', array_filter(['year' => $year, 'month' => $month, 'type' => $type, 'recipient_type' => $recipientType])) }}" target="_blank"
+                                    class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1 shadow-sm">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                        <rect x="6" y="14" width="12" height="8"></rect>
+                                    </svg>
+                                    Cetak Berita Acara Rekapitulasi Resmi
+                                </a>
+                            </div>
                         </form>
 
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <a href="{{ route('reports.berita-acara', ['year' => $year, 'month' => $month]) }}" target="_blank"
-                                class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1 shadow-sm">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                    <rect x="6" y="14" width="12" height="8"></rect>
-                                </svg>
-                                Cetak Berita Acara Rekapitulasi Resmi
-                            </a>
-                        </div>
+                        {{-- Indikator Filter Aktif --}}
+                        @if (!empty($type) || !empty($recipientType) || !empty($month))
+                            <div class="mt-2.5 pt-2 border-top d-flex align-items-center gap-1.5 flex-wrap">
+                                <span class="small text-muted fw-bold" style="font-size: 0.75rem;">Filter Aktif:</span>
+                                @if (!empty($month))
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 0.72rem;">
+                                        Bulan: {{ \Carbon\Carbon::createFromDate(2026, (int)$month, 1)->translatedFormat('F') }}
+                                    </span>
+                                @endif
+                                @if (!empty($type))
+                                    <span class="badge {{ $type == 'masuk' ? 'bg-success-subtle text-success border-success-subtle' : 'bg-danger-subtle text-danger border-danger-subtle' }} border rounded-pill px-2.5 py-1" style="font-size: 0.72rem;">
+                                        Jenis: {{ $type == 'masuk' ? 'Hanya Barang Masuk' : 'Hanya Barang Keluar' }}
+                                    </span>
+                                @endif
+                                @if (!empty($recipientType))
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1" style="font-size: 0.72rem;">
+                                        Penerima: {{ $recipientType == 'subdit' ? '🏢 Subdit (Kolektif)' : '👤 Pegawai (Individu)' }}
+                                    </span>
+                                @endif
+                                <a href="{{ route('reports.rekapitulasi', ['year' => $year]) }}" class="text-danger small fw-semibold text-decoration-none ms-1" style="font-size: 0.72rem;">
+                                    Hapus Semua Filter
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -217,3 +274,30 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.getElementById('filter-type');
+            const recipientSelect = document.getElementById('filter-recipient-type');
+
+            function syncRecipientState() {
+                if (typeSelect && recipientSelect) {
+                    if (typeSelect.value === 'masuk') {
+                        recipientSelect.value = '';
+                        recipientSelect.disabled = true;
+                        recipientSelect.title = 'Filter penerima hanya berlaku untuk barang keluar';
+                    } else {
+                        recipientSelect.disabled = false;
+                        recipientSelect.title = '';
+                    }
+                }
+            }
+
+            if (typeSelect) {
+                typeSelect.addEventListener('change', syncRecipientState);
+                syncRecipientState();
+            }
+        });
+    </script>
+@endpush

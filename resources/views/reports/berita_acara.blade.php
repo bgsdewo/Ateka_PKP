@@ -86,6 +86,16 @@
         <div class="d-flex align-items-center gap-2">
             <span class="fw-bold">Dokumen Resmi Berita Acara Rekapitulasi Mutasi ATK</span>
             <span class="badge bg-warning text-dark">{{ $periodLabel }}</span>
+            @if (!empty($type))
+                <span class="badge {{ $type == 'masuk' ? 'bg-success' : 'bg-danger' }}">
+                    {{ $type == 'masuk' ? 'Barang Masuk' : 'Barang Keluar' }}
+                </span>
+            @endif
+            @if (!empty($recipientType))
+                <span class="badge bg-info text-dark">
+                    {{ $recipientType == 'subdit' ? 'Penerima: Subdit' : 'Penerima: Pegawai' }}
+                </span>
+            @endif
         </div>
         <div class="d-flex gap-2">
             <button onclick="window.print()" class="btn btn-warning btn-sm fw-bold">
@@ -126,6 +136,17 @@
             </h5>
             <span style="font-size: 12px;">Nomor: <strong>BA.{{ date('Ymd') }}/PKP.1/TU-ATK/{{ $year }}</strong></span><br>
             <span style="font-size: 12px;">Periode Rekapitulasi: <strong>{{ $periodLabel }}</strong></span>
+            @if (!empty($type) || !empty($recipientType))
+                <br><span style="font-size: 11px;" class="text-muted">
+                    Kriteria Filter: 
+                    @if (!empty($type))
+                        <strong>{{ $type == 'masuk' ? 'Hanya Barang Masuk' : 'Hanya Barang Keluar' }}</strong>
+                    @endif
+                    @if (!empty($recipientType))
+                        ({{ $recipientType == 'subdit' ? 'Penerima: Subdit' : 'Penerima: Pegawai' }})
+                    @endif
+                </span>
+            @endif
         </div>
 
         <p style="font-size: 12px; line-height: 1.6;" class="mb-2">
@@ -188,7 +209,13 @@
                             {{ ucfirst($t->type) }}
                         </td>
                         <td class="text-center">{{ number_format($t->quantity) }} Pcs</td>
-                        <td>{{ $t->uraian ?? ($t->user->name ?? '-') }}</td>
+                        <td>
+                            @if ($t->type === 'masuk')
+                                Sub Bagian TU
+                            @else
+                                {{ $t->uraian ?? ($t->user->name ?? '-') }}
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
