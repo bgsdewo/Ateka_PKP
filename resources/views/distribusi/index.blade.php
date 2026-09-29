@@ -77,9 +77,9 @@
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase">Siap Didistribusikan</span>
-                            <span class="badge bg-warning text-dark rounded-pill">Pending Pickup</span>
+                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
+                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Siap Didistribusikan</span>
+                            <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Pending Pickup</span>
                         </div>
                         <h2 class="fw-bold text-warning mb-0">{{ number_format($totalReady) }}</h2>
                         <small class="text-muted">Telah disetujui Kasubag TU</small>
@@ -90,9 +90,9 @@
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase">Permintaan Subdit</span>
-                            <span class="badge bg-info text-white rounded-pill">Kolektif</span>
+                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
+                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Permintaan Subdit</span>
+                            <span class="badge bg-info text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Kolektif</span>
                         </div>
                         <h2 class="fw-bold text-info mb-0">{{ number_format($totalSubditReady) }}</h2>
                         <small class="text-muted">Paket kolektif unit kerja</small>
@@ -103,9 +103,9 @@
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase">Permintaan Pegawai</span>
-                            <span class="badge bg-primary text-white rounded-pill">Individu</span>
+                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
+                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Permintaan Pegawai</span>
+                            <span class="badge bg-primary text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Individu</span>
                         </div>
                         <h2 class="fw-bold text-primary mb-0">{{ number_format($totalIndividuReady) }}</h2>
                         <small class="text-muted">Kebutuhan staf perorangan</small>
@@ -116,9 +116,9 @@
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase">Selesai Diserahkan</span>
-                            <span class="badge bg-success text-white rounded-pill">Distributed</span>
+                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
+                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Selesai Diserahkan</span>
+                            <span class="badge bg-success text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Distributed</span>
                         </div>
                         <h2 class="fw-bold text-success mb-0">{{ number_format($totalDistributed) }}</h2>
                         <small class="text-muted">Sudah diserahterimakan</small>
