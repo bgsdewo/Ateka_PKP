@@ -119,6 +119,7 @@ class ApprovalController extends Controller
                             'stock_after'      => $product->stock, // Sisa stok terbaru
                             'uraian'           => $item->user->name ?? 'Pegawai', // <-- Nama pemohon otomatis masuk ke Uraian/Penerima
                             'kondisi'          => 'Baik',
+                            'harga_perolehan'  => $product->purchase_price ?? 0,
                             'transaction_date' => now(),
                             'note'             => 'Pengeluaran Permintaan ' . ucfirst($item->type) . ' oleh ' . ($item->user->name ?? 'Pegawai') . ' (' . $item->request_code . ')'
                         ]);

@@ -43,6 +43,13 @@ class InventoryController extends Controller
 
     public function storeTransaction(Request $request)
     {
+        if (!$request->has('tanggal_faktur') && $request->has('transaction_date')) {
+            $request->merge(['tanggal_faktur' => $request->transaction_date]);
+        }
+        if (!$request->has('keterangan') && $request->has('description')) {
+            $request->merge(['keterangan' => $request->description]);
+        }
+
         // 1. Validasi menyesuaikan nama input dari form Blade Anda
         $request->validate([
             'product_id' => ['required', 'exists:products,id'],
@@ -83,6 +90,10 @@ class InventoryController extends Controller
                 $stockAfter = $currentStock - $quantity;
             }
 
+            $hargaPerolehan = ($request->filled('harga_perolehan') && (float) $request->harga_perolehan > 0)
+                ? (float) $request->harga_perolehan
+                : (float) ($product->purchase_price ?? 0);
+
             StockTransaction::create([
                 'product_id' => $product->id,
                 'user_id' => Auth::id(),
@@ -95,7 +106,7 @@ class InventoryController extends Controller
                 'no_faktur' => $request->no_faktur,
                 'uraian' => $request->uraian,
                 'kondisi' => $request->kondisi,
-                'harga_perolehan' => $request->harga_perolehan ?? 0,
+                'harga_perolehan' => $hargaPerolehan,
                 'note' => $request->keterangan,
             ]);
 

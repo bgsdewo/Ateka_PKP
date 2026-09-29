@@ -734,9 +734,9 @@
                                 <tbody>
                                     @foreach ($transactions as $transaction)
                                         @php
-                                            $harga = $transaction->harga_perolehan ?? 0;
-                                            $jumlah = $transaction->quantity ?? 0;
-                                            $stockSisa = $transaction->stock_after ?? 0;
+                                            $harga = $transaction->harga_satuan ?? (($transaction->harga_perolehan > 0) ? (float) $transaction->harga_perolehan : (float) ($transaction->product->purchase_price ?? 0));
+                                            $jumlah = (int) ($transaction->quantity ?? 0);
+                                            $stockSisa = (int) ($transaction->stock_after ?? 0);
                                             // Stok Awal:
                                             // Jika transaksi keluar, stok awal sebelum pengurangan adalah stock_after + quantity
                                             // Jika transaksi masuk, stok awal saat pencatatan masuk
@@ -747,7 +747,8 @@
                                             }
                                             // Stok Dipinjam = barang keluar pada transaksi ini (0 jika masuk)
                                             $stockDipinjam = $transaction->type === 'keluar' ? $jumlah : 0;
-                                            $nilaiSaldo = $jumlah * $harga;
+                                            // Nilai Saldo mengikuti persediaan sisa stok barang yang masih ada
+                                            $nilaiSaldo = $stockSisa * $harga;
                                             $formattedHarga = 'Rp ' . number_format($harga, 0, ',', '.');
                                             $formattedTotal = 'Rp ' . number_format($nilaiSaldo, 0, ',', '.');
                                         @endphp

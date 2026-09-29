@@ -46,6 +46,19 @@ class StockTransaction extends Model
         return $this->is_subdit ? 'Subdit (Kolektif)' : 'Pegawai (Individu)';
     }
 
+    public function getHargaSatuanAttribute(): float
+    {
+        if ($this->harga_perolehan > 0) {
+            return (float) $this->harga_perolehan;
+        }
+        return (float) ($this->product->purchase_price ?? 0);
+    }
+
+    public function getNilaiSaldoAttribute(): float
+    {
+        return (int) $this->stock_after * $this->harga_satuan;
+    }
+
     protected $casts = [
         'transaction_date' => 'date',
         'harga_perolehan' => 'decimal:2', // Opsional, agar angka desimal formatnya rapi
