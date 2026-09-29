@@ -17,11 +17,19 @@ class ReportController extends Controller
     {
         $type = $request->type;
         $recipientType = $request->recipient_type; // 'subdit' or 'individu'
+        $month = $request->month;
+        $year = $request->year;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         $categoryId = $request->category_id;
 
         $query = StockTransaction::with(['product.category', 'user'])
+            ->when($year, function ($q) use ($year) {
+                $q->whereYear('transaction_date', $year);
+            })
+            ->when($month, function ($q) use ($month) {
+                $q->whereMonth('transaction_date', $month);
+            })
             ->when($type, function ($q) use ($type) {
                 $q->where('type', $type);
             })
@@ -33,7 +41,7 @@ class ReportController extends Controller
                               ->orWhere('note', 'like', '%Subdit%')
                               ->orWhere('uraian', 'like', '%Subdit%');
                       });
-                } elseif ($recipientType === 'individu') {
+                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
                     $q->where('type', 'keluar')
                       ->where(function ($sub) {
                           $sub->where('recipient_type', 'individu')
@@ -94,6 +102,8 @@ class ReportController extends Controller
             'totalIndividuOut',
             'type',
             'recipientType',
+            'month',
+            'year',
             'startDate',
             'endDate',
             'categoryId',

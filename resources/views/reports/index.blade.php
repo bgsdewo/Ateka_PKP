@@ -116,8 +116,7 @@
         }
 
         /* Form Controls */
-        .form-control-modern,
-        .form-select-modern {
+        .form-control-modern {
             border: 1px solid #cbd5e1;
             border-radius: 10px;
             padding: 0.65rem 0.9rem;
@@ -126,6 +125,27 @@
             color: #1e293b;
             transition: all 0.2s ease;
             width: 100%;
+        }
+
+        .form-select-modern {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 0.65rem 2.4rem 0.65rem 0.9rem !important;
+            font-size: 0.875rem;
+            background-color: #f8fafc;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.85rem center !important;
+            background-size: 14px 10px !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            color: #1e293b;
+            transition: all 0.2s ease;
+            width: 100%;
+            cursor: pointer;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .form-control-modern:focus,
@@ -140,23 +160,27 @@
         .preset-chip {
             display: inline-flex;
             align-items: center;
-            font-size: 0.8rem;
+            justify-content: center;
+            font-size: 0.815rem;
             font-weight: 500;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
             cursor: pointer;
-            border: 1px solid #e2e8f0;
-            background-color: #f8fafc;
-            color: #475569;
-            transition: all 0.15s ease;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #334155;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             user-select: none;
             text-decoration: none;
+            white-space: nowrap;
+            line-height: 1.2;
         }
 
         .preset-chip:hover {
             background-color: #eef2ff;
             color: #3a57e8;
-            border-color: #c7d2fe;
+            border-color: #3a57e8;
+            box-shadow: 0 2px 6px rgba(58, 87, 232, 0.12);
         }
 
         /* Modern Data Table */
@@ -269,130 +293,11 @@
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
-        {{-- Card Filter Laporan (Responsive & User-Friendly) --}}
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card report-card mb-4" data-aos="fade-up" data-aos-delay="200">
-                    <div
-                        class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="kpi-icon-wrapper bg-primary-subtle text-primary" style="width: 38px; height: 38px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                                </svg>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-0 fw-bold">Cari & Saring Laporan</h5>
-                                <small class="text-secondary">Pilih jenis transaksi atau rentang tanggal untuk menemukan
-                                    data laporan</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-body p-4">
-                        <form id="filterReportForm" action="{{ route('reports.index') }}" method="GET">
-                            <div class="row g-3">
-                                {{-- Kolom 1: Jenis Transaksi --}}
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Jenis Transaksi
-                                    </label>
-                                    <select name="type" class="form-select form-select-modern">
-                                        <option value="">Semua (Masuk & Keluar)</option>
-                                        <option value="masuk" {{ request('type') == 'masuk' ? 'selected' : '' }}>
-                                            Hanya Barang Masuk
-                                        </option>
-                                        <option value="keluar" {{ request('type') == 'keluar' ? 'selected' : '' }}>
-                                            Hanya Barang Keluar
-                                        </option>
-                                    </select>
-                                </div>
-
-                                {{-- Kolom 2: Filter Pemohon / Penerima (Subdit vs Pegawai) --}}
-                                <div class="col-12 col-md-3">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Kategori Pemohon
-                                    </label>
-                                    <select name="recipient_type" class="form-select form-select-modern">
-                                        <option value="">Semua (Subdit & Individu)</option>
-                                        <option value="subdit" {{ request('recipient_type') == 'subdit' ? 'selected' : '' }}>
-                                            🏢 Subdit (Kolektif)
-                                        </option>
-                                        <option value="individu" {{ request('recipient_type') == 'individu' ? 'selected' : '' }}>
-                                            👤 Pegawai (Individu)
-                                        </option>
-                                    </select>
-                                </div>
-
-                                {{-- Kolom 3: Dari Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-3">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Dari Tanggal
-                                    </label>
-                                    <input type="date" id="start_date" name="start_date"
-                                        class="form-control form-control-modern" value="{{ request('start_date') }}">
-                                </div>
-
-                                {{-- Kolom 4: Sampai Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-3">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Sampai Tanggal
-                                    </label>
-                                    <input type="date" id="end_date" name="end_date"
-                                        class="form-control form-control-modern" value="{{ request('end_date') }}">
-                                </div>
-
-                                {{-- Baris 2: Tombol Cepat di Kiri & Tombol Aksi di Kanan --}}
-                                <div
-                                    class="col-12 mt-3 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-3">
-                                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                        <span class="text-secondary small fw-bold me-1">Pilihan Cepat:</span>
-                                        <button type="button" class="preset-chip date-preset-btn" data-preset="today">Hari
-                                            Ini</button>
-                                        <button type="button" class="preset-chip date-preset-btn" data-preset="month">Bulan
-                                            Ini</button>
-                                        <button type="button" class="preset-chip date-preset-btn" data-preset="year">Tahun
-                                            Ini</button>
-                                        <button type="button" class="preset-chip date-preset-btn" data-preset="all">Semua
-                                            Waktu</button>
-                                    </div>
-
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <a href="{{ route('reports.index') }}"
-                                            class="btn btn-light border px-3 d-inline-flex align-items-center gap-1.5"
-                                            title="Kembalikan ke semua data">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2">
-                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                                <path d="M3 3v5h5"></path>
-                                            </svg>
-                                            Reset Filter
-                                        </a>
-                                        <button type="submit"
-                                            class="btn btn-primary px-4 d-inline-flex align-items-center gap-1.5 shadow-sm">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5">
-                                                <circle cx="11" cy="11" r="8"></circle>
-                                                <line x1="21" y1="21" x2="16.65" y2="16.65">
-                                                </line>
-                                            </svg>
-                                            Tampilkan Data
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {{-- 3 KARTU RINGKASAN: Total Transaksi, Total Masuk (Pcs), Total Keluar (Pcs) --}}
         <div class="row g-3 mb-4">
             {{-- Card 1: Total Transaksi --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="250">
+                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="150">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -420,7 +325,7 @@
 
             {{-- Card 2: Total Barang Masuk (Pcs) --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="300">
+                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="200">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -446,7 +351,7 @@
 
             {{-- Card 3: Total Barang Keluar (Pcs) --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="350">
+                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="250">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -466,6 +371,201 @@
                                 Total barang yang dikeluarkan
                             </span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Card Filter Laporan (Responsive & User-Friendly) --}}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card report-card mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div
+                        class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="kpi-icon-wrapper bg-primary-subtle text-primary" style="width: 38px; height: 38px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                </svg>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-0 fw-bold">Filter & Saring Laporan Persediaan</h5>
+                                <small class="text-secondary">Saring data berdasarkan periode bulan, tahun, jenis mutasi, atau kategori pemohon</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form id="filterReportForm" action="{{ route('reports.index') }}" method="GET">
+                            <div class="row g-3">
+                                {{-- Dropdown 1: Periode Bulan --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Periode Bulan
+                                    </label>
+                                    <select name="month" class="form-select form-select-modern">
+                                        <option value="">Semua Bulan (Tahunan)</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ sprintf('%02d', $m) }}" {{ ($month ?? '') == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Dropdown 2: Periode Tahun --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Periode Tahun
+                                    </label>
+                                    <select name="year" class="form-select form-select-modern">
+                                        <option value="">Semua Tahun</option>
+                                        @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                            <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
+                                                {{ $y }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Dropdown 3: Jenis Mutasi --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Jenis Mutasi
+                                    </label>
+                                    <select name="type" id="filter-type" class="form-select form-select-modern">
+                                        <option value="">Semua (Masuk & Keluar)</option>
+                                        <option value="masuk" {{ ($type ?? '') == 'masuk' ? 'selected' : '' }}>
+                                            Hanya Barang Masuk
+                                        </option>
+                                        <option value="keluar" {{ ($type ?? '') == 'keluar' ? 'selected' : '' }}>
+                                            Hanya Barang Keluar
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Dropdown 4: Kategori Pemohon / Penerima --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Kategori Pemohon
+                                    </label>
+                                    <select name="recipient_type" id="filter-recipient-type" class="form-select form-select-modern">
+                                        <option value="">Semua (Pegawai & Subdit)</option>
+                                        <option value="pegawai" {{ in_array(($recipientType ?? ''), ['pegawai', 'individu']) ? 'selected' : '' }}>
+                                            👤 Pegawai (Individu)
+                                        </option>
+                                        <option value="subdit" {{ ($recipientType ?? '') == 'subdit' ? 'selected' : '' }}>
+                                            🏢 Subdit (Kolektif)
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Collapsible Rentang Tanggal Spesifik (Opsional) --}}
+                                <div class="col-12 mt-2">
+                                    <div class="collapse {{ (request('start_date') || request('end_date')) ? 'show' : '' }}" id="customDateCollapse">
+                                        <div class="p-3 bg-light rounded-3 border mb-2">
+                                            <div class="row g-3 align-items-end">
+                                                {{-- Input Dari Tanggal --}}
+                                                <div class="col-12 col-sm-6 col-md-3">
+                                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                                        Dari Tanggal Spesifik
+                                                    </label>
+                                                    <input type="date" id="start_date" name="start_date"
+                                                        class="form-control form-control-modern bg-white" value="{{ request('start_date') }}">
+                                                </div>
+
+                                                {{-- Input Sampai Tanggal --}}
+                                                <div class="col-12 col-sm-6 col-md-3">
+                                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                                        Sampai Tanggal Spesifik
+                                                    </label>
+                                                    <input type="date" id="end_date" name="end_date"
+                                                        class="form-control form-control-modern bg-white" value="{{ request('end_date') }}">
+                                                </div>
+
+                                                {{-- Pilihan Rentang Cepat --}}
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                                        Pilihan Cepat
+                                                    </label>
+                                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                        <button type="button" class="preset-chip date-preset-btn" data-preset="today">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <polyline points="12 6 12 12 14 14"></polyline>
+                                                            </svg>
+                                                            Hari Ini
+                                                        </button>
+                                                        <button type="button" class="preset-chip date-preset-btn" data-preset="month">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                            </svg>
+                                                            Bulan Ini
+                                                        </button>
+                                                        <button type="button" class="preset-chip date-preset-btn" data-preset="year">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                            </svg>
+                                                            Tahun Ini
+                                                        </button>
+                                                        <button type="button" class="preset-chip date-preset-btn" data-preset="all">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                                                <path d="M3 3v5h5"></path>
+                                                            </svg>
+                                                            Semua Waktu
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Baris Aksi & Toggle Tanggal --}}
+                                <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <a class="btn btn-sm btn-link text-decoration-none text-secondary p-0 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="collapse" href="#customDateCollapse" role="button" aria-expanded="{{ (request('start_date') || request('end_date')) ? 'true' : 'false' }}">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            </svg>
+                                            <span>{{ (request('start_date') || request('end_date')) ? 'Tutup Filter Tanggal Spesifik' : '+ Rentang Tanggal Spesifik (Opsional)' }}</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <a href="{{ route('reports.index') }}"
+                                            class="btn btn-light border px-3 d-inline-flex align-items-center gap-1.5"
+                                            title="Kembalikan ke semua data">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                                <path d="M3 3v5h5"></path>
+                                            </svg>
+                                            Reset Filter
+                                        </a>
+                                        <button type="submit"
+                                            class="btn btn-primary px-4 d-inline-flex align-items-center gap-1.5 shadow-sm fw-semibold">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65">
+                                                </line>
+                                            </svg>
+                                            Terapkan Filter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -550,7 +650,7 @@
 
                     <div class="card-body p-4">
                         {{-- Notifikasi Filter Aktif --}}
-                        @if (request('type') || request('recipient_type') || request('start_date') || request('end_date'))
+                        @if (request('type') || request('recipient_type') || request('month') || request('year') || request('start_date') || request('end_date'))
                             <div
                                 class="p-2.5 px-3 rounded-3 bg-light border d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
                                 <div class="d-flex align-items-center flex-wrap gap-2">
@@ -562,24 +662,38 @@
                                         Sedang Menyaring:
                                     </span>
 
-                                    @if (request('type'))
+                                    @if (request('month'))
                                         <span
                                             class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">
-                                            Jenis: {{ request('type') == 'masuk' ? 'Barang Masuk' : 'Barang Keluar' }}
+                                            Bulan: {{ \Carbon\Carbon::createFromDate(2026, (int)request('month'), 1)->translatedFormat('F') }}
+                                        </span>
+                                    @endif
+
+                                    @if (request('year'))
+                                        <span
+                                            class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">
+                                            Tahun: {{ request('year') }}
+                                        </span>
+                                    @endif
+
+                                    @if (request('type'))
+                                        <span
+                                            class="badge {{ request('type') == 'masuk' ? 'bg-success-subtle text-success border-success-subtle' : 'bg-danger-subtle text-danger border-danger-subtle' }} border rounded-pill px-2.5 py-1">
+                                            Jenis: {{ request('type') == 'masuk' ? 'Hanya Barang Masuk' : 'Hanya Barang Keluar' }}
                                         </span>
                                     @endif
 
                                     @if (request('recipient_type'))
                                         <span
-                                            class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1">
-                                            Pemohon: {{ request('recipient_type') == 'subdit' ? 'Subdit (Kolektif)' : 'Pegawai (Individu)' }}
+                                            class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1">
+                                            Pemohon: {{ in_array(request('recipient_type'), ['pegawai', 'individu']) ? '👤 Pegawai (Individu)' : '🏢 Subdit (Kolektif)' }}
                                         </span>
                                     @endif
 
                                     @if (request('start_date') || request('end_date'))
                                         <span
                                             class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1">
-                                            Periode:
+                                            Rentang:
                                             {{ request('start_date') ? \Carbon\Carbon::parse(request('start_date'))->format('d-m-Y') : 'Awal' }}
                                             s/d
                                             {{ request('end_date') ? \Carbon\Carbon::parse(request('end_date'))->format('d-m-Y') : 'Akhir' }}
@@ -594,13 +708,12 @@
                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                         <line x1="6" y1="6" x2="18" y2="18"></line>
                                     </svg>
-                                    Tampilkan Semua Data
+                                    Hapus Semua Filter
                                 </a>
                             </div>
                         @endif
 
-                        <div class="table-responsive">
-                            <table id="laporanTable" class="table custom-report-table word-wrap">
+                        <table id="laporanTable" class="table custom-report-table word-wrap">
                                 <thead>
                                     <tr class="text-center">
                                         <th width="3%">No</th>
@@ -624,8 +737,14 @@
                                             $harga = $transaction->harga_perolehan ?? 0;
                                             $jumlah = $transaction->quantity ?? 0;
                                             $stockSisa = $transaction->stock_after ?? 0;
-                                            // Stok Awal = barang masuk pada transaksi ini (0 jika keluar)
-                                            $stockAwal = $transaction->type === 'masuk' ? $jumlah : 0;
+                                            // Stok Awal:
+                                            // Jika transaksi keluar, stok awal sebelum pengurangan adalah stock_after + quantity
+                                            // Jika transaksi masuk, stok awal saat pencatatan masuk
+                                            if ($transaction->type === 'keluar') {
+                                                $stockAwal = $stockSisa + $jumlah;
+                                            } else {
+                                                $stockAwal = ($stockSisa > $jumlah) ? ($stockSisa - $jumlah) : $jumlah;
+                                            }
                                             // Stok Dipinjam = barang keluar pada transaksi ini (0 jika masuk)
                                             $stockDipinjam = $transaction->type === 'keluar' ? $jumlah : 0;
                                             $nilaiSaldo = $jumlah * $harga;
@@ -690,11 +809,14 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            {{-- 7. Jumlah Stok Awal (Barang Masuk) --}}
+                                            {{-- 7. Jumlah Stok Awal --}}
                                             <td class="text-center text-nowrap">
                                                 @if ($stockAwal > 0)
                                                     <span
-                                                        class="fw-semibold text-success">{{ number_format($stockAwal) }}</span>
+                                                        class="fw-semibold {{ $transaction->type === 'masuk' ? 'text-success' : 'text-dark' }}">{{ number_format($stockAwal) }}</span>
+                                                    <span class="text-muted small ms-1">Pcs</span>
+                                                @elseif ($stockAwal === 0)
+                                                    <span class="fw-semibold text-muted">0</span>
                                                     <span class="text-muted small ms-1">Pcs</span>
                                                 @else
                                                     <span class="text-muted">-</span>
@@ -743,7 +865,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
 
                         {{-- Tanda Tangan Khusus untuk Print / Tampilan Bawah (Arsiparis & Kasubag TU) --}}
                         <div class="signature-section mt-5 pt-3">
@@ -787,7 +908,15 @@
             if (window.jQuery && $.fn.DataTable) {
                 var startDateVal = '{{ request('start_date') }}';
                 var endDateVal = '{{ request('end_date') }}';
+                var monthVal = '{{ request('month') }}';
+                var yearVal = '{{ request('year') }}';
                 var typeVal = '{{ request('type') }}';
+
+                var monthNames = {
+                    '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+                    '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+                    '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+                };
 
                 var periodeStr = 'Semua Periode';
                 if (startDateVal && endDateVal) {
@@ -796,6 +925,18 @@
                     periodeStr = 'Mulai ' + startDateVal;
                 } else if (endDateVal) {
                     periodeStr = 'Sampai ' + endDateVal;
+                } else if (monthVal && yearVal) {
+                    periodeStr = (monthNames[monthVal] || ('Bulan ' + monthVal)) + ' ' + yearVal;
+                } else if (monthVal) {
+                    periodeStr = 'Bulan ' + (monthNames[monthVal] || monthVal);
+                } else if (yearVal) {
+                    periodeStr = 'Tahun ' + yearVal;
+                }
+
+                if (typeVal === 'masuk') {
+                    periodeStr += ' (Hanya Barang Masuk)';
+                } else if (typeVal === 'keluar') {
+                    periodeStr += ' (Hanya Barang Keluar)';
                 }
 
                 var tglHariIni = new Date().toLocaleDateString('id-ID', {
@@ -811,7 +952,7 @@
                         [25, 50, 100, -1],
                         [25, 50, 100, 'Semua']
                     ],
-                    dom: '<"row align-items-center g-2 mb-3"<"col-sm-6"l><"col-sm-6 text-sm-end"f>>rt<"row align-items-center g-2 mt-3"<"col-sm-6 text-muted small"i><"col-sm-6 text-sm-end"p>>',
+                    dom: '<"row align-items-center g-2 mb-3"<"col-sm-6"l><"col-sm-6 text-sm-end"f>><"table-responsive my-1"rt><"row align-items-center g-2 mt-3"<"col-sm-6 text-muted small"i><"col-sm-6 text-sm-end"p>>',
                     buttons: [{
                             extend: 'excelHtml5',
                             title: 'LAPORAN MUTASI PERSEDIAAN BARANG (ATK)',
@@ -1123,6 +1264,28 @@
                     form.submit();
                 });
             });
+
+            // Sinkronisasi status dropdown pemohon jika jenis mutasi 'masuk'
+            const typeSelect = document.getElementById('filter-type');
+            const recipientSelect = document.getElementById('filter-recipient-type');
+
+            function syncRecipientState() {
+                if (typeSelect && recipientSelect) {
+                    if (typeSelect.value === 'masuk') {
+                        recipientSelect.value = '';
+                        recipientSelect.disabled = true;
+                        recipientSelect.title = 'Filter pemohon hanya berlaku untuk barang keluar';
+                    } else {
+                        recipientSelect.disabled = false;
+                        recipientSelect.title = '';
+                    }
+                }
+            }
+
+            if (typeSelect) {
+                typeSelect.addEventListener('change', syncRecipientState);
+                syncRecipientState();
+            }
         });
     </script>
 @endpush
