@@ -70,6 +70,98 @@ class UserRequestFeaturesTest extends TestCase
         $response->assertSee('name="search"', false);
     }
 
+    public function test_persetujuan_page_has_live_search_elements_and_scripts()
+    {
+        $response = $this->actingAs($this->buUtami)
+            ->get(route('persetujuan.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('id="persetujuan-search"', false);
+        $response->assertSee('id="btn-clear-search"', false);
+        $response->assertSee('id="table-container"', false);
+        $response->assertSee('id="persetujuan-table-body"', false);
+        $response->assertSee('filterRowsLocally', false);
+        $response->assertSee('performServerSearch', false);
+    }
+
+    public function test_persetujuan_search_by_applicant_name_and_code()
+    {
+        $bagus = User::firstOrCreate(
+            ['email' => 'bagus_test@gmail.com'],
+            ['name' => 'Bagus Sadewo', 'position' => 'Staff TU', 'password' => bcrypt('password123'), 'role' => 'pegawai']
+        );
+
+        $reqItem = RequestItem::create([
+            'request_code' => 'REQ-TEST-LIVE-01',
+            'user_id' => $bagus->id,
+            'type' => 'individu',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        // Search with initial "B"
+        $responseB = $this->actingAs($this->buUtami)
+            ->get(route('persetujuan.index', ['search' => 'B']));
+
+        $responseB->assertStatus(200);
+        $responseB->assertSee('Bagus Sadewo');
+        $responseB->assertSee('REQ-TEST-LIVE-01');
+
+        // Search with request code
+        $responseCode = $this->actingAs($this->buUtami)
+            ->get(route('persetujuan.index', ['search' => 'LIVE-01']));
+
+        $responseCode->assertStatus(200);
+        $responseCode->assertSee('REQ-TEST-LIVE-01');
+        $responseCode->assertSee('Bagus Sadewo');
+    }
+
+    public function test_distribusi_page_has_live_search_elements_and_scripts()
+    {
+        $response = $this->actingAs($this->buFairus)
+            ->get(route('distribusi.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('id="distribusi-search"', false);
+        $response->assertSee('id="btn-clear-search"', false);
+        $response->assertSee('id="table-container"', false);
+        $response->assertSee('id="distribusi-table-body"', false);
+        $response->assertSee('filterRowsLocally', false);
+        $response->assertSee('performServerSearch', false);
+    }
+
+    public function test_distribusi_search_by_applicant_name_and_code()
+    {
+        $bagus = User::firstOrCreate(
+            ['email' => 'bagus_dist_test@gmail.com'],
+            ['name' => 'Bagus Sadewo', 'position' => 'Staff TU', 'password' => bcrypt('password123'), 'role' => 'pegawai']
+        );
+
+        $reqItem = RequestItem::create([
+            'request_code' => 'REQ-DIST-LIVE-01',
+            'user_id' => $bagus->id,
+            'type' => 'individu',
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+
+        // Search with initial "B"
+        $responseB = $this->actingAs($this->buFairus)
+            ->get(route('distribusi.index', ['search' => 'B']));
+
+        $responseB->assertStatus(200);
+        $responseB->assertSee('Bagus Sadewo');
+        $responseB->assertSee('REQ-DIST-LIVE-01');
+
+        // Search with request code
+        $responseCode = $this->actingAs($this->buFairus)
+            ->get(route('distribusi.index', ['search' => 'DIST-LIVE-01']));
+
+        $responseCode->assertStatus(200);
+        $responseCode->assertSee('REQ-DIST-LIVE-01');
+        $responseCode->assertSee('Bagus Sadewo');
+    }
+
     public function test_katalog_displays_stok_instead_of_unit()
     {
         $response = $this->actingAs($this->subditUser)
@@ -79,6 +171,28 @@ class UserRequestFeaturesTest extends TestCase
         $response->assertSee('Stok');
         // Ensure "Sisa Stok Fisik" row has "Stok"
         $response->assertSee('Sisa Stok Fisik:', false);
+    }
+
+    public function test_katalog_page_has_live_search_elements_and_scripts()
+    {
+        $response = $this->actingAs($this->subditUser)
+            ->get(route('katalog-atk'));
+
+        $response->assertStatus(200);
+        $response->assertSee('id="katalog-search"', false);
+        $response->assertSee('id="btn-clear-search"', false);
+        $response->assertSee('id="katalog-grid-container"', false);
+        $response->assertSee('filterCardsLocally', false);
+        $response->assertSee('performServerSearch', false);
+    }
+
+    public function test_katalog_search_by_name_and_code()
+    {
+        $response = $this->actingAs($this->subditUser)
+            ->get(route('katalog-atk', ['search' => 'HVS']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Kertas HVS A4 Test');
     }
 
     public function test_pengajuan_create_displays_stok_instead_of_dos()
@@ -306,6 +420,27 @@ class UserRequestFeaturesTest extends TestCase
         $response->assertSee('.sidebar.sidebar-mini .sidebar-user-card', false);
         $response->assertSee('.sidebar.sidebar-mini .nav-item.static-item', false);
         $response->assertSee('transform: none !important;', false);
+    }
+
+    public function test_sidebar_mini_logo_and_icons_visibility(): void
+    {
+        $response = $this->actingAs($this->subditUser)->get(route('dashboard'));
+        $response->assertStatus(200);
+
+        // 1. Verify mini header & logo styles
+        $response->assertSee('.sidebar.sidebar-mini .sidebar-header', false);
+        $response->assertSee('.sidebar.sidebar-mini .navbar-brand .logo-normal img', false);
+        $response->assertSee('.sidebar.sidebar-mini .navbar-brand .ms-2', false);
+        $response->assertSee('sidebar-brand-text', false);
+
+        // 2. Verify main menu icons styling in mini sidebar
+        $response->assertSee('.sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon svg', false);
+        $response->assertSee('.sidebar.sidebar-mini .item-name', false);
+        $response->assertSee('.sidebar.sidebar-mini .sub-nav:not(.show)', false);
+
+        // 3. Verify title attributes exist on nav links for tooltips
+        $response->assertSee('title="Dashboard"', false);
+        $response->assertSee('title="Permintaan ATK"', false);
     }
 }
 

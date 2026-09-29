@@ -20,7 +20,7 @@
                         style="width: 50px; height: 50px; object-fit: contain;">
                 </div>
             </div>
-            <div class="ms-2">
+            <div class="ms-2 sidebar-brand-text">
                 <h5 class="logo-title mb-0 fw-bold" style="color: #144b59;">Inventori ATK</h5>
                 <small class="text-muted sidebar-subtext" style="font-size: 0.7rem; white-space: nowrap;">Kementerian PKP RI</small>
             </div>
@@ -73,7 +73,7 @@
 
                 <!-- Dashboard (Semua Role) -->
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}" title="Dashboard">
                         <i class="icon">
                             <svg width="20" viewBox="0 0 24 24" fill="none" class="icon-20">
                                 <path opacity="0.4"
@@ -93,7 +93,7 @@
                 <!-- ======================================================== -->
                 @if ($isKasubagTU)
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('persetujuan.*') ? 'active' : '' }}" href="{{ route('persetujuan.index') }}">
+                        <a class="nav-link {{ request()->routeIs('persetujuan.*') ? 'active' : '' }}" href="{{ route('persetujuan.index') }}" title="Persetujuan ATK">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M9 11l3 3L22 4"></path>
@@ -108,7 +108,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}">
+                        <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -125,7 +125,7 @@
                 <!-- ======================================================== -->
                 @if ($isPicDistribusi)
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}">
+                        <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -149,7 +149,7 @@
                     @endphp
                     <li class="nav-item">
                         <a class="nav-link {{ $transaksiActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#transaksi-menu" role="button" aria-expanded="{{ $transaksiActive ? 'true' : 'false' }}">
+                            href="#transaksi-menu" role="button" aria-expanded="{{ $transaksiActive ? 'true' : 'false' }}" title="Gudang & Stok">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.4" d="M3 7.5L12 2.5L21 7.5V16.5L12 21.5L3 16.5V7.5Z" fill="currentColor"></path>
@@ -166,14 +166,14 @@
 
                         <ul class="sub-nav collapse {{ $transaksiActive ? 'show' : '' }}" id="transaksi-menu" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('barang-masuk') ? 'active' : '' }}" href="{{ route('barang-masuk') }}">
+                                <a class="nav-link {{ request()->routeIs('barang-masuk') ? 'active' : '' }}" href="{{ route('barang-masuk') }}" title="Barang Masuk (Pengadaan)">
                                     <i class="sidenav-mini-icon">M</i>
                                     <span class="item-name">Barang Masuk (Pengadaan)</span>
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('barang-keluar') ? 'active' : '' }}" href="{{ route('barang-keluar') }}">
+                                <a class="nav-link {{ request()->routeIs('barang-keluar') ? 'active' : '' }}" href="{{ route('barang-keluar') }}" title="Barang Keluar">
                                     <i class="sidenav-mini-icon">K</i>
                                     <span class="item-name">Barang Keluar</span>
                                 </a>
@@ -191,7 +191,7 @@
                     @endphp
                     <li class="nav-item">
                         <a class="nav-link {{ $pengajuanActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#pengajuan-menu" role="button" aria-expanded="{{ $pengajuanActive ? 'true' : 'false' }}">
+                            href="#pengajuan-menu" role="button" aria-expanded="{{ $pengajuanActive ? 'true' : 'false' }}" title="Permintaan ATK">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.4"
@@ -210,21 +210,21 @@
 
                         <ul class="sub-nav collapse {{ $pengajuanActive ? 'show' : '' }}" id="pengajuan-menu" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.index') ? 'active' : '' }}" href="{{ route('pengajuan.index') }}">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.index') ? 'active' : '' }}" href="{{ route('pengajuan.index') }}" title="Riwayat Pengajuan">
                                     <i class="sidenav-mini-icon">R</i>
                                     <span class="item-name">Riwayat Pengajuan</span>
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Baru">
                                     <i class="sidenav-mini-icon">+</i>
                                     <span class="item-name">Buat Pengajuan Baru</span>
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('katalog-atk') ? 'active' : '' }}" href="{{ route('katalog-atk') }}">
+                                <a class="nav-link {{ request()->routeIs('katalog-atk') ? 'active' : '' }}" href="{{ route('katalog-atk') }}" title="Katalog & Ketersediaan">
                                     <i class="sidenav-mini-icon">K</i>
                                     <span class="item-name">Katalog & Ketersediaan</span>
                                 </a>
@@ -242,7 +242,7 @@
                     @endphp
                     <li class="nav-item">
                         <a class="nav-link {{ $laporanActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#laporan-menu" role="button" aria-expanded="{{ $laporanActive ? 'true' : 'false' }}">
+                            href="#laporan-menu" role="button" aria-expanded="{{ $laporanActive ? 'true' : 'false' }}" title="Laporan & Arsip">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.4"
@@ -261,14 +261,14 @@
 
                         <ul class="sub-nav collapse {{ $laporanActive ? 'show' : '' }}" id="laporan-menu" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                                <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}" title="Mutasi Persediaan">
                                     <i class="sidenav-mini-icon">L</i>
                                     <span class="item-name">Mutasi Persediaan</span>
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('reports.rekapitulasi') ? 'active' : '' }}" href="{{ route('reports.rekapitulasi') }}">
+                                <a class="nav-link {{ request()->routeIs('reports.rekapitulasi') ? 'active' : '' }}" href="{{ route('reports.rekapitulasi') }}" title="Rekapitulasi Arsip">
                                     <i class="sidenav-mini-icon">R</i>
                                     <span class="item-name">Rekapitulasi Arsip</span>
                                 </a>
@@ -289,7 +289,7 @@
                     @endphp
                     <li class="nav-item">
                         <a class="nav-link {{ $masterActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#master-data" role="button" aria-expanded="{{ $masterActive ? 'true' : 'false' }}">
+                            href="#master-data" role="button" aria-expanded="{{ $masterActive ? 'true' : 'false' }}" title="Master Data">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.4"
@@ -310,7 +310,7 @@
                         <ul class="sub-nav collapse {{ $masterActive ? 'show' : '' }}" id="master-data" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('master-data.kategori-barang.*') ? 'active' : '' }}"
-                                    href="{{ route('master-data.kategori-barang.index') }}">
+                                    href="{{ route('master-data.kategori-barang.index') }}" title="Kategori Barang">
                                     <i class="icon">
                                         <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
                                             <circle cx="12" cy="12" r="8" />
@@ -323,7 +323,7 @@
 
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('master-data.daftar-barang.*') ? 'active' : '' }}"
-                                    href="{{ route('master-data.daftar-barang.index') }}">
+                                    href="{{ route('master-data.daftar-barang.index') }}" title="Daftar Barang ATK">
                                     <i class="icon">
                                         <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
                                             <circle cx="12" cy="12" r="8" />
@@ -337,7 +337,7 @@
                             @if ($isKasubagTU)
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('master-data.manajemen-pengguna.*') ? 'active' : '' }}"
-                                        href="{{ route('master-data.manajemen-pengguna.index') }}">
+                                        href="{{ route('master-data.manajemen-pengguna.index') }}" title="Manajemen Pengguna">
                                         <i class="icon">
                                             <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
                                                 <circle cx="12" cy="12" r="8" />

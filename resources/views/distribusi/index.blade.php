@@ -73,7 +73,7 @@
         @endif
 
         {{-- 4 Kartu KPI PIC Distribusi --}}
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-4" id="distribution-metrics">
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-body p-3">
@@ -128,97 +128,99 @@
         </div>
 
         {{-- Pengelompokan Kolektif Subdirektorat (Accordion Rapi) --}}
-        @if ($subditGroups->count() > 0)
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-info text-white p-2">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                    </svg>
-                                </span>
-                                <div>
-                                    <h5 class="mb-0 fw-bold">Pengelompokan Kolektif Permintaan per Subdirektorat</h5>
-                                    <small class="text-muted">PIC Gudang dapat menyiapkan dan membundel paket ATK sekaligus per Subdirektorat sebelum diserahkan</small>
+        <div id="subdit-groups-container">
+            @if ($subditGroups->count() > 0)
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-info text-white p-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h5 class="mb-0 fw-bold">Pengelompokan Kolektif Permintaan per Subdirektorat</h5>
+                                        <small class="text-muted">PIC Gudang dapat menyiapkan dan membundel paket ATK sekaligus per Subdirektorat sebelum diserahkan</small>
+                                    </div>
                                 </div>
+                                <span class="badge bg-primary rounded-pill px-3 py-1">{{ $subditGroups->count() }} Subdit Aktif</span>
                             </div>
-                            <span class="badge bg-primary rounded-pill px-3 py-1">{{ $subditGroups->count() }} Subdit Aktif</span>
-                        </div>
-                        <div class="card-body p-3">
-                            <div class="accordion" id="accordionSubdit">
-                                @foreach ($subditGroups as $subditName => $items)
-                                    <div class="accordion-item mb-2 border rounded">
-                                        <h2 class="accordion-header" id="headingSubdit{{ $loop->index }}">
-                                            <button class="accordion-button collapsed py-2.5" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#collapseSubdit{{ $loop->index }}" aria-expanded="false"
-                                                aria-controls="collapseSubdit{{ $loop->index }}">
-                                                <div class="d-flex justify-content-between align-items-center w-100 me-3">
-                                                    <div>
-                                                        <strong class="text-dark">{{ $subditName }}</strong>
-                                                        <span class="text-muted small ms-2">({{ $items->count() }} Surat Pengajuan)</span>
+                            <div class="card-body p-3">
+                                <div class="accordion" id="accordionSubdit">
+                                    @foreach ($subditGroups as $subditName => $items)
+                                        <div class="accordion-item mb-2 border rounded">
+                                            <h2 class="accordion-header" id="headingSubdit{{ $loop->index }}">
+                                                <button class="accordion-button collapsed py-2.5" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseSubdit{{ $loop->index }}" aria-expanded="false"
+                                                    aria-controls="collapseSubdit{{ $loop->index }}">
+                                                    <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                        <div>
+                                                            <strong class="text-dark">{{ $subditName }}</strong>
+                                                            <span class="text-muted small ms-2">({{ $items->count() }} Surat Pengajuan)</span>
+                                                        </div>
+                                                        <span class="badge bg-warning text-dark">Siap Disiapkan</span>
                                                     </div>
-                                                    <span class="badge bg-warning text-dark">Siap Disiapkan</span>
-                                                </div>
-                                            </button>
-                                        </h2>
-                                        <div id="collapseSubdit{{ $loop->index }}" class="accordion-collapse collapse"
-                                            aria-labelledby="headingSubdit{{ $loop->index }}" data-bs-parent="#accordionSubdit">
-                                            <div class="accordion-body p-3 bg-light">
-                                                <div class="table-responsive bg-white rounded border">
-                                                    <table class="table table-sm table-hover mb-0">
-                                                        <thead class="table-light">
-                                                            <tr>
-                                                                <th>Kode Pengajuan</th>
-                                                                <th>Pemohon</th>
-                                                                <th>Rincian Barang yang Diminta</th>
-                                                                <th>Catatan</th>
-                                                                <th class="text-end">Aksi Cepat</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($items as $subItem)
+                                                </button>
+                                            </h2>
+                                            <div id="collapseSubdit{{ $loop->index }}" class="accordion-collapse collapse"
+                                                aria-labelledby="headingSubdit{{ $loop->index }}" data-bs-parent="#accordionSubdit">
+                                                <div class="accordion-body p-3 bg-light">
+                                                    <div class="table-responsive bg-white rounded border">
+                                                        <table class="table table-sm table-hover mb-0">
+                                                            <thead class="table-light">
                                                                 <tr>
-                                                                    <td class="fw-bold font-monospace">{{ $subItem->request_code }}</td>
-                                                                    <td>{{ $subItem->user->name ?? '-' }}</td>
-                                                                    <td>
-                                                                        <ul class="mb-0 ps-3">
-                                                                            @foreach ($subItem->details as $d)
-                                                                                <li>
-                                                                                    {{ $d->product->name ?? 'Barang' }} 
-                                                                                    <strong>({{ $d->quantity }} Pcs)</strong>
-                                                                                </li>
-                                                                            @endforeach
-                                                                        </ul>
-                                                                    </td>
-                                                                    <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
-                                                                    <td class="text-end text-nowrap">
-                                                                        <a href="{{ route('distribusi.bukti', $subItem->id) }}" target="_blank"
-                                                                            class="btn btn-xs btn-outline-secondary py-1 px-2">
-                                                                            Cetak Tanda Terima
-                                                                        </a>
-                                                                        <button type="button" class="btn btn-xs btn-success py-1 px-2"
-                                                                            data-bs-toggle="modal" data-bs-target="#handoverModal{{ $subItem->id }}">
-                                                                            Serahkan
-                                                                        </button>
-                                                                    </td>
+                                                                    <th>Kode Pengajuan</th>
+                                                                    <th>Pemohon</th>
+                                                                    <th>Rincian Barang yang Diminta</th>
+                                                                    <th>Catatan</th>
+                                                                    <th class="text-end">Aksi Cepat</th>
                                                                 </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($items as $subItem)
+                                                                    <tr>
+                                                                        <td class="fw-bold font-monospace">{{ $subItem->request_code }}</td>
+                                                                        <td>{{ $subItem->user->name ?? '-' }}</td>
+                                                                        <td>
+                                                                            <ul class="mb-0 ps-3">
+                                                                                @foreach ($subItem->details as $d)
+                                                                                    <li>
+                                                                                        {{ $d->product->name ?? 'Barang' }} 
+                                                                                        <strong>({{ $d->quantity }} Pcs)</strong>
+                                                                                    </li>
+                                                                                @endforeach
+                                                                            </ul>
+                                                                        </td>
+                                                                        <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
+                                                                        <td class="text-end text-nowrap">
+                                                                            <a href="{{ route('distribusi.bukti', $subItem->id) }}" target="_blank"
+                                                                                class="btn btn-xs btn-outline-secondary py-1 px-2">
+                                                                                Cetak Tanda Terima
+                                                                            </a>
+                                                                            <button type="button" class="btn btn-xs btn-success py-1 px-2"
+                                                                                data-bs-toggle="modal" data-bs-target="#handoverModal{{ $subItem->id }}">
+                                                                                Serahkan
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        </div>
 
         {{-- Tabel Utama Distribusi Barang --}}
         <div class="row">
@@ -229,7 +231,7 @@
                             <h4 class="card-title mb-0 fw-bold">Daftar Penyerahan Barang ke Pemohon</h4>
                             <small class="text-muted">Data permintaan barang yang telah disetujui Kasubag TU dan siap diserahkan oleh PIC Gudang</small>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" id="distribution-total-badge">
                             <span class="badge bg-primary rounded-pill px-3 py-1.5">
                                 {{ $requests->total() }} Permintaan Ditampilkan
                             </span>
@@ -238,7 +240,7 @@
 
                     {{-- Filter Bar Status, Tipe, Periode Bulan & Tahun, serta Pencarian --}}
                     <div class="p-3 bg-light border-bottom">
-                        <form action="{{ route('distribusi.index') }}" method="GET" class="row g-2 align-items-center">
+                        <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET" class="row g-2 align-items-center">
                             {{-- Filter Status --}}
                             <div class="col-12 col-sm-6 col-md-2">
                                 <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
@@ -290,10 +292,17 @@
                             {{-- Input Pencarian --}}
                             <div class="col-12 col-sm-6 col-md-2">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" name="search" class="form-control" placeholder="Cari..."
-                                        value="{{ $search ?? '' }}">
-                                    <button class="btn btn-primary" type="submit">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <input type="text" id="distribusi-search" name="search" class="form-control" placeholder="Cari..."
+                                        value="{{ $search ?? '' }}" autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-primary d-inline-flex align-items-center" id="btn-distribusi-search" type="submit" title="Cari">
+                                        <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                                        <svg id="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
@@ -302,7 +311,7 @@
                             </div>
 
                             {{-- Reset Button --}}
-                            <div class="col-12 col-sm-6 col-md-1 text-md-end">
+                            <div class="col-12 col-sm-6 col-md-1 text-md-end" id="distribusi-reset-container">
                                 @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
                                     <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
                                         Reset
@@ -312,7 +321,7 @@
                         </form>
                     </div>
 
-                    <div class="card-body p-4">
+                    <div class="card-body p-4" id="table-container">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover align-middle">
                                 <thead>
@@ -326,9 +335,9 @@
                                         <th width="15%" class="text-end">Aksi PIC</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="distribusi-table-body">
                                     @forelse ($requests as $index => $req)
-                                        <tr>
+                                        <tr class="distribusi-row" data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . ($req->receiver_name ?? '') . ' ' . ($req->distribution_notes ?? '') . ' ' . $req->type . ' ' . $req->status . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
                                             <td>
                                                 <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
@@ -459,7 +468,7 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr>
+                                        <tr id="table-initial-empty-row">
                                             <td colspan="7" class="text-center py-5 text-muted">
                                                 Tidak ada data distribusi yang sesuai kriteria filter.
                                             </td>
@@ -485,3 +494,228 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('distribusi-search');
+    const clearBtn = document.getElementById('btn-clear-search');
+    const filterForm = document.getElementById('distribusi-filter-form');
+    const searchSpinner = document.getElementById('search-spinner');
+    const searchIcon = document.getElementById('search-icon');
+    let debounceTimer = null;
+    let abortCtrl = null;
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    // 1. Instant local row filtering (0ms)
+    function filterRowsLocally(keyword) {
+        const rows = document.querySelectorAll('#distribusi-table-body tr.distribusi-row');
+        let emptyRow = document.getElementById('no-local-match-row');
+        const initialEmptyRow = document.getElementById('table-initial-empty-row');
+        
+        if (initialEmptyRow) {
+            return;
+        }
+
+        if (!keyword) {
+            rows.forEach(r => r.style.display = '');
+            if (emptyRow) emptyRow.remove();
+            return;
+        }
+
+        let visibleCount = 0;
+        rows.forEach(r => {
+            const rowText = (r.getAttribute('data-search-text') || r.innerText).toLowerCase();
+            if (rowText.includes(keyword)) {
+                r.style.display = '';
+                visibleCount++;
+            } else {
+                r.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0) {
+            if (!emptyRow) {
+                const tbody = document.getElementById('distribusi-table-body');
+                if (tbody) {
+                    emptyRow = document.createElement('tr');
+                    emptyRow.id = 'no-local-match-row';
+                    emptyRow.innerHTML = `
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <div class="d-inline-flex align-items-center gap-2">
+                                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                                <span>Mencari "<strong>${escapeHtml(keyword)}</strong>"...</span>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(emptyRow);
+                }
+            }
+        } else {
+            if (emptyRow) emptyRow.remove();
+        }
+    }
+
+    // 2. Debounced background AJAX sync to server
+    function performServerSearch(targetUrl = null) {
+        let url = targetUrl;
+        if (!url && filterForm) {
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams(formData);
+            url = filterForm.action + '?' + params.toString();
+        }
+
+        if (!url) return;
+
+        if (abortCtrl) {
+            abortCtrl.abort();
+        }
+        abortCtrl = new AbortController();
+
+        if (searchSpinner) searchSpinner.classList.remove('d-none');
+        if (searchIcon) searchIcon.classList.add('d-none');
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            signal: abortCtrl.signal
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Response error: ' + response.status);
+            return response.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newTable = doc.getElementById('table-container');
+            const currentTable = document.getElementById('table-container');
+            if (newTable && currentTable) {
+                currentTable.innerHTML = newTable.innerHTML;
+            }
+
+            const newTotalBadge = doc.getElementById('distribution-total-badge');
+            const currentTotalBadge = document.getElementById('distribution-total-badge');
+            if (newTotalBadge && currentTotalBadge) {
+                currentTotalBadge.innerHTML = newTotalBadge.innerHTML;
+            }
+
+            const newMetrics = doc.getElementById('distribution-metrics');
+            const currentMetrics = document.getElementById('distribution-metrics');
+            if (newMetrics && currentMetrics) {
+                currentMetrics.innerHTML = newMetrics.innerHTML;
+            }
+
+            const newReset = doc.getElementById('distribusi-reset-container');
+            const currentReset = document.getElementById('distribusi-reset-container');
+            if (newReset && currentReset) {
+                currentReset.innerHTML = newReset.innerHTML;
+            }
+
+            const newSubditGroups = doc.getElementById('subdit-groups-container');
+            const currentSubditGroups = document.getElementById('subdit-groups-container');
+            if (newSubditGroups && currentSubditGroups) {
+                currentSubditGroups.innerHTML = newSubditGroups.innerHTML;
+            }
+
+            // Sync URL in address bar without reload
+            window.history.replaceState(null, '', url);
+
+            // Re-apply local filter if user kept typing while AJAX was in-flight
+            if (searchInput) {
+                const currentVal = searchInput.value.trim().toLowerCase();
+                let searchedVal = '';
+                try {
+                    const urlParams = new URL(url, window.location.origin).searchParams;
+                    searchedVal = (urlParams.get('search') || '').trim().toLowerCase();
+                } catch (e) {}
+
+                if (currentVal !== searchedVal) {
+                    filterRowsLocally(currentVal);
+                }
+            }
+        })
+        .catch(err => {
+            if (err.name !== 'AbortError') {
+                console.error('Error saat sinkronisasi pencarian distribusi:', err);
+            }
+        })
+        .finally(() => {
+            if (searchSpinner) searchSpinner.classList.add('d-none');
+            if (searchIcon) searchIcon.classList.remove('d-none');
+        });
+    }
+
+    if (searchInput) {
+        // As-you-type input handler
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value;
+            const kw = val.trim().toLowerCase();
+
+            // Toggle clear button
+            if (clearBtn) {
+                clearBtn.style.display = val.length > 0 ? '' : 'none';
+            }
+
+            // Instant local filter (0ms delay)
+            filterRowsLocally(kw);
+
+            // Debounced server sync (350ms)
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                performServerSearch();
+            }, 350);
+        });
+
+        // Clear button click
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                this.style.display = 'none';
+                searchInput.focus();
+                filterRowsLocally('');
+                clearTimeout(debounceTimer);
+                performServerSearch();
+            });
+        }
+    }
+
+    // Intercept form submit (Enter key or Cari button click)
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            performServerSearch();
+        });
+
+        // Dynamic change for dropdown selects (Status, Tipe, Bulan, Tahun)
+        filterForm.querySelectorAll('select').forEach(select => {
+            select.onchange = function(e) {
+                e.preventDefault();
+                clearTimeout(debounceTimer);
+                performServerSearch();
+            };
+        });
+    }
+
+    // Intercept pagination clicks inside table container
+    const tableContainer = document.getElementById('table-container');
+    if (tableContainer) {
+        tableContainer.addEventListener('click', function(e) {
+            const pageLink = e.target.closest('.pagination a');
+            if (pageLink && pageLink.href) {
+                e.preventDefault();
+                performServerSearch(pageLink.href);
+            }
+        });
+    }
+});
+</script>
+@endpush

@@ -17,17 +17,67 @@
     <style>
         /* ======================================================== */
         /* STILISASI SIDEBAR KETIKA DITUTUP (MINI / COLLAPSED)      */
-        /* Semua elemen (Avatar, Divider, Icon Utama, Huruf Subnav) */
-        /* Sejajar lurus di sumbu tengah (vertikal)                 */
+        /* Semua elemen (Logo, Avatar, Divider, Icon Utama, Subnav) */
+        /* Sejajar lurus dan presisi di sumbu tengah (vertikal)    */
         /* ======================================================== */
 
-        /* 1. Sembunyikan teks label di header & profil */
+        /* 1. Header & Logo Sidebar ketika Mini */
+        .sidebar.sidebar-mini .sidebar-header {
+            padding: 0.85rem 0.5rem !important;
+            justify-content: center !important;
+            position: relative !important;
+            min-height: 68px !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        .sidebar.sidebar-mini .navbar-brand {
+            padding: 0 !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+        .sidebar.sidebar-mini .navbar-brand .logo-main,
+        .sidebar.sidebar-mini .navbar-brand .logo-normal {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto !important;
+            width: auto !important;
+        }
+        .sidebar.sidebar-mini .navbar-brand .logo-normal img {
+            width: 38px !important;
+            height: 38px !important;
+            max-width: 38px !important;
+            max-height: 38px !important;
+            object-fit: contain !important;
+            display: block !important;
+            margin: 0 auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        .sidebar.sidebar-mini .navbar-brand .ms-2,
+        .sidebar.sidebar-mini .navbar-brand .logo-title,
         .sidebar.sidebar-mini .navbar-brand small,
         .sidebar.sidebar-mini .sidebar-subtext,
+        .sidebar.sidebar-mini .sidebar-brand-text,
         .sidebar.sidebar-mini .sidebar-user-info {
             display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
             opacity: 0 !important;
             visibility: hidden !important;
+            position: absolute !important;
+            pointer-events: none !important;
+        }
+        .sidebar.sidebar-mini .sidebar-toggle {
+            position: absolute !important;
+            right: -12px !important;
+            top: 18px !important;
+            z-index: 1050 !important;
         }
 
         /* 2. Profil Avatar Pengguna */
@@ -53,6 +103,10 @@
             height: 38px !important;
             min-width: 38px !important;
             margin: 0 auto !important;
+            background-color: #ebf0fe !important;
+            border: 1.5px solid rgba(58, 87, 232, 0.3) !important;
+            color: var(--bs-primary) !important;
+            box-shadow: 0 2px 5px rgba(58, 87, 232, 0.12) !important;
         }
 
         /* 3. Garis Pemisah / Static Item Dash (-) */
@@ -69,6 +123,9 @@
             text-align: center !important;
             width: 100% !important;
         }
+        .sidebar.sidebar-mini .nav-item.static-item .default-icon {
+            display: none !important;
+        }
         .sidebar.sidebar-mini .nav-item.static-item .mini-icon {
             display: block !important;
             margin: 0 auto !important;
@@ -79,6 +136,19 @@
         }
 
         /* 4. Menu Utama (Dashboard, Persetujuan, Distribusi, Gudang, dll) */
+        .sidebar.sidebar-mini .sidebar-body {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            overflow-x: hidden !important;
+        }
+        .sidebar.sidebar-mini .sidebar-list,
+        .sidebar.sidebar-mini .iq-main-menu {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100% !important;
+        }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -94,6 +164,7 @@
             width: 42px !important;
             height: 42px !important;
             min-width: 42px !important;
+            max-width: 42px !important;
             padding: 0 !important;
             margin: 4px auto !important;
             display: flex !important;
@@ -101,30 +172,86 @@
             justify-content: center !important;
             border-radius: 10px !important;
             box-sizing: border-box !important;
+            position: relative !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link:not(.active) {
+            color: #64748b !important;
+            background-color: transparent !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link:not(.active):hover {
+            color: var(--bs-primary) !important;
+            background-color: rgba(58, 87, 232, 0.1) !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link.active,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] {
+            background-color: var(--bs-primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(58, 87, 232, 0.35) !important;
         }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon {
             margin: 0 auto !important;
+            padding: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             width: 20px !important;
             height: 20px !important;
+            min-width: 20px !important;
+            min-height: 20px !important;
+            line-height: 1 !important;
         }
-        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .right-icon,
-        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link > .badge {
-            display: none !important;
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon svg,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon-20 {
+            width: 20px !important;
+            height: 20px !important;
+            min-width: 20px !important;
+            min-height: 20px !important;
+            display: block !important;
+            margin: 0 auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link.active .icon,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link.active .icon svg,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] .icon,
+        .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] .icon svg {
+            color: #ffffff !important;
         }
 
-        /* 5. Sub-Menu & Huruf (R, +, K, M, L, dll) agar Sejajar Rapi di Tengah */
+        /* Sembunyikan teks label, panah dropdown, dan badge saat mini agar tidak mendorong ikon keluar batas */
+        .sidebar.sidebar-mini .item-name,
+        .sidebar.sidebar-mini .nav-link .item-name,
+        .sidebar.sidebar-mini .nav-link > span:not(.sidenav-mini-icon):not(.mini-icon),
+        .sidebar.sidebar-mini .right-icon,
+        .sidebar.sidebar-mini .nav-link .right-icon,
+        .sidebar.sidebar-mini .nav-link > .badge {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            pointer-events: none !important;
+        }
+
+        /* 5. Sub-Menu & Huruf (R, +, K, M, L, dll) */
         .sidebar.sidebar-mini .sub-nav {
             padding: 0.25rem 0 !important;
-            margin: 0 auto !important;
+            margin: 2px auto !important;
             width: 100% !important;
             list-style: none !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
+        }
+        /* Sembunyikan sub-nav yang sedang collapsed / ditutup agar tidak bocor */
+        .sidebar.sidebar-mini .sub-nav:not(.show) {
+            display: none !important;
         }
         .sidebar.sidebar-mini .sub-nav .nav-item {
             padding: 0 !important;
