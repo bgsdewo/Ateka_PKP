@@ -1,5 +1,29 @@
 <!-- Library Bundle Script -->
 <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
+<script>
+    if (typeof $ !== 'undefined' && typeof $.fn.dataTable !== 'undefined') {
+        $.fn.dataTable.ext.errMode = 'none';
+        $.extend(true, $.fn.dataTable.defaults, {
+            language: {
+                emptyTable: "Tidak ada data yang tersedia pada tabel ini",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                infoFiltered: "(disaring dari _MAX_ total entri)",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                loadingRecords: "Memuat...",
+                processing: "Sedang memproses...",
+                search: "Cari:",
+                zeroRecords: "Tidak ditemukan data yang sesuai",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    }
+</script>
 <!-- External Library Bundle Script -->
 <script src="{{ asset('hope-ui/assets/js/core/external.min.js') }}"></script>
 <!-- Widgetchart Script -->

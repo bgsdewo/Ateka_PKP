@@ -14,7 +14,9 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')
+        $products = Product::with(['category', 'stockTransactions' => function ($q) {
+                $q->orderBy('transaction_date', 'asc')->orderBy('id', 'asc');
+            }])
             ->withCount('stockTransactions')
             ->orderBy('name', 'asc')
             ->get();
@@ -73,7 +75,7 @@ class ProductController extends Controller
             if ($product->stock > 0) {
                 StockTransaction::create([
                     'product_id'       => $product->id,
-                    'user_id'          => Auth::id(),
+                    'user_id'          => Auth::id() ?? 1,
                     'type'             => 'masuk',
                     'quantity'         => $product->stock,
                     'stock_after'      => $product->stock,
@@ -107,6 +109,8 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
+            'no_faktur' => ['nullable', 'string', 'max:255'],
+            'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
@@ -126,35 +130,116 @@ class ProductController extends Controller
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
         ]);
 
-        $daftar_barang->update([
-            'category_id' => $request->category_id,
-            'code' => $request->code,
-            'name' => $request->name,
-            'unit' => $request->unit,
-            'stock' => $request->stock,
-            'minimum_stock' => $request->minimum_stock,
-            'purchase_price' => $request->purchase_price,
-            'description' => $request->description,
-        ]);
+        DB::beginTransaction();
+        try {
+            // 1. Perbarui data master barang
+            $daftar_barang->update([
+                'category_id'    => $request->category_id,
+                'code'           => $request->code,
+                'name'           => $request->name,
+                'unit'           => $request->unit,
+                'stock'          => $request->stock,
+                'minimum_stock'  => $request->minimum_stock,
+                'purchase_price' => $request->purchase_price,
+                'description'    => $request->description,
+            ]);
 
-        return redirect()
-            ->route('master-data.daftar-barang.index')
-            ->with('success', 'Barang berhasil diperbarui.');
+            // 2. Sinkronisasi real-time ke riwayat Barang Masuk (StockTransaction)
+            $masukTx = StockTransaction::where('product_id', $daftar_barang->id)
+                ->where('type', 'masuk')
+                ->orderBy('id', 'asc')
+                ->first();
+
+            if ($masukTx) {
+                // Hitung total keluar dan transaksi masuk lain untuk rekalkulasi quantity awal yang pas
+                $totalKeluar = (int) StockTransaction::where('product_id', $daftar_barang->id)
+                    ->where('type', 'keluar')
+                    ->sum('quantity');
+
+                $otherMasuk = (int) StockTransaction::where('product_id', $daftar_barang->id)
+                    ->where('type', 'masuk')
+                    ->where('id', '!=', $masukTx->id)
+                    ->sum('quantity');
+
+                $newQty = max(0, (int)$request->stock + $totalKeluar - $otherMasuk);
+
+                $masukTx->quantity = $newQty;
+                $masukTx->harga_perolehan = $request->purchase_price;
+                if ($request->has('no_faktur')) {
+                    $masukTx->no_faktur = $request->no_faktur ?: '-';
+                }
+                if ($request->has('uraian')) {
+                    $masukTx->uraian = $request->uraian ?: 'Pencatatan Stok Master Barang';
+                }
+                $masukTx->save();
+            } elseif ($request->stock > 0) {
+                // Jika sebelumnya tidak ada transaksi masuk (stok awal 0) dan sekarang diisi > 0
+                StockTransaction::create([
+                    'product_id'       => $daftar_barang->id,
+                    'user_id'          => Auth::id() ?? 1,
+                    'type'             => 'masuk',
+                    'quantity'         => $request->stock,
+                    'stock_after'      => $request->stock,
+                    'harga_perolehan'  => $request->purchase_price,
+                    'no_faktur'        => $request->no_faktur ?: '-',
+                    'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
+                    'transaction_date' => now(),
+                    'note'             => 'Pencatatan Stok / Pembaruan Master Barang (' . $daftar_barang->code . ')'
+                ]);
+            }
+
+            // 3. Rekalkulasi berurutan stock_after untuk seluruh transaksi produk ini agar akurat
+            $runningStock = 0;
+            $allTransactions = StockTransaction::where('product_id', $daftar_barang->id)
+                ->orderBy('transaction_date', 'asc')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($allTransactions as $tx) {
+                if ($tx->type === 'masuk') {
+                    $runningStock += (int) $tx->quantity;
+                } else {
+                    $runningStock -= (int) $tx->quantity;
+                }
+                $tx->stock_after = max(0, $runningStock);
+                $tx->save();
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('master-data.daftar-barang.index')
+                ->with('success', 'Barang berhasil diperbarui dan riwayat di Barang Masuk tersinkronisasi secara real-time.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function destroy(Product $daftar_barang)
     {
-        if ($daftar_barang->stockTransactions()->exists()) {
+        DB::beginTransaction();
+        try {
+            // 1. Hapus riwayat transaksi stok terkait (Barang Masuk & Keluar) secara real-time
+            $daftar_barang->stockTransactions()->delete();
+
+            // 2. Hapus detail permohonan yang merujuk barang ini jika ada
+            $daftar_barang->requestDetails()->delete();
+
+            // 3. Hapus data barang di Master Data
+            $daftar_barang->delete();
+
+            DB::commit();
+
             return redirect()
                 ->route('master-data.daftar-barang.index')
-                ->with('error', 'Barang tidak dapat dihapus karena sudah memiliki riwayat transaksi stok.');
+                ->with('success', 'Barang dan seluruh riwayat transaksinya di Barang Masuk berhasil dihapus secara real-time.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->route('master-data.daftar-barang.index')
+                ->with('error', 'Gagal menghapus barang: ' . $e->getMessage());
         }
-
-        $daftar_barang->delete();
-
-        return redirect()
-            ->route('master-data.daftar-barang.index')
-            ->with('success', 'Barang berhasil dihapus.');
     }
 
     public function catalog(Request $request)

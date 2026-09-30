@@ -59,6 +59,98 @@
             </div>
         @endif
 
+        {{-- Card Filter Periode Transaksi --}}
+        <div class="row mb-4">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-danger-subtle text-danger p-2 rounded-circle">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                </svg>
+                            </span>
+                            <div>
+                                <h5 class="card-title mb-0 fw-bold">Filter Periode Barang Keluar</h5>
+                                <small class="text-secondary">Saring riwayat pengeluaran barang berdasarkan bulan, tahun, atau rentang tanggal tertentu</small>
+                            </div>
+                        </div>
+                        @if ($month || $year || $startDate || $endDate)
+                            <a href="{{ route('barang-keluar') }}" class="btn btn-outline-danger btn-sm">
+                                <svg class="icon-16 me-1" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Reset Filter
+                            </a>
+                        @endif
+                    </div>
+                    <div class="card-body p-3">
+                        <form method="GET" action="{{ route('barang-keluar') }}" id="filterFormKeluar">
+                            <div class="row g-3 align-items-end">
+                                {{-- Periode Bulan --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Periode Bulan
+                                    </label>
+                                    <select name="month" class="form-select form-select-sm">
+                                        <option value="">Semua Bulan (Tahunan)</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ sprintf('%02d', $m) }}" {{ ($month ?? '') == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Periode Tahun (Dinamis jangka panjang) --}}
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Periode Tahun
+                                    </label>
+                                    <select name="year" class="form-select form-select-sm">
+                                        <option value="">Semua Tahun</option>
+                                        @foreach ($availableYears as $y)
+                                            <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
+                                                Tahun {{ $y }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Dari Tanggal --}}
+                                <div class="col-12 col-sm-6 col-md-2">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Dari Tanggal
+                                    </label>
+                                    <input type="date" name="start_date" value="{{ $startDate ?? '' }}" class="form-control form-control-sm">
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">*Isi 1 tanggal untuk filter harian</small>
+                                </div>
+
+                                {{-- Sampai Tanggal --}}
+                                <div class="col-12 col-sm-6 col-md-2">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Sampai Tanggal
+                                    </label>
+                                    <input type="date" name="end_date" value="{{ $endDate ?? '' }}" class="form-control form-control-sm">
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">*Opsional (rentang tanggal)</small>
+                                </div>
+
+                                {{-- Tombol Aksi --}}
+                                <div class="col-12 col-sm-12 col-md-2 d-flex gap-2">
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        <svg class="icon-16 me-1" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                        </svg>
+                                        Terapkan
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -66,14 +158,33 @@
                         <div class="header-title">
                             <h4 class="card-title mb-1">Data Persediaan Barang Keluar</h4>
                             <p class="mb-0 text-secondary">
-                                Tabel transaksi keluar barang lengkap dengan rincian penerima dan kondisi.
+                                Tabel transaksi keluar barang lengkap dengan rincian penerima, distribusi, dan kondisi.
                             </p>
                         </div>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-danger btn-sm btn-barang-keluar" data-bs-toggle="modal"
-                                data-bs-target="#modalBarangKeluar">
-                                Tambah Barang Keluar
-                            </button>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            @if ($startDate && $endDate)
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                    Filter: <strong>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}</strong> s/d <strong>{{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</strong>
+                                </span>
+                            @elseif ($startDate)
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                    Filter Tanggal: <strong>{{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}</strong>
+                                </span>
+                            @elseif ($endDate)
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                    Filter s/d: <strong>{{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}</strong>
+                                </span>
+                            @elseif ($month || $year)
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                    Filter: <strong>{{ $month ? \Carbon\Carbon::createFromDate(2026, (int)$month, 1)->translatedFormat('F') : '' }} {{ $year ?? '' }}</strong>
+                                </span>
+                            @endif
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                Total: <strong>{{ number_format($totalTransactions) }} Transaksi</strong>
+                                @if ($totalQuantity > 0)
+                                    &bull; <strong>-{{ number_format($totalQuantity) }} Unit</strong>
+                                @endif
+                            </span>
                         </div>
                     </div>
 
@@ -97,7 +208,6 @@
                                 <tbody>
                                     @foreach ($transactions as $transaction)
                                         @php
-                                            // Ambil sisa stok dari kolom database atau fallback ke stok produk saat ini
                                             $stockAfter = isset($transaction->stock_after)
                                                 ? (int) $transaction->stock_after
                                                 : $transaction->product->stock ?? 0;
@@ -124,21 +234,21 @@
                                             <td>{{ $transaction->description ?? ($transaction->uraian ?? '-') }}</td>
                                             <td>{{ $transaction->kondisi ?? 'Baik' }}</td>
 
-                                            <!-- Keluar (Murni Angka Saja) -->
+                                            <!-- Keluar -->
                                             <td>
                                                 @if ($transaction->type === 'out' || $transaction->type === 'keluar')
                                                     <span class="text-danger fw-bold">
-                                                        {{ number_format($transaction->quantity) }}
+                                                        -{{ number_format($transaction->quantity) }} {{ $transaction->product->unit ?? 'Pcs' }}
                                                     </span>
                                                 @else
                                                     <span class="text-muted">0</span>
                                                 @endif
                                             </td>
 
-                                            <!-- Stok Sisa (Murni Angka Saja) -->
+                                            <!-- Stok Sisa -->
                                             <td>
                                                 <strong>
-                                                    {{ number_format($stockAfter) }}
+                                                    {{ number_format($stockAfter) }} {{ $transaction->product->unit ?? '' }}
                                                 </strong>
                                             </td>
                                             <td>
@@ -156,141 +266,4 @@
             </div>
         </div>
     </div>
-
-    {{-- MODAL BARANG KELUAR --}}
-    <div class="modal fade" id="modalBarangKeluar" tabindex="-1" aria-labelledby="modalBarangKeluarLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <form action="{{ route('inventory.transaction.store') }}" method="POST" id="formBarangKeluar">
-                    @csrf
-                    <input type="hidden" name="type" value="keluar">
-
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title text-white" id="modalBarangKeluarLabel">Form Tambah Barang Keluar</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Bagian Kiri: Informasi Distribusi / Penerima -->
-                            <div class="col-md-6 border-end">
-                                <h6 class="mb-3 text-danger">Informasi Penyerahan</h6>
-                                <div class="mb-3">
-                                    <label class="form-label">Tanggal Transaksi <span class="text-danger">*</span></label>
-                                    <input type="date" name="transaction_date" class="form-control"
-                                        value="{{ date('Y-m-d') }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Uraian / Nama Penerima <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" name="uraian" class="form-control"
-                                        placeholder="Contoh: Muhammad Ariq Irsyad" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Kondisi Barang <span class="text-danger">*</span></label>
-                                    <select name="kondisi" class="form-select" required>
-                                        <option value="Baik" selected>Baik</option>
-                                        <option value="Baru">Baru</option>
-                                        <option value="Rusak">Rusak</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nomor Bukti / Faktur (Opsional)</label>
-                                    <input type="text" name="no_faktur" class="form-control"
-                                        placeholder="Contoh: BKK/2026/001">
-                                </div>
-                            </div>
-
-                            <!-- Bagian Kanan: Detail Barang Keluar -->
-                            <div class="col-md-6">
-                                <h6 class="mb-3 text-danger">Detail Barang Keluar</h6>
-                                <div class="mb-3">
-                                    <label class="form-label">Barang <span class="text-danger">*</span></label>
-                                    <select name="product_id" id="product_keluar" class="form-select" required>
-                                        <option value="">Pilih Barang...</option>
-                                        @foreach ($products as $product)
-                                            <option value="{{ $product->id }}" data-unit="{{ e($product->unit) }}"
-                                                data-stock="{{ $product->stock }}"
-                                                {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                                {{ $product->code }} - {{ $product->name }} | Stok Tersedia:
-                                                {{ $product->stock }}
-                                                {{ $product->stock <= 0 ? '(Kosong)' : '' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Jumlah Keluar <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="number" name="quantity" id="quantity_keluar" class="form-control"
-                                            min="1" placeholder="Contoh: 5" required>
-                                        <span class="input-group-text" id="unit_addon">-</span>
-                                    </div>
-                                    <small class="text-muted" id="stok_keluar_info">Pilih barang untuk melihat batas stok
-                                        keluar.</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Keterangan Tambahan</label>
-                                    <textarea name="description" class="form-control" rows="3"
-                                        placeholder="Contoh: Keperluan kantor bagian administrasi"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger">
-                            Simpan Barang Keluar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $('#product_keluar').on('change', function() {
-                    const selected = $(this).find(':selected');
-                    const unit = selected.data('unit') || '-';
-                    const stock = parseInt(selected.data('stock')) || 0;
-
-                    $('#unit_addon').text(unit);
-
-                    if ($(this).val()) {
-                        $('#quantity_keluar').attr('max', stock);
-                        $('#stok_keluar_info').text('Maksimal barang keluar: ' + stock + ' ' + unit);
-                    } else {
-                        $('#quantity_keluar').removeAttr('max');
-                        $('#stok_keluar_info').text('Pilih barang untuk melihat batas stok keluar.');
-                    }
-                });
-
-                $('#formBarangKeluar').on('submit', function(e) {
-                    const selected = $('#product_keluar').find(':selected');
-                    const stock = parseInt(selected.data('stock')) || 0;
-                    const quantity = parseInt($('#quantity_keluar').val()) || 0;
-
-                    if (quantity > stock) {
-                        e.preventDefault();
-                        alert('Jumlah barang keluar tidak boleh melebihi stok tersedia (' + stock + ').');
-                        return false;
-                    }
-                });
-
-                $('#modalBarangKeluar').on('hidden.bs.modal', function() {
-                    $('#formBarangKeluar')[0].reset();
-                    $('#unit_addon').text('-');
-                    $('#quantity_keluar').removeAttr('max');
-                    $('#stok_keluar_info').text('Pilih barang untuk melihat batas stok keluar.');
-                });
-            });
-        </script>
-    @endpush
 @endsection

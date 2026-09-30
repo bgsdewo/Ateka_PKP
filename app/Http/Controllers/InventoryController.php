@@ -55,6 +55,9 @@ class InventoryController extends Controller
             'product_id' => ['required', 'exists:products,id'],
             'type' => ['required', 'in:masuk,keluar'],
             'quantity' => ['required', 'integer', 'min:1'],
+            'satuan_beli' => ['nullable', 'string', 'max:50'],
+            'jumlah_beli' => ['nullable', 'integer', 'min:1'],
+            'isi_per_kemasan' => ['nullable', 'integer', 'min:1'],
             'tanggal_faktur' => ['required', 'date'], // Sesuai payload Anda
             'no_faktur' => ['nullable', 'string', 'max:255'],
             'uraian' => ['nullable', 'string', 'max:255'],
@@ -76,6 +79,15 @@ class InventoryController extends Controller
         DB::transaction(function () use ($request) {
             $product = Product::lockForUpdate()->findOrFail($request->product_id);
             $quantity = (int) $request->quantity;
+
+            // Jika transaksi masuk dan ada jumlah kemasan serta isi per kemasan, pastikan quantity stok sesuai konversi
+            if ($request->type === 'masuk' && $request->filled('jumlah_beli') && $request->filled('isi_per_kemasan')) {
+                $calcQty = (int) $request->jumlah_beli * (int) $request->isi_per_kemasan;
+                if ($calcQty > 0) {
+                    $quantity = $calcQty;
+                }
+            }
+
             $currentStock = (int) $product->stock;
 
             if ($request->type === 'keluar' && $quantity > $currentStock) {
@@ -99,6 +111,9 @@ class InventoryController extends Controller
                 'user_id' => Auth::id(),
                 'type' => $request->type,
                 'quantity' => $quantity,
+                'satuan_beli' => $request->satuan_beli,
+                'jumlah_beli' => $request->filled('jumlah_beli') ? (int) $request->jumlah_beli : null,
+                'isi_per_kemasan' => $request->filled('isi_per_kemasan') ? (int) $request->isi_per_kemasan : null,
                 'stock_after' => $stockAfter,
 
                 // 2. Mapping data dari request form ke kolom database
@@ -110,9 +125,11 @@ class InventoryController extends Controller
                 'note' => $request->keterangan,
             ]);
 
-            $product->update([
-                'stock' => $stockAfter,
-            ]);
+            $productUpdateData = ['stock' => $stockAfter];
+            if ($request->type === 'masuk' && $hargaPerolehan > 0) {
+                $productUpdateData['purchase_price'] = $hargaPerolehan;
+            }
+            $product->update($productUpdateData);
         });
 
         if ($request->type == 'masuk') {

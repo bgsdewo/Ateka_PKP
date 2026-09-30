@@ -139,6 +139,8 @@
                                                         data-stock="{{ $product->stock }}"
                                                         data-minimum-stock="{{ $product->minimum_stock }}"
                                                         data-purchase-price="{{ $product->purchase_price }}"
+                                                        data-no-faktur="{{ e($product->initial_no_faktur ?? '-') }}"
+                                                        data-uraian="{{ e($product->initial_uraian ?? '-') }}"
                                                         data-description="{{ e($product->description) }}"
                                                         data-transaction-count="{{ $product->stock_transactions_count }}"
                                                         data-created-at="{{ $product->created_at ? $product->created_at->format('d-m-Y H:i') : '-' }}"
@@ -154,6 +156,8 @@
                                                         data-stock="{{ $product->stock }}"
                                                         data-minimum-stock="{{ $product->minimum_stock }}"
                                                         data-purchase-price="{{ $product->purchase_price }}"
+                                                        data-no-faktur="{{ e($product->initial_no_faktur ?? '') }}"
+                                                        data-uraian="{{ e($product->initial_uraian ?? '') }}"
                                                         data-description="{{ e($product->description) }}">
                                                         Edit
                                                     </button>
@@ -382,6 +386,8 @@
                     $categoryId.val($(this).data('category-id'));
                     $code.val($(this).data('code'));
                     $name.val($(this).data('name'));
+                    $noFaktur.val($(this).data('no-faktur') || '');
+                    $uraian.val($(this).data('uraian') || '');
                     $unit.val($(this).data('unit'));
                     $stock.val($(this).data('stock'));
                     $minimumStock.val($(this).data('minimum-stock'));
@@ -398,6 +404,8 @@
                     const categoryId = $(this).data('category-id');
                     const code = $(this).data('code');
                     const name = $(this).data('name');
+                    const noFaktur = $(this).data('no-faktur');
+                    const uraian = $(this).data('uraian');
                     const unit = $(this).data('unit');
                     const stock = parseInt($(this).data('stock'));
                     const minimumStock = parseInt($(this).data('minimum-stock'));
@@ -410,6 +418,8 @@
                     $categoryId.val(categoryId);
                     $code.val(code);
                     $name.val(name);
+                    $noFaktur.val(noFaktur ? noFaktur : '-');
+                    $uraian.val(uraian ? uraian : '-');
                     $unit.val(unit);
                     $stock.val(stock);
                     $minimumStock.val(minimumStock);

@@ -32,6 +32,29 @@ class Product extends Model
         return $this->hasMany(StockTransaction::class);
     }
 
+    public function requestDetails()
+    {
+        return $this->hasMany(RequestDetail::class);
+    }
+
+    public function getInitialNoFakturAttribute(): ?string
+    {
+        $first = $this->relationLoaded('stockTransactions')
+            ? $this->stockTransactions->firstWhere('type', 'masuk')
+            : $this->stockTransactions()->where('type', 'masuk')->orderBy('id', 'asc')->first();
+
+        return $first?->no_faktur ?? '';
+    }
+
+    public function getInitialUraianAttribute(): ?string
+    {
+        $first = $this->relationLoaded('stockTransactions')
+            ? $this->stockTransactions->firstWhere('type', 'masuk')
+            : $this->stockTransactions()->where('type', 'masuk')->orderBy('id', 'asc')->first();
+
+        return $first?->uraian ?? '';
+    }
+
     public function getStockStatusAttribute()
     {
         return $this->stock < 10 ? 'Akan Habis' : 'Aman';

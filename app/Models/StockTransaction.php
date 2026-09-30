@@ -19,6 +19,11 @@ class StockTransaction extends Model
 
         'recipient_type', // 'subdit', 'individu', or null
 
+        // --- Konversi Kemasan Pembelian ---
+        'satuan_beli',
+        'jumlah_beli',
+        'isi_per_kemasan',
+
         // --- Kolom Baru Tambahan ---
         'no_faktur',
         'uraian',

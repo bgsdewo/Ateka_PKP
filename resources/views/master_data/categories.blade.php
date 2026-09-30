@@ -105,7 +105,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($categories as $category)
+                                    @foreach ($categories as $category)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
@@ -149,13 +149,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted">
-                                                Belum ada data kategori barang.
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

@@ -94,7 +94,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($users as $user)
+                                    @foreach ($users as $user)
                                         @php
                                             $roleBadge = match ($user->role) {
                                                 'kasubag_tu', 'admin' => 'bg-primary',
@@ -164,13 +164,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted py-4">
-                                                Belum ada data pengguna.
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
