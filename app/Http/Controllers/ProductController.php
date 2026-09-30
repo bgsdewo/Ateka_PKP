@@ -12,18 +12,130 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'stockTransactions' => function ($q) {
+        $month = $request->get('month');
+        $year = $request->get('year');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        $query = Product::with(['category', 'stockTransactions' => function ($q) {
                 $q->orderBy('transaction_date', 'asc')->orderBy('id', 'asc');
             }])
-            ->withCount('stockTransactions')
-            ->orderBy('name', 'asc')
-            ->get();
+            ->withCount('stockTransactions');
 
+        if ($startDate && $endDate) {
+            $minDate = min($startDate, $endDate);
+            $maxDate = max($startDate, $endDate);
+            $query->where(function ($q) use ($minDate, $maxDate) {
+                $q->whereHas('stockTransactions', function ($sq) use ($minDate, $maxDate) {
+                    $sq->where('type', 'masuk')
+                       ->whereDate('transaction_date', '>=', $minDate)
+                       ->whereDate('transaction_date', '<=', $maxDate);
+                })->orWhere(function ($sq) use ($minDate, $maxDate) {
+                    $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                        $sub->where('type', 'masuk');
+                    })->whereDate('created_at', '>=', $minDate)
+                      ->whereDate('created_at', '<=', $maxDate);
+                });
+            });
+        } elseif ($startDate) {
+            // Filter tepat pada tanggal tersebut (filter harian)
+            $query->where(function ($q) use ($startDate) {
+                $q->whereHas('stockTransactions', function ($sq) use ($startDate) {
+                    $sq->where('type', 'masuk')
+                       ->whereDate('transaction_date', $startDate);
+                })->orWhere(function ($sq) use ($startDate) {
+                    $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                        $sub->where('type', 'masuk');
+                    })->whereDate('created_at', $startDate);
+                });
+            });
+        } elseif ($endDate) {
+            $query->where(function ($q) use ($endDate) {
+                $q->whereHas('stockTransactions', function ($sq) use ($endDate) {
+                    $sq->where('type', 'masuk')
+                       ->whereDate('transaction_date', $endDate);
+                })->orWhere(function ($sq) use ($endDate) {
+                    $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                        $sub->where('type', 'masuk');
+                    })->whereDate('created_at', $endDate);
+                });
+            });
+        } else {
+            // Filter tahun dan bulan
+            if ($year && $month) {
+                $query->where(function ($q) use ($year, $month) {
+                    $q->whereHas('stockTransactions', function ($sq) use ($year, $month) {
+                        $sq->where('type', 'masuk')
+                           ->whereYear('transaction_date', $year)
+                           ->whereMonth('transaction_date', $month);
+                    })->orWhere(function ($sq) use ($year, $month) {
+                        $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                            $sub->where('type', 'masuk');
+                        })->whereYear('created_at', $year)
+                          ->whereMonth('created_at', $month);
+                    });
+                });
+            } elseif ($year) {
+                $query->where(function ($q) use ($year) {
+                    $q->whereHas('stockTransactions', function ($sq) use ($year) {
+                        $sq->where('type', 'masuk')
+                           ->whereYear('transaction_date', $year);
+                    })->orWhere(function ($sq) use ($year) {
+                        $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                            $sub->where('type', 'masuk');
+                        })->whereYear('created_at', $year);
+                    });
+                });
+            } elseif ($month) {
+                $query->where(function ($q) use ($month) {
+                    $q->whereHas('stockTransactions', function ($sq) use ($month) {
+                        $sq->where('type', 'masuk')
+                           ->whereMonth('transaction_date', $month);
+                    })->orWhere(function ($sq) use ($month) {
+                        $sq->whereDoesntHave('stockTransactions', function ($sub) {
+                            $sub->where('type', 'masuk');
+                        })->whereMonth('created_at', $month);
+                    });
+                });
+            }
+        }
+
+        $products = $query->orderBy('name', 'asc')->get();
         $categories = Category::orderBy('name', 'asc')->get();
 
-        return view('master_data.products', compact('products', 'categories'));
+        // Ambil daftar tahun dinamis dari data transaksi dan produk untuk jangka panjang
+        $dbYears = StockTransaction::where('type', 'masuk')
+            ->whereNotNull('transaction_date')
+            ->selectRaw('YEAR(transaction_date) as year')
+            ->distinct()
+            ->pluck('year')
+            ->toArray();
+
+        $productYears = Product::whereNotNull('created_at')
+            ->selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->pluck('year')
+            ->toArray();
+
+        $currentYear = (int) date('Y');
+        $defaultYears = range($currentYear - 3, $currentYear + 3);
+        $availableYears = array_unique(array_merge($dbYears, $productYears, $defaultYears));
+        rsort($availableYears);
+
+        $totalProducts = $products->count();
+
+        return view('master_data.products', compact(
+            'products',
+            'categories',
+            'month',
+            'year',
+            'startDate',
+            'endDate',
+            'availableYears',
+            'totalProducts'
+        ));
     }
 
     public function store(Request $request)
@@ -37,6 +149,7 @@ class ProductController extends Controller
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
+            'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
         ], [
@@ -55,6 +168,7 @@ class ProductController extends Controller
             'purchase_price.required' => 'Harga beli/perolehan wajib diisi.',
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
+            'transaction_date.date' => 'Format tanggal faktur tidak valid.',
         ]);
 
         DB::beginTransaction();
@@ -71,7 +185,7 @@ class ProductController extends Controller
                 'description' => $request->description,
             ]);
 
-            // 2. Jika stok awal > 0, otomatis catat ke transaksi Barang Masuk beserta No Faktur & Uraiannya
+            // 2. Jika stok awal > 0, otomatis catat ke transaksi Barang Masuk beserta No Faktur, Tgl Faktur & Uraiannya
             if ($product->stock > 0) {
                 StockTransaction::create([
                     'product_id'       => $product->id,
@@ -80,9 +194,9 @@ class ProductController extends Controller
                     'quantity'         => $product->stock,
                     'stock_after'      => $product->stock,
                     'harga_perolehan'  => $product->purchase_price,
-                    'no_faktur'        => $request->no_faktur ?? '-',
-                    'uraian'           => $request->uraian ?? 'Pencatatan Stok Awal Master Barang',
-                    'transaction_date' => now(),
+                    'no_faktur'        => $request->no_faktur ?: '-',
+                    'uraian'           => $request->uraian ?: 'Pencatatan Stok Awal Master Barang',
+                    'transaction_date' => $request->transaction_date ?: now(),
                     'note'             => 'Pencatatan Stok Awal / Penambahan Master Barang Baru (' . $product->code . ')'
                 ]);
             }
@@ -110,6 +224,7 @@ class ProductController extends Controller
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
+            'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
         ], [
@@ -128,6 +243,7 @@ class ProductController extends Controller
             'purchase_price.required' => 'Harga beli/perolehan wajib diisi.',
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
+            'transaction_date.date' => 'Format tanggal faktur tidak valid.',
         ]);
 
         DB::beginTransaction();
@@ -171,6 +287,9 @@ class ProductController extends Controller
                 if ($request->has('uraian')) {
                     $masukTx->uraian = $request->uraian ?: 'Pencatatan Stok Master Barang';
                 }
+                if ($request->filled('transaction_date')) {
+                    $masukTx->transaction_date = $request->transaction_date;
+                }
                 $masukTx->save();
             } elseif ($request->stock > 0) {
                 // Jika sebelumnya tidak ada transaksi masuk (stok awal 0) dan sekarang diisi > 0
@@ -183,7 +302,7 @@ class ProductController extends Controller
                     'harga_perolehan'  => $request->purchase_price,
                     'no_faktur'        => $request->no_faktur ?: '-',
                     'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
-                    'transaction_date' => now(),
+                    'transaction_date' => $request->transaction_date ?: now(),
                     'note'             => 'Pencatatan Stok / Pembaruan Master Barang (' . $daftar_barang->code . ')'
                 ]);
             }

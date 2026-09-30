@@ -37,22 +37,106 @@ class Product extends Model
         return $this->hasMany(RequestDetail::class);
     }
 
+    public function getInitialStockTransactionAttribute()
+    {
+        if (!$this->relationLoaded('stockTransactions')) {
+            return $this->stockTransactions()->where('type', 'masuk')->orderBy('transaction_date', 'asc')->orderBy('id', 'asc')->first();
+        }
+
+        $masukTransactions = $this->stockTransactions->where('type', 'masuk');
+
+        $startDate = request('start_date');
+        $endDate = request('end_date');
+        $year = request('year');
+        $month = request('month');
+
+        if ($startDate && $endDate) {
+            $minDate = min($startDate, $endDate);
+            $maxDate = max($startDate, $endDate);
+            $match = $masukTransactions->first(function ($t) use ($minDate, $maxDate) {
+                $d = $t->transaction_date ? \Carbon\Carbon::parse($t->transaction_date)->format('Y-m-d') : null;
+                return $d && $d >= $minDate && $d <= $maxDate;
+            });
+            if ($match) {
+                return $match;
+            }
+        } elseif ($startDate) {
+            $match = $masukTransactions->first(function ($t) use ($startDate) {
+                $d = $t->transaction_date ? \Carbon\Carbon::parse($t->transaction_date)->format('Y-m-d') : null;
+                return $d && $d === $startDate;
+            });
+            if ($match) {
+                return $match;
+            }
+        } elseif ($endDate) {
+            $match = $masukTransactions->first(function ($t) use ($endDate) {
+                $d = $t->transaction_date ? \Carbon\Carbon::parse($t->transaction_date)->format('Y-m-d') : null;
+                return $d && $d === $endDate;
+            });
+            if ($match) {
+                return $match;
+            }
+        } else {
+            if ($year && $month) {
+                $match = $masukTransactions->first(function ($t) use ($year, $month) {
+                    if (!$t->transaction_date) return false;
+                    $dt = \Carbon\Carbon::parse($t->transaction_date);
+                    return $dt->year == $year && $dt->month == (int) $month;
+                });
+                if ($match) {
+                    return $match;
+                }
+            } elseif ($year) {
+                $match = $masukTransactions->first(function ($t) use ($year) {
+                    if (!$t->transaction_date) return false;
+                    return \Carbon\Carbon::parse($t->transaction_date)->year == $year;
+                });
+                if ($match) {
+                    return $match;
+                }
+            } elseif ($month) {
+                $match = $masukTransactions->first(function ($t) use ($month) {
+                    if (!$t->transaction_date) return false;
+                    return \Carbon\Carbon::parse($t->transaction_date)->month == (int) $month;
+                });
+                if ($match) {
+                    return $match;
+                }
+            }
+        }
+
+        return $masukTransactions->first();
+    }
+
     public function getInitialNoFakturAttribute(): ?string
     {
-        $first = $this->relationLoaded('stockTransactions')
-            ? $this->stockTransactions->firstWhere('type', 'masuk')
-            : $this->stockTransactions()->where('type', 'masuk')->orderBy('id', 'asc')->first();
-
-        return $first?->no_faktur ?? '';
+        return $this->initial_stock_transaction?->no_faktur ?? '';
     }
 
     public function getInitialUraianAttribute(): ?string
     {
-        $first = $this->relationLoaded('stockTransactions')
-            ? $this->stockTransactions->firstWhere('type', 'masuk')
-            : $this->stockTransactions()->where('type', 'masuk')->orderBy('id', 'asc')->first();
+        return $this->initial_stock_transaction?->uraian ?? '';
+    }
 
-        return $first?->uraian ?? '';
+    public function getInitialTransactionDateAttribute(): ?string
+    {
+        $tx = $this->initial_stock_transaction;
+        if ($tx && $tx->transaction_date) {
+            return \Carbon\Carbon::parse($tx->transaction_date)->format('Y-m-d');
+        }
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
+    }
+
+    public function getInitialTransactionDateFormattedAttribute(): string
+    {
+        $tx = $this->initial_stock_transaction;
+        if ($tx && $tx->transaction_date) {
+            return \Carbon\Carbon::parse($tx->transaction_date)->format('d/m/Y');
+        }
+        if ($this->created_at) {
+            return $this->created_at->format('d/m/Y');
+        }
+        return '-';
     }
 
     public function getStockStatusAttribute()

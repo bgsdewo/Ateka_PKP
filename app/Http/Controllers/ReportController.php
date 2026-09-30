@@ -176,7 +176,38 @@ class ReportController extends Controller
                 'current_stock' => $totalStok,
                 'total_value' => $totalNilai,
             ];
-        });
+        })->sort(function ($a, $b) {
+            $aHasData = ($a->total_in > 0 || $a->total_out > 0 || $a->current_stock > 0 || $a->total_value > 0);
+            $bHasData = ($b->total_in > 0 || $b->total_out > 0 || $b->current_stock > 0 || $b->total_value > 0);
+
+            // Prioritaskan kategori yang memiliki barang masuk, keluar, sisa stok, atau nilai saldo
+            if ($aHasData !== $bHasData) {
+                return $bHasData <=> $aHasData;
+            }
+
+            // 1. Urutkan dari yang memiliki Barang Masuk terbesar
+            if ($b->total_in !== $a->total_in) {
+                return $b->total_in <=> $a->total_in;
+            }
+
+            // 2. Urutkan dari yang memiliki Barang Keluar terbesar
+            if ($b->total_out !== $a->total_out) {
+                return $b->total_out <=> $a->total_out;
+            }
+
+            // 3. Urutkan dari yang memiliki Sisa Stok Fisik terbesar
+            if ($b->current_stock !== $a->current_stock) {
+                return $b->current_stock <=> $a->current_stock;
+            }
+
+            // 4. Urutkan dari yang memiliki Nilai Saldo terbesar
+            if ($b->total_value != $a->total_value) {
+                return $b->total_value <=> $a->total_value;
+            }
+
+            // 5. Fallback berdasarkan abjad nama jika nilainya sama
+            return strcasecmp($a->name, $b->name);
+        })->values();
 
         $totalAllProducts = Product::count();
         $totalAllStock = Product::sum('stock');
