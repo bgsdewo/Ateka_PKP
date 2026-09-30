@@ -240,7 +240,7 @@
                                             <!-- Jumlah Masuk -->
                                             <td>
                                                 <span class="text-success fw-bold">
-                                                    +{{ number_format($transaction->quantity) }} {{ $transaction->product->unit ?? 'Pcs' }}
+                                                    {{ number_format($transaction->quantity) }}
                                                 </span>
                                                 @if ($transaction->satuan_beli && $transaction->jumlah_beli && strtolower($transaction->satuan_beli) !== strtolower($transaction->product->unit ?? ''))
                                                     <br>
@@ -256,7 +256,7 @@
                                             <!-- Stok Sisa -->
                                             <td>
                                                 <strong>
-                                                    {{ number_format($stockAfter) }} {{ $transaction->product->unit ?? '' }}
+                                                    {{ number_format($stockAfter) }}
                                                 </strong>
                                             </td>
                                         </tr>

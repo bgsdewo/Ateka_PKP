@@ -62,7 +62,7 @@ class ProductRealtimeSyncTest extends TestCase
         $respBarangMasuk = $this->actingAs($this->user)->get(route('barang-masuk'));
         $respBarangMasuk->assertSee('Pulpen Pilot G2', false);
         $respBarangMasuk->assertSee('FAK-SYNC-01', false);
-        $respBarangMasuk->assertSee('+30 Dos', false);
+        $respBarangMasuk->assertSee('30', false);
     }
 
     public function test_product_update_syncs_stock_transaction_and_barang_masuk_realtime(): void
@@ -128,7 +128,7 @@ class ProductRealtimeSyncTest extends TestCase
         $respBarangMasuk->assertSee('Spidol Whiteboard Diperbarui', false);
         $respBarangMasuk->assertSee('FAK-BARU-99', false);
         $respBarangMasuk->assertSee('PT. ATK Modern', false);
-        $respBarangMasuk->assertSee('+35 Dos', false);
+        $respBarangMasuk->assertSee('35', false);
         $respBarangMasuk->assertDontSee('FAK-AWAL-02', false);
         $respBarangMasuk->assertDontSee('Spidol Whiteboard Awal', false);
         $respBarangMasuk->assertDontSee('Toko Alat Tulis', false);

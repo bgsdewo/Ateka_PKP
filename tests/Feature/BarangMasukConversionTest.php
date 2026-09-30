@@ -68,7 +68,7 @@ class BarangMasukConversionTest extends TestCase
         // Pastikan halaman barang-masuk menampilkan konversi lusin & unit produk
         $indexResponse = $this->actingAs($user)->get(route('barang-masuk'));
         $indexResponse->assertStatus(200);
-        $indexResponse->assertSee('+24 Buku', false);
+        $indexResponse->assertSee('24', false);
         $indexResponse->assertSee('2 Lusin', false);
         $indexResponse->assertSee('@ 12 Buku', false);
     }

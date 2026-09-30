@@ -211,7 +211,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($products as $product)
+                                    @foreach ($products as $product)
                                         @php
                                             $hargaBeli = $product->purchase_price ?? 0;
                                             $totalNilai = $product->stock * $hargaBeli;
@@ -304,13 +304,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="13" class="text-center text-muted py-4">
-                                                Belum ada data barang atau tidak ada barang yang sesuai dengan periode yang dipilih.
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

@@ -238,7 +238,7 @@
                                             <td>
                                                 @if ($transaction->type === 'out' || $transaction->type === 'keluar')
                                                     <span class="text-danger fw-bold">
-                                                        -{{ number_format($transaction->quantity) }} {{ $transaction->product->unit ?? 'Pcs' }}
+                                                        {{ number_format($transaction->quantity) }}
                                                     </span>
                                                 @else
                                                     <span class="text-muted">0</span>
@@ -248,7 +248,7 @@
                                             <!-- Stok Sisa -->
                                             <td>
                                                 <strong>
-                                                    {{ number_format($stockAfter) }} {{ $transaction->product->unit ?? '' }}
+                                                    {{ number_format($stockAfter) }}
                                                 </strong>
                                             </td>
                                             <td>
