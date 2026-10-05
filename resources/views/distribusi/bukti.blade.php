@@ -193,13 +193,24 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td class="text-center font-monospace">{{ $detail->product->code ?? '-' }}</td>
-                        <td>{{ $detail->product->name ?? 'Barang' }}</td>
-                        <td class="text-center">{{ $detail->quantity }} Pcs</td>
-                        <td class="text-center fw-bold">{{ $detail->quantity }} Pcs (Baik)</td>
+                        <td>
+                            <strong>{{ $detail->item_name }}</strong>
+                            @if ($detail->specification)
+                                <br><small class="text-muted fst-italic">Spesifikasi: {{ $detail->specification }}</small>
+                            @endif
+                        </td>
+                        <td class="text-center">{{ $detail->quantity }} {{ $detail->item_unit }}</td>
+                        <td class="text-center fw-bold">{{ $detail->effective_quantity }} {{ $detail->item_unit }} (Baik)</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        @if ($requestItem->verification_notes)
+            <div class="p-2 border bg-light my-2" style="font-size: 12px;">
+                <strong>Catatan Verifikasi Subbag TU:</strong> {{ $requestItem->verification_notes }}
+            </div>
+        @endif
 
         @if ($requestItem->distribution_notes)
             <div class="p-2 border bg-light my-2" style="font-size: 12px;">

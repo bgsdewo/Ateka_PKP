@@ -143,8 +143,14 @@ class DashboardController extends Controller
         })->values();
 
         $pendingRequestsCount = RequestItem::where('status', 'pending')->count();
-        $readyDistribusiCount = RequestItem::where('status', 'approved')->count();
-        $totalDistributedCount = RequestItem::where('status', 'distributed')->count();
+        $readyDistribusiCount = RequestItem::where('status', 'approved')
+            ->where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })->count();
+        $totalDistributedCount = RequestItem::where('status', 'distributed')
+            ->where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })->count();
 
         // Data khusus user requester yang sedang login (Subdit / Pegawai)
         $userId = auth()->id();

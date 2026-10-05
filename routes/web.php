@@ -14,6 +14,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\RequestRecapController;
 
 // Default Route
 Route::get('/', function () {
@@ -62,13 +63,34 @@ Route::middleware('auth')->group(function () {
         ->name('inventory.transaction.store');
 
     // ==========================================
-    // 1. ROUTE PERSETUJUAN (APPROVAL) - KASUBAG TU
+    // 1. ROUTE VERIFIKASI & PERSETUJUAN - KASUBAG TU
     // ==========================================
     Route::get('/persetujuan', [ApprovalController::class, 'index'])
         ->name('persetujuan.index');
 
+    Route::get('/verifikasi', [ApprovalController::class, 'index'])
+        ->name('verifikasi.index');
+
     Route::put('/persetujuan/{id}', [ApprovalController::class, 'updateStatus'])
         ->name('persetujuan.update');
+
+    Route::put('/verifikasi/{id}', [ApprovalController::class, 'updateStatus'])
+        ->name('verifikasi.update');
+
+    Route::post('/persetujuan/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
+        ->name('persetujuan.procure');
+
+    Route::post('/verifikasi/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
+        ->name('verifikasi.procure');
+
+    // ==========================================
+    // 1B. ROUTE REKAPITULASI PERMINTAAN - SUBBAG TU
+    // ==========================================
+    Route::get('/rekapitulasi-permintaan', [RequestRecapController::class, 'index'])
+        ->name('rekapitulasi-permintaan.index');
+
+    Route::get('/rekapitulasi-permintaan/cetak/{id?}', [RequestRecapController::class, 'printRecap'])
+        ->name('rekapitulasi-permintaan.cetak');
 
     // ==========================================
     // 2. ROUTE KOORDINASI & DISTRIBUSI - PIC DISTRIBUSI
@@ -93,6 +115,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/pengajuan', [RequestController::class, 'store'])
         ->name('pengajuan.store');
+
+    Route::get('/pengajuan/pengadaan', [RequestController::class, 'createProcurement'])
+        ->name('pengajuan.pengadaan.create');
+
+    Route::post('/pengajuan/pengadaan', [RequestController::class, 'storeProcurement'])
+        ->name('pengajuan.pengadaan.store');
 
     Route::get('/katalog-atk', [ProductController::class, 'catalog'])
         ->name('katalog-atk');

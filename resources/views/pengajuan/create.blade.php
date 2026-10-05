@@ -40,8 +40,8 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="card-title mb-0 fw-bold">Isi Formulir Permintaan ATK</h5>
-                            <small class="text-muted">Permintaan akan diteruskan ke Kasubag TU untuk persetujuan dan disiapkan oleh PIC Gudang</small>
+                            <h5 class="card-title mb-0 fw-bold">Isi Formulir Permintaan ATK ke Subbag TU</h5>
+                            <small class="text-muted">Permintaan diajukan ke Subbag Tata Usaha (Subbag TU) untuk direkapitulasi dan diverifikasi sebelum penyerahan fisik barang oleh PIC Gudang</small>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -118,10 +118,8 @@
                                                 <option value="{{ $product->id }}" 
                                                     data-stock="{{ $product->stock }}"
                                                     data-unit="Stok"
-                                                    {{ $isSelected ? 'selected' : '' }}
-                                                    {{ $product->stock <= 0 ? 'disabled' : '' }}>
-                                                    {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->stock }} Stok)
-                                                    {{ $product->stock <= 0 ? '- [HABIS]' : '' }}
+                                                    {{ $isSelected ? 'selected' : '' }}>
+                                                    {{ $product->code }} - {{ $product->name }} (Stok: {{ $product->stock }} Stok{{ $product->stock <= 0 ? ' - Perlu Dibeli TU' : '' }})
                                                 </option>
                                             @endforeach
                                         </select>
@@ -191,10 +189,11 @@
                         unitAddon.textContent = 'Stok';
 
                         if (this.value) {
-                            qtyInput.max = stock;
-                            stockInfo.textContent = 'Maksimal permintaan: ' + stock + ' Stok';
-                            if (parseInt(qtyInput.value) > stock) {
-                                qtyInput.value = stock > 0 ? stock : 1;
+                            qtyInput.removeAttribute('max');
+                            if (stock > 0) {
+                                stockInfo.innerHTML = '<span class="text-success fw-semibold">Sisa stok gudang: ' + stock + ' Stok.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubag TU.';
+                            } else {
+                                stockInfo.innerHTML = '<span class="text-warning fw-semibold">Stok gudang: 0 (Kosong).</span> Permintaan ini akan diproses untuk dibeli oleh Kasubag TU.';
                             }
                         } else {
                             qtyInput.removeAttribute('max');

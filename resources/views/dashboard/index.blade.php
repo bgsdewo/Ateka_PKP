@@ -113,6 +113,9 @@
                                     </svg>
                                     Review Pengajuan ({{ $pendingRequestsCount }} Pending)
                                 </a>
+                                <a href="{{ route('rekapitulasi-permintaan.index') }}" class="btn btn-info text-white btn-sm fw-bold shadow-sm d-inline-flex align-items-center gap-1.5">
+                                    Rekapitulasi Permintaan
+                                </a>
                                 <a href="{{ route('barang-masuk') }}" class="btn btn-success btn-sm text-white">
                                     + Pengadaan (Barang Masuk)
                                 </a>
@@ -256,9 +259,9 @@
                 <div class="col-6 col-md-3">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body p-3">
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Disetujui (Siap Ambil)</span>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Disetujui TU (Proses Beli)</span>
                             <h3 class="fw-bold text-info mb-0">{{ $userApprovedCount }}</h3>
-                            <small class="text-muted">Menunggu serah terima</small>
+                            <small class="text-muted">Akan dibeli Subbag TU</small>
                         </div>
                     </div>
                 </div>
@@ -327,9 +330,11 @@
                                                     <span class="badge {{ $req->status_badge }}">{{ $req->status_label }}</span>
                                                 </td>
                                                 <td class="text-end">
-                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                    @if ($req->status === 'distributed')
                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
                                                             class="btn btn-sm btn-outline-secondary">Bukti</a>
+                                                    @else
+                                                        <span class="text-muted small">-</span>
                                                     @endif
                                                 </td>
                                             </tr>

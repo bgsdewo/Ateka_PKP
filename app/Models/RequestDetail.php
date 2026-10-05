@@ -9,7 +9,12 @@ class RequestDetail extends Model
     protected $fillable = [
         'request_id',
         'product_id',
+        'custom_product_name',
+        'custom_unit',
+        'specification',
         'quantity',
+        'approved_quantity',
+        'verification_note',
     ];
 
     public function product()
@@ -20,5 +25,35 @@ class RequestDetail extends Model
     public function requestItem()
     {
         return $this->belongsTo(RequestItem::class, 'request_id');
+    }
+
+    /**
+     * Nama barang (mengutamakan master product jika ada, atau nama barang custom)
+     */
+    public function getItemNameAttribute(): string
+    {
+        if ($this->product) {
+            return $this->product->name;
+        }
+        return $this->custom_product_name ?: 'Barang Permintaan';
+    }
+
+    /**
+     * Satuan barang
+     */
+    public function getItemUnitAttribute(): string
+    {
+        if ($this->product) {
+            return $this->product->unit ?? 'Pcs';
+        }
+        return $this->custom_unit ?: 'Pcs';
+    }
+
+    /**
+     * Jumlah yang berlaku setelah verifikasi (jika sudah disetujui, pakai approved_quantity, default ke quantity)
+     */
+    public function getEffectiveQuantityAttribute(): int
+    {
+        return $this->approved_quantity !== null ? (int) $this->approved_quantity : (int) $this->quantity;
     }
 }

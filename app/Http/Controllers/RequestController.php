@@ -68,4 +68,70 @@ class RequestController extends Controller
 
         return redirect()->route('pengajuan.index')->with('success', 'Pengajuan permintaan ATK berhasil dikirim dan menunggu persetujuan Kasubag TU.');
     }
+
+    // Menampilkan form untuk usulan pengadaan barang baru (beli ke supplier)
+    public function createProcurement(Request $request)
+    {
+        $existingProducts = Product::orderBy('name', 'asc')->get();
+        return view('pengajuan.pengadaan', compact('existingProducts'));
+    }
+
+    // Menyimpan data usulan pengadaan barang ke database
+    public function storeProcurement(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:individu,subdit',
+            'notes' => 'nullable|string',
+            'item_name' => 'required|array|min:1',
+            'item_name.*' => 'required|string|max:255',
+            'quantity' => 'required|array|min:1',
+            'quantity.*' => 'required|integer|min:1',
+            'custom_unit' => 'nullable|array',
+            'specification' => 'nullable|array',
+            'product_id' => 'nullable|array',
+        ], [
+            'item_name.required' => 'Minimal satu barang yang diusulkan untuk dibeli wajib diisi.',
+            'item_name.*.required' => 'Nama barang yang diminta wajib diisi.',
+            'quantity.*.required' => 'Jumlah barang wajib diisi.',
+            'quantity.*.min' => 'Jumlah barang minimal 1 unit.',
+        ]);
+
+        $requestCode = 'REQ-BUY-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+
+        $requestItem = RequestItem::create([
+            'user_id' => Auth::id(),
+            'request_code' => $requestCode,
+            'type' => $request->type,
+            'is_procurement' => true,
+            'status' => 'pending',
+            'notes' => $request->notes,
+        ]);
+
+        $itemNames = $request->input('item_name', []);
+        $quantities = $request->input('quantity', []);
+        $units = $request->input('custom_unit', []);
+        $specs = $request->input('specification', []);
+        $productIds = $request->input('product_id', []);
+
+        foreach ($itemNames as $index => $name) {
+            $qty = isset($quantities[$index]) ? (int) $quantities[$index] : 1;
+            if ($qty > 0 && !empty(trim($name))) {
+                $pid = !empty($productIds[$index]) ? (int) $productIds[$index] : null;
+                $unit = !empty($units[$index]) ? trim($units[$index]) : 'Pcs';
+                $spec = !empty($specs[$index]) ? trim($specs[$index]) : null;
+
+                RequestDetail::create([
+                    'request_id' => $requestItem->id,
+                    'product_id' => $pid,
+                    'custom_product_name' => trim($name),
+                    'custom_unit' => $unit,
+                    'specification' => $spec,
+                    'quantity' => $qty,
+                ]);
+            }
+        }
+
+        return redirect()->route('pengajuan.index')
+            ->with('success', 'Permintaan pengadaan barang (' . $requestCode . ') berhasil diajukan! Usulan ini akan direkapitulasi oleh Subbag TU untuk dibeli langsung ke supplier.');
+    }
 }

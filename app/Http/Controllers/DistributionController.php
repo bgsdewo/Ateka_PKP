@@ -29,6 +29,10 @@ class DistributionController extends Controller
 
         $baseQuery = RequestItem::with(['user', 'details.product', 'distributor'])
             ->whereIn('status', ['approved', 'distributed'])
+            ->where(function ($q) {
+                $q->where('is_procurement', false)
+                  ->orWhereNull('is_procurement');
+            })
             ->when($filterType, function ($q) use ($filterType) {
                 $q->where('type', $filterType);
             })
@@ -132,7 +136,11 @@ class DistributionController extends Controller
      */
     public function confirmHandover(Request $request, $id)
     {
-        $requestItem = RequestItem::with(['user', 'details.product'])->findOrFail($id);
+        $requestItem = RequestItem::with(['user', 'details.product'])
+            ->where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })
+            ->findOrFail($id);
 
         $request->validate([
             'receiver_name' => 'required|string|max:255',
@@ -157,7 +165,11 @@ class DistributionController extends Controller
      */
     public function printBukti($id)
     {
-        $requestItem = RequestItem::with(['user', 'details.product', 'distributor'])->findOrFail($id);
+        $requestItem = RequestItem::with(['user', 'details.product', 'distributor'])
+            ->where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })
+            ->findOrFail($id);
 
         return view('distribusi.bukti', compact('requestItem'));
     }

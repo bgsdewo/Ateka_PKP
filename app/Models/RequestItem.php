@@ -15,22 +15,39 @@ class RequestItem extends Model
         'user_id',
         'request_code',
         'type',
+        'is_procurement',
         'status',
+        'verified_at',
+        'verified_by',
+        'verification_notes',
+        'purchase_invoice',
+        'purchase_date',
+        'purchase_price',
+        'purchase_notes',
         'notes',
         'rejection_reason',
         'distributed_at',
         'distributed_by',
         'receiver_name',
         'distribution_notes',
+        'created_at',
     ];
 
     protected $casts = [
+        'is_procurement' => 'boolean',
+        'verified_at' => 'datetime',
         'distributed_at' => 'datetime',
+        'purchase_date' => 'date',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function distributor()
@@ -46,10 +63,10 @@ class RequestItem extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'pending' => 'Menunggu Persetujuan Kasubag TU',
-            'approved' => 'Disetujui (Menunggu Distribusi)',
+            'pending' => 'Menunggu Verifikasi Subbag TU',
+            'approved' => 'Disetujui TU (Akan Dibeli)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
-            'rejected' => 'Ditolak',
+            'rejected' => 'Ditolak Subbag TU',
             default => ucfirst($this->status),
         };
     }
@@ -58,8 +75,8 @@ class RequestItem extends Model
     {
         return match ($this->status) {
             'pending' => 'bg-warning text-dark',
-            'approved' => 'bg-info text-white',
-            'distributed' => 'bg-success text-white',
+            'approved' => 'bg-success text-white',
+            'distributed' => 'bg-primary text-white',
             'rejected' => 'bg-danger text-white',
             default => 'bg-secondary text-white',
         };
