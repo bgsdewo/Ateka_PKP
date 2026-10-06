@@ -512,7 +512,7 @@ class RequestRecapController extends Controller
         $subdit = strtolower($user->subdit_name ?? '');
         $position = strtolower($user->position ?? '');
 
-        return str_contains($email, 'pjf') || preg_match('/\bpjf\b/i', $name) || preg_match('/\bpjf\b/i', $subdit) || preg_match('/\bpjf\b/i', $position);
+        return str_contains($email, 'pjf') || preg_match('/\bpjf\b/i', $name) || preg_match('/\bpjf\b/i', $subdit) || preg_match('/\bpjf\b/i', $position) || str_contains($subdit, 'jabatan fungsional') || str_contains($position, 'jabatan fungsional');
     }
 
     /**
@@ -529,7 +529,7 @@ class RequestRecapController extends Controller
         $subdit = strtolower($user->subdit_name ?? '');
         $position = strtolower($user->position ?? '');
 
-        return str_contains($email, 'kbr') || preg_match('/\bkbr\b/i', $name) || preg_match('/\bkbr\b/i', $subdit) || preg_match('/\bkbr\b/i', $position);
+        return str_contains($email, 'kbr') || preg_match('/\bkbr\b/i', $name) || preg_match('/\bkbr\b/i', $subdit) || preg_match('/\bkbr\b/i', $position) || str_contains($subdit, 'kendala bangunan') || str_contains($position, 'kendala bangunan');
     }
 
     /**
@@ -606,7 +606,7 @@ class RequestRecapController extends Controller
             return [
                 'signerName' => ($user && $user->name && !str_contains(strtolower($user->name), 'subdit')) ? $user->name : 'Subdit PJF',
                 'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '-',
-                'subditLabel' => 'Subdirektorat PJF',
+                'subditLabel' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
             ];
         }
 
@@ -615,7 +615,7 @@ class RequestRecapController extends Controller
             return [
                 'signerName' => ($user && $user->name && !str_contains(strtolower($user->name), 'subdit')) ? $user->name : 'Subdit KBR',
                 'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '-',
-                'subditLabel' => 'Subdirektorat KBR',
+                'subditLabel' => 'Subdirektorat Kendala Bangunan Rumah',
             ];
         }
 

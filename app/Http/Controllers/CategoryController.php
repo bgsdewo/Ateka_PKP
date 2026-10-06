@@ -10,6 +10,10 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi() && !auth()->user()->isArsiparis()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU, PIC Distribusi, dan Arsiparis.');
+        }
+
         $categories = Category::orderBy('name', 'asc')->get();
 
         return view('master_data.categories', compact('categories'));

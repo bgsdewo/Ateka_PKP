@@ -23,7 +23,7 @@
                         <div>
                             <h1>Daftar Barang</h1>
                             <p>
-                                Kelola master barang, stok awal, satuan, dan batas minimum persediaan.
+                                Kelola master barang, stok awal, satuan, dan pencatatan persediaan barang.
                             </p>
                         </div>
                     </div>
@@ -248,10 +248,8 @@
                                             <td>
                                                 @if ($product->stock <= 0)
                                                     <span class="badge bg-dark">Stok Habis</span>
-                                                @elseif ($product->stock <= $product->minimum_stock)
-                                                    <span class="badge bg-danger">Stok Minimum</span>
                                                 @else
-                                                    <span class="badge bg-success">Aman</span>
+                                                    <span class="badge bg-success">Tersedia</span>
                                                 @endif
                                             </td>
                                             <td class="text-center">
@@ -390,7 +388,7 @@
                                     placeholder="Contoh: CV. Milia Pertama">
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Satuan <span class="text-danger">*</span></label>
                                 <select name="unit" id="unit" class="form-select" required>
                                     <option value="">Pilih Satuan</option>
@@ -409,19 +407,13 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Stok Awal <span class="text-danger">*</span></label>
                                 <input type="number" name="stock" id="stock" class="form-control" min="0"
                                     value="0" required>
                             </div>
 
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
-                                <input type="number" name="minimum_stock" id="minimum_stock" class="form-control"
-                                    min="0" value="10" required>
-                            </div>
-
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Harga Beli / Satuan <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
@@ -466,7 +458,6 @@
                 const $uraian = $('#uraian');
                 const $unit = $('#unit');
                 const $stock = $('#stock');
-                const $minimumStock = $('#minimum_stock');
                 const $purchasePrice = $('#purchase_price');
                 const $description = $('#description');
                 const $detailInfo = $('#detailBarangInfo');
@@ -487,7 +478,6 @@
                     $uraian.prop('readonly', false).val('');
                     $unit.prop('readonly', false).val('pcs');
                     $stock.prop('readonly', false).val(0);
-                    $minimumStock.prop('readonly', false).val(10);
                     $purchasePrice.prop('readonly', false).val(0);
                     $description.prop('readonly', false).val('');
                     $detailInfo.addClass('d-none');
@@ -523,7 +513,6 @@
                     $uraian.val($(this).data('uraian') || '');
                     $unit.val($(this).data('unit'));
                     $stock.val($(this).data('stock'));
-                    $minimumStock.val($(this).data('minimum-stock'));
                     $purchasePrice.val($(this).data('purchase-price'));
                     $description.val($(this).data('description'));
 
@@ -542,7 +531,6 @@
                     const uraian = $(this).data('uraian');
                     const unit = $(this).data('unit');
                     const stock = parseInt($(this).data('stock'));
-                    const minimumStock = parseInt($(this).data('minimum-stock'));
                     const purchasePrice = $(this).data('purchase-price');
                     const description = $(this).data('description');
                     const transactionCount = $(this).data('transaction-count');
@@ -557,7 +545,6 @@
                     $uraian.val(uraian ? uraian : '-');
                     $unit.val(unit);
                     $stock.val(stock);
-                    $minimumStock.val(minimumStock);
                     $purchasePrice.val(purchasePrice);
                     $description.val(description ? description : '-');
 
@@ -569,16 +556,13 @@
                     $uraian.prop('readonly', true);
                     $unit.prop('readonly', true);
                     $stock.prop('readonly', true);
-                    $minimumStock.prop('readonly', true);
                     $purchasePrice.prop('readonly', true);
                     $description.prop('readonly', true);
 
                     if (stock <= 0) {
                         $detailStatusStok.html('<span class="badge bg-dark">Stok Habis</span>');
-                    } else if (stock <= minimumStock) {
-                        $detailStatusStok.html('<span class="badge bg-danger">Stok Minimum</span>');
                     } else {
-                        $detailStatusStok.html('<span class="badge bg-success">Aman</span>');
+                        $detailStatusStok.html('<span class="badge bg-success">Tersedia</span>');
                     }
 
                     $detailTransactionCount.text(transactionCount + ' Transaksi');

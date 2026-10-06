@@ -222,6 +222,45 @@
             Demikian Bukti Serah Terima Barang ini dibuat dengan sebenarnya dalam rangkap untuk dipergunakan sebagai arsip administrasi persediaan ATK kantor.
         </p>
 
+        @php
+            $currentUser = auth()->user();
+
+            // Mapping default PIC per subdit (PJF: Desi, KBR: Hira, SDK: Fairuz, TU: Devi)
+            $subditPicMap = [
+                'pjf' => ['name' => 'Desi', 'pos' => 'PIC Distribusi Subdirektorat PJF'],
+                'kbr' => ['name' => 'Hira', 'pos' => 'PIC Distribusi Subdirektorat KBR'],
+                'sdk' => ['name' => 'Fairuz Armina Nur Azizah, S.T.', 'pos' => 'PIC Distribusi Subdirektorat SDK'],
+                'tu'  => ['name' => 'Devi Ismiyanti', 'pos' => 'PIC Distribusi Subbagian Tata Usaha'],
+            ];
+
+            $isKasubag = $currentUser && (in_array($currentUser->role, ['kasubag_tu', 'admin']) || str_contains(strtolower($currentUser->name), 'utami'));
+
+            if ($currentUser && $currentUser->isPicDistribusi()) {
+                // Diambil langsung dari nama akun PIC yang sedang login mencetak
+                $namaPenyerah = $currentUser->name;
+                $jabatanPenyerah = $currentUser->position ?? 'PIC Distribusi';
+            } elseif ($requestItem->distributor) {
+                $namaPenyerah = $requestItem->distributor->name;
+                $jabatanPenyerah = $requestItem->distributor->position ?? 'PIC Distribusi & Rekapitulasi';
+            } else {
+                // Jika Kasubag TU mencetak dan belum ada data distributor: cari PIC berdasarkan subdit pemohon
+                $pemohonText = strtolower(($requestItem->user->subdit_name ?? '') . ' ' . ($requestItem->user->position ?? '') . ' ' . ($requestItem->user->email ?? '') . ' ' . ($requestItem->user->name ?? ''));
+                $matched = false;
+                foreach ($subditPicMap as $code => $picData) {
+                    if (str_contains($pemohonText, $code)) {
+                        $namaPenyerah = $picData['name'];
+                        $jabatanPenyerah = $picData['pos'];
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched) {
+                    $namaPenyerah = 'Fairuz Armina Nur Azizah, S.T.';
+                    $jabatanPenyerah = 'PIC Distribusi & Rekapitulasi';
+                }
+            }
+        @endphp
+
         <!-- KOLOM TANDA TANGAN (3 PIHAK) -->
         <div class="row text-center mt-4" style="font-size: 13px;">
             <div class="col-4">
@@ -234,14 +273,14 @@
 
             <div class="col-4">
                 <p class="mb-1">Yang Menyerahkan,</p>
-                <p class="text-muted small mb-0">PIC Distribusi & Gudang</p>
+                <p class="text-muted small mb-0">PIC Distribusi &amp; Gudang</p>
                 <div style="height: 60px;"></div>
-                <p class="mb-0 fw-bold"><u>{{ $requestItem->distributor->name ?? 'Fairuz' }}</u></p>
-                <small class="text-muted">PIC Distribusi & Rekapitulasi</small>
+                <p class="mb-0 fw-bold"><u>{{ $namaPenyerah }}</u></p>
+                <small class="text-muted">{{ $jabatanPenyerah }}</small>
             </div>
 
             <div class="col-4">
-                <p class="mb-1">Mengetahui & Menyetujui,</p>
+                <p class="mb-1">Mengetahui &amp; Menyetujui,</p>
                 <p class="text-muted small mb-0">Kasubag Tata Usaha</p>
                 <div style="height: 60px;"></div>
                 <p class="mb-0 fw-bold"><u>Utami M.</u></p>

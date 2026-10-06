@@ -187,12 +187,24 @@
                                                                         <td>
                                                                             <ul class="mb-0 ps-3">
                                                                                 @foreach ($subItem->details as $d)
-                                                                                    <li>
-                                                                                        {{ $d->product->name ?? 'Barang' }} 
-                                                                                        <strong>({{ $d->quantity }} Pcs)</strong>
+                                                                                    <li class="mb-1">
+                                                                                        <strong>{{ $d->item_name }}</strong>
+                                                                                        @if ($d->approved_quantity !== null && $d->approved_quantity != $d->quantity)
+                                                                                            <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $d->effective_quantity }} Pcs</span>
+                                                                                            <small class="text-muted">(Diminta: {{ $d->quantity }} Pcs)</small>
+                                                                                        @else
+                                                                                            <strong>({{ $d->effective_quantity }} Pcs)</strong>
+                                                                                        @endif
+
+                                                                                        @if ($d->verification_note)
+                                                                                            <small class="text-primary d-block fst-italic">Catatan TU: "{{ $d->verification_note }}"</small>
+                                                                                        @endif
                                                                                     </li>
                                                                                 @endforeach
                                                                             </ul>
+                                                                            @if ($subItem->verification_notes)
+                                                                                <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $subItem->verification_notes }}</small>
+                                                                            @endif
                                                                         </td>
                                                                         <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
                                                                         <td class="text-end text-nowrap">
@@ -359,12 +371,24 @@
                                             <td>
                                                 <ul class="mb-0 ps-3 small">
                                                     @foreach ($req->details as $detail)
-                                                        <li>
-                                                            {{ $detail->product->name ?? 'Barang' }}
-                                                            (<strong>{{ $detail->quantity }} Pcs</strong>)
+                                                        <li class="mb-1">
+                                                            <strong>{{ $detail->item_name }}</strong>
+                                                            @if ($detail->approved_quantity !== null && $detail->approved_quantity != $detail->quantity)
+                                                                <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $detail->effective_quantity }} Pcs</span>
+                                                                <small class="text-muted">(Diminta: {{ $detail->quantity }} Pcs)</small>
+                                                            @else
+                                                                (<strong>{{ $detail->effective_quantity }} Pcs</strong>)
+                                                            @endif
+
+                                                            @if ($detail->verification_note)
+                                                                <small class="text-primary d-block fst-italic">Catatan TU: "{{ $detail->verification_note }}"</small>
+                                                            @endif
                                                         </li>
                                                     @endforeach
                                                 </ul>
+                                                @if ($req->verification_notes)
+                                                    <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $req->verification_notes }}</small>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if ($req->status === 'approved')

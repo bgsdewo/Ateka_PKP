@@ -4,44 +4,48 @@
     <style>
         .iq-navbar-header {
             position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
+            background: linear-gradient(135deg, rgba(10, 48, 56, 0.94) 0%, rgba(20, 75, 88, 0.90) 100%), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            min-height: 175px;
+            padding-top: 1.75rem;
+            padding-bottom: 4.5rem;
         }
 
         .iq-navbar-header .iq-container {
             position: relative;
             z-index: 2;
         }
+
+        .kpi-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 12px;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
+        }
     </style>
-    <div class="iq-navbar-header" style="height: 215px;">
+    <div class="iq-navbar-header">
         <div class="container-fluid iq-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
-                        <div>
-                            <h1 class="text-white fw-bold mb-1">Verifikasi & Persetujuan Permintaan ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.9;">
-                                Wewenang Kasubag TU untuk meninjau dan menyetujui usulan permintaan barang dari pegawai/subdit sebelum diproses pembelian secara offline.
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('rekapitulasi-permintaan.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
-                                Rekapitulasi Permintaan
-                            </a>
-                            <span class="badge bg-primary text-white px-3 py-2 fw-bold">
-                                Kasubag TU (Approver / Pimpinan)
-                            </span>
-                        </div>
-                    </div>
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <h1 class="text-white fw-bold mb-1 fs-3">
+                        @if (($category ?? 'pengadaan') === 'persediaan')
+                            Verifikasi Permintaan Stok (Persediaan)
+                        @else
+                            Verifikasi Pengadaan (Beli Baru)
+                        @endif
+                    </h1>
+                    <p class="text-white mb-0 small" style="opacity: 0.88; max-width: 750px; line-height: 1.5;">
+                        @if (($category ?? 'pengadaan') === 'persediaan')
+                            Wewenang Kasubag TU untuk meninjau dan menyetujui permintaan barang dari stok persediaan gudang sebelum diserahkan oleh PIC Distribusi.
+                        @else
+                            Wewenang Kasubag TU untuk meninjau dan menyetujui usulan permintaan ATK pengadaan beli baru sebelum diproses pembelian offline.
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -50,71 +54,50 @@
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
-        {{-- Flash Messages --}}
+        {{-- Flash Messages Banner --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-3 p-3 mb-4 rounded-3" role="alert" style="background: linear-gradient(90deg, #d1e7dd 0%, #e8f5e9 100%); border-left: 5px solid #198754 !important;">
+                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading fw-bold mb-0 text-success">Permintaan Berhasil Disetujui!</h6>
+                    <div class="small text-dark mt-0.5">{{ session('success') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-3 p-3 mb-4 rounded-3" role="alert" style="background: linear-gradient(90deg, #f8d7da 0%, #ffebee 100%); border-left: 5px solid #dc3545 !important;">
+                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading fw-bold mb-0 text-danger">Perhatian / Gagal Memproses</h6>
+                    <div class="small text-dark mt-0.5">{{ session('error') }}</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-
-        {{-- Pilihan Kategori Verifikasi (Pengadaan Beli Baru vs Permintaan Barang Stok) --}}
-        <div class="card mb-4 border-0 shadow-sm">
-            <div class="card-body p-2">
-                <ul class="nav nav-pills nav-fill gap-2" id="category-switcher">
-                    <li class="nav-item">
-                        <a class="nav-link py-2.5 px-3 d-flex align-items-center justify-content-center gap-2 fw-bold {{ ($category ?? 'pengadaan') === 'pengadaan' ? 'active shadow-sm' : 'bg-light text-dark' }}" 
-                           href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'pengadaan'])) }}">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="9" cy="21" r="1"></circle>
-                                <circle cx="20" cy="21" r="1"></circle>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                            </svg>
-                            <span>1. Verifikasi Pengadaan (Beli Baru)</span>
-                            @if (($pendingProcurementCount ?? 0) > 0)
-                                <span class="badge {{ ($category ?? 'pengadaan') === 'pengadaan' ? 'bg-danger text-white' : 'bg-danger text-white' }} rounded-pill ms-1">
-                                    {{ $pendingProcurementCount }} Menunggu
-                                </span>
-                            @endif
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link py-2.5 px-3 d-flex align-items-center justify-content-center gap-2 fw-bold {{ ($category ?? 'pengadaan') === 'persediaan' ? 'active shadow-sm' : 'bg-light text-dark' }}" 
-                           href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'persediaan'])) }}">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                            <span>2. Verifikasi Permintaan Stok (Persediaan)</span>
-                            @if (($pendingStockCount ?? 0) > 0)
-                                <span class="badge {{ ($category ?? 'pengadaan') === 'persediaan' ? 'bg-warning text-dark' : 'bg-warning text-dark' }} rounded-pill ms-1">
-                                    {{ $pendingStockCount }} Menunggu
-                                </span>
-                            @endif
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
 
         {{-- 4 Kartu KPI Kasubag TU --}}
         <div class="row g-3 mb-4" id="approval-metrics">
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0 kpi-card">
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Menunggu Verifikasi</span>
-                            <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem;">Menunggu Verifikasi</span>
+                            <span class="badge bg-warning text-dark rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">Pending</span>
                         </div>
                         <h2 class="fw-bold text-warning mb-0">{{ $pendingCount }}</h2>
-                        <small class="text-muted">
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
                             {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Permintaan dari stok gudang' : 'Perlu tindakan persetujuan' }}
                         </small>
                     </div>
@@ -122,14 +105,14 @@
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0 kpi-card">
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Telah Disetujui</span>
-                            <span class="badge bg-success text-white rounded-pill">Approved</span>
+                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem;">Telah Disetujui</span>
+                            <span class="badge bg-success text-white rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">Approved</span>
                         </div>
                         <h2 class="fw-bold text-success mb-0">{{ $approvedCount }}</h2>
-                        <small class="text-muted">
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
                             {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Siap diserahkan oleh PIC Distribusi' : 'Akan diproses pembelian TU' }}
                         </small>
                     </div>
@@ -137,29 +120,29 @@
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0 kpi-card">
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Permintaan Ditolak</span>
-                            <span class="badge bg-danger text-white rounded-pill">Rejected</span>
+                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem;">Permintaan Ditolak</span>
+                            <span class="badge bg-danger text-white rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">Rejected</span>
                         </div>
                         <h2 class="fw-bold text-danger mb-0">{{ $rejectedCount }}</h2>
-                        <small class="text-muted">Tidak disetujui pimpinan</small>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Tidak disetujui pimpinan</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0 kpi-card">
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">
+                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem;">
                                 Total {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Permintaan Stok' : 'Usulan Pengadaan' }}
                             </span>
-                            <span class="badge bg-primary text-white rounded-pill">Total</span>
+                            <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">Total</span>
                         </div>
                         <h2 class="fw-bold text-dark mb-0">{{ $totalCount }}</h2>
-                        <small class="text-muted">Seluruh arsip kategori ini</small>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Seluruh arsip kategori ini</small>
                     </div>
                 </div>
             </div>
@@ -526,17 +509,26 @@
                                                                                     <tr>
                                                                                         <th>Nama Barang ATK</th>
                                                                                         <th width="15%" class="text-center">Diminta</th>
-                                                                                        <th width="22%" class="text-center">Disetujui <span class="text-danger">*</span></th>
-                                                                                        <th width="28%">Catatan Barang (Opsional)</th>
+                                                                                        <th width="24%" class="text-center">Disetujui <span class="text-danger">*</span></th>
+                                                                                        <th width="26%">Catatan Barang (Opsional)</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
                                                                                     @foreach ($req->details as $detail)
+                                                                                        @php
+                                                                                            $productStock = $detail->product ? (int) $detail->product->stock : null;
+                                                                                            $defaultApproved = min($detail->quantity, $productStock !== null ? $productStock : $detail->quantity);
+                                                                                        @endphp
                                                                                         <tr>
                                                                                             <td>
                                                                                                 <strong>{{ $detail->item_name }}</strong><br>
                                                                                                 @if ($detail->product)
                                                                                                     <small class="text-muted">{{ $detail->product->category->name ?? '-' }} ({{ $detail->product->code ?? '-' }})</small>
+                                                                                                    <div class="mt-1">
+                                                                                                        <span class="badge {{ ($productStock ?? 0) > 0 ? 'bg-info-subtle text-info border' : 'bg-danger-subtle text-danger border' }}" style="font-size: 0.72rem;">
+                                                                                                            Sisa Stok Gudang: <strong>{{ $productStock ?? 0 }}</strong> {{ $detail->item_unit }}
+                                                                                                        </span>
+                                                                                                    </div>
                                                                                                 @elseif ($detail->specification)
                                                                                                     <small class="text-info fst-italic">Spesifikasi: {{ $detail->specification }}</small>
                                                                                                 @else
@@ -547,13 +539,25 @@
                                                                                                 {{ $detail->quantity }} {{ $detail->item_unit }}
                                                                                             </td>
                                                                                             <td>
-                                                                                                <input type="number" 
-                                                                                                       name="approved_quantity[{{ $detail->id }}]" 
-                                                                                                       class="form-control form-control-sm text-center fw-bold" 
-                                                                                                       min="0" 
-                                                                                                       max="{{ $detail->quantity }}" 
-                                                                                                       value="{{ $detail->quantity }}" 
-                                                                                                       required>
+                                                                                                <div class="input-group input-group-sm">
+                                                                                                    <input type="number" 
+                                                                                                           name="approved_quantity[{{ $detail->id }}]" 
+                                                                                                           class="form-control form-control-sm text-center fw-bold" 
+                                                                                                           min="0" 
+                                                                                                           @if(!$req->is_procurement && $productStock !== null)
+                                                                                                               max="{{ $productStock }}"
+                                                                                                           @endif
+                                                                                                           value="{{ $defaultApproved }}" 
+                                                                                                           required>
+                                                                                                    <span class="input-group-text small">{{ $detail->item_unit }}</span>
+                                                                                                </div>
+                                                                                                <small class="text-muted d-block text-center mt-1" style="font-size: 0.7rem;">
+                                                                                                    @if(!$req->is_procurement && $productStock !== null)
+                                                                                                        Bebas tentukan (Maks: {{ $productStock }} {{ $detail->item_unit }})
+                                                                                                    @else
+                                                                                                        Bebas tentukan kuantitas
+                                                                                                    @endif
+                                                                                                </small>
                                                                                             </td>
                                                                                             <td>
                                                                                                 <input type="text" 
@@ -586,8 +590,9 @@
                                                                                     <div>1. Menyetujui usulan ini menandakan bahwa barang disetujui untuk diproses pembelian oleh Kasubag TU secara offline.</div>
                                                                                     <div>2. Setelah barang dibeli offline, Kasubag TU menambahkan stok di <strong>Master Data &rarr; Daftar Barang ATK</strong>.</div>
                                                                                 @else
-                                                                                    <div>1. Menyetujui permintaan ini menandakan bahwa permohonan pengambilan barang dari stok persediaan disetujui oleh Kasubag TU.</div>
-                                                                                    <div>2. Tiket ini selanjutnya akan diproses penyerahan fisiknya oleh <strong>PIC Distribusi</strong>.</div>
+                                                                                    <div>1. Menyetujui permintaan ini akan <strong>mengurangi stok gudang secara real-time</strong> sesuai kuantitas yang disetujui Kasubag TU.</div>
+                                                                                    <div>2. Data transaksi akan <strong>langsung tercatat di Barang Keluar</strong> dan valuasi persediaan otomatis berkurang.</div>
+                                                                                    <div>3. Tiket ini selanjutnya siap diserahkan fisiknya oleh <strong>PIC Distribusi</strong>.</div>
                                                                                 @endif
                                                                             </div>
                                                                         </div>
@@ -923,6 +928,55 @@
                     }
                 });
             }
+
+            // SweetAlert2 Toast / Modal Notification
+            @if (session('success'))
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Permintaan Berhasil Disetujui!',
+                        html: `<div class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.5;">{!! addslashes(session('success')) !!}</div>`,
+                        confirmButtonText: '<i class="bi bi-check-circle me-1"></i> Selesai & Tutup',
+                        confirmButtonColor: '#198754',
+                        background: '#ffffff',
+                        customClass: {
+                            popup: 'rounded-4 shadow-lg border-0 p-4',
+                            title: 'fw-bold text-dark fs-4 mb-1',
+                            confirmButton: 'btn btn-success px-4 py-2 fw-bold rounded-pill shadow-sm'
+                        },
+                        timer: 6000,
+                        timerProgressBar: true
+                    });
+                }
+            @endif
+
+            @if (session('error'))
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Perhatian / Terjadi Kesalahan',
+                        html: `<div class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.5;">{!! addslashes(session('error')) !!}</div>`,
+                        confirmButtonText: 'Tutup',
+                        confirmButtonColor: '#dc3545',
+                        customClass: {
+                            popup: 'rounded-4 shadow-lg border-0 p-4',
+                            title: 'fw-bold text-danger fs-4 mb-1',
+                            confirmButton: 'btn btn-danger px-4 py-2 fw-bold rounded-pill shadow-sm'
+                        }
+                    });
+                }
+            @endif
+
+            // Loading state on approval form submissions
+            document.querySelectorAll('form[action*="/persetujuan/"], form[action*="/verifikasi/"]').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const btn = this.querySelector('button[type="submit"]');
+                    if (btn && !btn.disabled) {
+                        btn.disabled = true;
+                        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Menyimpan...`;
+                    }
+                });
+            });
         });
     </script>
 @endpush

@@ -161,15 +161,38 @@
                                             <td>
                                                 <ul class="ps-3 mb-0 small">
                                                     @foreach ($req->details as $detail)
-                                                        <li>
+                                                        <li class="mb-1">
                                                             <strong>{{ $detail->item_name }}</strong>
-                                                            ({{ $detail->quantity }} {{ $detail->item_unit }})
+                                                            @if (in_array($req->status, ['approved', 'distributed']))
+                                                                @if ($detail->approved_quantity !== null && $detail->approved_quantity != $detail->quantity)
+                                                                    <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
+                                                                    <small class="text-muted">(Diminta: {{ $detail->quantity }} {{ $detail->item_unit }})</small>
+                                                                @else
+                                                                    <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
+                                                                @endif
+                                                            @else
+                                                                <span class="text-secondary">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
+                                                            @endif
+
                                                             @if ($detail->specification)
-                                                                <small class="text-muted d-block fst-italic">"{{ $detail->specification }}"</small>
+                                                                <small class="text-muted d-block fst-italic">Spesifikasi: {{ $detail->specification }}</small>
+                                                            @endif
+
+                                                            @if ($detail->verification_note)
+                                                                <small class="text-primary d-block fw-semibold fst-italic mt-0.5">
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                                                    Catatan Kasubag TU: "{{ $detail->verification_note }}"
+                                                                </small>
                                                             @endif
                                                         </li>
                                                     @endforeach
                                                 </ul>
+
+                                                @if ($req->verification_notes)
+                                                    <div class="mt-1 pt-1 border-top small text-primary fst-italic" style="font-size: 0.75rem;">
+                                                        <strong>Catatan Kasubag TU:</strong> {{ $req->verification_notes }}
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <small class="text-secondary">{{ $req->notes ?? '-' }}</small>
@@ -290,11 +313,19 @@
                                                                 @endif
                                                             </div>
                                                             <div class="modal-footer">
-                                                                @if (in_array($req->status, ['approved', 'distributed']))
+                                                                @if ($req->status === 'distributed' || (!$req->is_procurement && $req->status === 'approved'))
                                                                     <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
                                                                         class="btn btn-secondary btn-sm">
                                                                         Cetak Bukti Tanda Terima
                                                                     </a>
+                                                                @elseif ($req->is_procurement && $req->status === 'approved')
+                                                                    <span class="badge bg-warning-subtle text-dark border me-auto py-2 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                                        </svg>
+                                                                        Barang dalam proses pembelian Subbag TU
+                                                                    </span>
                                                                 @endif
                                                                 <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Tutup</button>
                                                             </div>

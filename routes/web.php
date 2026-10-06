@@ -36,6 +36,15 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/register', [AuthController::class, 'storeRegister'])
         ->name('register.store');
+
+    // ==========================================
+    // ROUTE LUPA PASSWORD DENGAN NIP
+    // ==========================================
+    Route::get('/lupa-password', [AuthController::class, 'showForgotPassword'])
+        ->name('password.forgot');
+
+    Route::post('/lupa-password', [AuthController::class, 'resetPasswordWithNip'])
+        ->name('password.reset.nip');
 });
 
 Route::middleware('auth')->group(function () {

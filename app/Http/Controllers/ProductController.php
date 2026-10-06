@@ -14,6 +14,10 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi() && !auth()->user()->isArsiparis()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU, PIC Distribusi, dan Arsiparis.');
+        }
+
         $month = $request->get('month');
         $year = $request->get('year');
         $startDate = $request->get('start_date');
@@ -146,7 +150,7 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
-            'minimum_stock' => ['required', 'integer', 'min:0'],
+            'minimum_stock' => ['nullable', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
             'transaction_date' => ['nullable', 'date'],
@@ -162,9 +166,6 @@ class ProductController extends Controller
             'stock.required' => 'Stok awal wajib diisi.',
             'stock.integer' => 'Stok awal harus berupa angka.',
             'stock.min' => 'Stok awal tidak boleh kurang dari 0.',
-            'minimum_stock.required' => 'Stok minimum wajib diisi.',
-            'minimum_stock.integer' => 'Stok minimum harus berupa angka.',
-            'minimum_stock.min' => 'Stok minimum tidak boleh kurang dari 0.',
             'purchase_price.required' => 'Harga beli/perolehan wajib diisi.',
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
@@ -180,7 +181,7 @@ class ProductController extends Controller
                 'name' => $request->name,
                 'unit' => $request->unit,
                 'stock' => $request->stock,
-                'minimum_stock' => $request->minimum_stock,
+                'minimum_stock' => $request->minimum_stock ?? 0,
                 'purchase_price' => $request->purchase_price,
                 'description' => $request->description,
             ]);
@@ -221,7 +222,7 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
-            'minimum_stock' => ['required', 'integer', 'min:0'],
+            'minimum_stock' => ['nullable', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
             'transaction_date' => ['nullable', 'date'],
@@ -237,9 +238,6 @@ class ProductController extends Controller
             'stock.required' => 'Stok awal wajib diisi.',
             'stock.integer' => 'Stok awal harus berupa angka.',
             'stock.min' => 'Stok awal tidak boleh kurang dari 0.',
-            'minimum_stock.required' => 'Stok minimum wajib diisi.',
-            'minimum_stock.integer' => 'Stok minimum harus berupa angka.',
-            'minimum_stock.min' => 'Stok minimum tidak boleh kurang dari 0.',
             'purchase_price.required' => 'Harga beli/perolehan wajib diisi.',
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
@@ -255,7 +253,7 @@ class ProductController extends Controller
                 'name'           => $request->name,
                 'unit'           => $request->unit,
                 'stock'          => $request->stock,
-                'minimum_stock'  => $request->minimum_stock,
+                'minimum_stock'  => $request->minimum_stock ?? ($daftar_barang->minimum_stock ?? 0),
                 'purchase_price' => $request->purchase_price,
                 'description'    => $request->description,
             ]);

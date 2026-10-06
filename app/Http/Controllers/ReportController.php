@@ -15,6 +15,10 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi() && !auth()->user()->isArsiparis()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Laporan & Arsip hanya dapat diakses oleh Kasubag TU, PIC Distribusi, dan Arsiparis.');
+        }
+
         $type = $request->type;
         $recipientType = $request->recipient_type; // 'subdit' or 'individu'
         $month = $request->month;

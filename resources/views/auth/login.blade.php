@@ -172,8 +172,13 @@
                                         </div>
                                         <div class="col-lg-12">
                                             <div class="form-group mb-4">
-                                                <label for="password"
-                                                    class="form-label font-weight-bold text-theme">Password</label>
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="password"
+                                                        class="form-label font-weight-bold text-theme mb-0">Password</label>
+                                                    <a href="{{ route('password.forgot') }}" class="small fw-semibold" style="color: #144b59; text-decoration: none;">
+                                                        Lupa Password?
+                                                    </a>
+                                                </div>
                                                 <input type="password" name="password" class="form-control"
                                                     placeholder="Masukkan Password" required>
                                             </div>

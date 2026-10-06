@@ -15,6 +15,10 @@ class ApprovalController extends Controller
 {
     public function index(Request $request)
     {
+        if (!auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Verifikasi & Persetujuan hanya dapat diakses oleh Kasubag TU.');
+        }
+
         $category = $request->get('category'); // 'pengadaan' or 'persediaan' or null
         $statusFilter = $request->get('status');
         $typeFilter = $request->get('type');
@@ -107,6 +111,10 @@ class ApprovalController extends Controller
     {
         $item = RequestItem::with('details.product', 'user')->findOrFail($id);
 
+        if ($item->status !== 'pending') {
+            return redirect()->back()->with('error', 'Permintaan ini sudah pernah diproses verifikasi sebelumnya.');
+        }
+
         $request->validate([
             'status' => 'required|in:approved,rejected',
             'rejection_reason' => 'nullable|string|max:255',
@@ -130,12 +138,21 @@ class ApprovalController extends Controller
                         ? (int) $approvedQuantities[$detail->id]
                         : (int) $detail->quantity;
 
-                    if ($approvedQty > $detail->quantity) {
-                        return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . ($detail->item_name ?? 'Barang') . '" tidak boleh melebihi jumlah permintaan awal (' . $detail->quantity . ').');
-                    }
-
                     if ($approvedQty > 0) {
                         $hasApprovedItems = true;
+                    }
+
+                    if ($approvedQty > $detail->quantity) {
+                        $itemName = $detail->product ? $detail->product->name : ($detail->custom_product_name ?? 'Barang');
+                        return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $itemName . '" (' . $approvedQty . ') tidak boleh melebihi jumlah yang diajukan (' . $detail->quantity . ').');
+                    }
+
+                    // Jika permintaan persediaan (dari stok gudang), kuantitas disetujui tidak boleh melebihi sisa stok yang ada
+                    if (!$item->is_procurement && $detail->product_id) {
+                        $product = Product::find($detail->product_id);
+                        if ($product && $approvedQty > $product->stock) {
+                            return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $product->name . '" (' . $approvedQty . ' ' . $product->unit . ') melebihi sisa stok gudang (' . $product->stock . ' ' . $product->unit . ').');
+                        }
                     }
                 }
 
@@ -143,7 +160,7 @@ class ApprovalController extends Controller
                     return redirect()->back()->with('error', 'Jumlah barang yang disetujui tidak boleh 0 untuk semua barang. Jika ingin menolak permohonan, pilih opsi Tolak Permintaan.');
                 }
 
-                // 2. Simpan kuantitas yang disetujui (tanpa memotong stok karena barang baru akan dibeli offline oleh Kasubag TU)
+                // 2. Simpan kuantitas yang disetujui & lakukan pemotongan stok jika barang persediaan
                 foreach ($item->details as $detail) {
                     $approvedQty = isset($approvedQuantities[$detail->id])
                         ? (int) $approvedQuantities[$detail->id]
@@ -154,6 +171,43 @@ class ApprovalController extends Controller
                         'approved_quantity' => $approvedQty,
                         'verification_note' => $itemNote,
                     ]);
+
+                    // Jika permintaan barang persediaan dari stok gudang & disetujui > 0
+                    if (!$item->is_procurement && $detail->product_id && $approvedQty > 0) {
+                        $product = Product::lockForUpdate()->find($detail->product_id);
+                        if ($product) {
+                            $stockAfter = max(0, $product->stock - $approvedQty);
+                            $product->stock = $stockAfter;
+                            $product->save();
+
+                            $pemohonName = $item->user->name ?? 'Pegawai';
+                            $pemohonUnit = $item->user->position ? ' (' . $item->user->position . ')' : '';
+                            $uraianPenerima = $pemohonName . $pemohonUnit;
+
+                            $noteText = 'Pengeluaran persediaan ATK untuk ' . $pemohonName . ' [' . $item->request_code . ']';
+                            if ($itemNote) {
+                                $noteText .= ' - ' . $itemNote;
+                            } elseif ($request->filled('verification_notes')) {
+                                $noteText .= ' - ' . $request->verification_notes;
+                            }
+
+                            // Catat transaksi Barang Keluar secara real-time
+                            StockTransaction::create([
+                                'product_id'       => $product->id,
+                                'user_id'          => Auth::id(),
+                                'type'             => 'keluar',
+                                'recipient_type'   => $item->type ?? 'individu',
+                                'quantity'         => $approvedQty,
+                                'stock_after'      => $stockAfter,
+                                'transaction_date' => now()->toDateString(),
+                                'no_faktur'        => $item->request_code,
+                                'uraian'           => $uraianPenerima,
+                                'kondisi'          => 'Baik',
+                                'harga_perolehan'  => $product->purchase_price ?? 0,
+                                'note'             => $noteText,
+                            ]);
+                        }
+                    }
                 }
 
                 // Update status tiket pengajuan
@@ -168,7 +222,7 @@ class ApprovalController extends Controller
                 if ($item->is_procurement) {
                     $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Barang akan diproses untuk pembelian offline oleh Kasubag TU.';
                 } else {
-                    $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Barang siap diserahkan oleh PIC Distribusi.';
+                    $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
                 }
             } else {
                 // Status rejected

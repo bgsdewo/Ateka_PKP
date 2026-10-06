@@ -23,7 +23,7 @@
                         <div>
                             <h1 class="text-white fw-bold mb-1">Manajemen Pengguna & Peran (Role)</h1>
                             <p class="text-white mb-0" style="opacity: 0.9;">
-                                Kelola hak akses akun pengguna untuk 4 peran: Kasubag TU, Arsiparis, PIC Distribusi, dan Pegawai / Subdit.
+                                Kelola hak akses akun pengguna untuk 5 peran: Kasubag TU, Arsiparis, PIC Distribusi, Subdirektorat (Kolektif), dan Pegawai (Individu).
                             </p>
                         </div>
                         <button type="button" class="btn btn-warning text-dark fw-bold btn-sm btn-create-user shadow-sm">
@@ -108,7 +108,7 @@
                                                 'arsiparis' => 'Arsiparis (Pelaporan)',
                                                 'pic_distribusi' => 'PIC Distribusi (Gudang)',
                                                 'subdit' => 'Subdirektorat (Kolektif)',
-                                                default => 'Pegawai (Requester)',
+                                                default => 'Pegawai (Individu)',
                                             };
                                         @endphp
                                         <tr>
@@ -117,6 +117,9 @@
                                                 <strong class="text-dark">{{ $user->name }}</strong>
                                                 <br>
                                                 <small class="text-muted">{{ $user->position ?? '-' }}</small>
+                                                @if($user->nip)
+                                                    <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $user->nip }}</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="badge {{ $roleBadge }} px-2.5 py-1">
@@ -134,9 +137,11 @@
                                                     <button type="button" class="btn btn-info btn-sm btn-detail-user text-white"
                                                         data-id="{{ $user->id }}" 
                                                         data-name="{{ e($user->name) }}"
+                                                        data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
                                                         data-position="{{ e($user->position) }}"
+                                                        data-subdit-name="{{ e($user->subdit_name) }}"
                                                         data-role-label="{{ $roleLabel }}"
                                                         data-created-at="{{ $user->created_at ? $user->created_at->format('d-m-Y H:i') : '-' }}"
                                                         data-updated-at="{{ $user->updated_at ? $user->updated_at->format('d-m-Y H:i') : '-' }}">
@@ -145,9 +150,11 @@
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit-user text-dark"
                                                         data-id="{{ $user->id }}" 
                                                         data-name="{{ e($user->name) }}"
+                                                        data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
-                                                        data-position="{{ e($user->position) }}">
+                                                        data-position="{{ e($user->position) }}"
+                                                        data-subdit-name="{{ e($user->subdit_name) }}">
                                                         Edit
                                                     </button>
                                                     <form
@@ -205,6 +212,14 @@
                                     <strong id="detailCreatedAt">-</strong>
                                 </div>
                                 <div class="col-md-6">
+                                    <small class="text-muted d-block">Nomor Induk Pegawai (NIP)</small>
+                                    <strong id="detailNip">-</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block">Unit / Subdirektorat Resmi</small>
+                                    <strong id="detailSubditName">-</strong>
+                                </div>
+                                <div class="col-md-6">
                                     <small class="text-muted d-block">Terakhir Diupdate</small>
                                     <strong id="detailUpdatedAt">-</strong>
                                 </div>
@@ -218,6 +233,17 @@
                                 </label>
                                 <input type="text" name="name" id="name" class="form-control"
                                     placeholder="Contoh: Utami M" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">
+                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="nip" id="nip" class="form-control"
+                                    placeholder="Contoh: 19950510 202012 1 002" required>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    Wajib diisi untuk identitas dinas & verifikasi keamanan lupa password.
+                                </small>
                             </div>
 
                             <div class="col-md-6">
@@ -236,17 +262,48 @@
                                     <option value="kasubag_tu">Kasubag TU (Approver / Pimpinan)</option>
                                     <option value="arsiparis">Arsiparis (Pelaporan & Administrasi)</option>
                                     <option value="pic_distribusi">PIC Distribusi (Pengelola / Gudang)</option>
-                                    <option value="pegawai" selected>Pegawai (Requester / Pemohon)</option>
-                                    <option value="subdit">Perwakilan Subdirektorat (Kolektif)</option>
+                                    <option value="subdit">Subdirektorat (Pemohon Kolektif)</option>
+                                    <option value="pegawai" selected>Pegawai (Pemohon Individu)</option>
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
+                            {{-- Pilihan 4 Perwakilan Unit PIC Distribusi (TU, KBR, SDK, PJF) --}}
+                            <div class="col-md-6 d-none" id="picUnitContainer">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Jabatan / Unit Kerja / Subdirektorat
+                                    Perwakilan Divisi PIC (TU, KBR, SDK, PJF) <span class="text-danger">*</span>
+                                </label>
+                                <select name="pic_unit_choice" id="pic_unit_choice" class="form-select">
+                                    <option value="" disabled selected>-- Pilih 1 dari 4 Divisi PIC --</option>
+                                    <option value="TU">Subbagian TU (Tata Usaha)</option>
+                                    <option value="KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
+                                    <option value="SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
+                                    <option value="PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
+                                </select>
+                                <small class="text-muted" style="font-size: 0.75rem;">Pilih unit penugasan PIC Distribusi.</small>
+                            </div>
+
+                            {{-- Pilihan Unit Subdirektorat (Jika role == subdit) --}}
+                            <div class="col-md-6 d-none" id="subditUnitContainer">
+                                <label class="form-label fw-bold small text-uppercase">
+                                    Unit Subdirektorat <span class="text-danger">*</span>
+                                </label>
+                                <select name="subdit_unit_choice" id="subdit_unit_choice" class="form-select">
+                                    <option value="" disabled selected>-- Pilih Unit Subdirektorat --</option>
+                                    <option value="Subbagian TU">Subbagian TU (Tata Usaha)</option>
+                                    <option value="Subdirektorat KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
+                                    <option value="Subdirektorat SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
+                                    <option value="Subdirektorat PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
+                                </select>
+                                <small class="text-muted" style="font-size: 0.75rem;">Pilih unit Subdirektorat resmi yang diwakili.</small>
+                            </div>
+
+                            <div class="col-md-6" id="positionContainer">
+                                <label class="form-label fw-bold small text-uppercase">
+                                    Jabatan / Posisi Kerja
                                 </label>
                                 <input type="text" name="position" id="position" class="form-control"
-                                    placeholder="Contoh: Kasubag TU / Staf Keuangan / Subdit SDK">
+                                    placeholder="Contoh: Kasubag TU / PIC Distribusi Subdirektorat SDK / Staf Keuangan">
+                                <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih perwakilan PIC/Subdit, atau dapat disesuaikan.</small>
                             </div>
 
                             <div class="col-md-6 password-wrapper">
@@ -295,9 +352,14 @@
                 const $title = $('#modalUserLabel');
                 const $btnSubmit = $('#btnSubmitUser');
                 const $name = $('#name');
+                const $nip = $('#nip');
                 const $email = $('#email');
                 const $role = $('#role');
                 const $position = $('#position');
+                const $picUnitContainer = $('#picUnitContainer');
+                const $picUnitChoice = $('#pic_unit_choice');
+                const $subditUnitContainer = $('#subditUnitContainer');
+                const $subditUnitChoice = $('#subdit_unit_choice');
                 const $password = $('#password');
                 const $passwordConfirmation = $('#password_confirmation');
                 const $passwordWrapper = $('.password-wrapper');
@@ -306,17 +368,65 @@
                 const $detailInfo = $('#detailUserInfo');
                 const $detailUserId = $('#detailUserId');
                 const $detailRoleLabel = $('#detailRoleLabel');
+                const $detailNip = $('#detailNip');
+                const $detailSubditName = $('#detailSubditName');
                 const $detailCreatedAt = $('#detailCreatedAt');
                 const $detailUpdatedAt = $('#detailUpdatedAt');
+
+                function updateRoleContainers() {
+                    const roleVal = $role.val();
+                    if (roleVal === 'pic_distribusi') {
+                        $picUnitContainer.removeClass('d-none');
+                        $subditUnitContainer.addClass('d-none');
+                    } else if (roleVal === 'subdit') {
+                        $subditUnitContainer.removeClass('d-none');
+                        $picUnitContainer.addClass('d-none');
+                    } else {
+                        $picUnitContainer.addClass('d-none');
+                        $subditUnitContainer.addClass('d-none');
+                        if (roleVal === 'arsiparis' && !$position.val()) {
+                            $position.val('Arsiparis Ahli Pertama');
+                        } else if (roleVal === 'kasubag_tu' && !$position.val()) {
+                            $position.val('Kasubag TU');
+                        }
+                    }
+                }
+
+                $role.on('change', updateRoleContainers);
+
+                $picUnitChoice.on('change', function() {
+                    const val = $(this).val();
+                    const map = {
+                        'TU': 'PIC Distribusi Subbagian Tata Usaha',
+                        'KBR': 'PIC Distribusi Subdirektorat KBR',
+                        'SDK': 'PIC Distribusi Subdirektorat SDK',
+                        'PJF': 'PIC Distribusi Subdirektorat PJF',
+                    };
+                    if (map[val]) {
+                        $position.val(map[val]);
+                    }
+                });
+
+                $subditUnitChoice.on('change', function() {
+                    const val = $(this).val();
+                    if (val) {
+                        $position.val(val);
+                    }
+                });
 
                 function resetModalUser() {
                     $form[0].reset();
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $name.prop('readonly', false).val('');
+                    $nip.prop('readonly', false).val('');
                     $email.prop('readonly', false).val('');
                     $role.prop('disabled', false).val('pegawai');
                     $position.prop('readonly', false).val('');
+                    $picUnitChoice.val('').prop('disabled', false);
+                    $subditUnitChoice.val('').prop('disabled', false);
+                    $picUnitContainer.addClass('d-none');
+                    $subditUnitContainer.addClass('d-none');
                     $password.prop('readonly', false).val('');
                     $passwordConfirmation.prop('readonly', false).val('');
                     $passwordWrapper.removeClass('d-none');
@@ -327,6 +437,8 @@
                     $detailInfo.addClass('d-none');
                     $detailUserId.text('-');
                     $detailRoleLabel.text('-');
+                    $detailNip.text('-');
+                    $detailSubditName.text('-');
                     $detailCreatedAt.text('-');
                     $detailUpdatedAt.text('-');
                     $title.text('Form Pengguna');
@@ -348,9 +460,28 @@
                     $form.attr('action', updateUrl);
                     $method.prop('disabled', false).val('PUT');
                     $name.val($(this).data('name'));
+                    $nip.val($(this).data('nip'));
                     $email.val($(this).data('email'));
                     $role.val($(this).data('role') || 'pegawai');
                     $position.val($(this).data('position'));
+
+                    updateRoleContainers();
+
+                    const subditName = ($(this).data('subdit-name') || '').toString();
+                    const pos = ($(this).data('position') || '').toString().toLowerCase();
+                    const sub = subditName.toLowerCase();
+
+                    if ($(this).data('role') === 'pic_distribusi') {
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('PJF');
+                    } else if ($(this).data('role') === 'subdit') {
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $subditUnitChoice.val('Subdirektorat SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $subditUnitChoice.val('Subdirektorat PJF');
+                    }
 
                     // Pada edit, password boleh kosong
                     $password.prop('required', false);
@@ -369,17 +500,39 @@
                     resetModalUser();
                     const id = $(this).data('id');
                     const name = $(this).data('name');
+                    const nip = $(this).data('nip');
                     const email = $(this).data('email');
                     const role = $(this).data('role');
                     const roleLabel = $(this).data('role-label');
                     const position = $(this).data('position');
+                    const subditName = $(this).data('subdit-name') || '';
                     const createdAt = $(this).data('created-at');
                     const updatedAt = $(this).data('updated-at');
 
                     $name.val(name).prop('readonly', true);
+                    $nip.val(nip).prop('readonly', true);
                     $email.val(email).prop('readonly', true);
                     $role.val(role).prop('disabled', true);
                     $position.val(position).prop('readonly', true);
+
+                    updateRoleContainers();
+                    $picUnitChoice.prop('disabled', true);
+                    $subditUnitChoice.prop('disabled', true);
+
+                    const pos = (position || '').toString().toLowerCase();
+                    const sub = (subditName || '').toString().toLowerCase();
+
+                    if (role === 'pic_distribusi') {
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('PJF');
+                    } else if (role === 'subdit') {
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $subditUnitChoice.val('Subdirektorat SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $subditUnitChoice.val('Subdirektorat PJF');
+                    }
 
                     $passwordWrapper.addClass('d-none');
                     $password.prop('required', false);
@@ -387,6 +540,8 @@
 
                     $detailUserId.text(id);
                     $detailRoleLabel.text(roleLabel);
+                    $detailNip.text(nip || '-');
+                    $detailSubditName.text(subditName || '-');
                     $detailCreatedAt.text(createdAt);
                     $detailUpdatedAt.text(updatedAt);
                     $detailInfo.removeClass('d-none');

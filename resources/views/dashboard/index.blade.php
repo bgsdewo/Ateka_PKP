@@ -21,8 +21,8 @@
         'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
         'arsiparis' => 'Arsiparis (Pelaporan & Administrasi)',
         'pic_distribusi' => 'PIC Distribusi (Pengelola / Gudang)',
-        'subdit' => 'Subdirektorat (Requester Kolektif)',
-        default => 'Pegawai / Subdit (Requester / Pemohon)',
+        'subdit' => 'Subdirektorat (Pemohon Kolektif)',
+        default => 'Pegawai (Pemohon Individu)',
     };
 @endphp
 
@@ -316,26 +316,63 @@
                                     <tbody>
                                         @forelse ($userRequests as $req)
                                             <tr>
-                                                <td><strong class="font-monospace text-primary">{{ $req->request_code }}</strong></td>
+                                                <td>
+                                                    <strong class="font-monospace text-primary">{{ $req->request_code }}</strong>
+                                                    @if ($req->is_procurement)
+                                                        <br><span class="badge bg-warning-subtle text-dark border px-1.5 py-0.5 mt-1" style="font-size: 0.7rem;">Pengadaan</span>
+                                                    @endif
+                                                </td>
                                                 <td><span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }}">{{ ucfirst($req->type) }}</span></td>
                                                 <td><small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small></td>
                                                 <td>
                                                     <ul class="mb-0 ps-3 small">
                                                         @foreach ($req->details as $d)
-                                                            <li>{{ $d->product->name ?? 'Barang' }} ({{ $d->quantity }} Pcs)</li>
+                                                            <li class="mb-1">
+                                                                <strong>{{ $d->item_name }}</strong>
+                                                                @if (in_array($req->status, ['approved', 'distributed']))
+                                                                    @if ($d->approved_quantity !== null && $d->approved_quantity != $d->quantity)
+                                                                        <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $d->effective_quantity }} {{ $d->item_unit }}</span>
+                                                                        <small class="text-muted">(Diminta: {{ $d->quantity }} {{ $d->item_unit }})</small>
+                                                                    @else
+                                                                        <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $d->effective_quantity }} {{ $d->item_unit }}</span>
+                                                                    @endif
+                                                                @else
+                                                                    <span class="text-secondary">({{ $d->quantity }} {{ $d->item_unit }})</span>
+                                                                @endif
+
+                                                                @if ($d->specification)
+                                                                    <small class="text-muted d-block fst-italic">Spesifikasi: {{ $d->specification }}</small>
+                                                                @endif
+
+                                                                @if ($d->verification_note)
+                                                                    <small class="text-primary d-block fw-semibold fst-italic mt-0.5">
+                                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                                                        Catatan Kasubag TU: "{{ $d->verification_note }}"
+                                                                    </small>
+                                                                @endif
+                                                            </li>
                                                         @endforeach
                                                     </ul>
+
+                                                    @if ($req->verification_notes)
+                                                        <div class="mt-1 pt-1 border-top small text-primary fst-italic" style="font-size: 0.75rem;">
+                                                            <strong>Catatan TU:</strong> {{ $req->verification_notes }}
+                                                        </div>
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     <span class="badge {{ $req->status_badge }}">{{ $req->status_label }}</span>
                                                 </td>
                                                 <td class="text-end">
-                                                    @if ($req->status === 'distributed')
-                                                        <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                            class="btn btn-sm btn-outline-secondary">Bukti</a>
-                                                    @else
-                                                        <span class="text-muted small">-</span>
-                                                    @endif
+                                                    <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                                        <a href="{{ route('pengajuan.index') }}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;">
+                                                            Detail
+                                                        </a>
+                                                        @if ($req->status === 'distributed')
+                                                            <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
+                                                                class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.75rem;">Bukti</a>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty
@@ -515,7 +552,7 @@
                             <div class="card-body p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
                                     <strong class="text-warning d-block">Peringatan Stok Menipis (< 10 Pcs)</strong>
-                                    <small class="text-muted">Terdapat {{ $lowStockCount }} barang dengan stok mendekati batas minimum di gudang</small>
+                                    <small class="text-muted">Terdapat {{ $lowStockCount }} barang dengan stok yang menipis di gudang</small>
                                 </div>
                                 <div class="d-flex gap-2">
                                     @foreach ($lowStockProducts->take(4) as $lp)

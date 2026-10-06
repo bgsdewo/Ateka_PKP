@@ -5,6 +5,7 @@
     $isKasubagTU = in_array($role, ['kasubag_tu', 'admin']);
     $isArsiparis = $role === 'arsiparis';
     $isPicDistribusi = $role === 'pic_distribusi';
+    $isSubdit = $role === 'subdit';
     $isRequester = in_array($role, ['pegawai', 'subdit', 'member']) || empty($role);
 
     $pendingApprovalsCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->count() : 0;
@@ -57,9 +58,11 @@
                                 @elseif ($isArsiparis)
                                     Arsiparis (Pelaporan)
                                 @elseif ($isPicDistribusi)
-                                    PIC Distribusi (Gudang)
+                                    {{ $currentUser->position ?? ('PIC Distribusi (' . ($currentUser->subdit_name ?? 'Gudang') . ')') }}
+                                @elseif ($isSubdit)
+                                    Subdirektorat (Pemohon Kolektif)
                                 @else
-                                    Requester (Pemohon)
+                                    Pegawai (Pemohon Individu)
                                 @endif
                             </small>
                         </div>
@@ -97,59 +100,78 @@
                     @php
                         $activeCategory = request('category', 'pengadaan');
                         $isPersediaanRoute = request()->routeIs('persetujuan.*') && $activeCategory === 'persediaan';
-                        $isPengadaanRoute = request()->routeIs('persetujuan.*') && $activeCategory !== 'persediaan';
+                        $isPengadaanRoute = (request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*')) && $activeCategory !== 'persediaan';
+                        $isRekapRoute = request()->routeIs('rekapitulasi-permintaan.*');
+                        $verifikasiActive = request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*') || $isRekapRoute;
+                        $totalPendingVerifikasi = ($pendingProcurementCount ?? 0) + ($pendingStockCount ?? 0);
                     @endphp
 
-                    {{-- 1A. Verifikasi Usulan Pengadaan (Beli Baru) --}}
+                    {{-- Menu Group: Verifikasi & Rekapitulasi (Collapsible) --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ $isPengadaanRoute ? 'active' : '' }}" 
-                           href="{{ route('persetujuan.index', ['category' => 'pengadaan']) }}" 
-                           title="Verifikasi Pengadaan (Beli Baru)">
+                        <a class="nav-link {{ $verifikasiActive ? 'active' : '' }}" data-bs-toggle="collapse"
+                            href="#verifikasi-menu" role="button" aria-expanded="{{ $verifikasiActive ? 'true' : 'false' }}" title="Verifikasi & Rekapitulasi">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="9" cy="21" r="1"></circle>
-                                    <circle cx="20" cy="21" r="1"></circle>
-                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4" />
                                 </svg>
                             </i>
-                            <span class="item-name">Verifikasi Pengadaan (Beli)</span>
-                            @if ($pendingProcurementCount > 0)
-                                <span class="badge bg-danger rounded-pill ms-auto px-2">{{ $pendingProcurementCount }}</span>
+                            <span class="item-name">Verifikasi & Rekapitulasi</span>
+                            @if ($totalPendingVerifikasi > 0)
+                                <span class="badge bg-danger text-white rounded-pill px-2 py-0.5 fw-bold shadow-sm" 
+                                      style="font-size: 0.75rem; min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 6px;">
+                                    {{ $totalPendingVerifikasi }}
+                                </span>
                             @endif
-                        </a>
-                    </li>
-
-                    {{-- 1B. Verifikasi Permintaan Barang Stok (Persediaan) --}}
-                    <li class="nav-item">
-                        <a class="nav-link {{ $isPersediaanRoute ? 'active' : '' }}" 
-                           href="{{ route('persetujuan.index', ['category' => 'persediaan']) }}" 
-                           title="Verifikasi Permintaan Stok (Persediaan)">
-                            <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            <i class="right-icon" style="flex-shrink: 0;">
+                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </i>
-                            <span class="item-name">Verifikasi Permintaan Stok</span>
-                            @if ($pendingStockCount > 0)
-                                <span class="badge bg-warning text-dark rounded-pill ms-auto px-2">{{ $pendingStockCount }}</span>
-                            @endif
                         </a>
-                    </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('rekapitulasi-permintaan.*') ? 'active' : '' }}" href="{{ route('rekapitulasi-permintaan.index') }}" title="Rekapitulasi Permintaan">
-                            <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
-                            </i>
-                            <span class="item-name">Rekapitulasi Permintaan</span>
-                        </a>
+                        <ul class="sub-nav collapse {{ $verifikasiActive ? 'show' : '' }}" id="verifikasi-menu" data-bs-parent="#sidebar-menu">
+                            {{-- 1A. Verifikasi Usulan Pengadaan (Beli Baru) --}}
+                            <li class="nav-item">
+                                <a class="nav-link {{ $isPengadaanRoute ? 'active' : '' }}" 
+                                   href="{{ route('persetujuan.index', ['category' => 'pengadaan']) }}" 
+                                   title="Verifikasi Pengadaan (Beli Baru)">
+                                    <i class="sidenav-mini-icon">P</i>
+                                    <span class="item-name">Verifikasi Pengadaan</span>
+                                    @if ($pendingProcurementCount > 0)
+                                        <span class="badge bg-danger text-white rounded-pill ms-auto px-2 py-0.5 fw-bold" 
+                                              style="font-size: 0.72rem; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            {{ $pendingProcurementCount }}
+                                        </span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            {{-- 1B. Verifikasi Permintaan Barang Stok (Persediaan) --}}
+                            <li class="nav-item">
+                                <a class="nav-link {{ $isPersediaanRoute ? 'active' : '' }}" 
+                                   href="{{ route('persetujuan.index', ['category' => 'persediaan']) }}" 
+                                   title="Verifikasi Permintaan Stok">
+                                    <i class="sidenav-mini-icon">V</i>
+                                    <span class="item-name">Verifikasi Permintaan</span>
+                                    @if ($pendingStockCount > 0)
+                                        <span class="badge bg-warning text-dark rounded-pill ms-auto px-2 py-0.5 fw-bold" 
+                                              style="font-size: 0.72rem; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            {{ $pendingStockCount }}
+                                        </span>
+                                    @endif
+                                </a>
+                            </li>
+
+                            {{-- 1C. Rekapitulasi Permintaan --}}
+                            <li class="nav-item">
+                                <a class="nav-link {{ $isRekapRoute ? 'active' : '' }}" 
+                                   href="{{ route('rekapitulasi-permintaan.index') }}" 
+                                   title="Rekapitulasi Permintaan">
+                                    <i class="sidenav-mini-icon">R</i>
+                                    <span class="item-name">Rekapitulasi Permintaan</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <li class="nav-item">
@@ -161,6 +183,9 @@
                                 </svg>
                             </i>
                             <span class="item-name">Distribusi Barang</span>
+                            @if ($readyDistribusiCount > 0)
+                                <span class="badge bg-warning text-dark rounded-pill ms-auto px-2">{{ $readyDistribusiCount }}</span>
+                            @endif
                         </a>
                     </li>
                 @endif
@@ -168,7 +193,7 @@
                 <!-- ======================================================== -->
                 <!-- 2. MENU KHUSUS PIC DISTRIBUSI (Pengelola / Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isPicDistribusi)
+                @if ($isPicDistribusi && !$isKasubagTU)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
@@ -230,7 +255,7 @@
                 <!-- ======================================================== -->
                 <!-- 4. MENU PENGAJUAN ATK (Pegawai & Subdirektorat) -->
                 <!-- ======================================================== -->
-                @if ($isRequester || $isKasubagTU)
+                @if ($isRequester || $isKasubagTU || $isPicDistribusi)
                     @php
                         $pengajuanActive = request()->routeIs('pengajuan.*') || request()->routeIs('katalog-atk');
                     @endphp

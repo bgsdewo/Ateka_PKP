@@ -200,6 +200,9 @@ class SubbagTuVerificationAndRecapTest extends TestCase
             ['email' => 'tu@gmail.com'],
             ['name' => 'Devi Ismiyanti', 'position' => 'Subbagian Tata Usaha', 'password' => bcrypt('password123'), 'role' => 'subdit']
         );
+        $tuUser->nip = '19900815 201503 2 004';
+        $tuUser->name = 'Devi Ismiyanti';
+        $tuUser->save();
 
         $req = RequestItem::create([
             'request_code' => 'REQ-BUY-TU-001',
@@ -275,9 +278,9 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $this->assertEquals(7, $detail->effective_quantity);
         $this->assertEquals('Stok dibagi rata dengan unit lain', $detail->verification_note);
 
-        // Kasubag TU approval marks item as approved for procurement without cutting stock prematurely
+        // Kasubag TU approval cuts stock in real-time as requested by user
         $this->productA->refresh();
-        $this->assertEquals($initialStock, $this->productA->stock);
+        $this->assertEquals($initialStock - 7, $this->productA->stock);
     }
 
     public function test_verifikasi_permintaan_prevents_approved_qty_exceeding_requested_qty(): void
@@ -650,8 +653,8 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $responsePengadaan->assertSee('REQ-BUY-SEP-001');
         $responsePengadaan->assertDontSee('REQ-STK-SEP-002');
         $responsePengadaan->assertSee('Daftar Antrean Usulan Pengadaan (Beli Baru)');
-        $responsePengadaan->assertSee('Verifikasi Pengadaan (Beli)');
-        $responsePengadaan->assertSee('Verifikasi Permintaan Stok');
+        $responsePengadaan->assertSee('Verifikasi Pengadaan');
+        $responsePengadaan->assertSee('Verifikasi Permintaan');
 
         // 2. Visit category = persediaan
         $responsePersediaan = $this->actingAs($this->buUtami)

@@ -63,8 +63,8 @@ class RequestItem extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'pending' => 'Menunggu Verifikasi Subbag TU',
-            'approved' => 'Disetujui TU (Akan Dibeli)',
+            'pending' => $this->is_procurement ? 'Menunggu Verifikasi Pengadaan' : 'Menunggu Verifikasi Subbag TU',
+            'approved' => $this->is_procurement ? 'Disetujui TU (Akan Dibeli)' : 'Disetujui TU (Siap Diambil)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',
             default => ucfirst($this->status),

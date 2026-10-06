@@ -164,6 +164,24 @@
                                             </div>
                                         </div>
 
+                                        <!-- Nomor Induk Pegawai (NIP) -->
+                                        <div class="col-12">
+                                            <div class="form-group mb-2">
+                                                <label class="form-label font-weight-bold text-theme small text-uppercase">
+                                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" name="nip" id="nip" class="form-control"
+                                                    value="{{ old('nip') }}" placeholder="Contoh: 19950510 202012 1 002" required>
+                                                <small class="text-muted" style="font-size: 0.78rem;">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-primary">
+                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                    </svg>
+                                                    NIP digunakan untuk identitas dinas & verifikasi keamanan saat <strong>lupa password</strong>.
+                                                </small>
+                                            </div>
+                                        </div>
+
                                         <!-- Pilihan Role (Hanya Subdit dan Pegawai) -->
                                         <div class="col-12">
                                             <label class="form-label font-weight-bold text-theme small text-uppercase mb-2">
@@ -218,15 +236,40 @@
                                             </div>
                                         </div>
 
-                                        <!-- Jabatan / Subdirektorat -->
-                                        <div class="col-12">
+                                        <!-- Opsi Khusus Subdirektorat (Dropdown Muncul Otomatis saat Subdit dipilih) -->
+                                        <div class="col-12" id="subdit-choice-container" style="display: {{ old('role') === 'subdit' ? 'block' : 'none' }};">
                                             <div class="form-group mb-2">
                                                 <label class="form-label font-weight-bold text-theme small text-uppercase">
-                                                    Jabatan / Unit Kerja / Subdirektorat
+                                                    Pilih Subdirektorat / Unit Kerja <span class="text-danger">*</span>
                                                 </label>
-                                                <input type="text" name="position" class="form-control"
-                                                    value="{{ old('position') }}" placeholder="Contoh: Subdit Perumahan / Staf Tata Usaha / Bagian Keuangan">
-                                                <small class="text-muted">Bisa diisi nama Subdirektorat atau posisi jabatan Anda.</small>
+                                                <select name="subdit_choice" id="subdit_choice" class="form-select">
+                                                    <option value="" disabled {{ old('subdit_choice') ? '' : 'selected' }}>-- Pilih Unit Subdirektorat --</option>
+                                                    <option value="Subdirektorat SDK" {{ old('subdit_choice') == 'Subdirektorat SDK' ? 'selected' : '' }}>
+                                                        Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Pemukiman)
+                                                    </option>
+                                                    <option value="Subdirektorat PJF" {{ old('subdit_choice') == 'Subdirektorat PJF' ? 'selected' : '' }}>
+                                                        Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)
+                                                    </option>
+                                                    <option value="Subdirektorat KBR" {{ old('subdit_choice') == 'Subdirektorat KBR' ? 'selected' : '' }}>
+                                                        Subdirektorat KBR (Kendala Bangunan Rumah)
+                                                    </option>
+                                                    <option value="Subbagian TU" {{ old('subdit_choice') == 'Subbagian TU' ? 'selected' : '' }}>
+                                                        Subbagian TU (Tata Usaha)
+                                                    </option>
+                                                </select>
+                                                <small class="text-muted" style="font-size: 0.78rem;">Pilih unit Subdirektorat resmi yang Anda wakili.</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Jabatan Khusus Pegawai (Muncul saat Pegawai dipilih) -->
+                                        <div class="col-12" id="pegawai-position-container" style="display: {{ (old('role') === 'pegawai' || !old('role')) ? 'block' : 'none' }};">
+                                            <div class="form-group mb-2">
+                                                <label class="form-label font-weight-bold text-theme small text-uppercase">
+                                                    Jabatan / Posisi Kerja <span class="text-muted font-normal">(Opsional)</span>
+                                                </label>
+                                                <input type="text" name="position" id="position" class="form-control"
+                                                    value="{{ old('position') }}" placeholder="Contoh: Staf Keuangan / Analis Kebijakan / Bagian Umum">
+                                                <small class="text-muted" style="font-size: 0.78rem;">Isi dengan posisi jabatan dinas Anda.</small>
                                             </div>
                                         </div>
 
@@ -280,15 +323,37 @@
         document.addEventListener('DOMContentLoaded', function() {
             const roleInputs = document.querySelectorAll('input[name="role"]');
             const roleCards = document.querySelectorAll('.role-radio-card');
+            const subditContainer = document.getElementById('subdit-choice-container');
+            const pegawaiContainer = document.getElementById('pegawai-position-container');
+            const subditSelect = document.getElementById('subdit_choice');
+
+            function updateRoleUI(selectedRole) {
+                if (selectedRole === 'subdit') {
+                    subditContainer.style.display = 'block';
+                    pegawaiContainer.style.display = 'none';
+                    if (subditSelect) subditSelect.setAttribute('required', 'required');
+                } else {
+                    subditContainer.style.display = 'none';
+                    pegawaiContainer.style.display = 'block';
+                    if (subditSelect) subditSelect.removeAttribute('required');
+                }
+            }
 
             roleInputs.forEach(input => {
                 input.addEventListener('change', function() {
                     roleCards.forEach(c => c.classList.remove('active'));
                     if (this.checked) {
                         this.closest('.role-radio-card').classList.add('active');
+                        updateRoleUI(this.value);
                     }
                 });
             });
+
+            // Jalankan inisialisasi awal sesuai radio yang aktif
+            const activeRadio = document.querySelector('input[name="role"]:checked');
+            if (activeRadio) {
+                updateRoleUI(activeRadio.value);
+            }
         });
     </script>
 </body>

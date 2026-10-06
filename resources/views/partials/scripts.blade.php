@@ -39,7 +39,8 @@
 <script src="{{ asset('hope-ui/assets/js/plugins/slider-tabs.js') }}"></script>
 <!-- Form Wizard Script -->
 <script src="{{ asset('hope-ui/assets/js/plugins/form-wizard.js') }}"></script>
-<!-- AOS Animation Plugin-->
-<script src="{{ asset('hope-ui/assets/vendor/aos/dist/aos.js') }}"></script>
+<!-- SweetAlert2 Plugin -->
+<script src="{{ asset('hope-ui/assets/js/plugins/sweetalert2.all.min.js') }}"></script>
 <!-- App Script -->
 <script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}" defer></script>
+

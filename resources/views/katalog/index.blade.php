@@ -91,7 +91,6 @@
             @forelse ($products as $item)
                 @php
                     $isAvailable = $item->stock > 0;
-                    $isLowStock = $item->stock > 0 && $item->stock <= ($item->minimum_stock ?? 5);
                 @endphp
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 katalog-card-item"
                     data-search-text="{{ strtolower($item->name . ' ' . $item->code . ' ' . ($item->category->name ?? '')) }}"
@@ -105,8 +104,6 @@
                                     </span>
                                     @if ($item->stock <= 0)
                                         <span class="badge bg-danger">Stok Habis</span>
-                                    @elseif ($isLowStock)
-                                        <span class="badge bg-warning text-dark">Stok Menipis</span>
                                     @else
                                         <span class="badge bg-success">Tersedia</span>
                                     @endif

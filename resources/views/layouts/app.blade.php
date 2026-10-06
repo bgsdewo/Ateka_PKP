@@ -311,6 +311,49 @@
         .sidebar.sidebar-mini .sub-nav .nav-link .item-name {
             display: none !important;
         }
+
+        /* ======================================================== */
+        /* STILISASI SIDEBAR EXPANDED (DEFAULT)                     */
+        /* Menjaga teks menu panjang, badge angka, dan icon panah   */
+        /* tetap rapi, proporsional, dan tidak terpotong (clipped)  */
+        /* ======================================================== */
+        @media (min-width: 1200px) {
+            :root {
+                --sidebar-width: 17.5rem;
+            }
+
+            .sidebar:not(.sidebar-mini) {
+                width: 17.5rem !important;
+                max-width: 17.5rem !important;
+            }
+
+            .sidebar:not(.sidebar-mini) + .main-content {
+                margin-left: 17.5rem !important;
+            }
+        }
+
+        .sidebar:not(.sidebar-mini) .nav-item .nav-link {
+            padding: 0.5rem 0.85rem !important;
+        }
+
+        .sidebar:not(.sidebar-mini) .nav-item .nav-link .item-name {
+            margin-left: 0.75rem !important;
+            font-size: 0.88rem !important;
+            min-width: 0 !important;
+            flex: 1 1 auto !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        .sidebar:not(.sidebar-mini) .nav-item .nav-link .right-icon {
+            flex-shrink: 0 !important;
+            margin-left: auto !important;
+        }
+
+        .sidebar:not(.sidebar-mini) .nav-item .nav-link .badge {
+            flex-shrink: 0 !important;
+        }
     </style>
 </head>
 

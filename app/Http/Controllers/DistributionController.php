@@ -15,6 +15,10 @@ class DistributionController extends Controller
      */
     public function index(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh Kasubag TU dan PIC Distribusi.');
+        }
+
         $filterType = $request->get('type'); // individu, subdit, or null
         $filterStatus = $request->get('status', 'all'); // default to 'all' so handed over items remain visible
         $search = $request->get('search');

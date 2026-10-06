@@ -10,6 +10,10 @@ class BarangKeluarController extends Controller
 {
     public function index(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Gudang hanya dapat diakses oleh Kasubag TU dan PIC Distribusi.');
+        }
+
         $month = $request->get('month');
         $year = $request->get('year');
         $startDate = $request->get('start_date');

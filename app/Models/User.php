@@ -65,7 +65,12 @@ class User extends Authenticatable
         return $this->role === 'pic_distribusi';
     }
 
-    public function isPegawai(): bool
+    public function isSubdit(): bool
+    {
+        return $this->role === 'subdit';
+    }
+
+    public function isRequester(): bool
     {
         return in_array($this->role, ['pegawai', 'subdit', 'member']) || empty($this->role);
     }
@@ -76,8 +81,9 @@ class User extends Authenticatable
             'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
             'arsiparis' => 'Arsiparis (Pelaporan & Administrasi)',
             'pic_distribusi' => 'PIC Distribusi (Pengelola / Gudang)',
-            'subdit' => 'Perwakilan Subdirektorat (Requester)',
-            default => 'Pegawai / Subdit (Requester / Pemohon)',
+            'subdit' => 'Subdirektorat (Pemohon Kolektif)',
+            'pegawai' => 'Pegawai (Pemohon Individu)',
+            default => 'Pegawai (Pemohon Individu)',
         };
     }
 
