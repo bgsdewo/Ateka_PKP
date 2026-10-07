@@ -25,13 +25,15 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:50'],
+            'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'nip' => ['required', 'string', 'max:50'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
             'role' => ['required', 'string', 'in:kasubag_tu,arsiparis,pic_distribusi,pegawai,subdit'],
             'position' => ['nullable', 'string', 'max:255'],
-            'pic_unit_choice' => ['nullable', 'string', 'in:TU,KBR,SDK,PJF'],
-            'subdit_unit_choice' => ['nullable', 'string'],
+            'pic_unit_choice' => ['nullable', 'string', 'max:255'],
+            'subdit_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Nama pengguna wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -50,29 +52,21 @@ class UserManagementController extends Controller
 
         if ($request->role === 'pic_distribusi') {
             $unit = $request->pic_unit_choice;
-            if ($unit === 'TU') {
-                $position = $position ?: 'PIC Distribusi Subbagian Tata Usaha';
-                $subditName = 'Subbagian Tata Usaha';
-            } elseif ($unit === 'KBR') {
-                $position = $position ?: 'PIC Distribusi Subdirektorat KBR';
-                $subditName = 'Subdirektorat Kendala Bangunan Rumah';
-            } elseif ($unit === 'SDK') {
+            if (str_contains(strtolower($unit ?? ''), 'sdk') || str_contains(strtolower($unit ?? ''), 'sumber daya')) {
                 $position = $position ?: 'PIC Distribusi Subdirektorat SDK';
                 $subditName = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
-            } elseif ($unit === 'PJF') {
+            } elseif (str_contains(strtolower($unit ?? ''), 'pjf') || str_contains(strtolower($unit ?? ''), 'fungsional')) {
                 $position = $position ?: 'PIC Distribusi Subdirektorat PJF';
                 $subditName = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
+            } elseif (str_contains(strtolower($unit ?? ''), 'kbr') || str_contains(strtolower($unit ?? ''), 'kendala')) {
+                $position = $position ?: 'PIC Distribusi Subdirektorat KBR';
+                $subditName = 'Subdirektorat Kendala Bangunan Rumah';
+            } elseif (str_contains(strtolower($unit ?? ''), 'tu') || str_contains(strtolower($unit ?? ''), 'tata usaha')) {
+                $position = $position ?: 'PIC Distribusi Subbagian Tata Usaha';
+                $subditName = 'Subbagian Tata Usaha';
             } else {
-                $posLower = strtolower($position ?? '');
-                if (str_contains($posLower, 'tu') || str_contains($posLower, 'tata usaha')) {
-                    $subditName = 'Subbagian Tata Usaha';
-                } elseif (str_contains($posLower, 'kbr') || str_contains($posLower, 'kendala')) {
-                    $subditName = 'Subdirektorat Kendala Bangunan Rumah';
-                } elseif (str_contains($posLower, 'sdk') || str_contains($posLower, 'sumber daya')) {
-                    $subditName = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
-                } elseif (str_contains($posLower, 'pjf') || str_contains($posLower, 'fungsional')) {
-                    $subditName = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
-                }
+                $position = $position ?: 'PIC Distribusi & Gudang';
+                $subditName = 'Subbagian Tata Usaha';
             }
         } elseif ($request->role === 'subdit') {
             $choice = $request->subdit_unit_choice ?: $request->position;
@@ -101,8 +95,11 @@ class UserManagementController extends Controller
             $subditName = 'Pegawai Perorangan';
         }
 
+        $title = $request->title ?: $request->gelar;
+
         User::create([
             'name' => $request->name,
+            'title' => $title ? trim($title) : null,
             'email' => $request->email,
             'nip' => $request->nip,
             'password' => Hash::make($request->password),
@@ -120,13 +117,15 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:50'],
+            'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($manajemen_pengguna->id)],
             'nip' => ['required', 'string', 'max:50'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
             'role' => ['required', 'string', 'in:kasubag_tu,arsiparis,pic_distribusi,pegawai,subdit,admin'],
             'position' => ['nullable', 'string', 'max:255'],
-            'pic_unit_choice' => ['nullable', 'string', 'in:TU,KBR,SDK,PJF'],
-            'subdit_unit_choice' => ['nullable', 'string'],
+            'pic_unit_choice' => ['nullable', 'string', 'max:255'],
+            'subdit_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Nama pengguna wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -144,18 +143,18 @@ class UserManagementController extends Controller
 
         if ($request->role === 'pic_distribusi') {
             $unit = $request->pic_unit_choice;
-            if ($unit === 'TU') {
-                $position = $position ?: 'PIC Distribusi Subbagian Tata Usaha';
-                $subditName = 'Subbagian Tata Usaha';
-            } elseif ($unit === 'KBR') {
-                $position = $position ?: 'PIC Distribusi Subdirektorat KBR';
-                $subditName = 'Subdirektorat Kendala Bangunan Rumah';
-            } elseif ($unit === 'SDK') {
+            if (str_contains(strtolower($unit ?? ''), 'sdk') || str_contains(strtolower($unit ?? ''), 'sumber daya')) {
                 $position = $position ?: 'PIC Distribusi Subdirektorat SDK';
                 $subditName = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
-            } elseif ($unit === 'PJF') {
+            } elseif (str_contains(strtolower($unit ?? ''), 'pjf') || str_contains(strtolower($unit ?? ''), 'fungsional')) {
                 $position = $position ?: 'PIC Distribusi Subdirektorat PJF';
                 $subditName = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
+            } elseif (str_contains(strtolower($unit ?? ''), 'kbr') || str_contains(strtolower($unit ?? ''), 'kendala')) {
+                $position = $position ?: 'PIC Distribusi Subdirektorat KBR';
+                $subditName = 'Subdirektorat Kendala Bangunan Rumah';
+            } elseif (str_contains(strtolower($unit ?? ''), 'tu') || str_contains(strtolower($unit ?? ''), 'tata usaha')) {
+                $position = $position ?: 'PIC Distribusi Subbagian Tata Usaha';
+                $subditName = 'Subbagian Tata Usaha';
             }
         } elseif ($request->role === 'subdit') {
             $choice = $request->subdit_unit_choice ?: $request->position;
@@ -174,8 +173,11 @@ class UserManagementController extends Controller
             }
         }
 
+        $title = $request->title ?: $request->gelar;
+
         $data = [
             'name' => $request->name,
+            'title' => $title ? trim($title) : null,
             'email' => $request->email,
             'nip' => $request->nip,
             'role' => $request->role,

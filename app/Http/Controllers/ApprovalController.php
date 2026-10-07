@@ -7,6 +7,7 @@ use App\Models\RequestItem;
 use App\Models\StockTransaction;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\UserNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -376,10 +377,19 @@ class ApprovalController extends Controller
                 'rejection_reason'    => null,
             ]);
 
+            // Kirim notifikasi ke pemohon bahwa barang pengadaan telah dibeli dan tersedia di daftar barang
+            if ($item->user) {
+                foreach ($item->details as $det) {
+                    if ($det->product) {
+                        UserNotification::sendProcurementNotification($item, $det->product, $request->no_faktur);
+                    }
+                }
+            }
+
             DB::commit();
 
             return redirect()->route('persetujuan.index')
-                ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Tiket permohonan telah disetujui dan siap didistribusikan ke pemohon.');
+                ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Notifikasi telah dikirimkan ke pemohon usulan.');
 
         } catch (\Exception $e) {
             DB::rollBack();

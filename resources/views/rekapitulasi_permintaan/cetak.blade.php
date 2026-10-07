@@ -223,10 +223,10 @@
                             Yang Mengajukan,
                         </p>
                         <p style="margin: 0; font-size: 10.5pt; font-weight: bold; text-decoration: underline;">
-                            {{ $signerName ?? 'Fairuz Armina Nur Azizah, S.T.' }}
+                            {{ $signerName ?? 'Pengaju Permintaan' }}
                         </p>
                         <p style="margin: 3px 0 0 0; font-size: 9.5pt;">
-                            NIP. {{ $signerNip ?? '200202262025062007' }}
+                            NIP. {{ (!empty($signerNip) && $signerNip !== '-') ? $signerNip : '-' }}
                         </p>
                     </td>
                 </tr>

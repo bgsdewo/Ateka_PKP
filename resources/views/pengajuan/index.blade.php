@@ -285,9 +285,14 @@
                                                                 </div>
 
                                                                 @if ($req->purchase_invoice)
-                                                                    <div class="card bg-primary-subtle border-0 p-2.5 mb-2">
-                                                                        <small class="text-primary fw-bold d-block">Pembelian Pengadaan Kasubag TU:</small>
+                                                                    <div class="card bg-success-subtle border border-success-subtle p-2.5 mb-2">
+                                                                        <small class="text-success fw-bold d-block">Barang Telah Dibeli Subbag TU &amp; Masuk Daftar Barang:</small>
                                                                         <span class="text-dark small">Nomor Faktur: <strong>{{ $req->purchase_invoice }}</strong> ({{ $req->purchase_date ? $req->purchase_date->format('d/m/Y') : '-' }})</span>
+                                                                        <div class="mt-1 pt-1 border-top border-success-subtle">
+                                                                            <a href="{{ route('katalog-atk') }}" class="badge bg-success text-white text-decoration-none py-1 px-2">
+                                                                                Cek Ketersediaan di Katalog ATK &rarr;
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
                                                                 @endif
 

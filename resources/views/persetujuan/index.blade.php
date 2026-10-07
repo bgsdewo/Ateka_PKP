@@ -316,7 +316,7 @@
                                 <tbody id="persetujuan-table-body">
                                     @forelse($requests as $index => $req)
                                         <tr class="persetujuan-row"
-                                            data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
+                                            data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name_with_title ?? ($req->user->name ?? '')) . ' ' . ($req->user->nip ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}
                                             </td>
                                             <td>
@@ -336,8 +336,11 @@
                                                     class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
                                             </td>
                                             <td>
-                                                <strong>{{ $req->user->name ?? '-' }}</strong><br>
-                                                <small class="text-muted">{{ $req->user->position ?? '-' }}</small>
+                                                <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
+                                                <small class="text-muted">{{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}</small>
+                                                @if(!empty($req->user->nip))
+                                                    <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <ul class="ps-3 mb-0 small">
@@ -489,7 +492,10 @@
                                                                             <div class="col-sm-6">
                                                                                 <strong>Nomor Tiket:</strong>
                                                                                 <span class="font-monospace text-primary fw-bold">{{ $req->request_code }}</span><br>
-                                                                                <strong>Pemohon:</strong> {{ $req->user->name ?? '-' }} ({{ $req->user->position ?? '-' }})
+                                                                                <strong>Pemohon:</strong> {{ $req->user->name_with_title ?? ($req->user->name ?? '-') }} ({{ $req->user->position ?? '-' }})
+                                                @if(!empty($req->user->nip))
+                                                    <span class="badge bg-light text-secondary border ms-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
+                                                @endif
                                                                             </div>
                                                                             <div class="col-sm-6">
                                                                                 <strong>Jenis Permintaan:</strong> {{ ucfirst($req->type) }}<br>
@@ -647,11 +653,136 @@
                                                         </div>
                                                     </div>
                                                 @else
-                                                    <div class="d-flex justify-content-end gap-1">
-                                                        <span
-                                                            class="badge bg-light text-secondary border px-2 py-1.5 small">
+                                                    <div class="d-flex justify-content-end align-items-center gap-1">
+                                                        <span class="badge bg-light text-secondary border px-2 py-1 small">
                                                             Selesai Ditinjau
                                                         </span>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#detailModal{{ $req->id }}"
+                                                            title="Lihat Rincian Pengajuan">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                            </svg>
+                                                            Detail
+                                                        </button>
+                                                    </div>
+
+                                                    {{-- Modal Detail Permintaan / Pengadaan Kasubag TU --}}
+                                                    <div class="modal fade text-start" id="detailModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header bg-light">
+                                                                    <h5 class="modal-title d-flex align-items-center gap-2">
+                                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+                                                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                                                        </svg>
+                                                                        Rincian Pengajuan &mdash; <span class="font-monospace text-primary">{{ $req->request_code }}</span>
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                </div>
+                                                                <div class="modal-body p-4">
+                                                                    {{-- Status & Pemohon Info --}}
+                                                                    <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom flex-wrap gap-2">
+                                                                        <div>
+                                                                            <h6 class="fw-bold mb-1 text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? 'Pemohon') }}</h6>
+                                                                            <small class="text-muted d-block">{{ $req->user->position ?? ($req->type === 'subdit' ? 'Subdirektorat' : 'Pegawai') }} &bull; NIP: {{ $req->user->nip ?: '-' }}</small>
+                                                                            <small class="text-muted">Diajukan: {{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                                        </div>
+                                                                        <div class="text-end">
+                                                                            <span class="badge {{ $req->status_badge }} px-2.5 py-1.5">{{ $req->status_label }}</span>
+                                                                            @if ($req->is_procurement)
+                                                                                <span class="badge bg-warning-subtle text-dark border px-2 py-1.5 ms-1">Usulan Pengadaan</span>
+                                                                            @else
+                                                                                <span class="badge bg-info-subtle text-info border px-2 py-1.5 ms-1">Barang Persediaan</span>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {{-- Tabel Rincian Barang --}}
+                                                                    <h6 class="fw-bold mb-2 small text-uppercase text-secondary">Daftar Barang yang Diajukan:</h6>
+                                                                    <div class="table-responsive mb-3">
+                                                                        <table class="table table-bordered table-sm align-middle mb-0">
+                                                                            <thead class="table-light">
+                                                                                <tr>
+                                                                                    <th style="width: 5%;">No</th>
+                                                                                    <th>Nama Barang</th>
+                                                                                    <th style="width: 20%;" class="text-center">Diminta</th>
+                                                                                    <th style="width: 25%;" class="text-center">Disetujui Kasubag TU</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach ($req->details as $idx => $d)
+                                                                                    <tr>
+                                                                                        <td class="text-center">{{ $idx + 1 }}</td>
+                                                                                        <td>
+                                                                                            <strong>{{ $d->item_name }}</strong>
+                                                                                            @if ($d->specification)
+                                                                                                <br><small class="text-muted fst-italic">Spesifikasi: {{ $d->specification }}</small>
+                                                                                            @endif
+                                                                                            @if ($d->verification_note)
+                                                                                                <br><small class="text-primary fst-italic">Catatan: "{{ $d->verification_note }}"</small>
+                                                                                            @endif
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <span class="badge bg-secondary-subtle text-dark border">
+                                                                                                {{ $d->quantity }} {{ $d->item_unit }}
+                                                                                            </span>
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            @if (in_array($req->status, ['approved', 'distributed']))
+                                                                                                <span class="badge bg-success-subtle text-success border fw-bold">
+                                                                                                    {{ $d->effective_quantity }} {{ $d->item_unit }}
+                                                                                                </span>
+                                                                                            @elseif ($req->status == 'rejected')
+                                                                                                <span class="badge bg-danger-subtle text-danger border">Ditolak</span>
+                                                                                            @else
+                                                                                                <span class="text-muted">-</span>
+                                                                                            @endif
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endforeach
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+
+                                                                    {{-- Catatan Pemohon & Kasubag TU --}}
+                                                                    <div class="row g-2 mb-2">
+                                                                        <div class="col-md-6">
+                                                                            <div class="p-2.5 rounded bg-light border h-100">
+                                                                                <small class="text-muted fw-bold d-block mb-1">Catatan / Keperluan Pemohon:</small>
+                                                                                <span class="text-dark small">{{ $req->notes ?: '-' }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="p-2.5 rounded bg-light border h-100">
+                                                                                <small class="text-muted fw-bold d-block mb-1">Catatan Verifikasi Kasubag TU:</small>
+                                                                                <span class="text-dark small">{{ $req->verification_notes ?: ($req->rejection_reason ?: '-') }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    @if ($req->purchase_invoice)
+                                                                        <div class="alert alert-success py-2 px-3 small mt-2 mb-0">
+                                                                            <strong>Informasi Pembelian:</strong> Nomor Faktur: <strong>{{ $req->purchase_invoice }}</strong>
+                                                                            @if ($req->purchase_date)
+                                                                                &bull; Tanggal: {{ date('d/m/Y', strtotime($req->purchase_date)) }}
+                                                                            @endif
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 @endif
                                             </td>

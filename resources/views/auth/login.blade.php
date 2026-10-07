@@ -196,29 +196,17 @@
                                         </a>
                                     </div>
 
-                                    <!-- Bantuan Demo 4 Role -->
+                                    <!-- Bantuan Demo Akun Kasubag TU -->
                                     <div class="card border bg-light shadow-none mb-3">
                                         <div class="card-body p-2 text-start">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <small class="fw-bold text-theme" style="font-size: 0.75rem;">Akun Percobaan (4 Role):</small>
+                                                <small class="fw-bold text-theme" style="font-size: 0.75rem;">Akun Percobaan:</small>
                                                 <small class="text-muted" style="font-size: 0.7rem;">Klik untuk isi</small>
                                             </div>
                                             <div class="d-flex flex-wrap gap-1">
                                                 <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 quick-fill" 
                                                     style="font-size: 0.72rem;" data-email="utami@gmail.com">
                                                     Kasubag TU
-                                                </button>
-                                                <button type="button" class="btn btn-xs btn-outline-info py-0 px-2 quick-fill" 
-                                                    style="font-size: 0.72rem;" data-email="devi@gmail.com">
-                                                    Arsiparis
-                                                </button>
-                                                <button type="button" class="btn btn-xs btn-outline-warning text-dark py-0 px-2 quick-fill" 
-                                                    style="font-size: 0.72rem;" data-email="fairuz@gmail.com">
-                                                    PIC Distribusi
-                                                </button>
-                                                <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2 quick-fill" 
-                                                    style="font-size: 0.72rem;" data-email="sdk@gmail.com">
-                                                    Pegawai/Subdit
                                                 </button>
                                             </div>
                                         </div>
@@ -266,6 +254,12 @@
                         passInput.value = 'password123';
                     }
                 });
+            });
+
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
             });
         });
     </script>

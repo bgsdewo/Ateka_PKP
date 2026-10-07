@@ -175,6 +175,22 @@ class DashboardController extends Controller
         $userDistributedCount = (clone $userRequestsQuery)->where('status', 'distributed')->count();
         $userRejectedCount = (clone $userRequestsQuery)->where('status', 'rejected')->count();
 
+        $userProcurementBoughtCount = (clone $userRequestsQuery)
+            ->where('is_procurement', true)
+            ->where('status', 'approved')
+            ->where(function ($q) {
+                $q->whereNotNull('purchase_invoice')
+                  ->orWhereHas('details', fn($dq) => $dq->whereNotNull('product_id'));
+            })
+            ->count();
+
+        $recentProcurementNotifications = auth()->user()->notifications()
+            ->where('type', 'procurement_available')
+            ->where('is_read', false)
+            ->latest()
+            ->take(3)
+            ->get();
+
         // Periode text label
         $monthNamesFull = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
@@ -214,6 +230,8 @@ class DashboardController extends Controller
             'userApprovedCount',
             'userDistributedCount',
             'userRejectedCount',
+            'userProcurementBoughtCount',
+            'recentProcurementNotifications',
             'selectedMonth',
             'selectedYear',
             'selectedPeriodLabel',

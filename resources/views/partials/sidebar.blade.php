@@ -116,12 +116,6 @@
                                 </svg>
                             </i>
                             <span class="item-name">Verifikasi & Rekapitulasi</span>
-                            @if ($totalPendingVerifikasi > 0)
-                                <span class="badge bg-danger text-white rounded-pill px-2 py-0.5 fw-bold shadow-sm" 
-                                      style="font-size: 0.75rem; min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 6px;">
-                                    {{ $totalPendingVerifikasi }}
-                                </span>
-                            @endif
                             <i class="right-icon" style="flex-shrink: 0;">
                                 <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -137,12 +131,6 @@
                                    title="Verifikasi Pengadaan (Beli Baru)">
                                     <i class="sidenav-mini-icon">P</i>
                                     <span class="item-name">Verifikasi Pengadaan</span>
-                                    @if ($pendingProcurementCount > 0)
-                                        <span class="badge bg-danger text-white rounded-pill ms-auto px-2 py-0.5 fw-bold" 
-                                              style="font-size: 0.72rem; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                            {{ $pendingProcurementCount }}
-                                        </span>
-                                    @endif
                                 </a>
                             </li>
 
@@ -153,12 +141,6 @@
                                    title="Verifikasi Permintaan Stok">
                                     <i class="sidenav-mini-icon">V</i>
                                     <span class="item-name">Verifikasi Permintaan</span>
-                                    @if ($pendingStockCount > 0)
-                                        <span class="badge bg-warning text-dark rounded-pill ms-auto px-2 py-0.5 fw-bold" 
-                                              style="font-size: 0.72rem; min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                            {{ $pendingStockCount }}
-                                        </span>
-                                    @endif
                                 </a>
                             </li>
 

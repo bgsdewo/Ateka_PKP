@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Registrasi Akun | Sistem Inventori ATK</title>
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
@@ -122,7 +123,48 @@
                                     <p class="text-muted small mb-0">Sistem Pencatatan Persediaan & Pengajuan Alat Tulis Kantor (ATK)</p>
                                 </div>
 
-                                <!-- Alert Kesalahan -->
+                                <!-- Alert Notifikasi Sesi & Kesalahan -->
+                                @if (session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                            </svg>
+                                            <div>{{ session('error') }}</div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                                @if (session('info'))
+                                    <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                            </svg>
+                                            <div>{{ session('info') }}</div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                                @if (session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                            </svg>
+                                            <div>{{ session('success') }}</div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
                                 @if ($errors->any())
                                     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                         <div class="d-flex align-items-center mb-1">
@@ -165,7 +207,7 @@
                                         </div>
 
                                         <!-- Nomor Induk Pegawai (NIP) -->
-                                        <div class="col-12">
+                                        <div class="col-md-6 col-12">
                                             <div class="form-group mb-2">
                                                 <label class="form-label font-weight-bold text-theme small text-uppercase">
                                                     Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
@@ -177,7 +219,25 @@
                                                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                                     </svg>
-                                                    NIP digunakan untuk identitas dinas & verifikasi keamanan saat <strong>lupa password</strong>.
+                                                    Identitas dinas & verifikasi <strong>lupa password</strong>.
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gelar Akademik / Kehormatan (Opsional) -->
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-2">
+                                                <label class="form-label font-weight-bold text-theme small text-uppercase">
+                                                    Gelar Akademik / Titel <span class="text-muted font-normal">(Opsional)</span>
+                                                </label>
+                                                <input type="text" name="title" id="title" class="form-control"
+                                                    value="{{ old('title', old('gelar')) }}" placeholder="Contoh: S.T. / M.Si. / S.Kom. atau Ir.">
+                                                <small class="text-muted" style="font-size: 0.78rem;">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-success">
+                                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                                                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                                                    </svg>
+                                                    Gelar otomatis disematkan pada <strong>dokumen rekapitulasi</strong> resmi.
                                                 </small>
                                             </div>
                                         </div>
@@ -190,9 +250,9 @@
                                             <div class="row g-3">
                                                 <!-- Opsi 1: Pegawai (Individu) -->
                                                 <div class="col-md-6 col-12">
-                                                    <label class="role-radio-card d-block {{ (old('role') == 'pegawai' || !old('role')) ? 'active' : '' }}">
+                                                    <label class="role-radio-card d-block {{ (old('role') == 'pegawai' || !old('role')) ? 'active' : '' }}" for="role_pegawai">
                                                         <div class="d-flex align-items-start gap-2">
-                                                            <input type="radio" name="role" value="pegawai" class="mt-1" {{ (old('role') == 'pegawai' || !old('role')) ? 'checked' : '' }} required>
+                                                            <input type="radio" id="role_pegawai" name="role" value="pegawai" class="mt-1" {{ (old('role') == 'pegawai' || !old('role')) ? 'checked' : '' }} required>
                                                             <div>
                                                                 <div class="d-flex align-items-center gap-1.5">
                                                                     <strong class="text-dark">Pegawai</strong>
@@ -208,9 +268,9 @@
 
                                                 <!-- Opsi 2: Subdirektorat (Kolektif) -->
                                                 <div class="col-md-6 col-12">
-                                                    <label class="role-radio-card d-block {{ old('role') == 'subdit' ? 'active' : '' }}">
+                                                    <label class="role-radio-card d-block {{ old('role') == 'subdit' ? 'active' : '' }}" for="role_subdit">
                                                         <div class="d-flex align-items-start gap-2">
-                                                            <input type="radio" name="role" value="subdit" class="mt-1" {{ old('role') == 'subdit' ? 'checked' : '' }}>
+                                                            <input type="radio" id="role_subdit" name="role" value="subdit" class="mt-1" {{ old('role') == 'subdit' ? 'checked' : '' }}>
                                                             <div>
                                                                 <div class="d-flex align-items-center gap-1.5">
                                                                     <strong class="text-dark">Subdirektorat</strong>
@@ -326,33 +386,85 @@
             const subditContainer = document.getElementById('subdit-choice-container');
             const pegawaiContainer = document.getElementById('pegawai-position-container');
             const subditSelect = document.getElementById('subdit_choice');
+            const form = document.querySelector('form');
+            const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
             function updateRoleUI(selectedRole) {
                 if (selectedRole === 'subdit') {
-                    subditContainer.style.display = 'block';
-                    pegawaiContainer.style.display = 'none';
+                    if (subditContainer) subditContainer.style.display = 'block';
+                    if (pegawaiContainer) pegawaiContainer.style.display = 'none';
                     if (subditSelect) subditSelect.setAttribute('required', 'required');
                 } else {
-                    subditContainer.style.display = 'none';
-                    pegawaiContainer.style.display = 'block';
-                    if (subditSelect) subditSelect.removeAttribute('required');
+                    if (subditContainer) subditContainer.style.display = 'none';
+                    if (pegawaiContainer) pegawaiContainer.style.display = 'block';
+                    if (subditSelect) {
+                        subditSelect.removeAttribute('required');
+                        subditSelect.value = '';
+                    }
                 }
             }
 
-            roleInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    roleCards.forEach(c => c.classList.remove('active'));
-                    if (this.checked) {
-                        this.closest('.role-radio-card').classList.add('active');
-                        updateRoleUI(this.value);
+            function selectRole(roleVal) {
+                const targetRadio = document.querySelector(`input[name="role"][value="${roleVal}"]`);
+                if (targetRadio) {
+                    targetRadio.checked = true;
+                }
+                roleCards.forEach(c => {
+                    const r = c.querySelector('input[name="role"]');
+                    if (r && r.value === roleVal) {
+                        c.classList.add('active');
+                    } else {
+                        c.classList.remove('active');
+                    }
+                });
+                updateRoleUI(roleVal);
+            }
+
+            roleCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    const r = this.querySelector('input[name="role"]');
+                    if (r) {
+                        selectRole(r.value);
                     }
                 });
             });
 
-            // Jalankan inisialisasi awal sesuai radio yang aktif
-            const activeRadio = document.querySelector('input[name="role"]:checked');
-            if (activeRadio) {
-                updateRoleUI(activeRadio.value);
+            roleInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectRole(this.value);
+                    }
+                });
+            });
+
+            function syncInitialRole() {
+                const activeRadio = document.querySelector('input[name="role"]:checked');
+                if (activeRadio) {
+                    selectRole(activeRadio.value);
+                } else {
+                    selectRole('pegawai');
+                }
+            }
+
+            // Inisialisasi awal
+            syncInitialRole();
+
+            // Cegah isu BFCache (Back/Forward Cache di Browser):
+            // Jika halaman direstorasi dari memori cache browser (tombol Back), reload untuk mendapatkan CSRF token segar
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    window.location.reload();
+                } else {
+                    syncInitialRole();
+                }
+            });
+
+            // Cegah double submission
+            if (form && submitBtn) {
+                form.addEventListener('submit', function() {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mendaftarkan Akun...';
+                });
             }
         });
     </script>

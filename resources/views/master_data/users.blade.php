@@ -26,9 +26,6 @@
                                 Kelola hak akses akun pengguna untuk 5 peran: Kasubag TU, Arsiparis, PIC Distribusi, Subdirektorat (Kolektif), dan Pegawai (Individu).
                             </p>
                         </div>
-                        <button type="button" class="btn btn-warning text-dark fw-bold btn-sm btn-create-user shadow-sm">
-                            + Tambah Pengguna Baru
-                        </button>
                     </div>
                 </div>
             </div>
@@ -75,8 +72,9 @@
                                 Daftar seluruh pengguna terdaftar dengan peran wewenangnya dalam aplikasi
                             </small>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm btn-create-user">
-                            + Tambah Pengguna
+                        <button type="button" class="btn btn-primary btn-sm btn-create-user"
+                            data-bs-toggle="modal" data-bs-target="#modalUser">
+                            + Tambah Pengguna Baru
                         </button>
                     </div>
                     <div class="card-body p-4">
@@ -114,7 +112,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
-                                                <strong class="text-dark">{{ $user->name }}</strong>
+                                                <strong class="text-dark">{{ $user->name_with_title ?? $user->name }}</strong>
                                                 <br>
                                                 <small class="text-muted">{{ $user->position ?? '-' }}</small>
                                                 @if($user->nip)
@@ -135,8 +133,10 @@
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1 flex-nowrap">
                                                     <button type="button" class="btn btn-info btn-sm btn-detail-user text-white"
+                                                        data-bs-toggle="modal" data-bs-target="#modalUser"
                                                         data-id="{{ $user->id }}" 
                                                         data-name="{{ e($user->name) }}"
+                                                        data-title="{{ e($user->title) }}"
                                                         data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
@@ -148,8 +148,10 @@
                                                         Detail
                                                     </button>
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit-user text-dark"
+                                                        data-bs-toggle="modal" data-bs-target="#modalUser"
                                                         data-id="{{ $user->id }}" 
                                                         data-name="{{ e($user->name) }}"
+                                                        data-title="{{ e($user->title) }}"
                                                         data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
@@ -237,6 +239,14 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small text-uppercase">
+                                    Gelar Akademik / Titel <span class="text-muted font-normal">(Opsional)</span>
+                                </label>
+                                <input type="text" name="title" id="userTitle" class="form-control"
+                                    placeholder="Contoh: S.T. / M.Si. / S.Kom.">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">
                                     Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="nip" id="nip" class="form-control"
@@ -267,42 +277,42 @@
                                 </select>
                             </div>
 
-                            {{-- Pilihan 4 Perwakilan Unit PIC Distribusi (TU, KBR, SDK, PJF) --}}
+                            {{-- Pilihan Unit Subdirektorat PIC Distribusi --}}
                             <div class="col-md-6 d-none" id="picUnitContainer">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Perwakilan Divisi PIC (TU, KBR, SDK, PJF) <span class="text-danger">*</span>
+                                    Pilih Subdirektorat / Unit Kerja PIC <span class="text-danger">*</span>
                                 </label>
                                 <select name="pic_unit_choice" id="pic_unit_choice" class="form-select">
-                                    <option value="" disabled selected>-- Pilih 1 dari 4 Divisi PIC --</option>
-                                    <option value="TU">Subbagian TU (Tata Usaha)</option>
-                                    <option value="KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
-                                    <option value="SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
-                                    <option value="PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
+                                    <option value="" disabled selected>-- Pilih Unit Penugasan PIC --</option>
+                                    <option value="Subdirektorat SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
+                                    <option value="Subdirektorat PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
+                                    <option value="Subdirektorat KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
+                                    <option value="Subbagian TU">Subbagian TU (Tata Usaha)</option>
                                 </select>
-                                <small class="text-muted" style="font-size: 0.75rem;">Pilih unit penugasan PIC Distribusi.</small>
+                                <small class="text-muted" style="font-size: 0.75rem;">Pilih unit penugasan resmi untuk penyerahan barang dan dokumen bukti distribusi.</small>
                             </div>
 
                             {{-- Pilihan Unit Subdirektorat (Jika role == subdit) --}}
                             <div class="col-md-6 d-none" id="subditUnitContainer">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Unit Subdirektorat <span class="text-danger">*</span>
+                                    Pilih Subdirektorat / Unit Kerja <span class="text-danger">*</span>
                                 </label>
                                 <select name="subdit_unit_choice" id="subdit_unit_choice" class="form-select">
                                     <option value="" disabled selected>-- Pilih Unit Subdirektorat --</option>
-                                    <option value="Subbagian TU">Subbagian TU (Tata Usaha)</option>
-                                    <option value="Subdirektorat KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
                                     <option value="Subdirektorat SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
                                     <option value="Subdirektorat PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
+                                    <option value="Subdirektorat KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
+                                    <option value="Subbagian TU">Subbagian TU (Tata Usaha)</option>
                                 </select>
                                 <small class="text-muted" style="font-size: 0.75rem;">Pilih unit Subdirektorat resmi yang diwakili.</small>
                             </div>
 
                             <div class="col-md-6" id="positionContainer">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Jabatan / Posisi Kerja
+                                    Jabatan / Posisi Kerja <span class="text-muted font-normal">(Opsional)</span>
                                 </label>
                                 <input type="text" name="position" id="position" class="form-control"
-                                    placeholder="Contoh: Kasubag TU / PIC Distribusi Subdirektorat SDK / Staf Keuangan">
+                                    placeholder="Contoh: PIC Distribusi Subdirektorat SDK / Staf Keuangan">
                                 <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih perwakilan PIC/Subdit, atau dapat disesuaikan.</small>
                             </div>
 
@@ -352,6 +362,7 @@
                 const $title = $('#modalUserLabel');
                 const $btnSubmit = $('#btnSubmitUser');
                 const $name = $('#name');
+                const $userTitle = $('#userTitle');
                 const $nip = $('#nip');
                 const $email = $('#email');
                 const $role = $('#role');
@@ -397,6 +408,10 @@
                 $picUnitChoice.on('change', function() {
                     const val = $(this).val();
                     const map = {
+                        'Subbagian TU': 'PIC Distribusi Subbagian Tata Usaha',
+                        'Subdirektorat KBR': 'PIC Distribusi Subdirektorat KBR',
+                        'Subdirektorat SDK': 'PIC Distribusi Subdirektorat SDK',
+                        'Subdirektorat PJF': 'PIC Distribusi Subdirektorat PJF',
                         'TU': 'PIC Distribusi Subbagian Tata Usaha',
                         'KBR': 'PIC Distribusi Subdirektorat KBR',
                         'SDK': 'PIC Distribusi Subdirektorat SDK',
@@ -419,6 +434,7 @@
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $name.prop('readonly', false).val('');
+                    $userTitle.prop('readonly', false).val('');
                     $nip.prop('readonly', false).val('');
                     $email.prop('readonly', false).val('');
                     $role.prop('disabled', false).val('pegawai');
@@ -445,21 +461,31 @@
                     $btnSubmit.removeClass('d-none').text('Simpan Pengguna');
                 }
 
-                $('.btn-create-user').on('click', function() {
+                function showUserModal() {
+                    const modalEl = document.getElementById('modalUser');
+                    if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                    } else if (typeof $modal.modal === 'function') {
+                        $modal.modal('show');
+                    }
+                }
+
+                $(document).on('click', '.btn-create-user', function() {
                     resetModalUser();
                     $title.text('Tambah Pengguna Baru');
                     $btnSubmit.text('Simpan Pengguna');
-                    $modal.modal('show');
+                    showUserModal();
                 });
 
                 $(document).on('click', '.btn-edit-user', function() {
                     resetModalUser();
                     const id = $(this).data('id');
-                    const updateUrl = updateUrlTemplate.replace(':id', id);
+                    const updateUrl = updateUrlTemplate.replace(':id', id).replace('%3Aid', id);
 
                     $form.attr('action', updateUrl);
                     $method.prop('disabled', false).val('PUT');
                     $name.val($(this).data('name'));
+                    $userTitle.val($(this).data('title') || '').prop('readonly', false);
                     $nip.val($(this).data('nip'));
                     $email.val($(this).data('email'));
                     $role.val($(this).data('role') || 'pegawai');
@@ -472,10 +498,10 @@
                     const sub = subditName.toLowerCase();
 
                     if ($(this).data('role') === 'pic_distribusi') {
-                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('TU');
-                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('KBR');
-                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('SDK');
-                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('PJF');
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('Subbagian TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('Subdirektorat KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('Subdirektorat SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('Subdirektorat PJF');
                     } else if ($(this).data('role') === 'subdit') {
                         if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
                         else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
@@ -493,13 +519,14 @@
 
                     $title.text('Edit Pengguna');
                     $btnSubmit.text('Simpan Perubahan');
-                    $modal.modal('show');
+                    showUserModal();
                 });
 
                 $(document).on('click', '.btn-detail-user', function() {
                     resetModalUser();
                     const id = $(this).data('id');
                     const name = $(this).data('name');
+                    const titleVal = $(this).data('title') || '';
                     const nip = $(this).data('nip');
                     const email = $(this).data('email');
                     const role = $(this).data('role');
@@ -510,6 +537,7 @@
                     const updatedAt = $(this).data('updated-at');
 
                     $name.val(name).prop('readonly', true);
+                    $userTitle.val(titleVal).prop('readonly', true);
                     $nip.val(nip).prop('readonly', true);
                     $email.val(email).prop('readonly', true);
                     $role.val(role).prop('disabled', true);
@@ -523,10 +551,10 @@
                     const sub = (subditName || '').toString().toLowerCase();
 
                     if (role === 'pic_distribusi') {
-                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('TU');
-                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('KBR');
-                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('SDK');
-                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('PJF');
+                        if (pos.includes('tu') || sub.includes('tata usaha')) $picUnitChoice.val('Subbagian TU');
+                        else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('Subdirektorat KBR');
+                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('Subdirektorat SDK');
+                        else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('Subdirektorat PJF');
                     } else if (role === 'subdit') {
                         if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
                         else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
@@ -548,7 +576,7 @@
 
                     $title.text('Detail Pengguna');
                     $btnSubmit.addClass('d-none');
-                    $modal.modal('show');
+                    showUserModal();
                 });
 
                 $modal.on('hidden.bs.modal', function() {

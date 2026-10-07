@@ -119,7 +119,9 @@ class RequestRecapController extends Controller
 
                 // Pemohon breakdown
                 $requesterBreakdown = $details->groupBy(function ($d) {
-                    return ($d->requestItem->user->name ?? 'Pegawai') . ' (' . ($d->requestItem->user->position ?? 'Unit') . ')';
+                    $u = $d->requestItem->user ?? null;
+                    $userName = $u ? ($u->name_with_title ?: $u->name) : 'Pegawai';
+                    return $userName . ' (' . ($u->position ?? 'Unit') . ')';
                 })->map(function ($group) {
                     return $group->sum('quantity');
                 });
@@ -235,11 +237,14 @@ class RequestRecapController extends Controller
             // Rincian Barang Tiket Ini
             $items = collect();
             foreach ($singleReq->details as $det) {
+                $qtyToDisplay = ($det->approved_quantity !== null) ? (int) $det->approved_quantity : (int) $det->quantity;
                 $items->push((object) [
                     'request_code' => $singleReq->request_code,
                     'item_name' => $det->item_name,
                     'specification' => $det->specification,
-                    'quantity' => $det->quantity,
+                    'quantity' => $qtyToDisplay,
+                    'requested_quantity' => $det->quantity,
+                    'approved_quantity' => $det->approved_quantity,
                     'unit' => $det->item_unit,
                     'effective_quantity' => $det->effective_quantity,
                     'user_or_spec' => $teamName,
@@ -345,6 +350,7 @@ class RequestRecapController extends Controller
         foreach ($query as $req) {
             $reqTeamName = $this->resolveTeamName($req->user, $req->type);
             foreach ($req->details as $det) {
+                $qtyToDisplay = ($det->approved_quantity !== null) ? (int) $det->approved_quantity : (int) $det->quantity;
                 $items->push((object) [
                     'request_code' => $req->request_code,
                     'request_id' => $req->id,
@@ -352,7 +358,9 @@ class RequestRecapController extends Controller
                     'user' => $req->user,
                     'item_name' => $det->item_name,
                     'specification' => $det->specification,
-                    'quantity' => $det->quantity,
+                    'quantity' => $qtyToDisplay,
+                    'requested_quantity' => $det->quantity,
+                    'approved_quantity' => $det->approved_quantity,
                     'unit' => $det->item_unit,
                     'effective_quantity' => $det->effective_quantity,
                     'user_or_spec' => $reqTeamName,
@@ -402,8 +410,9 @@ class RequestRecapController extends Controller
             $firstDate = $query->first()->created_at;
             $signingDate = $firstDate->format('j') . ' ' . ($monthNames[(int) $firstDate->format('n')] ?? $firstDate->format('F')) . ' ' . $firstDate->format('Y');
         } else {
-            $signerName = 'Fairuz Armina Nur Azizah, S.T.';
-            $signerNip = '200202262025062007';
+            $signerInfo = $this->resolveSignerInfo(auth()->user(), $typeFilter ?? 'subdit');
+            $signerName = $signerInfo['signerName'];
+            $signerNip = $signerInfo['signerNip'];
             $signingDate = date('j') . ' ' . ($monthNames[(int) date('n')] ?? date('F')) . ' ' . date('Y');
         }
 
@@ -539,7 +548,7 @@ class RequestRecapController extends Controller
     {
         // Jika Pegawai individu -> nama pemohonnya (misal Pegawai)
         if ($this->isPegawai($user, $type)) {
-            return ($user && $user->name && $user->name !== 'Devi Ismiyanti') ? $user->name : 'Pegawai';
+            return ($user && $user->name) ? ($user->name_with_title ?: $user->name) : 'Pegawai';
         }
 
         // Subdit TU -> TIM TU
@@ -566,15 +575,27 @@ class RequestRecapController extends Controller
     }
 
     /**
-     * Resolve Signer and Subdit Information
+     * Resolve Signer and Subdit Information secara real-time dari data akun pemohon terdaftar
      */
     private function resolveSignerInfo($user, $type = 'subdit'): array
     {
-        // 1. Pegawai individu -> Gunakan nama Pegawai (bukan Devi)
-        if ($this->isPegawai($user, $type)) {
-            $name = ($user && $user->name && $user->name !== 'Devi Ismiyanti') ? $user->name : 'Pegawai';
-            $nip = ($user && $user->nip && $user->nip !== '-' && $user->nip !== '19900815 201503 2 004') ? $user->nip : '19950510 202012 1 002';
-            $subdit = ($user && $user->subdit_name) ? $user->subdit_name : (($user && $user->position) ? $user->position : 'Pegawai Perorangan');
+        if ($user) {
+            $name = $user->name_with_title ?: $user->name;
+            $nip = ($user->nip && $user->nip !== '-') ? $user->nip : '-';
+
+            if (!empty($user->subdit_name)) {
+                $subdit = $user->subdit_name;
+            } elseif ($this->isTu($user)) {
+                $subdit = 'Subbagian Tata Usaha';
+            } elseif ($this->isSdk($user)) {
+                $subdit = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
+            } elseif ($this->isPjf($user)) {
+                $subdit = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
+            } elseif ($this->isKbr($user)) {
+                $subdit = 'Subdirektorat Kendala Bangunan Rumah';
+            } else {
+                $subdit = $user->position ?: ($type === 'subdit' ? 'Subdirektorat' : 'Pegawai Perorangan');
+            }
 
             return [
                 'signerName' => $name,
@@ -583,46 +604,10 @@ class RequestRecapController extends Controller
             ];
         }
 
-        // 2. Subdit TU -> Devi Ismiyanti
-        if ($this->isTu($user)) {
-            return [
-                'signerName' => 'Devi Ismiyanti',
-                'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '19900815 201503 2 004',
-                'subditLabel' => 'Subbagian Tata Usaha',
-            ];
-        }
-
-        // 3. Subdit SDK -> Fairuz Armina Nur Azizah, S.T.
-        if ($this->isSdk($user)) {
-            return [
-                'signerName' => 'Fairuz Armina Nur Azizah, S.T.',
-                'signerNip' => '200202262025062007',
-                'subditLabel' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
-            ];
-        }
-
-        // 4. Subdit PJF
-        if ($this->isPjf($user)) {
-            return [
-                'signerName' => ($user && $user->name && !str_contains(strtolower($user->name), 'subdit')) ? $user->name : 'Subdit PJF',
-                'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '-',
-                'subditLabel' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
-            ];
-        }
-
-        // 5. Subdit KBR
-        if ($this->isKbr($user)) {
-            return [
-                'signerName' => ($user && $user->name && !str_contains(strtolower($user->name), 'subdit')) ? $user->name : 'Subdit KBR',
-                'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '-',
-                'subditLabel' => 'Subdirektorat Kendala Bangunan Rumah',
-            ];
-        }
-
         return [
-            'signerName' => $user ? $user->name : 'Koordinator Subdit',
-            'signerNip' => ($user && $user->nip && $user->nip !== '-') ? $user->nip : '-',
-            'subditLabel' => $user ? ($user->subdit_name ?: ($user->position ?: $user->name)) : 'Subdirektorat',
+            'signerName' => 'Pengaju Permintaan',
+            'signerNip' => '-',
+            'subditLabel' => $type === 'subdit' ? 'Subdirektorat' : 'Pegawai Perorangan',
         ];
     }
 }

@@ -60,11 +60,26 @@ class RequestItem extends Model
         return $this->hasMany(RequestDetail::class, 'request_id');
     }
 
+    public function getIsPurchasedAttribute(): bool
+    {
+        if (!$this->is_procurement) {
+            return false;
+        }
+        if (!empty($this->purchase_invoice)) {
+            return true;
+        }
+        return $this->relationLoaded('details')
+            ? $this->details->contains(fn($d) => !empty($d->product_id))
+            : $this->details()->whereNotNull('product_id')->exists();
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
             'pending' => $this->is_procurement ? 'Menunggu Verifikasi Pengadaan' : 'Menunggu Verifikasi Subbag TU',
-            'approved' => $this->is_procurement ? 'Disetujui TU (Akan Dibeli)' : 'Disetujui TU (Siap Diambil)',
+            'approved' => $this->is_procurement
+                ? ($this->is_purchased ? 'Disetujui & Telah Dibeli (Tersedia)' : 'Disetujui TU (Akan Dibeli)')
+                : 'Disetujui TU (Siap Diambil)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',
             default => ucfirst($this->status),
@@ -75,7 +90,7 @@ class RequestItem extends Model
     {
         return match ($this->status) {
             'pending' => 'bg-warning text-dark',
-            'approved' => 'bg-success text-white',
+            'approved' => ($this->is_procurement && !$this->is_purchased) ? 'bg-info text-white' : 'bg-success text-white',
             'distributed' => 'bg-primary text-white',
             'rejected' => 'bg-danger text-white',
             default => 'bg-secondary text-white',

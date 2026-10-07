@@ -245,6 +245,38 @@
         <!-- KHUSUS PEGAWAI / SUBDIT (REQUESTER VIEW) -->
         <!-- ======================================================== -->
         @if ($isRequester && !$isKasubagTU)
+            {{-- Alert Banner Notifikasi Pengadaan Tersedia --}}
+            @if(isset($recentProcurementNotifications) && $recentProcurementNotifications->isNotEmpty())
+                @foreach($recentProcurementNotifications as $pNotif)
+                    <div class="alert alert-success border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-4 rounded-3 notif-banner" id="banner-notif-{{ $pNotif->id }}">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-success text-white p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 44px; height: 44px;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold text-success d-flex align-items-center gap-2">
+                                    {{ $pNotif->title }}
+                                    <span class="badge bg-success text-white" style="font-size: 0.65rem;">Sudah Dibeli</span>
+                                </h6>
+                                <div class="small text-dark">{{ $pNotif->message }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-3">
+                            <a href="{{ route('katalog-atk') }}" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">
+                                Cek di Katalog ATK
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="markSingleNotificationRead({{ $pNotif->id }}, event, '')" title="Tandai Sudah Dibaca">
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">
                     <div class="card h-100 shadow-sm border-0">
@@ -259,9 +291,15 @@
                 <div class="col-6 col-md-3">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-body p-3">
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Disetujui TU (Proses Beli)</span>
-                            <h3 class="fw-bold text-info mb-0">{{ $userApprovedCount }}</h3>
-                            <small class="text-muted">Akan dibeli Subbag TU</small>
+                            @if(isset($userProcurementBoughtCount) && $userProcurementBoughtCount > 0)
+                                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Pengadaan Siap</span>
+                                <h3 class="fw-bold text-success mb-0">{{ $userProcurementBoughtCount }}</h3>
+                                <small class="text-success fw-semibold">Sudah dibeli &amp; tersedia</small>
+                            @else
+                                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Disetujui TU (Proses Beli)</span>
+                                <h3 class="fw-bold text-info mb-0">{{ $userApprovedCount }}</h3>
+                                <small class="text-muted">Akan dibeli Subbag TU</small>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -362,6 +400,16 @@
                                                 </td>
                                                 <td>
                                                     <span class="badge {{ $req->status_badge }}">{{ $req->status_label }}</span>
+                                                    @if ($req->is_procurement && $req->purchase_invoice)
+                                                        <br><span class="badge bg-primary-subtle text-primary border mt-1" style="font-size: 0.7rem;">
+                                                            Faktur: {{ $req->purchase_invoice }}
+                                                        </span>
+                                                    @endif
+                                                    @if ($req->is_procurement && $req->is_purchased)
+                                                        <br><a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border mt-1 text-decoration-none" style="font-size: 0.7rem;">
+                                                            Tersedia di Katalog &rarr;
+                                                        </a>
+                                                    @endif
                                                 </td>
                                                 <td class="text-end">
                                                     <div class="d-flex justify-content-end gap-1 flex-wrap">

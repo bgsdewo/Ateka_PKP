@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\StockTransaction;
+use App\Models\RequestDetail;
+use App\Models\RequestItem;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -130,6 +133,15 @@ class ProductController extends Controller
 
         $totalProducts = $products->count();
 
+        // Ambil usulan pengadaan yang disetujui / pending dan belum terpenuhi master barangnya
+        $unfulfilledProcurements = RequestDetail::whereHas('requestItem', function ($q) {
+            $q->where('is_procurement', true)
+              ->whereIn('status', ['pending', 'approved']);
+        })
+        ->whereNull('product_id')
+        ->with(['requestItem.user'])
+        ->get();
+
         return view('master_data.products', compact(
             'products',
             'categories',
@@ -138,7 +150,8 @@ class ProductController extends Controller
             'startDate',
             'endDate',
             'availableYears',
-            'totalProducts'
+            'totalProducts',
+            'unfulfilledProcurements'
         ));
     }
 
@@ -202,11 +215,25 @@ class ProductController extends Controller
                 ]);
             }
 
+            // 3. Hubungkan dengan usulan pengadaan yang cocok & kirim notifikasi real-time ke pemohon
+            $notifiedNames = $this->fulfillMatchingProcurements(
+                $product,
+                $request->no_faktur,
+                $request->transaction_date,
+                $request->uraian,
+                $request->filled('request_detail_id') ? (int) $request->request_detail_id : null
+            );
+
             DB::commit();
+
+            $successMsg = 'Barang berhasil ditambahkan dan tercatat di Barang Masuk.';
+            if (!empty($notifiedNames)) {
+                $successMsg .= ' Usulan pengadaan terpenuhi dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+            }
 
             return redirect()
                 ->route('master-data.daftar-barang.index')
-                ->with('success', 'Barang berhasil ditambahkan dan tercatat di Barang Masuk.');
+                ->with('success', $successMsg);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -322,11 +349,24 @@ class ProductController extends Controller
                 $tx->save();
             }
 
+            // 4. Sinkronkan dengan usulan pengadaan yang cocok (jika ada usulan yang belum terpenuhi)
+            $notifiedNames = $this->fulfillMatchingProcurements(
+                $daftar_barang,
+                $request->no_faktur,
+                $request->transaction_date,
+                $request->uraian
+            );
+
             DB::commit();
+
+            $successMsg = 'Barang berhasil diperbarui dan riwayat di Barang Masuk tersinkronisasi secara real-time.';
+            if (!empty($notifiedNames)) {
+                $successMsg .= ' Usulan pengadaan terpenuhi dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+            }
 
             return redirect()
                 ->route('master-data.daftar-barang.index')
-                ->with('success', 'Barang berhasil diperbarui dan riwayat di Barang Masuk tersinkronisasi secara real-time.');
+                ->with('success', $successMsg);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())->withInput();
@@ -381,5 +421,140 @@ class ProductController extends Controller
         $categories = Category::orderBy('name', 'asc')->get();
 
         return view('katalog.index', compact('products', 'categories', 'categoryId', 'search'));
+    }
+
+    /**
+     * Cek kesesuaian antara produk master dengan usulan pengadaan pegawai/subdit
+     */
+    public static function isProcurementMatch(Product $product, RequestDetail $detail): bool
+    {
+        $pName   = mb_strtolower(trim($product->name ?? ''));
+        $cName   = mb_strtolower(trim($detail->custom_product_name ?? ''));
+        $spec    = mb_strtolower(trim($detail->specification ?? ''));
+        $cFull   = trim($cName . ' ' . $spec);
+        $catName = mb_strtolower(trim($product->category->name ?? ''));
+
+        if (empty($cName) && empty($cFull)) {
+            return false;
+        }
+
+        // 1. Exact match nama usulan atau nama + spesifikasi dengan nama produk
+        if ($cName === $pName || $cFull === $pName) {
+            return true;
+        }
+
+        // 2. Exact match antara kategori + spesifikasi dengan nama produk (contoh: Kategori 'Map' + 'Merah' == 'Map Merah')
+        if ($catName !== '' && trim($catName . ' ' . $spec) === $pName) {
+            return true;
+        }
+
+        $cWords = array_filter(preg_split('/[\s,\.\-_]+/', $cName), fn($w) => mb_strlen($w) >= 2);
+        $pWords = array_filter(preg_split('/[\s,\.\-_]+/', $pName), fn($w) => mb_strlen($w) >= 2);
+        $specWords = array_filter(preg_split('/[\s,\.\-_]+/', $spec), fn($w) => mb_strlen($w) >= 2);
+
+        // 3. Substring matching (mendukung kata pendek ATK seperti map, lem, pen, A4, dsb.)
+        if (mb_strlen($cName) >= 3 && str_contains($pName, $cName)) {
+            if ($spec !== '') {
+                if (str_contains($pName, $spec) || str_contains($cFull, $pName)) {
+                    return true;
+                }
+                // Jika ada kata spesifikasi yang termuat dalam nama barang
+                if (!empty($specWords)) {
+                    foreach ($specWords as $sw) {
+                        if (str_contains($pName, $sw)) {
+                            return true;
+                        }
+                    }
+                }
+                // Jika nama barang pemohon sudah sangat spesifik (>= 2 kata, e.g. "Kertas A4")
+                if (count($cWords) >= 2) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+
+        // 4. Keseluruhan usulan (nama + spec) terdapat dalam nama barang atau sebaliknya
+        if (mb_strlen($cFull) >= 3) {
+            if (str_contains($pName, $cFull) || str_contains($cFull, $pName)) {
+                return true;
+            }
+        }
+
+        // 5. Pencocokan kata (token matching)
+        if (!empty($cWords)) {
+            $cWordsInP = count(array_intersect($cWords, $pWords));
+            if ($cWordsInP === count($cWords)) {
+                if ($spec !== '') {
+                    if (empty($specWords) || count(array_intersect($specWords, $pWords)) > 0 || count($cWords) >= 2) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        // 6. Typo / kemiripan karakter
+        if (mb_strlen($cName) >= 5 && mb_strlen($pName) >= 5 && levenshtein($pName, $cName) <= 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Hubungkan produk master dengan usulan pengadaan yang cocok, update status, dan kirim notifikasi ke pemohon
+     */
+    public function fulfillMatchingProcurements(Product $product, ?string $noFaktur = null, ?string $transactionDate = null, ?string $uraian = null, ?int $specificDetailId = null): array
+    {
+        $fulfilledReqDetails = collect();
+
+        if ($specificDetailId) {
+            $chosenDetail = RequestDetail::with('requestItem.user')->find($specificDetailId);
+            if ($chosenDetail) {
+                $fulfilledReqDetails->push($chosenDetail);
+            }
+        } else {
+            $openDetails = RequestDetail::whereHas('requestItem', function ($q) {
+                $q->where('is_procurement', true)
+                  ->whereIn('status', ['pending', 'approved']);
+            })
+            ->whereNull('product_id')
+            ->with(['requestItem.user'])
+            ->get();
+
+            foreach ($openDetails as $od) {
+                if (self::isProcurementMatch($product, $od)) {
+                    $fulfilledReqDetails->push($od);
+                }
+            }
+        }
+
+        $notifiedNames = [];
+        foreach ($fulfilledReqDetails as $det) {
+            $det->update(['product_id' => $product->id]);
+            $reqItem = $det->requestItem;
+            if ($reqItem) {
+                $reqItem->update([
+                    'purchase_invoice'   => $noFaktur ?: ($reqItem->purchase_invoice ?: '-'),
+                    'purchase_date'      => $transactionDate ?: ($reqItem->purchase_date ?: now()),
+                    'purchase_price'     => ($product->purchase_price ?? 0) * ($det->approved_quantity ?: $det->quantity),
+                    'purchase_notes'     => $uraian ?: ($reqItem->purchase_notes ?: 'Barang dibeli dan dimasukkan ke Daftar Barang'),
+                    'verification_notes' => $reqItem->verification_notes ?: 'Barang telah dibeli oleh Subbag TU dan kini tersedia di daftar barang/katalog.',
+                    'status'             => 'approved',
+                    'verified_at'        => $reqItem->verified_at ?: now(),
+                    'verified_by'        => $reqItem->verified_by ?: (Auth::id() ?? 1),
+                ]);
+
+                if ($reqItem->user) {
+                    UserNotification::sendProcurementNotification($reqItem, $product, $noFaktur);
+                    $notifiedNames[] = $reqItem->user->name_with_title ?: $reqItem->user->name;
+                }
+            }
+        }
+
+        return $notifiedNames;
     }
 }

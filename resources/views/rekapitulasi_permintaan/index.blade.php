@@ -217,8 +217,11 @@
                                             <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
                                         </td>
                                         <td>
-                                            <strong>{{ $req->user->name ?? '-' }}</strong><br>
-                                            <small class="text-muted">{{ $req->user->position ?? '-' }}</small>
+                                            <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
+                                            <small class="text-muted">{{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}</small>
+                                            @if(!empty($req->user->nip))
+                                                <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
+                                            @endif
                                         </td>
                                         <td>
                                             <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary text-white' }}">
@@ -323,7 +326,10 @@
                                                             <div class="row g-2 mb-3 bg-light p-3 rounded border">
                                                                 <div class="col-sm-6">
                                                                     <small class="text-muted d-block">Pemohon / Unit Kerja:</small>
-                                                                    <strong>{{ $req->user->name ?? '-' }} ({{ $req->user->position ?? '-' }})</strong>
+                                                                    <strong>{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }} ({{ $req->user->position ?? '-' }})</strong>
+                                                                    @if(!empty($req->user->nip))
+                                                                        <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
+                                                                    @endif
                                                                 </div>
                                                                 <div class="col-sm-6">
                                                                     <small class="text-muted d-block">Waktu Pengajuan:</small>

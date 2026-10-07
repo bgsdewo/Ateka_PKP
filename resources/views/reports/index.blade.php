@@ -1,5 +1,14 @@
 @extends('layouts.app')
 
+@php
+    $arsiparisUser = \App\Models\User::where('role', 'arsiparis')->first();
+    $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
+    $arsiparisName = $arsiparisUser ? ($arsiparisUser->name_with_title ?: $arsiparisUser->name) : 'Devi Ismiyanti';
+    $arsiparisNip = $arsiparisUser->nip ?? '199508142022032005';
+    $kasubagName = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
+    $kasubagNip = $kasubagUser->nip ?? '199812132025062010';
+@endphp
+
 @section('page-header')
     <style>
         .iq-navbar-header {
@@ -875,8 +884,8 @@
                                     <p class="mb-5"><strong>Arsiparis (Pelaporan & Administrasi)</strong></p>
                                     <div style="height: 50px;"></div>
                                     <p class="mb-0">
-                                        <strong><u>Devi Ismiyanti</u></strong><br>
-                                        <small class="text-muted">NIP. 199508142022032005</small>
+                                        <strong><u>{{ $arsiparisName }}</u></strong><br>
+                                        <small class="text-muted">NIP. {{ $arsiparisNip }}</small>
                                     </p>
                                 </div>
                                 <div class="col-6">
@@ -884,8 +893,8 @@
                                     <p class="mb-5">Mengetahui & Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
                                     <div style="height: 50px;"></div>
                                     <p class="mb-0">
-                                        <strong><u>Utami M.</u></strong><br>
-                                        <small class="text-muted">NIP. 199812132025062010</small>
+                                        <strong><u>{{ $kasubagName }}</u></strong><br>
+                                        <small class="text-muted">NIP. {{ $kasubagNip }}</small>
                                     </p>
                                 </div>
                             </div>
@@ -992,11 +1001,11 @@
                                     '<row r="' + (rowCount + 2) + '">' +
                                     '<c t="inlineStr" r="M' + (rowCount + 2) + '" s="55"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
                                     '<row r="' + (rowCount + 6) + '">' +
-                                    '<c t="inlineStr" r="E' + (rowCount + 6) + '" s="55"><is><t>Devi Ismiyanti</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 6) + '" s="55"><is><t>Utami M.</t></is></c></row>' +
+                                    '<c t="inlineStr" r="E' + (rowCount + 6) + '" s="55"><is><t>{{ addslashes($arsiparisName) }}</t></is></c>' +
+                                    '<c t="inlineStr" r="M' + (rowCount + 6) + '" s="55"><is><t>{{ addslashes($kasubagName) }}</t></is></c></row>' +
                                     '<row r="' + (rowCount + 7) + '">' +
-                                    '<c t="inlineStr" r="E' + (rowCount + 7) + '" s="55"><is><t>NIP. 199508142022032005</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 7) + '" s="55"><is><t>NIP. 199812132025062010</t></is></c></row>';
+                                    '<c t="inlineStr" r="E' + (rowCount + 7) + '" s="55"><is><t>NIP. {{ $arsiparisNip }}</t></is></c>' +
+                                    '<c t="inlineStr" r="M' + (rowCount + 7) + '" s="55"><is><t>NIP. {{ $kasubagNip }}</t></is></c></row>';
 
                                 $('sheetData', sheet).append(signatureXml);
                             }
@@ -1101,13 +1110,13 @@
                                                     margin: [0, 0, 0, 40]
                                                 },
                                                 {
-                                                    text: 'Devi Ismiyanti',
+                                                    text: @json($arsiparisName),
                                                     fontSize: 8.5,
                                                     bold: true,
                                                     decoration: 'underline'
                                                 },
                                                 {
-                                                    text: 'NIP. 199508142022032005',
+                                                    text: 'NIP. {{ $arsiparisNip }}',
                                                     fontSize: 7.5,
                                                     color: '#475569'
                                                 }
@@ -1125,28 +1134,28 @@
                                                     text: 'Jakarta, ' + tglHariIni,
                                                     fontSize: 8.5,
                                                     margin: [0, 0, 0, 3]
-                                                },
-                                                {
-                                                    text: 'Mengetahui & Mengesahkan,',
-                                                    fontSize: 8.5
-                                                },
-                                                {
-                                                    text: 'Kasubag TU (Approver / Pimpinan)',
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    margin: [0, 0, 0, 40]
-                                                },
-                                                {
-                                                    text: 'Utami M.',
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    decoration: 'underline'
-                                                },
-                                                {
-                                                    text: 'NIP. 199812132025062010',
-                                                    fontSize: 7.5,
-                                                    color: '#475569'
-                                                }
+                                                 },
+                                                 {
+                                                     text: 'Mengetahui & Mengesahkan,',
+                                                     fontSize: 8.5
+                                                 },
+                                                 {
+                                                     text: 'Kasubag TU (Approver / Pimpinan)',
+                                                     fontSize: 8.5,
+                                                     bold: true,
+                                                     margin: [0, 0, 0, 40]
+                                                 },
+                                                 {
+                                                     text: @json($kasubagName),
+                                                     fontSize: 8.5,
+                                                     bold: true,
+                                                     decoration: 'underline'
+                                                 },
+                                                 {
+                                                     text: 'NIP. {{ $kasubagNip }}',
+                                                     fontSize: 7.5,
+                                                     color: '#475569'
+                                                 }
                                             ]
                                         }
                                     ]

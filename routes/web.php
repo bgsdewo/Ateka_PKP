@@ -15,6 +15,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\RequestRecapController;
+use App\Http\Controllers\NotificationController;
 
 // Default Route
 Route::get('/', function () {
@@ -53,6 +54,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+    // ==========================================
+    // ROUTE NOTIFIKASI
+    // ==========================================
+    Route::get('/notifikasi', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifikasi/{id}/baca', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.markAsRead');
+    Route::post('/notifikasi/baca-semua', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.markAllAsRead');
 
     // Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {

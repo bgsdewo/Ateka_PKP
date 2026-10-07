@@ -224,41 +224,54 @@
 
         @php
             $currentUser = auth()->user();
+            $picUser = null;
 
-            // Mapping default PIC per subdit (PJF: Desi, KBR: Hira, SDK: Fairuz, TU: Devi)
-            $subditPicMap = [
-                'pjf' => ['name' => 'Desi', 'pos' => 'PIC Distribusi Subdirektorat PJF'],
-                'kbr' => ['name' => 'Hira', 'pos' => 'PIC Distribusi Subdirektorat KBR'],
-                'sdk' => ['name' => 'Fairuz Armina Nur Azizah, S.T.', 'pos' => 'PIC Distribusi Subdirektorat SDK'],
-                'tu'  => ['name' => 'Devi Ismiyanti', 'pos' => 'PIC Distribusi Subbagian Tata Usaha'],
-            ];
-
-            $isKasubag = $currentUser && (in_array($currentUser->role, ['kasubag_tu', 'admin']) || str_contains(strtolower($currentUser->name), 'utami'));
-
-            if ($currentUser && $currentUser->isPicDistribusi()) {
-                // Diambil langsung dari nama akun PIC yang sedang login mencetak
-                $namaPenyerah = $currentUser->name;
-                $jabatanPenyerah = $currentUser->position ?? 'PIC Distribusi';
-            } elseif ($requestItem->distributor) {
-                $namaPenyerah = $requestItem->distributor->name;
-                $jabatanPenyerah = $requestItem->distributor->position ?? 'PIC Distribusi & Rekapitulasi';
+            if ($requestItem->distributor) {
+                $picUser = $requestItem->distributor;
+            } elseif ($currentUser && $currentUser->isPicDistribusi()) {
+                $picUser = $currentUser;
             } else {
-                // Jika Kasubag TU mencetak dan belum ada data distributor: cari PIC berdasarkan subdit pemohon
-                $pemohonText = strtolower(($requestItem->user->subdit_name ?? '') . ' ' . ($requestItem->user->position ?? '') . ' ' . ($requestItem->user->email ?? '') . ' ' . ($requestItem->user->name ?? ''));
-                $matched = false;
-                foreach ($subditPicMap as $code => $picData) {
-                    if (str_contains($pemohonText, $code)) {
-                        $namaPenyerah = $picData['name'];
-                        $jabatanPenyerah = $picData['pos'];
-                        $matched = true;
+                // Cari akun PIC Distribusi resmi di database yang ditugaskan pada unit pemohon
+                $pemohonText = strtolower(($requestItem->user->subdit_name ?? '') . ' ' . ($requestItem->user->position ?? '') . ' ' . ($requestItem->user->name ?? ''));
+                
+                $picCandidates = \App\Models\User::where('role', 'pic_distribusi')->get();
+                
+                foreach ($picCandidates as $pic) {
+                    $picText = strtolower(($pic->position ?? '') . ' ' . ($pic->subdit_name ?? ''));
+                    if (str_contains($pemohonText, 'sdk') && str_contains($picText, 'sdk')) {
+                        $picUser = $pic;
+                        break;
+                    } elseif (str_contains($pemohonText, 'pjf') && str_contains($picText, 'pjf')) {
+                        $picUser = $pic;
+                        break;
+                    } elseif (str_contains($pemohonText, 'kbr') && str_contains($picText, 'kbr')) {
+                        $picUser = $pic;
+                        break;
+                    } elseif ((str_contains($pemohonText, 'tu') || str_contains($pemohonText, 'tata usaha')) && (str_contains($picText, 'tu') || str_contains($picText, 'tata usaha'))) {
+                        $picUser = $pic;
                         break;
                     }
                 }
-                if (!$matched) {
-                    $namaPenyerah = 'Fairuz Armina Nur Azizah, S.T.';
-                    $jabatanPenyerah = 'PIC Distribusi & Rekapitulasi';
+
+                if (!$picUser) {
+                    $picUser = $picCandidates->first();
                 }
             }
+
+            if ($picUser) {
+                $namaPenyerah = $picUser->name_with_title ?: $picUser->name;
+                $jabatanPenyerah = $picUser->position ?: 'PIC Distribusi & Gudang';
+                $nipPenyerah = $picUser->nip;
+            } else {
+                $namaPenyerah = 'PIC Distribusi & Gudang';
+                $jabatanPenyerah = 'PIC Distribusi';
+                $nipPenyerah = null;
+            }
+
+            // Data Kasubag TU resmi dari database akun
+            $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
+            $namaKasubag = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
+            $nipKasubag = $kasubagUser ? ($kasubagUser->nip ?: '199812132025062010') : '199812132025062010';
         @endphp
 
         <!-- KOLOM TANDA TANGAN (3 PIHAK) -->
@@ -267,8 +280,11 @@
                 <p class="mb-1">Yang Menerima,</p>
                 <p class="text-muted small mb-0">{{ $requestItem->type === 'subdit' ? 'Perwakilan Subdirektorat' : 'Pegawai Pemohon' }}</p>
                 <div style="height: 60px;"></div>
-                <p class="mb-0 fw-bold"><u>{{ $requestItem->receiver_name ?? ($requestItem->user->name ?? 'Penerima') }}</u></p>
-                <small class="text-muted">{{ $requestItem->user->position ?? 'Pegawai' }}</small>
+                <p class="mb-0 fw-bold"><u>{{ $requestItem->receiver_name ?? ($requestItem->user->name_with_title ?? ($requestItem->user->name ?? 'Penerima')) }}</u></p>
+                <small class="text-muted d-block">{{ $requestItem->user->position ?? 'Pegawai' }}</small>
+                @if(!empty($requestItem->user->nip))
+                    <small class="text-muted d-block">NIP. {{ $requestItem->user->nip }}</small>
+                @endif
             </div>
 
             <div class="col-4">
@@ -276,15 +292,20 @@
                 <p class="text-muted small mb-0">PIC Distribusi &amp; Gudang</p>
                 <div style="height: 60px;"></div>
                 <p class="mb-0 fw-bold"><u>{{ $namaPenyerah }}</u></p>
-                <small class="text-muted">{{ $jabatanPenyerah }}</small>
+                <small class="text-muted d-block">{{ $jabatanPenyerah }}</small>
+                @if(!empty($nipPenyerah))
+                    <small class="text-muted d-block">NIP. {{ $nipPenyerah }}</small>
+                @endif
             </div>
 
             <div class="col-4">
                 <p class="mb-1">Mengetahui &amp; Menyetujui,</p>
                 <p class="text-muted small mb-0">Kasubag Tata Usaha</p>
                 <div style="height: 60px;"></div>
-                <p class="mb-0 fw-bold"><u>Utami M.</u></p>
-                <small class="text-muted">NIP. 199812132025062010</small>
+                <p class="mb-0 fw-bold"><u>{{ $namaKasubag }}</u></p>
+                @if(!empty($nipKasubag))
+                    <small class="text-muted d-block">NIP. {{ $nipKasubag }}</small>
+                @endif
             </div>
         </div>
     </div>

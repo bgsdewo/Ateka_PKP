@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'title',
         'email',
         'password',
         'role',
@@ -75,6 +76,21 @@ class User extends Authenticatable
         return in_array($this->role, ['pegawai', 'subdit', 'member']) || empty($this->role);
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class)->latest();
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->hasMany(UserNotification::class)->where('is_read', false)->latest();
+    }
+
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->unreadNotifications()->count();
+    }
+
     public function getRoleTitleAttribute(): string
     {
         return match ($this->role) {
@@ -96,5 +112,41 @@ class User extends Authenticatable
             'subdit' => 'bg-success',
             default => 'bg-secondary',
         };
+    }
+
+    public function getGelarAttribute(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setGelarAttribute(?string $value): void
+    {
+        $this->title = $value;
+    }
+
+    /**
+     * Format nama lengkap beserta gelar (real-time)
+     */
+    public function getNameWithTitleAttribute(): string
+    {
+        if (empty($this->title)) {
+            return $this->name ?? '';
+        }
+
+        $title = trim($this->title);
+        $name = trim($this->name ?? '');
+
+        if (str_contains(strtolower($name), strtolower($title))) {
+            return $name;
+        }
+
+        $prefixes = ['dr.', 'dr', 'drs.', 'drs', 'dra.', 'dra', 'ir.', 'ir', 'prof.', 'prof'];
+        $firstWord = strtolower(explode(' ', $title)[0]);
+
+        if (in_array($firstWord, $prefixes)) {
+            return $title . ' ' . $name;
+        }
+
+        return $name . ', ' . $title;
     }
 }

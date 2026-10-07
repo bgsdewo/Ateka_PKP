@@ -476,7 +476,7 @@
                     $noFaktur.prop('readonly', false).val('');
                     $transactionDate.prop('readonly', false).val('');
                     $uraian.prop('readonly', false).val('');
-                    $unit.prop('readonly', false).val('pcs');
+                    $unit.prop('readonly', false).val('Pcs');
                     $stock.prop('readonly', false).val(0);
                     $purchasePrice.prop('readonly', false).val(0);
                     $description.prop('readonly', false).val('');

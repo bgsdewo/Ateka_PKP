@@ -9,7 +9,15 @@ class AuthController extends Controller
 {
     public function login()
     {
-        return view('auth.login');
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
+        return response()
+            ->view('auth.login')
+            ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
     }
 
     public function authenticate(Request $request)
@@ -30,13 +38,27 @@ class AuthController extends Controller
     }
     public function register()
     {
-        return view('auth.register');
+        if (Auth::check()) {
+            return redirect()->route('dashboard')->with('info', 'Anda sudah masuk sebagai ' . Auth::user()->name . '.');
+        }
+
+        return response()
+            ->view('auth.register')
+            ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sun, 02 Jan 1990 00:00:00 GMT');
     }
 
     public function storeRegister(Request $request)
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard')->with('info', 'Anda sudah masuk sebagai ' . Auth::user()->name . '.');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:50'],
+            'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'nip' => ['required', 'string', 'max:50'],
             'role' => ['required', 'string', 'in:pegawai,subdit'],
@@ -47,7 +69,7 @@ class AuthController extends Controller
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email dinas/kantor wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email ini sudah terdaftar.',
+            'email.unique' => 'Alamat email ini sudah terdaftar. Silakan masuk (login) dengan akun tersebut atau gunakan email dinas lain.',
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi untuk keamanan akun.',
             'role.required' => 'Silakan pilih peran (role) Anda.',
             'role.in' => 'Pilihan role pendaftaran hanya untuk Pegawai atau Subdirektorat.',
@@ -55,6 +77,8 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
+
+        $titleInput = $validated['title'] ?? ($validated['gelar'] ?? null);
 
         if ($validated['role'] === 'subdit') {
             $subditChoice = $request->input('subdit_choice');
@@ -76,6 +100,7 @@ class AuthController extends Controller
 
         $user = \App\Models\User::create([
             'name' => $validated['name'],
+            'title' => $titleInput ? trim($titleInput) : null,
             'email' => $validated['email'],
             'nip' => $validated['nip'],
             'role' => $validated['role'],
