@@ -24,6 +24,9 @@ class AdminSeeder extends Seeder
             ]
         );
 
+        // Akun-akun dummy sebelumnya dinonaktifkan karena sistem beralih ke data asli pengguna.
+        // Hanya akun Kasubag TU yang dipertahankan.
+        /*
         // 2. Role: Arsiparis (Laporan)
         User::updateOrCreate(
             ['email' => 'devi@gmail.com'],
@@ -155,6 +158,7 @@ class AdminSeeder extends Seeder
                 'role' => 'pegawai',
             ]
         );
+        */
 
         // Daftar Kategori ATK
         $categories = [

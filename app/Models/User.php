@@ -66,14 +66,91 @@ class User extends Authenticatable
         return $this->role === 'pic_distribusi';
     }
 
+    /**
+     * Cek apakah user adalah PIC Distribusi Subbagian Tata Usaha
+     */
+    public function isPicTataUsaha(): bool
+    {
+        if (!$this->isPicDistribusi()) {
+            return false;
+        }
+        $text = strtolower(($this->subdit_name ?? '') . ' ' . ($this->position ?? '') . ' ' . ($this->name ?? ''));
+        return str_contains($text, 'tata usaha') || preg_match('/\btu\b/i', $text);
+    }
+
+    /**
+     * Dapatkan kunci unit/divisi untuk pencocokan (misal: 'sdk', 'pjf', 'kbr', 'tu')
+     */
+    public function getDivisionKey(): string
+    {
+        $text = strtolower(($this->subdit_name ?? '') . ' ' . ($this->position ?? '') . ' ' . ($this->name ?? ''));
+        if (str_contains($text, 'sdk') || str_contains($text, 'sumber daya')) {
+            return 'sdk';
+        }
+        if (str_contains($text, 'pjf') || str_contains($text, 'fungsional')) {
+            return 'pjf';
+        }
+        if (str_contains($text, 'kbr') || str_contains($text, 'kendala')) {
+            return 'kbr';
+        }
+        if (str_contains($text, 'tata usaha') || preg_match('/\btu\b/i', $text)) {
+            return 'tu';
+        }
+        return trim(strtolower($this->subdit_name ?: ($this->position ?: '')));
+    }
+
+    /**
+     * Cek apakah PIC ini berhak menangani pengajuan tertentu
+     */
+    public function canHandleRequest($requestItem): bool
+    {
+        if (!$this->isPicDistribusi()) {
+            return false;
+        }
+
+        // Pengajuan individu (Pegawai) selalu ditangani oleh PIC Subbagian Tata Usaha
+        if ($requestItem->type === 'individu' || ($requestItem->user && $requestItem->user->role === 'pegawai')) {
+            return $this->isPicTataUsaha();
+        }
+
+        // Pengajuan kolektif Subdirektorat:
+        // Jika PIC Tata Usaha, hanya menangani pengajuan dari Subbag TU
+        if ($this->isPicTataUsaha()) {
+            $requesterDivision = $requestItem->user ? $requestItem->user->getDivisionKey() : '';
+            return $requesterDivision === 'tu';
+        }
+
+        // Untuk PIC Subdit lain (SDK, PJF, KBR, dll.):
+        // Harus cocok antara divisi PIC dengan divisi pemohon Subdit
+        $picDivision = $this->getDivisionKey();
+        $requesterDivision = $requestItem->user ? $requestItem->user->getDivisionKey() : '';
+
+        return !empty($picDivision) && $picDivision === $requesterDivision;
+    }
+
     public function isSubdit(): bool
     {
         return $this->role === 'subdit';
     }
 
+    public function isPegawai(): bool
+    {
+        return $this->role === 'pegawai';
+    }
+
     public function isRequester(): bool
     {
         return in_array($this->role, ['pegawai', 'subdit', 'member']) || empty($this->role);
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(RequestItem::class, 'user_id');
+    }
+
+    public function procurementRequests()
+    {
+        return $this->hasMany(RequestItem::class, 'user_id')->where('is_procurement', true);
     }
 
     public function notifications()

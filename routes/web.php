@@ -121,6 +121,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/distribusi/{id}/handover', [DistributionController::class, 'confirmHandover'])
         ->name('distribusi.handover');
 
+    Route::post('/distribusi/{id}/upload-bukti', [DistributionController::class, 'uploadProof'])
+        ->name('distribusi.uploadProof');
+
     Route::get('/distribusi/{id}/bukti', [DistributionController::class, 'printBukti'])
         ->name('distribusi.bukti');
 

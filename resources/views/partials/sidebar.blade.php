@@ -156,26 +156,13 @@
                         </ul>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
-                            <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                </svg>
-                            </i>
-                            <span class="item-name">Distribusi Barang</span>
-                            @if ($readyDistribusiCount > 0)
-                                <span class="badge bg-warning text-dark rounded-pill ms-auto px-2">{{ $readyDistribusiCount }}</span>
-                            @endif
-                        </a>
-                    </li>
+                    {{-- Catatan: Fitur Distribusi Barang dihapus dari menu Kasubag TU sesuai hak akses khusus PIC Distribusi --}}
                 @endif
 
                 <!-- ======================================================== -->
                 <!-- 2. MENU KHUSUS PIC DISTRIBUSI (Pengelola / Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isPicDistribusi && !$isKasubagTU)
+                @if ($isPicDistribusi)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
@@ -185,9 +172,6 @@
                                 </svg>
                             </i>
                             <span class="item-name">Distribusi Barang</span>
-                            @if ($readyDistribusiCount > 0)
-                                <span class="badge bg-warning text-dark rounded-pill ms-auto px-2">{{ $readyDistribusiCount }}</span>
-                            @endif
                         </a>
                     </li>
                 @endif

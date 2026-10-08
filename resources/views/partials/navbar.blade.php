@@ -39,6 +39,7 @@
                 @php
                     $currentUser = auth()->user();
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
+                    $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
                     $userNotifications = $currentUser ? $currentUser->unreadNotifications()->take(7)->get() : collect();
 
@@ -86,8 +87,47 @@
                         }
                     }
 
-                    $navBadgeCount = $isKasubagTU ? ($unreadNotifCount + $totalPendingVerifikasi) : $unreadNotifCount;
-                    $hasAnyNotifications = $pendingVerifications->isNotEmpty() || $userNotifications->isNotEmpty();
+                    // Khusus PIC Distribusi: Notifikasi barang siap serah/didistribusikan per divisi dipindahkan ke lonceng navbar
+                    $pendingDistributions = collect();
+                    $totalPendingDistribusi = 0;
+
+                    if ($isPicDistribusi) {
+                        $readyDistribusiQuery = \App\Models\RequestItem::where('status', 'approved')
+                            ->where(function ($q) {
+                                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+                            })
+                            ->forPic($currentUser)
+                            ->with(['user', 'details.product']);
+
+                        $totalPendingDistribusi = (clone $readyDistribusiQuery)->count();
+                        $readyItems = (clone $readyDistribusiQuery)->latest('updated_at')->latest('id')->take(6)->get();
+
+                        foreach ($readyItems as $ri) {
+                            $pemohonName = $ri->user ? ($ri->user->name_with_title ?: $ri->user->name) : 'Pemohon';
+                            $firstDetail = $ri->details->first();
+                            $itemName = $firstDetail ? ($firstDetail->item_name ?: ($firstDetail->product->name ?? 'Barang ATK')) : 'Barang ATK';
+                            $detailCount = $ri->details->count();
+                            $itemSummary = $detailCount > 1 ? ($itemName . ' (+ ' . ($detailCount - 1) . ' item)') : $itemName;
+
+                            $pendingDistributions->push((object)[
+                                'title' => 'Distribusi Barang',
+                                'message' => 'Permintaan "' . $itemSummary . '" dari ' . $pemohonName . ' (' . $ri->request_code . ') siap diserahkan.',
+                                'link' => route('distribusi.index', ['status' => 'ready']),
+                                'type' => 'ready_distribution',
+                                'badge_label' => $ri->type === 'subdit' ? 'Kolektif Subdit' : 'Perorangan',
+                                'badge_class' => $ri->type === 'subdit' ? 'bg-success text-white' : 'bg-primary text-white',
+                                'created_at' => $ri->updated_at ?: $ri->created_at,
+                            ]);
+                        }
+                    }
+
+                    $navBadgeCount = $isKasubagTU 
+                        ? ($unreadNotifCount + $totalPendingVerifikasi) 
+                        : ($isPicDistribusi 
+                            ? ($unreadNotifCount + $totalPendingDistribusi) 
+                            : $unreadNotifCount);
+
+                    $hasAnyNotifications = $pendingVerifications->isNotEmpty() || $pendingDistributions->isNotEmpty() || $userNotifications->isNotEmpty();
                 @endphp
                 <li class="nav-item dropdown me-2">
                     <a href="#" class="nav-link position-relative p-2 rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border"
@@ -113,6 +153,8 @@
                                 <small class="text-white-50" id="nav-notif-subtitle">
                                     @if($isKasubagTU && $totalPendingVerifikasi > 0)
                                         {{ $totalPendingVerifikasi }} menunggu verifikasi
+                                    @elseif($isPicDistribusi && $totalPendingDistribusi > 0)
+                                        {{ $totalPendingDistribusi }} siap diserahkan
                                     @else
                                         {{ $unreadNotifCount }} belum dibaca
                                     @endif
@@ -157,6 +199,34 @@
                                                     <polyline points="12 6 12 12 16 14"></polyline>
                                                 </svg>
                                                 {{ $pv->created_at ? $pv->created_at->diffForHumans() : 'Menunggu' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+
+                            {{-- Item Siap Distribusi untuk PIC Distribusi --}}
+                            @foreach($pendingDistributions as $pd)
+                                <a href="{{ $pd->link }}" class="list-group-item list-group-item-action p-3 notif-item bg-light border-start border-warning border-4">
+                                    <div class="d-flex align-items-start gap-2.5">
+                                        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center flex-shrink-0 bg-warning-subtle text-warning" style="width: 36px; height: 36px;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <h6 class="mb-0 small fw-bold text-dark text-truncate">{{ $pd->title }}</h6>
+                                                <span class="badge {{ $pd->badge_class }} ms-1" style="font-size: 0.6rem;">{{ $pd->badge_label }}</span>
+                                            </div>
+                                            <p class="mb-1 text-muted small text-break" style="font-size: 0.78rem; line-height: 1.35;">{{ $pd->message }}</p>
+                                            <small class="text-secondary" style="font-size: 0.7rem;">
+                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                                </svg>
+                                                {{ $pd->created_at ? $pd->created_at->diffForHumans() : 'Siap Diserahkan' }}
                                             </small>
                                         </div>
                                     </div>
@@ -219,6 +289,10 @@
                             @if($isKasubagTU)
                                 <a href="{{ route('persetujuan.index') }}" class="btn btn-link btn-sm text-primary py-0 small fw-bold text-decoration-none" style="font-size: 0.75rem;">
                                     Buka Menu Verifikasi &amp; Persetujuan &rarr;
+                                </a>
+                            @elseif($isPicDistribusi)
+                                <a href="{{ route('distribusi.index') }}" class="btn btn-link btn-sm text-primary py-0 small fw-bold text-decoration-none" style="font-size: 0.75rem;">
+                                    Buka Halaman Distribusi Barang &rarr;
                                 </a>
                             @else
                                 <a href="{{ route('katalog-atk') }}" class="btn btn-link btn-sm text-primary py-0 small fw-bold text-decoration-none" style="font-size: 0.75rem;">

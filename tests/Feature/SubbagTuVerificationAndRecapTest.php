@@ -36,8 +36,15 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         );
 
         $this->subditUser = User::firstOrCreate(
-            ['email' => 'sdk@gmail.com'],
-            ['name' => 'Subdit SDK', 'position' => 'Subdirektorat', 'password' => bcrypt('password123'), 'role' => 'subdit']
+            ['email' => 'sdk_test_recap@gmail.com'],
+            [
+                'name' => 'Fairuz Armina Nur Azizah, S.T.',
+                'nip' => '200202262025062007',
+                'position' => 'Subdirektorat Sumber Daya Konstruksi',
+                'subdit_name' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
+                'password' => bcrypt('password123'),
+                'role' => 'subdit'
+            ]
         );
 
         $category = Category::firstOrCreate(['name' => 'Alat Tulis']);
@@ -664,6 +671,58 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $responsePersediaan->assertSee('REQ-STK-SEP-002');
         $responsePersediaan->assertDontSee('REQ-BUY-SEP-001');
         $responsePersediaan->assertSee('Daftar Antrean Permintaan Barang Stok (Persediaan)');
+    }
+
+    public function test_kasubag_tu_can_view_procurement_history_and_anti_stocking_indicators_for_requester(): void
+    {
+        // 1. Pengadaan terdahulu oleh subdit
+        $pastReq = RequestItem::create([
+            'request_code' => 'REQ-BUY-PAST-001',
+            'user_id' => $this->subditUser->id,
+            'type' => 'subdit',
+            'status' => 'approved',
+            'is_procurement' => true,
+            'purchase_invoice' => 'INV/PAST/2026/01',
+            'notes' => 'Pengadaan kertas terdahulu',
+            'created_at' => now()->subDays(5),
+        ]);
+        RequestDetail::create([
+            'request_id' => $pastReq->id,
+            'item_name' => 'Kertas HVS F4',
+            'item_unit' => 'Rim',
+            'quantity' => 10,
+            'approved_quantity' => 10,
+        ]);
+
+        // 2. Usulan pengadaan baru yang meminta barang yang sama lagi
+        $newReq = RequestItem::create([
+            'request_code' => 'REQ-BUY-NEW-002',
+            'user_id' => $this->subditUser->id,
+            'type' => 'subdit',
+            'status' => 'pending',
+            'is_procurement' => true,
+            'notes' => 'Minta beli kertas lagi',
+            'created_at' => now(),
+        ]);
+        RequestDetail::create([
+            'request_id' => $newReq->id,
+            'item_name' => 'Kertas HVS F4',
+            'item_unit' => 'Rim',
+            'quantity' => 5,
+        ]);
+
+        $response = $this->actingAs($this->buUtami)
+            ->get(route('persetujuan.index', ['category' => 'pengadaan']));
+
+        $response->assertStatus(200);
+
+        // Kasubag TU melihat tombol History Pengadaan dan indikator barang pernah diminta
+        $response->assertSee('History Pengadaan');
+        $response->assertSee('Pernah Minta Serupa');
+        $response->assertSee('userHistoryModal' . $newReq->id);
+        $response->assertSee('INV/PAST/2026/01');
+        $response->assertSee('Akumulasi Barang yang Pernah Diajukan');
+        $response->assertSee('Waspada Penimbunan Stok');
     }
 }
 

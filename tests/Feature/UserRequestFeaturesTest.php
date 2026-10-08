@@ -31,7 +31,7 @@ class UserRequestFeaturesTest extends TestCase
 
         $this->buFairus = User::firstOrCreate(
             ['email' => 'fairuz@gmail.com'],
-            ['name' => 'Fairuz', 'position' => 'PIC Distribusi', 'password' => bcrypt('password123'), 'role' => 'pic_distribusi']
+            ['name' => 'Fairuz', 'position' => 'PIC Distribusi Subdirektorat SDK', 'subdit_name' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman', 'password' => bcrypt('password123'), 'role' => 'pic_distribusi']
         );
 
         $this->subditUser = User::firstOrCreate(
@@ -134,13 +134,13 @@ class UserRequestFeaturesTest extends TestCase
     {
         $bagus = User::firstOrCreate(
             ['email' => 'bagus_dist_test@gmail.com'],
-            ['name' => 'Bagus Sadewo', 'position' => 'Staff TU', 'password' => bcrypt('password123'), 'role' => 'pegawai']
+            ['name' => 'Bagus Sadewo', 'position' => 'Subdirektorat SDK', 'password' => bcrypt('password123'), 'role' => 'subdit']
         );
 
         $reqItem = RequestItem::create([
             'request_code' => 'REQ-DIST-LIVE-01',
             'user_id' => $bagus->id,
-            'type' => 'individu',
+            'type' => 'subdit',
             'status' => 'approved',
             'created_at' => now(),
         ]);
@@ -361,10 +361,14 @@ class UserRequestFeaturesTest extends TestCase
         $responseSubdit->assertDontSee('&bull; ' . $this->subditUser->position, false);
         $responseSubdit->assertSee($this->subditUser->name);
 
-        // 3. On other pages (e.g. distribusi), ensure no &bull; appears in navbar
-        $responseDist = $this->actingAs($this->buUtami)->get(route('distribusi.index'));
+        // 3. On other pages (e.g. distribusi for PIC), ensure no &bull; appears in navbar
+        $responseDist = $this->actingAs($this->buFairus)->get(route('distribusi.index'));
         $responseDist->assertStatus(200);
-        $responseDist->assertDontSee('&bull; Kasubag TU', false);
+        $responseDist->assertDontSee('&bull; ' . $this->buFairus->position, false);
+
+        // 4. Kasubag TU is disallowed from accessing Distribusi Barang page
+        $responseUtamiDist = $this->actingAs($this->buUtami)->get(route('distribusi.index'));
+        $responseUtamiDist->assertRedirect(route('dashboard'));
     }
 
     public function test_sidebar_mini_hides_kementerian_pkp_ri_subtext(): void

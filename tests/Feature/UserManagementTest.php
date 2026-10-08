@@ -38,7 +38,7 @@ class UserManagementTest extends TestCase
         $response->assertSee('Manajemen Pengguna & Peran (Role)', false);
         $response->assertSee('Master Data Akun Pengguna');
         $response->assertSee('pic_unit_choice');
-        $response->assertSee('Perwakilan Divisi PIC (TU, KBR, SDK, PJF)');
+        $response->assertSee('Pilih Subdirektorat / Unit Kerja PIC');
     }
 
     public function test_kasubag_tu_can_add_pic_users_for_all_4_units_with_nip(): void

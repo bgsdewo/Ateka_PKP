@@ -315,6 +315,48 @@
                                 </thead>
                                 <tbody id="persetujuan-table-body">
                                     @forelse($requests as $index => $req)
+                                        @php
+                                            $userPastRequests = $req->user && $req->user->requests
+                                                ? $req->user->requests->where('id', '!=', $req->id)
+                                                : collect();
+
+                                            // Khusus riwayat pengadaan pemohon
+                                            $userPastProcurements = $userPastRequests->where('is_procurement', true);
+                                            $totalProcurementsCount = $userPastProcurements->count();
+                                            $approvedProcurementsCount = $userPastProcurements->whereIn('status', ['approved', 'distributed'])->count();
+                                            $rejectedProcurementsCount = $userPastProcurements->where('status', 'rejected')->count();
+
+                                            // History item untuk deteksi stocking/hoarding
+                                            $currentItems = $req->details->pluck('item_name')->map(fn($n) => strtolower(trim($n)))->toArray();
+                                            $pastItemHistory = [];
+
+                                            foreach ($userPastRequests as $pastReq) {
+                                                foreach ($pastReq->details as $pd) {
+                                                    $normalizedName = strtolower(trim($pd->item_name));
+                                                    if (!isset($pastItemHistory[$normalizedName])) {
+                                                        $pastItemHistory[$normalizedName] = [];
+                                                    }
+                                                    $pastItemHistory[$normalizedName][] = [
+                                                        'request_code' => $pastReq->request_code,
+                                                        'is_procurement' => $pastReq->is_procurement,
+                                                        'date' => $pastReq->created_at,
+                                                        'status' => $pastReq->status,
+                                                        'quantity' => $pd->effective_quantity ?? $pd->quantity,
+                                                        'unit' => $pd->item_unit,
+                                                        'invoice' => $pastReq->purchase_invoice,
+                                                    ];
+                                                }
+                                            }
+
+                                            // Cek apakah ada barang saat ini yang pernah diajukan sebelumnya oleh pemohon ini
+                                            $hasRepeatedItems = false;
+                                            foreach ($currentItems as $cItem) {
+                                                if (!empty($pastItemHistory[$cItem])) {
+                                                    $hasRepeatedItems = true;
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
                                         <tr class="persetujuan-row"
                                             data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name_with_title ?? ($req->user->name ?? '')) . ' ' . ($req->user->nip ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}
@@ -341,6 +383,35 @@
                                                 @if(!empty($req->user->nip))
                                                     <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
                                                 @endif
+
+                                                {{-- Tombol Lihat History Pengadaan Pemohon --}}
+                                                @if (($category ?? 'pengadaan') !== 'persediaan')
+                                                    <div class="mt-2 d-flex align-items-center gap-1 flex-wrap">
+                                                        <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
+                                                            style="font-size: 0.72rem;"
+                                                            data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
+                                                            title="Lihat riwayat usulan pengadaan pemohon untuk mencegah penumpukan stok">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                                            </svg>
+                                                            History Pengadaan ({{ $totalProcurementsCount }})
+                                                        </button>
+
+                                                        @if ($hasRepeatedItems)
+                                                            <span class="badge bg-warning-subtle text-dark border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
+                                                                style="font-size: 0.68rem;"
+                                                                title="Peringatan: Pemohon ini pernah mengajukan barang serupa sebelumnya!">
+                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                                                </svg>
+                                                                Pernah Minta Serupa
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <ul class="ps-3 mb-0 small">
@@ -348,6 +419,10 @@
                                                         @php
                                                              $currentStock = $detail->product->stock ?? 0;
                                                              $isSufficient = $detail->product && ($currentStock >= $detail->quantity);
+                                                             $normName = strtolower(trim($detail->item_name));
+                                                             $pastMatches = $pastItemHistory[$normName] ?? [];
+                                                             $totalPastApproved = collect($pastMatches)->whereIn('status', ['approved', 'distributed'])->sum('quantity');
+                                                             $lastPastMatch = collect($pastMatches)->sortByDesc('date')->first();
                                                         @endphp
                                                         <li class="mb-1">
                                                             <strong>{{ $detail->item_name }}</strong>:
@@ -370,6 +445,23 @@
                                                                     </span>
                                                                 @endif
                                                             @endif
+
+                                                            @if (($category ?? 'pengadaan') !== 'persediaan' && !empty($pastMatches))
+                                                                <div class="mt-1">
+                                                                    <span class="badge bg-warning-subtle text-dark border py-0.5 px-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;"
+                                                                        title="Riwayat: Pemohon pernah mengajukan barang ini sebelumnya">
+                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                                        </svg>
+                                                                        Pernah Diajukan: {{ count($pastMatches) }}x (Disetujui: {{ $totalPastApproved }} {{ $detail->item_unit }})
+                                                                        @if ($lastPastMatch)
+                                                                            &bull; Terakhir: {{ \Carbon\Carbon::parse($lastPastMatch['date'])->format('d/m/Y') }}
+                                                                        @endif
+                                                                    </span>
+                                                                </div>
+                                                            @endif
+
                                                             @if ($detail->specification)
                                                                 <div class="text-muted fst-italic" style="font-size: 0.72rem;">
                                                                     Spesifikasi: {{ $detail->specification }}
@@ -507,6 +599,35 @@
                                                                                 </div>
                                                                             @endif
                                                                         </div>
+
+                                                                        {{-- Alert Pencegahan Penimbunan / Stocking Barang --}}
+                                                                        @if (($category ?? 'pengadaan') !== 'persediaan' && ($totalProcurementsCount > 0 || $hasRepeatedItems))
+                                                                            <div class="alert alert-warning border mb-3 p-3 small rounded-3" style="background: #fffbeb; border-color: #fde68a !important;">
+                                                                                <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                                                                                    <div class="d-flex align-items-center gap-1.5 fw-bold text-dark">
+                                                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                                                        </svg>
+                                                                                        Kontrol Stok Pemohon (Riwayat Pengadaan):
+                                                                                    </div>
+                                                                                    <button type="button" class="btn btn-xs btn-outline-dark rounded-pill px-2.5 py-0.5"
+                                                                                        data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
+                                                                                        title="Buka rekap riwayat lengkap">
+                                                                                        Buka History Lengkap &rarr;
+                                                                                    </button>
+                                                                                </div>
+                                                                                <div class="text-secondary">
+                                                                                    Pemohon ini tercatat telah memiliki <strong>{{ $totalProcurementsCount }} usulan pengadaan</strong> sebelumnya 
+                                                                                    ({{ $approvedProcurementsCount }} disetujui, {{ $rejectedProcurementsCount }} ditolak).
+                                                                                    @if ($hasRepeatedItems)
+                                                                                        <div class="mt-1 text-danger fw-semibold">
+                                                                                            ⚠️ Perhatian: Pemohon pernah mengajukan barang serupa pada pengajuan terdahulu. Pertimbangkan kuantitas yang disetujui untuk mencegah penumpukan/penimbunan stok di unit kerja pemohon.
+                                                                                        </div>
+                                                                                    @endif
+                                                                                </div>
+                                                                            </div>
+                                                                        @endif
 
                                                                         <h6 class="fw-bold mb-2">Daftar Barang & Kuantitas yang Disetujui:</h6>
                                                                         <div class="table-responsive mb-3">
@@ -778,12 +899,296 @@
                                                                         </div>
                                                                     @endif
                                                                 </div>
-                                                                <div class="modal-footer">
+                                                                <div class="modal-footer d-flex justify-content-between">
+                                                                    @if (($category ?? 'pengadaan') !== 'persediaan')
+                                                                        <button type="button" class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1"
+                                                                            data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}">
+                                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                                                            </svg>
+                                                                            Lihat Riwayat Pengadaan Pemohon
+                                                                        </button>
+                                                                    @else
+                                                                        <div></div>
+                                                                    @endif
                                                                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                @endif
+
+                                                @if (($category ?? 'pengadaan') !== 'persediaan')
+                                                    {{-- Modal Riwayat Pengadaan & Permintaan Pemohon (Pencegahan Stocking / Hoarding) --}}
+                                                    <div class="modal fade text-start" id="userHistoryModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-primary text-white">
+                                                                <div>
+                                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 mb-1">
+                                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                                        </svg>
+                                                                        Riwayat Pengadaan &amp; Permintaan Pemohon
+                                                                    </h5>
+                                                                    <small class="text-white opacity-75">
+                                                                        {{ $req->user->name_with_title ?? ($req->user->name ?? '-') }} &bull; {{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}
+                                                                        @if(!empty($req->user->nip))
+                                                                            &bull; NIP: {{ $req->user->nip }}
+                                                                        @endif
+                                                                    </small>
+                                                                </div>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body p-4">
+                                                                {{-- Banner Edukasi / Kontrol Kasubag TU --}}
+                                                                <div class="alert alert-info py-2.5 px-3 small mb-3 border-0 rounded-3 d-flex align-items-center gap-2" style="background: #e0f2fe; border-left: 4px solid #0284c7 !important;">
+                                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info flex-shrink-0">
+                                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                    </svg>
+                                                                    <div>
+                                                                        <strong>Fitur Pengawasan Stok Kasubag TU:</strong> Gunakan data rekapitulasi riwayat pengadaan ini untuk memastikan pemohon tidak menimbun atau men-stock barang yang baru saja dibeli/diterima.
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- 4 Stat Cards Ringkasan Pemohon --}}
+                                                                <div class="row g-2 mb-4 text-center">
+                                                                    <div class="col-6 col-md-3">
+                                                                        <div class="card border bg-light h-100 shadow-none mb-0">
+                                                                            <div class="card-body p-2.5">
+                                                                                <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">TOTAL PENGADAAN</small>
+                                                                                <h4 class="fw-bold text-dark mb-0 mt-1">{{ $totalProcurementsCount }}</h4>
+                                                                                <small class="text-muted" style="font-size: 0.7rem;">Usulan diajukan</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-md-3">
+                                                                        <div class="card border bg-light h-100 shadow-none mb-0">
+                                                                            <div class="card-body p-2.5">
+                                                                                <small class="text-success d-block fw-bold" style="font-size: 0.72rem;">DISETUJUI / SELESAI</small>
+                                                                                <h4 class="fw-bold text-success mb-0 mt-1">{{ $approvedProcurementsCount }}</h4>
+                                                                                <small class="text-muted" style="font-size: 0.7rem;">Barang disetujui</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-md-3">
+                                                                        <div class="card border bg-light h-100 shadow-none mb-0">
+                                                                            <div class="card-body p-2.5">
+                                                                                <small class="text-danger d-block fw-bold" style="font-size: 0.72rem;">DITOLAK PIMPINAN</small>
+                                                                                <h4 class="fw-bold text-danger mb-0 mt-1">{{ $rejectedProcurementsCount }}</h4>
+                                                                                <small class="text-muted" style="font-size: 0.7rem;">Tidak disetujui</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-md-3">
+                                                                        <div class="card border bg-light h-100 shadow-none mb-0">
+                                                                            <div class="card-body p-2.5">
+                                                                                <small class="text-primary d-block fw-bold" style="font-size: 0.72rem;">TOTAL SEMUA PERMINTAAN</small>
+                                                                                <h4 class="fw-bold text-primary mb-0 mt-1">{{ $userPastRequests->count() }}</h4>
+                                                                                <small class="text-muted" style="font-size: 0.7rem;">Pengadaan + Stok</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Seksi 1: Ringkasan Akumulasi Barang yang Pernah Diterima Pemohon --}}
+                                                                @php
+                                                                    $itemSummary = [];
+                                                                    foreach ($userPastRequests as $pReq) {
+                                                                        foreach ($pReq->details as $pDetail) {
+                                                                            $k = strtolower(trim($pDetail->item_name));
+                                                                            if (!isset($itemSummary[$k])) {
+                                                                                $itemSummary[$k] = [
+                                                                                    'name' => $pDetail->item_name,
+                                                                                    'unit' => $pDetail->item_unit,
+                                                                                    'total_requested' => 0,
+                                                                                    'total_approved' => 0,
+                                                                                    'frequency' => 0,
+                                                                                    'last_date' => $pReq->created_at,
+                                                                                    'last_status' => $pReq->status,
+                                                                                ];
+                                                                            }
+                                                                            $itemSummary[$k]['total_requested'] += $pDetail->quantity;
+                                                                            if (in_array($pReq->status, ['approved', 'distributed'])) {
+                                                                                $itemSummary[$k]['total_approved'] += ($pDetail->effective_quantity ?? $pDetail->quantity);
+                                                                            }
+                                                                            $itemSummary[$k]['frequency']++;
+                                                                            if ($pReq->created_at > $itemSummary[$k]['last_date']) {
+                                                                                $itemSummary[$k]['last_date'] = $pReq->created_at;
+                                                                                $itemSummary[$k]['last_status'] = $pReq->status;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                @endphp
+
+                                                                <div class="card border mb-4">
+                                                                    <div class="card-header bg-light py-2.5 d-flex justify-content-between align-items-center">
+                                                                        <h6 class="fw-bold mb-0 text-dark small text-uppercase">
+                                                                            Akumulasi Barang yang Pernah Diajukan &amp; Diterima oleh Pemohon Ini
+                                                                        </h6>
+                                                                        <span class="badge bg-secondary rounded-pill">{{ count($itemSummary) }} Jenis Barang</span>
+                                                                    </div>
+                                                                    <div class="card-body p-0">
+                                                                        @if (count($itemSummary) > 0)
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-hover mb-0 align-middle">
+                                                                                    <thead class="table-light small">
+                                                                                        <tr>
+                                                                                            <th>Nama Barang ATK</th>
+                                                                                            <th class="text-center">Total Diminta</th>
+                                                                                            <th class="text-center">Total Disetujui</th>
+                                                                                            <th class="text-center">Frekuensi Permintaan</th>
+                                                                                            <th>Terakhir Diajukan</th>
+                                                                                            <th class="text-center">Indikator Kontrol Stok</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody class="small">
+                                                                                        @foreach ($itemSummary as $normKey => $iSum)
+                                                                                            @php
+                                                                                                $isCurrentlyRequested = in_array($normKey, $currentItems);
+                                                                                            @endphp
+                                                                                            <tr class="{{ $isCurrentlyRequested ? 'table-warning' : '' }}">
+                                                                                                <td>
+                                                                                                    <strong>{{ $iSum['name'] }}</strong>
+                                                                                                    @if ($isCurrentlyRequested)
+                                                                                                        <span class="badge bg-warning text-dark ms-1" style="font-size: 0.68rem;">
+                                                                                                            ⚠️ Sedang Diajukan Lagi!
+                                                                                                        </span>
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                                <td class="text-center">{{ $iSum['total_requested'] }} {{ $iSum['unit'] }}</td>
+                                                                                                <td class="text-center fw-bold text-success">{{ $iSum['total_approved'] }} {{ $iSum['unit'] }}</td>
+                                                                                                <td class="text-center">{{ $iSum['frequency'] }} kali</td>
+                                                                                                <td>{{ \Carbon\Carbon::parse($iSum['last_date'])->format('d/m/Y H:i') }}</td>
+                                                                                                <td class="text-center">
+                                                                                                    @if ($isCurrentlyRequested && $iSum['total_approved'] > 0)
+                                                                                                        <span class="badge bg-danger-subtle text-danger border" style="font-size: 0.7rem;">
+                                                                                                            Waspada Penimbunan Stok
+                                                                                                        </span>
+                                                                                                    @elseif ($iSum['total_approved'] > 0)
+                                                                                                        <span class="badge bg-success-subtle text-success border" style="font-size: 0.7rem;">
+                                                                                                            Pernah Diterima
+                                                                                                        </span>
+                                                                                                    @else
+                                                                                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
+                                                                                                            Belum Pernah Disetujui
+                                                                                                        </span>
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        @endforeach
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="p-3 text-center text-muted small">
+                                                                                Belum ada riwayat akumulasi barang sebelumnya untuk pemohon ini.
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Seksi 2: Tabel Arsip Seluruh Riwayat Pengadaan Pemohon --}}
+                                                                <div class="card border mb-0">
+                                                                    <div class="card-header bg-light py-2.5 d-flex justify-content-between align-items-center">
+                                                                        <h6 class="fw-bold mb-0 text-dark small text-uppercase">
+                                                                            Arsip Usulan Pengadaan (Beli Baru) Sebelumnya oleh Pemohon Ini
+                                                                        </h6>
+                                                                        <span class="badge bg-primary rounded-pill">{{ $userPastProcurements->count() }} Usulan</span>
+                                                                    </div>
+                                                                    <div class="card-body p-0">
+                                                                        @if ($userPastProcurements->count() > 0)
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-striped table-hover mb-0 align-middle">
+                                                                                    <thead class="table-light small">
+                                                                                        <tr>
+                                                                                            <th width="4%">No</th>
+                                                                                            <th>Kode Usulan &amp; Tanggal</th>
+                                                                                            <th>Rincian Barang yang Diminta</th>
+                                                                                            <th>Status Kasubag TU</th>
+                                                                                            <th>Informasi Faktur / Pembelian</th>
+                                                                                            <th>Catatan Pemohon &amp; TU</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody class="small">
+                                                                                        @foreach ($userPastProcurements as $pIdx => $pastP)
+                                                                                            <tr>
+                                                                                                <td>{{ $loop->iteration }}</td>
+                                                                                                <td>
+                                                                                                    <strong class="font-monospace text-primary">{{ $pastP->request_code }}</strong><br>
+                                                                                                    <small class="text-muted">{{ $pastP->created_at->format('d/m/Y H:i') }}</small>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <ul class="ps-3 mb-0">
+                                                                                                        @foreach ($pastP->details as $pDetail)
+                                                                                                            <li>
+                                                                                                                <strong>{{ $pDetail->item_name }}</strong>:
+                                                                                                                <span class="badge bg-light text-dark border">Diminta: {{ $pDetail->quantity }} {{ $pDetail->item_unit }}</span>
+                                                                                                                @if (in_array($pastP->status, ['approved', 'distributed']))
+                                                                                                                    <span class="badge bg-success-subtle text-success border">
+                                                                                                                        Disetujui: {{ $pDetail->effective_quantity }} {{ $pDetail->item_unit }}
+                                                                                                                    </span>
+                                                                                                                @endif
+                                                                                                                @if ($pDetail->specification)
+                                                                                                                    <small class="text-muted d-block fst-italic">Spesifikasi: {{ $pDetail->specification }}</small>
+                                                                                                                @endif
+                                                                                                            </li>
+                                                                                                        @endforeach
+                                                                                                    </ul>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <span class="badge {{ $pastP->status_badge }}">{{ $pastP->status_label }}</span>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    @if ($pastP->purchase_invoice)
+                                                                                                        <strong class="text-dark font-monospace">{{ $pastP->purchase_invoice }}</strong><br>
+                                                                                                        <small class="text-muted">{{ $pastP->purchase_date ? date('d/m/Y', strtotime($pastP->purchase_date)) : '-' }}</small>
+                                                                                                    @else
+                                                                                                        <span class="text-muted">-</span>
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    @if ($pastP->notes)
+                                                                                                        <small class="d-block text-dark"><strong>Pemohon:</strong> {{ $pastP->notes }}</small>
+                                                                                                    @endif
+                                                                                                    @if ($pastP->verification_notes)
+                                                                                                        <small class="d-block text-primary"><strong>TU:</strong> {{ $pastP->verification_notes }}</small>
+                                                                                                    @endif
+                                                                                                    @if ($pastP->rejection_reason)
+                                                                                                        <small class="d-block text-danger"><strong>Alasan Tolak:</strong> {{ $pastP->rejection_reason }}</small>
+                                                                                                    @endif
+                                                                                                    @if (!$pastP->notes && !$pastP->verification_notes && !$pastP->rejection_reason)
+                                                                                                        <span class="text-muted">-</span>
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        @endforeach
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="p-4 text-center text-muted">
+                                                                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted mb-2">
+                                                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                                                </svg>
+                                                                                <p class="mb-0 fw-semibold">Belum ada usulan pengadaan lain yang pernah diajukan oleh pemohon ini.</p>
+                                                                                <small class="text-muted">Ini adalah pengajuan pengadaan pertama kali oleh pemohon ini di sistem.</small>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup Riwayat</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 @endif
                                             </td>
                                         </tr>

@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DistributionController extends Controller
 {
@@ -15,10 +16,11 @@ class DistributionController extends Controller
      */
     public function index(Request $request)
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh Kasubag TU dan PIC Distribusi.');
+        if (!auth()->user()->isPicDistribusi()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh PIC Distribusi.');
         }
 
+        $picUser = auth()->user();
         $filterType = $request->get('type'); // individu, subdit, or null
         $filterStatus = $request->get('status', 'all'); // default to 'all' so handed over items remain visible
         $search = $request->get('search');
@@ -37,6 +39,7 @@ class DistributionController extends Controller
                 $q->where('is_procurement', false)
                   ->orWhereNull('is_procurement');
             })
+            ->forPic($picUser)
             ->when($filterType, function ($q) use ($filterType) {
                 $q->where('type', $filterType);
             })
@@ -140,16 +143,39 @@ class DistributionController extends Controller
      */
     public function confirmHandover(Request $request, $id)
     {
+        if (!auth()->user()->isPicDistribusi()) {
+            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh PIC Distribusi.');
+        }
+
+        $picUser = auth()->user();
+
         $requestItem = RequestItem::with(['user', 'details.product'])
             ->where(function ($q) {
                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
             })
+            ->forPic($picUser)
             ->findOrFail($id);
 
         $request->validate([
             'receiver_name' => 'required|string|max:255',
             'distribution_notes' => 'nullable|string',
+            'distribution_proof' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ], [
+            'receiver_name.required' => 'Nama penerima barang fisik wajib diisi.',
+            'distribution_proof.image' => 'File bukti penyerahan harus berupa foto/gambar.',
+            'distribution_proof.mimes' => 'Format foto harus berupa JPEG, PNG, JPG, atau WEBP.',
+            'distribution_proof.max' => 'Ukuran foto bukti tidak boleh melebihi 5 MB.',
         ]);
+
+        $proofPath = $requestItem->distribution_proof;
+        if ($request->hasFile('distribution_proof')) {
+            if ($proofPath && Storage::disk('public')->exists($proofPath)) {
+                Storage::disk('public')->delete($proofPath);
+            }
+            $file = $request->file('distribution_proof');
+            $filename = 'proof_' . $requestItem->request_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
+        }
 
         $requestItem->update([
             'status' => 'distributed',
@@ -157,11 +183,54 @@ class DistributionController extends Controller
             'distributed_by' => Auth::id(),
             'receiver_name' => $request->receiver_name,
             'distribution_notes' => $request->distribution_notes,
+            'distribution_proof' => $proofPath,
         ]);
 
         return redirect()->back()
-            ->with('success', 'Barang berhasil diserahterimakan ke ' . $request->receiver_name . ' (' . $requestItem->request_code . ').')
+            ->with('success', 'Barang berhasil diserahterimakan ke ' . $request->receiver_name . ' (' . $requestItem->request_code . ').' . ($proofPath ? ' Foto bukti serah terima berhasil diunggah.' : ''))
             ->with('print_id', $requestItem->id);
+    }
+
+    /**
+     * Upload / perbarui foto bukti penyerahan barang setelah didistribusikan
+     */
+    public function uploadProof(Request $request, $id)
+    {
+        if (!auth()->user()->isPicDistribusi()) {
+            return redirect()->route('dashboard')->with('error', 'Aksi ini hanya dapat dilakukan oleh PIC Distribusi.');
+        }
+
+        $picUser = auth()->user();
+
+        $requestItem = RequestItem::where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })
+            ->forPic($picUser)
+            ->findOrFail($id);
+
+        $request->validate([
+            'distribution_proof' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ], [
+            'distribution_proof.required' => 'Silakan pilih file foto bukti penyerahan terlebih dahulu.',
+            'distribution_proof.image' => 'File bukti penyerahan harus berupa foto/gambar.',
+            'distribution_proof.mimes' => 'Format foto harus berupa JPEG, PNG, JPG, atau WEBP.',
+            'distribution_proof.max' => 'Ukuran foto bukti tidak boleh melebihi 5 MB.',
+        ]);
+
+        if ($requestItem->distribution_proof && Storage::disk('public')->exists($requestItem->distribution_proof)) {
+            Storage::disk('public')->delete($requestItem->distribution_proof);
+        }
+
+        $file = $request->file('distribution_proof');
+        $filename = 'proof_' . $requestItem->request_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
+
+        $requestItem->update([
+            'distribution_proof' => $proofPath,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Foto bukti serah terima barang untuk ' . $requestItem->request_code . ' berhasil disimpan.');
     }
 
     /**
@@ -169,11 +238,26 @@ class DistributionController extends Controller
      */
     public function printBukti($id)
     {
+        $currentUser = auth()->user();
+
         $requestItem = RequestItem::with(['user', 'details.product', 'distributor'])
             ->where(function ($q) {
                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
             })
             ->findOrFail($id);
+
+        // Jika PIC Distribusi yang mengakses, pastikan hanya bukti dari divisi yang ditanganinya
+        if ($currentUser && $currentUser->isPicDistribusi() && !$currentUser->canHandleRequest($requestItem)) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mencetak bukti serah terima barang dari divisi ini.');
+        }
+
+        // Jika Pegawai atau Subdit: hanya tampilkan bukti upload foto yang diunggah oleh PIC
+        if ($currentUser && ($currentUser->isPegawai() || $currentUser->isSubdit())) {
+            if ($requestItem->user_id !== $currentUser->id) {
+                abort(403, 'Anda tidak memiliki hak akses untuk melihat bukti serah terima permintaan ini.');
+            }
+            return view('distribusi.bukti_foto', compact('requestItem'));
+        }
 
         return view('distribusi.bukti', compact('requestItem'));
     }

@@ -231,7 +231,7 @@
                                                     <!-- Tombol Cetak Bukti Serah Terima (Hanya jika sudah diserahterimakan/didistribusikan) -->
                                                     @if ($req->status === 'distributed')
                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                            class="btn btn-sm btn-outline-secondary" title="Cetak Bukti Serah Terima">
+                                                            class="btn btn-sm btn-outline-secondary" title="Lihat Bukti Foto Serah Terima">
                                                             Bukti
                                                         </a>
                                                     @endif
@@ -308,7 +308,16 @@
                                                                         <strong>Telah Diterima:</strong> {{ $req->receiver_name ?? '-' }}<br>
                                                                         <strong>Waktu Penyerahan:</strong> {{ $req->distributed_at ? $req->distributed_at->format('d/m/Y H:i') : '-' }}<br>
                                                                         @if ($req->distribution_notes)
-                                                                            <strong>Catatan Gudang:</strong> {{ $req->distribution_notes }}
+                                                                            <strong>Catatan Gudang:</strong> {{ $req->distribution_notes }}<br>
+                                                                        @endif
+                                                                        @if ($req->distribution_proof)
+                                                                            <div class="mt-2 pt-2 border-top">
+                                                                                <strong class="d-block mb-1">Bukti Foto Penyerahan Barang:</strong>
+                                                                                <a href="{{ $req->distribution_proof_url }}" target="_blank" title="Klik untuk memperbesar gambar">
+                                                                                    <img src="{{ $req->distribution_proof_url }}" alt="Bukti Serah Terima" class="img-thumbnail rounded border shadow-sm" style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                                                                                </a>
+                                                                                <div class="text-muted mt-1" style="font-size: 0.72rem;">(Klik foto untuk membuka resolusi penuh)</div>
+                                                                            </div>
                                                                         @endif
                                                                     </div>
                                                                 @elseif ($req->status === 'rejected')
@@ -318,10 +327,15 @@
                                                                 @endif
                                                             </div>
                                                             <div class="modal-footer">
-                                                                @if ($req->status === 'distributed' || (!$req->is_procurement && $req->status === 'approved'))
+                                                                @if ($req->status === 'distributed')
                                                                     <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                                        class="btn btn-secondary btn-sm">
-                                                                        Cetak Bukti Tanda Terima
+                                                                        class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                                                        </svg>
+                                                                        Lihat Bukti Foto PIC
                                                                     </a>
                                                                 @elseif ($req->is_procurement && $req->status === 'approved')
                                                                     <span class="badge bg-warning-subtle text-dark border me-auto py-2 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">

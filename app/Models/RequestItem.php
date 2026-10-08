@@ -30,6 +30,7 @@ class RequestItem extends Model
         'distributed_by',
         'receiver_name',
         'distribution_notes',
+        'distribution_proof',
         'created_at',
     ];
 
@@ -58,6 +59,64 @@ class RequestItem extends Model
     public function details()
     {
         return $this->hasMany(RequestDetail::class, 'request_id');
+    }
+
+    /**
+     * Scope untuk memfilter permohonan sesuai dengan divisi PIC Distribusi
+     */
+    public function scopeForPic($query, User $picUser)
+    {
+        if ($picUser->isPicTataUsaha()) {
+            return $query->where(function ($q) {
+                $q->where('type', 'individu')
+                  ->orWhereHas('user', function ($uq) {
+                      $uq->where('role', 'pegawai')
+                         ->orWhere(function ($subQ) {
+                             $subQ->where('role', 'subdit')
+                                  ->where(function ($tuQ) {
+                                      $tuQ->where('subdit_name', 'like', '%tata usaha%')
+                                          ->orWhere('subdit_name', 'like', '%subbagian tu%')
+                                          ->orWhere('position', 'like', '%tata usaha%')
+                                          ->orWhere('position', 'like', '%subbagian tu%')
+                                          ->orWhere('name', 'like', '%tata usaha%')
+                                          ->orWhere('name', 'like', '%subbagian tu%');
+                                  });
+                         });
+                  });
+            });
+        }
+
+        $key = $picUser->getDivisionKey();
+
+        return $query->where('type', 'subdit')
+            ->whereHas('user', function ($uq) use ($key, $picUser) {
+                $uq->where('role', '!=', 'pegawai')
+                   ->where(function ($subQ) use ($key, $picUser) {
+                       if ($key === 'sdk') {
+                           $subQ->where('subdit_name', 'like', '%sumber daya%')
+                                ->orWhere('subdit_name', 'like', '%sdk%')
+                                ->orWhere('position', 'like', '%sdk%')
+                                ->orWhere('name', 'like', '%sdk%');
+                       } elseif ($key === 'pjf') {
+                           $subQ->where('subdit_name', 'like', '%fungsional%')
+                                ->orWhere('subdit_name', 'like', '%pjf%')
+                                ->orWhere('position', 'like', '%pjf%')
+                                ->orWhere('name', 'like', '%pjf%');
+                       } elseif ($key === 'kbr') {
+                           $subQ->where('subdit_name', 'like', '%kendala%')
+                                ->orWhere('subdit_name', 'like', '%kbr%')
+                                ->orWhere('position', 'like', '%kbr%')
+                                ->orWhere('name', 'like', '%kbr%');
+                       } else {
+                           if (!empty($picUser->subdit_name)) {
+                               $subQ->where('subdit_name', $picUser->subdit_name);
+                           }
+                           if (!empty($picUser->position)) {
+                               $subQ->orWhere('position', $picUser->position);
+                           }
+                       }
+                   });
+            });
     }
 
     public function getIsPurchasedAttribute(): bool
@@ -95,5 +154,13 @@ class RequestItem extends Model
             'rejected' => 'bg-danger text-white',
             default => 'bg-secondary text-white',
         };
+    }
+
+    public function getDistributionProofUrlAttribute(): ?string
+    {
+        if (!$this->distribution_proof) {
+            return null;
+        }
+        return asset('storage/' . $this->distribution_proof);
     }
 }

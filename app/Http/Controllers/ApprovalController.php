@@ -76,7 +76,12 @@ class ApprovalController extends Controller
         $rejectedCount = (clone $baseQuery)->where('status', 'rejected')->count();
         $totalCount = (clone $baseQuery)->count();
 
-        $query = (clone $baseQuery)->with(['user', 'details.product'])->latest('created_at')->latest('id');
+        $query = (clone $baseQuery)->with([
+            'user.requests' => function ($rq) {
+                $rq->with(['details.product'])->latest('created_at');
+            },
+            'details.product'
+        ])->latest('created_at')->latest('id');
 
         if ($statusFilter && $statusFilter !== 'all') {
             if ($statusFilter === 'approved') {
