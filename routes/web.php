@@ -62,6 +62,8 @@ Route::middleware('auth')->group(function () {
         ->name('notifications.index');
     Route::post('/notifikasi/{id}/baca', [NotificationController::class, 'markAsRead'])
         ->name('notifications.markAsRead');
+    Route::post('/notifikasi/baca-batch', [NotificationController::class, 'markBatchAsRead'])
+        ->name('notifications.markBatchAsRead');
     Route::post('/notifikasi/baca-semua', [NotificationController::class, 'markAllAsRead'])
         ->name('notifications.markAllAsRead');
 
@@ -147,6 +149,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/katalog-atk', [ProductController::class, 'catalog'])
         ->name('katalog-atk');
+
+    Route::post('/katalog-atk/pesan', [RequestController::class, 'orderFromCatalog'])
+        ->name('katalog.pesan');
 
     // ==========================================
     // 4. ROUTE PELAPORAN & ARSIP - ARSIPARIS / KASUBAG TU

@@ -1,29 +1,19 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <style>
-        .iq-navbar-header {
-            position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .iq-navbar-header .iq-container {
-            position: relative;
-            z-index: 2;
-        }
-    </style>
-    <div class="iq-navbar-header" style="height: 215px;">
+    <div class="iq-navbar-header" style="height: 220px;">
         <div class="container-fluid iq-container">
             <div class="row">
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                                <span class="badge-dot badge-dot-success"></span>
+                                <span>Kementerian PKP RI &bull; Permohonan Persediaan</span>
+                            </div>
                             <h1 class="text-white fw-bold mb-1">Pengajuan Kebutuhan ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.9;">
-                                Riwayat dan pemantauan status permohonan Alat Tulis Kantor (Individu & Subdirektorat).
+                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
+                                Riwayat dan pemantauan status permohonan Alat Tulis Kantor (Individu &amp; Subdirektorat) secara transparan dan akuntabel.
                             </p>
                         </div>
                     </div>
@@ -59,38 +49,70 @@
         @endphp
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Menunggu Review</span>
-                        <h3 class="fw-bold text-warning mb-0">{{ $countPending }}</h3>
-                        <small class="text-muted">Kasubag TU</small>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Menunggu Review</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-amber-light); color: var(--accent-amber);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0 fs-3">{{ $countPending }}</h2>
+                        <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubag TU</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Disetujui TU (Proses Beli)</span>
-                        <h3 class="fw-bold text-info mb-0">{{ $countApproved }}</h3>
-                        <small class="text-muted">Akan dibeli Subbag TU</small>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Disetujui TU</span>
+                        <div class="kpi-icon-squircle" style="background-color: #f0f9ff; color: #0284c7;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-primary mb-0 fs-3">{{ $countApproved }}</h2>
+                        <small class="text-muted" style="font-size: 0.75rem;">Akan dibeli / disiapkan</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Selesai Diterima</span>
-                        <h3 class="fw-bold text-success mb-0">{{ $countDistributed }}</h3>
-                        <small class="text-muted">Telah diserahterimakan</small>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Selesai Diterima</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0 fs-3">{{ $countDistributed }}</h2>
+                        <small class="text-muted" style="font-size: 0.75rem;">Telah diserahterimakan</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Ditolak</span>
-                        <h3 class="fw-bold text-danger mb-0">{{ $countRejected }}</h3>
-                        <small class="text-muted">Belum disetujui</small>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Ditolak</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-rose-light); color: var(--accent-rose);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-danger mb-0 fs-3">{{ $countRejected }}</h2>
+                        <small class="text-muted" style="font-size: 0.75rem;">Belum disetujui TU</small>
                     </div>
                 </div>
             </div>

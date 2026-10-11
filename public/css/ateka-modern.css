@@ -1,0 +1,836 @@
+/**
+ * ==============================================================================
+ * ATEKA MODERN DESIGN SYSTEM (V2.0 - ULTRA POLISHED)
+ * KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI (KEMEN PKP RI)
+ * High-End GovTech / Enterprise SaaS Design System & Micro-Animations
+ * ==============================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Official Ministry & Deep Oceanic Blue Palette */
+    --pkp-navy-950: #061224;
+    --pkp-navy-900: #0a1b33;
+    --pkp-navy-800: #0e294b;
+    --pkp-blue-700: #134074;
+    --pkp-blue-600: #1d5899;
+    --pkp-blue-500: #2563eb;
+    --pkp-azure:    #0284c7;
+    --pkp-cyan:     #06b6d4;
+    --pkp-teal:     #0d9488;
+
+    /* Primary Gradient Brand System */
+    --brand-primary: #0f4c81;
+    --brand-primary-hover: #0a365c;
+    --brand-primary-light: #eff6ff;
+    --brand-gradient: linear-gradient(135deg, #0b345b 0%, #174e84 45%, #0284c7 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #082643 0%, #113d68 45%, #0369a1 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+
+    /* Semantic Accent Colors */
+    --accent-emerald: #059669;
+    --accent-emerald-light: #ecfdf5;
+    --accent-emerald-border: #a7f3d0;
+    --accent-amber: #d97706;
+    --accent-amber-light: #fffbeb;
+    --accent-amber-border: #fde68a;
+    --accent-rose: #e11d48;
+    --accent-rose-light: #fff1f2;
+    --accent-rose-border: #fecdd3;
+    --accent-indigo: #4f46e5;
+    --accent-indigo-light: #eef2ff;
+    --accent-indigo-border: #c7d2fe;
+
+    /* Surfaces & Glassmorphism */
+    --surface-bg: #f8fafc;
+    --surface-card: #ffffff;
+    --surface-card-glass: rgba(255, 255, 255, 0.92);
+    --border-subtle: #e2e8f0;
+    --border-light: #f1f5f9;
+    --border-glow: rgba(37, 99, 235, 0.22);
+
+    /* Elevation & Multi-Layered Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    --shadow-card: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+    --shadow-card-hover: 0 16px 32px -6px rgba(15, 23, 42, 0.10), 0 6px 12px -3px rgba(15, 23, 42, 0.04);
+    --shadow-glow-blue: 0 8px 24px -4px rgba(2, 132, 199, 0.28);
+    --shadow-glow-emerald: 0 8px 24px -4px rgba(16, 185, 129, 0.26);
+    --shadow-glow-amber: 0 8px 24px -4px rgba(245, 158, 11, 0.26);
+    --shadow-elevated: 0 24px 38px -8px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+
+    /* Radii */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+    --radius-full: 9999px;
+}
+
+/* ==============================================================================
+   1. GLOBAL RESETS & TYPOGRAPHY
+   ============================================================================== */
+body {
+    font-family: var(--font-sans) !important;
+    background-color: var(--surface-bg) !important;
+    color: #334155 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.012em;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-sans) !important;
+    letter-spacing: -0.025em !important;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.font-monospace {
+    font-family: var(--font-mono) !important;
+}
+
+/* Sleek WebKit Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ==============================================================================
+   2. KEYFRAME ANIMATIONS (AURORA MESH & MOTION SYSTEM)
+   ============================================================================== */
+@keyframes orbFloatA {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.26;
+    }
+    50% {
+        transform: translate(35px, -20px) scale(1.15);
+        opacity: 0.38;
+    }
+}
+
+@keyframes orbFloatB {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.20;
+    }
+    50% {
+        transform: translate(-30px, 25px) scale(1.10);
+        opacity: 0.32;
+    }
+}
+
+@keyframes atekaFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes atekaFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes pulseGlowRing {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+@keyframes pulseGlowRingDanger {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(244, 63, 94, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    }
+}
+
+@keyframes pulseGlowRingWarning {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+@keyframes bellTinkling {
+    0%, 100% { transform: rotate(0); }
+    15% { transform: rotate(14deg); }
+    30% { transform: rotate(-12deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(-6deg); }
+    75% { transform: rotate(0); }
+}
+
+@keyframes buttonShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Page content smooth entrance - opacity only to prevent stacking context trapping */
+.content-inner {
+    animation: atekaFadeIn 0.3s ease-out;
+}
+
+/* Staggered cards entrance */
+.katalog-card-item:nth-child(1) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.03s both; }
+.katalog-card-item:nth-child(2) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
+.katalog-card-item:nth-child(3) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.09s both; }
+.katalog-card-item:nth-child(4) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
+.katalog-card-item:nth-child(5) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.katalog-card-item:nth-child(6) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both; }
+.katalog-card-item:nth-child(7) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.21s both; }
+.katalog-card-item:nth-child(8) { animation: atekaFadeUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
+
+/* ==============================================================================
+   3. HERO BANNER (.iq-navbar-header) - LIVING AURORA MESH
+   ============================================================================== */
+.iq-navbar-header {
+    position: relative !important;
+    background: linear-gradient(135deg, #061224 0%, #0a213e 40%, #0c3d69 75%, #075985 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden !important;
+    box-shadow: 0 6px 24px -2px rgba(6, 18, 36, 0.35) !important;
+}
+
+/* Ambient morphing floating orb 1 */
+.iq-navbar-header::before {
+    content: '' !important;
+    position: absolute !important;
+    width: 600px;
+    height: 600px;
+    right: -100px;
+    top: -200px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.32) 0%, rgba(14, 165, 233, 0.14) 40%, transparent 70%) !important;
+    border-radius: 50% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    animation: orbFloatA 12s ease-in-out infinite !important;
+}
+
+/* Ambient morphing floating orb 2 + isometric micro-grid */
+.iq-navbar-header::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background-image: 
+        radial-gradient(circle at 15% 90%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 28px 28px, 28px 28px !important;
+    mask-image: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.95) 0%, transparent 80%) !important;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.95) 0%, transparent 80%) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    animation: orbFloatB 16s ease-in-out infinite !important;
+}
+
+.iq-navbar-header .iq-container {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.iq-navbar-header h1 {
+    font-size: 1.95rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.iq-navbar-header p {
+    font-size: 0.95rem !important;
+    line-height: 1.55 !important;
+    color: rgba(255, 255, 255, 0.90) !important;
+    max-width: 820px;
+}
+
+/* ==============================================================================
+   4. GLASSMORPHIC TOP NAVBAR (.iq-navbar)
+   ============================================================================== */
+.iq-navbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 1px 4px 0 rgba(15, 23, 42, 0.03) !important;
+    transition: all 0.25s ease;
+}
+
+.iq-navbar .search-input {
+    border-radius: var(--radius-full) !important;
+    background: #f1f5f9 !important;
+    border: 1px solid rgba(226, 232, 240, 0.7) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden;
+}
+
+.iq-navbar .search-input:focus-within {
+    background: #ffffff !important;
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14), var(--shadow-sm) !important;
+    transform: translateY(-1px);
+}
+
+.iq-navbar .search-input .input-group-text {
+    background: transparent !important;
+    border: none !important;
+    color: #64748b !important;
+    padding-left: 1.1rem !important;
+}
+
+.iq-navbar .search-input .form-control {
+    background: transparent !important;
+    border: none !important;
+    font-size: 0.88rem !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    padding-left: 0.35rem !important;
+}
+
+/* Notification Bell Animation */
+.iq-navbar .btn-icon-notify:hover svg {
+    animation: bellTinkling 0.8s ease-in-out;
+}
+
+/* ==============================================================================
+   5. MODERN SIDEBAR & NAVIGATION POLISH
+   ============================================================================== */
+.sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid var(--border-subtle) !important;
+    box-shadow: 2px 0 8px 0 rgba(15, 23, 42, 0.02) !important;
+}
+
+.sidebar .sidebar-user-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+    transition: all 0.25s ease;
+}
+
+.sidebar .sidebar-user-card:hover {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+.sidebar .nav-item .nav-link {
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    color: #475569 !important;
+    padding: 0.55rem 0.85rem !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+}
+
+.sidebar .nav-item .nav-link:hover {
+    background-color: #f1f5f9 !important;
+    color: var(--brand-primary) !important;
+    transform: translateX(3px);
+}
+
+.sidebar .nav-item .nav-link.active {
+    background: var(--brand-gradient) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 14px -2px rgba(15, 76, 129, 0.35) !important;
+}
+
+.sidebar .nav-item .nav-link.active svg {
+    color: #ffffff !important;
+}
+
+/* ==============================================================================
+   6. CARDS, CONTAINERS & INTERACTIVE HOVER GLOWS
+   ============================================================================== */
+.card {
+    background: var(--surface-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-card) !important;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-card-hover) !important;
+}
+
+.card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    padding: 1.1rem 1.4rem !important;
+}
+
+/* Hover Lift Effect */
+.card-hover-lift:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--shadow-card-hover) !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* ==============================================================================
+   7. KATALOG ATK PRODUCT CARDS - E-COMMERCE LEVEL FINISH
+   ============================================================================== */
+.katalog-card-item .card {
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden;
+}
+
+.katalog-card-item .card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 16px 34px -6px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(37, 99, 235, 0.18) !important;
+    border-color: #93c5fd !important;
+}
+
+.katalog-card-visual {
+    height: 110px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.katalog-card-visual svg {
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.katalog-card-item .card:hover .katalog-card-visual svg {
+    transform: scale(1.12) translateY(-2px);
+}
+
+/* Pastel Glass Accents for Categories */
+.bg-cat-folder  { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #1d4ed8; }
+.bg-cat-holder  { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); color: #6d28d9; }
+.bg-cat-paper   { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); color: #047857; }
+.bg-cat-pen     { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); color: #b45309; }
+.bg-cat-general { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #475569; }
+
+/* Stock Meter Progress Bar */
+.stock-meter-bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: #e2e8f0;
+    overflow: hidden;
+    margin-top: 5px;
+}
+.stock-meter-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stock-meter-fill.stock-high {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
+}
+.stock-meter-fill.stock-low {
+    background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+}
+.stock-meter-fill.stock-empty {
+    background: #cbd5e1;
+}
+
+/* Category Quick Filter Chips */
+.filter-chip-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.4rem 0.95rem;
+    border-radius: var(--radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    text-decoration: none;
+}
+
+.filter-chip-pill:hover {
+    color: var(--brand-primary);
+    border-color: #93c5fd;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.filter-chip-pill.active {
+    background: var(--brand-gradient);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px -1px rgba(15, 76, 129, 0.35);
+}
+
+/* ==============================================================================
+   8. KPI DASHBOARD WIDGETS (.kpi-widget-card)
+   ============================================================================== */
+.kpi-widget-card {
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    padding: 1.35rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kpi-widget-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: #cbd5e1;
+}
+
+.kpi-icon-squircle {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kpi-widget-card:hover .kpi-icon-squircle {
+    transform: scale(1.10) rotate(2deg);
+}
+
+/* ==============================================================================
+   9. STATUS BADGES & PULSING GLOW DOTS
+   ============================================================================== */
+.badge {
+    font-family: var(--font-sans) !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-full) !important;
+    padding: 0.38em 0.82em !important;
+    letter-spacing: 0.01em;
+    font-size: 0.74rem;
+}
+
+.badge.bg-success,
+.badge-success-subtle {
+    background-color: var(--accent-emerald-light) !important;
+    color: #065f46 !important;
+    border: 1px solid var(--accent-emerald-border) !important;
+}
+
+.badge.bg-danger,
+.badge-danger-subtle {
+    background-color: var(--accent-rose-light) !important;
+    color: #9f1239 !important;
+    border: 1px solid var(--accent-rose-border) !important;
+}
+
+.badge.bg-warning,
+.badge-warning-subtle {
+    background-color: var(--accent-amber-light) !important;
+    color: #92400e !important;
+    border: 1px solid var(--accent-amber-border) !important;
+}
+
+.badge.bg-primary,
+.badge-primary-subtle {
+    background-color: var(--brand-primary-light) !important;
+    color: #1e40af !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+.badge.bg-info,
+.badge-info-subtle {
+    background-color: #f0f9ff !important;
+    color: #0369a1 !important;
+    border: 1px solid #bae6fd !important;
+}
+
+.badge.bg-secondary,
+.badge-secondary-subtle {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Pulsing Status Dot Indicators */
+.badge-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.badge-dot-success {
+    background-color: #10b981;
+    animation: pulseGlowRing 2.4s infinite;
+}
+.badge-dot-danger {
+    background-color: #f43f5e;
+    animation: pulseGlowRingDanger 2.4s infinite;
+}
+.badge-dot-warning {
+    background-color: #f59e0b;
+    animation: pulseGlowRingWarning 2.4s infinite;
+}
+.badge-dot-primary {
+    background-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+.badge-dot-info {
+    background-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+/* ==============================================================================
+   10. BUTTONS & TACTILE FEEDBACK
+   ============================================================================== */
+.btn {
+    font-family: var(--font-sans) !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.48rem 1.05rem !important;
+    letter-spacing: -0.01em;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:active {
+    transform: scale(0.97) !important;
+}
+
+.btn-primary {
+    background: var(--brand-gradient) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px -1px rgba(15, 76, 129, 0.25) !important;
+}
+
+.btn-primary:hover {
+    background: var(--brand-gradient-hover) !important;
+    box-shadow: 0 6px 18px -2px rgba(15, 76, 129, 0.38) !important;
+    transform: translateY(-1.5px);
+}
+
+.btn-outline-primary {
+    border: 1.5px solid #93c5fd !important;
+    color: var(--brand-primary) !important;
+    background: #ffffff !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px -2px rgba(15, 76, 129, 0.28) !important;
+    transform: translateY(-1.5px);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px -1px rgba(217, 119, 6, 0.25) !important;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px -2px rgba(217, 119, 6, 0.38) !important;
+    transform: translateY(-1.5px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px -1px rgba(5, 150, 105, 0.25) !important;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+    box-shadow: 0 6px 18px -2px rgba(5, 150, 105, 0.38) !important;
+    transform: translateY(-1.5px);
+}
+
+/* ==============================================================================
+   11. DATA TABLES - MODERNIZED ENTERPRISE FINISH
+   ============================================================================== */
+.table {
+    color: #334155 !important;
+    vertical-align: middle !important;
+    margin-bottom: 0 !important;
+}
+
+.table thead th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    border-top: none !important;
+    padding: 0.95rem 1.15rem !important;
+}
+
+.table tbody td {
+    padding: 0.95rem 1.15rem !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    font-size: 0.88rem !important;
+}
+
+.table-hover tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(15, 76, 129, 0.03) !important;
+}
+
+/* DataTables Controls Modernization */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--border-subtle) !important;
+    padding: 0.35rem 0.75rem !important;
+    margin: 0 2px !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    transition: all 0.2s ease !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--brand-gradient) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 2px 6px rgba(15, 76, 129, 0.3) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #f1f5f9 !important;
+    color: var(--brand-primary) !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* ==============================================================================
+   12. FORM CONTROLS & FLOATING LABELS
+   ============================================================================== */
+.form-control, .form-select {
+    font-family: var(--font-sans) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.9rem !important;
+    color: #1e293b !important;
+    background-color: #ffffff !important;
+    transition: all 0.22s ease !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+    outline: none !important;
+}
+
+/* ==============================================================================
+   13. MODALS & POPUPS - STACKING CONTEXT & BACKDROP REPAIR
+   ============================================================================== */
+.modal {
+    z-index: 1060 !important;
+    pointer-events: auto !important;
+}
+
+.modal-dialog {
+    z-index: 1065 !important;
+    pointer-events: auto !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+.modal-backdrop.show {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0.55;
+}
+
+.modal-content {
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-elevated) !important;
+    overflow: hidden;
+    pointer-events: auto !important;
+}
+
+/* Guard: When any modal is open, ensure no parent container establishes
+   a transform, filter, or perspective containing block that traps fixed modals behind backdrop */
+body.modal-open .content-inner,
+body.modal-open .card,
+body.modal-open .table-responsive,
+body.modal-open table,
+body.modal-open tbody,
+body.modal-open tr,
+body.modal-open td,
+body.modal-open .katalog-card-item {
+    transform: none !important;
+    animation: none !important;
+    filter: none !important;
+    perspective: none !important;
+}

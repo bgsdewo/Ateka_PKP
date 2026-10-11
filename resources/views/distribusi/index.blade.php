@@ -1,34 +1,24 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <style>
-        .iq-navbar-header {
-            position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .iq-navbar-header .iq-container {
-            position: relative;
-            z-index: 2;
-        }
-    </style>
-    <div class="iq-navbar-header" style="height: 215px;">
+    <div class="iq-navbar-header" style="height: 220px;">
         <div class="container-fluid iq-container">
             <div class="row">
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <h1 class="text-white fw-bold mb-1">Koordinasi & Distribusi Barang ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.9;">
-                                Kelola pengelompokan data permintaan dari berbagai Subdirektorat, penyerahan fisik barang, dan cetak bukti tanda terima.
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                                <span class="badge-dot badge-dot-warning"></span>
+                                <span>Kementerian PKP RI &bull; Pengelolaan Gudang &bull; PIC Distribusi</span>
+                            </div>
+                            <h1 class="text-white fw-bold mb-1">Koordinasi &amp; Distribusi Barang ATK</h1>
+                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
+                                Kelola pengelompokan data permintaan dari berbagai Subdirektorat, penyerahan fisik barang, dan cetak bukti tanda terima resmi.
                             </p>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm">
-                                <i class="me-1"></i>{{ auth()->user()->position ?? 'PIC Distribusi (Gudang)' }}
+                                {{ auth()->user()->position ?? 'PIC Distribusi (Gudang)' }}
                             </span>
                         </div>
                     </div>
@@ -75,53 +65,74 @@
         {{-- 4 Kartu KPI PIC Distribusi --}}
         <div class="row g-3 mb-4" id="distribution-metrics">
             <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
-                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Siap Didistribusikan</span>
-                            <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Pending Pickup</span>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Siap Didistribusikan</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-amber-light); color: var(--accent-amber);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-warning mb-0">{{ number_format($totalReady) }}</h2>
-                        <small class="text-muted">Telah disetujui Kasubag TU</small>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-warning mb-0 fs-3">{{ number_format($totalReady) }}</h2>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Telah disetujui Kasubag TU</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
-                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Permintaan Subdit</span>
-                            <span class="badge bg-info text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Kolektif</span>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Permintaan Subdit</span>
+                        <div class="kpi-icon-squircle" style="background-color: #f0f9ff; color: #0284c7;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-info mb-0">{{ number_format($totalSubditReady) }}</h2>
-                        <small class="text-muted">Paket kolektif unit kerja</small>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-info mb-0 fs-3">{{ number_format($totalSubditReady) }}</h2>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Paket kolektif unit kerja</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
-                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Permintaan Pegawai</span>
-                            <span class="badge bg-primary text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Individu</span>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Permintaan Pegawai</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--brand-primary-light); color: var(--brand-primary);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-primary mb-0">{{ number_format($totalIndividuReady) }}</h2>
-                        <small class="text-muted">Kebutuhan staf perorangan</small>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-primary mb-0 fs-3">{{ number_format($totalIndividuReady) }}</h2>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Kebutuhan staf perorangan</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-lg-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 flex-wrap">
-                            <span class="text-secondary fw-bold text-uppercase" style="font-size: 0.72rem; line-height: 1.25; letter-spacing: -0.2px;">Selesai Diserahkan</span>
-                            <span class="badge bg-success text-white rounded-pill" style="font-size: 0.68rem; padding: 0.28rem 0.55rem; white-space: nowrap;">Distributed</span>
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Selesai Diserahkan</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-success mb-0">{{ number_format($totalDistributed) }}</h2>
-                        <small class="text-muted">Sudah diserahterimakan</small>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold text-success mb-0 fs-3">{{ number_format($totalDistributed) }}</h2>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Sudah diserahterimakan</small>
                     </div>
                 </div>
             </div>

@@ -48,13 +48,16 @@ class NotificationController extends Controller
     }
 
     /**
-     * Hapus notifikasi spesifik saat diklik / dibaca agar tidak menumpuk di riwayat
+     * Tandai notifikasi spesifik sebagai sudah dibaca
      */
     public function markAsRead($id)
     {
         $user = Auth::user();
         $notification = UserNotification::where('user_id', $user->id)->findOrFail($id);
-        $notification->delete();
+        $notification->update([
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
 
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
@@ -63,16 +66,56 @@ class NotificationController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Notifikasi telah dibersihkan.');
+        return redirect()->back()->with('success', 'Notifikasi telah ditandai sudah dibaca.');
     }
 
     /**
-     * Bersihkan semua notifikasi pengguna agar tidak menumpuk
+     * Tandai banyak notifikasi sekaligus sebagai sudah dibaca (batch dismiss)
+     */
+    public function markBatchAsRead(Request $request)
+    {
+        $user = Auth::user();
+        $rawIds = $request->input('ids');
+
+        if (is_string($rawIds)) {
+            $ids = array_filter(array_map('trim', explode(',', $rawIds)));
+        } elseif (is_array($rawIds)) {
+            $ids = $rawIds;
+        } else {
+            $ids = [];
+        }
+
+        if (!empty($ids)) {
+            UserNotification::where('user_id', $user->id)
+                ->whereIn('id', $ids)
+                ->update([
+                    'is_read' => true,
+                    'read_at' => now(),
+                ]);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => $user->unreadNotificationsCount,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Notifikasi terpilih telah ditandai sudah dibaca.');
+    }
+
+    /**
+     * Tandai semua notifikasi pengguna sebagai sudah dibaca
      */
     public function markAllAsRead()
     {
         $user = Auth::user();
-        UserNotification::where('user_id', $user->id)->delete();
+        UserNotification::where('user_id', $user->id)
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
 
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
@@ -81,6 +124,6 @@ class NotificationController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Semua notifikasi telah dibersihkan.');
+        return redirect()->back()->with('success', 'Semua notifikasi telah ditandai sudah dibaca.');
     }
 }

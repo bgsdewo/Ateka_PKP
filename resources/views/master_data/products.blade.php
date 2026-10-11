@@ -1,29 +1,19 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <style>
-        .iq-navbar-header {
-            position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .iq-navbar-header .iq-container {
-            position: relative;
-            z-index: 2;
-        }
-    </style>
-    <div class="iq-navbar-header" style="height: 215px;">
+    <div class="iq-navbar-header" style="height: 220px;">
         <div class="container-fluid iq-container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center">
+                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <h1>Daftar Barang</h1>
-                            <p>
-                                Kelola master barang, stok awal, satuan, dan pencatatan persediaan barang.
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                                <span class="badge-dot badge-dot-primary"></span>
+                                <span>Kementerian PKP RI &bull; Master Data Persediaan</span>
+                            </div>
+                            <h1 class="text-white fw-bold mb-1">Daftar Barang ATK</h1>
+                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
+                                Kelola master barang, stok minimum, satuan, dan standardisasi katalog persediaan kantor.
                             </p>
                         </div>
                     </div>
@@ -35,12 +25,6 @@
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -442,6 +426,40 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                // SweetAlert2 Modal Popup Notification matching Image 1
+                @if (session('success'))
+                    if (typeof Swal !== 'undefined') {
+                        const successMsg = {!! json_encode(session('success')) !!};
+                        let titleText = 'Barang Berhasil Ditambahkan!';
+                        const lowerMsg = successMsg.toLowerCase();
+                        if (lowerMsg.includes('diperbarui') || lowerMsg.includes('diperbaharui')) {
+                            titleText = 'Barang Berhasil Diperbarui!';
+                        } else if (lowerMsg.includes('dihapus')) {
+                            titleText = 'Barang Berhasil Dihapus!';
+                        } else if (lowerMsg.includes('ditambahkan')) {
+                            titleText = 'Barang Berhasil Ditambahkan!';
+                        } else {
+                            titleText = 'Barang Berhasil Disimpan!';
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: titleText,
+                            html: `<div class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.5;">${successMsg}</div>`,
+                            confirmButtonText: 'Selesai & Tutup',
+                            confirmButtonColor: '#059669',
+                            background: '#ffffff',
+                            customClass: {
+                                popup: 'rounded-4 shadow-lg border-0 p-4',
+                                title: 'fw-bold text-dark fs-4 mb-1',
+                                confirmButton: 'btn btn-success px-4 py-2 fw-semibold rounded-3 shadow-sm'
+                            },
+                            timer: 7000,
+                            timerProgressBar: true
+                        });
+                    }
+                @endif
+
                 const storeUrl = "{{ route('master-data.daftar-barang.store') }}";
                 const updateUrlTemplate = "{{ route('master-data.daftar-barang.update', ':id') }}";
 

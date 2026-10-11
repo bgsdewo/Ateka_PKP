@@ -521,18 +521,22 @@ class ProductController extends Controller
                 $q->where('is_procurement', true)
                   ->whereIn('status', ['pending', 'approved']);
             })
-            ->whereNull('product_id')
+            ->where(function ($subQ) use ($product) {
+                $subQ->whereNull('product_id')
+                     ->orWhere('product_id', $product->id);
+            })
             ->with(['requestItem.user'])
             ->get();
 
             foreach ($openDetails as $od) {
-                if (self::isProcurementMatch($product, $od)) {
+                if ($od->product_id == $product->id || self::isProcurementMatch($product, $od)) {
                     $fulfilledReqDetails->push($od);
                 }
             }
         }
 
         $notifiedNames = [];
+        $notifiedUserIds = [];
         foreach ($fulfilledReqDetails as $det) {
             $det->update(['product_id' => $product->id]);
             $reqItem = $det->requestItem;
@@ -548,9 +552,10 @@ class ProductController extends Controller
                     'verified_by'        => $reqItem->verified_by ?: (Auth::id() ?? 1),
                 ]);
 
-                if ($reqItem->user) {
+                if ($reqItem->user && !in_array($reqItem->user_id, $notifiedUserIds)) {
                     UserNotification::sendProcurementNotification($reqItem, $product, $noFaktur);
                     $notifiedNames[] = $reqItem->user->name_with_title ?: $reqItem->user->name;
+                    $notifiedUserIds[] = $reqItem->user_id;
                 }
             }
         }

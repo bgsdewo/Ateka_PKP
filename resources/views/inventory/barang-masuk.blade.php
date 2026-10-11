@@ -1,29 +1,19 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <style>
-        .iq-navbar-header {
-            position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.45), rgba(0, 70, 80, 0.45)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .iq-navbar-header .iq-container {
-            position: relative;
-            z-index: 2;
-        }
-    </style>
-    <div class="iq-navbar-header" style="height: 215px;">
+    <div class="iq-navbar-header" style="height: 220px;">
         <div class="container-fluid iq-container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center">
+                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <h1>Transaksi Barang Masuk</h1>
-                            <p>
-                                Kelola transaksi barang masuk, faktur pembelian, dan pantau pergerakan stok persediaan.
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                                <span class="badge-dot badge-dot-success"></span>
+                                <span>Kementerian PKP RI &bull; Logistik &amp; Penerimaan Stok</span>
+                            </div>
+                            <h1 class="text-white fw-bold mb-1">Transaksi Barang Masuk</h1>
+                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
+                                Kelola transaksi barang masuk, faktur pembelian, dan catat penambahan stok persediaan ATK ke sistem.
                             </p>
                         </div>
                     </div>

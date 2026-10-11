@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="ms-2 sidebar-brand-text">
-                <h5 class="logo-title mb-0 fw-bold" style="color: #144b59;">Inventori ATK</h5>
+                <h5 class="logo-title mb-0 fw-bold" style="color: #0f4c81; letter-spacing: -0.02em;">Inventori ATK</h5>
                 <small class="text-muted sidebar-subtext" style="font-size: 0.7rem; white-space: nowrap;">Kementerian PKP RI</small>
             </div>
         </a>

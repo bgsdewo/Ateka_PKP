@@ -61,9 +61,22 @@ class UserNotification extends Model
 
     /**
      * Kirim notifikasi pengadaan barang telah dibeli dan tersedia di daftar barang / katalog
+     * Dilengkapi proteksi anti-duplikasi otomatis (mencegah spam jika produk sama diajukan berulang)
      */
     public static function sendProcurementNotification(RequestItem $requestItem, Product $product, ?string $invoice = null): self
     {
+        // Cegah spam: jika notifikasi barang yang sama untuk user ini sudah ada dan belum dibaca, jangan buat baris baru
+        $existing = self::where('user_id', $requestItem->user_id)
+            ->where('product_id', $product->id)
+            ->where('type', 'procurement_available')
+            ->where('is_read', false)
+            ->first();
+
+        if ($existing) {
+            $existing->touch();
+            return $existing;
+        }
+
         return self::create([
             'user_id' => $requestItem->user_id,
             'title' => 'Barang Telah Tersedia',
@@ -76,6 +89,62 @@ class UserNotification extends Model
             'is_read' => false,
             'data' => [
                 'product_name' => $product->name,
+                'invoice' => $invoice,
+            ],
+        ]);
+    }
+
+    /**
+     * Kirim notifikasi pengadaan gabungan (konsolidasi) jika satu tiket usulan memiliki banyak item barang
+     */
+    public static function sendConsolidatedProcurementNotification(RequestItem $requestItem, iterable $products, ?string $invoice = null): self
+    {
+        $productsCollection = collect($products)->filter();
+        $count = $productsCollection->count();
+
+        if ($count <= 1 && $productsCollection->isNotEmpty()) {
+            return self::sendProcurementNotification($requestItem, $productsCollection->first(), $invoice);
+        }
+
+        $names = $productsCollection->map(fn($p) => is_object($p) ? $p->name : (string)$p)->values();
+        $firstTwo = $names->take(2)->join(', ');
+        $remainingCount = $count - 2;
+        $summaryText = $remainingCount > 0 ? "{$firstTwo}, dan {$remainingCount} barang lainnya" : $names->join(', ');
+
+        // Cegah duplikasi per tiket pengadaan
+        $existing = self::where('user_id', $requestItem->user_id)
+            ->where('request_id', $requestItem->id)
+            ->where('type', 'procurement_available')
+            ->where('is_read', false)
+            ->first();
+
+        if ($existing) {
+            $existing->update([
+                'title' => "{$count} Barang Usulan Telah Tersedia",
+                'message' => "Barang pada usulan #{$requestItem->request_code} ({$summaryText}) telah dibeli Subbag TU dan kini tersedia di persediaan ATK.",
+                'data' => [
+                    'product_names' => $names->toArray(),
+                    'total_items' => $count,
+                    'invoice' => $invoice,
+                ],
+            ]);
+            return $existing;
+        }
+
+        return self::create([
+            'user_id' => $requestItem->user_id,
+            'title' => "{$count} Barang Usulan Telah Tersedia",
+            'message' => "Barang pada usulan #{$requestItem->request_code} ({$summaryText}) telah dibeli Subbag TU dan kini tersedia di persediaan ATK.",
+            'type' => 'procurement_available',
+            'icon' => 'box',
+            'link' => route('katalog-atk'),
+            'request_id' => $requestItem->id,
+            'product_id' => $productsCollection->first()->id ?? null,
+            'is_read' => false,
+            'data' => [
+                'product_names' => $names->toArray(),
+                'total_items' => $count,
+                'invoice' => $invoice,
             ],
         ]);
     }

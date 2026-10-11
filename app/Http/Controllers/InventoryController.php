@@ -130,12 +130,21 @@ class InventoryController extends Controller
                 $productUpdateData['purchase_price'] = $hargaPerolehan;
             }
             $product->update($productUpdateData);
+
+            if ($request->type === 'masuk') {
+                (new ProductController())->fulfillMatchingProcurements(
+                    $product,
+                    $request->no_faktur,
+                    $request->tanggal_faktur,
+                    $request->uraian
+                );
+            }
         });
 
         if ($request->type == 'masuk') {
             return redirect()
                 ->route('barang-masuk')
-                ->with('success', 'Barang masuk berhasil disimpan.');
+                ->with('success', 'Barang masuk berhasil disimpan dan usulan pengadaan terkait telah disinkronkan.');
         }
 
         return redirect()

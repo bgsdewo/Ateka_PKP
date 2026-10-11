@@ -124,36 +124,43 @@ class AuthController extends Controller
     public function resetPasswordWithNip(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
             'nip' => ['required', 'string'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ], [
-            'email.required' => 'Alamat email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi.',
             'password.required' => 'Password baru wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
         ]);
 
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $cleanInputNip = preg_replace('/[^a-zA-Z0-9]/', '', $request->nip);
 
+        // Cari akun berdasarkan NIP (langsung atau tanpa spasi/simbol)
+        $user = \App\Models\User::where('nip', $request->nip)
+            ->orWhereRaw("REPLACE(REPLACE(nip, ' ', ''), '-', '') = ?", [$cleanInputNip])
+            ->first();
+
+        // Fallback pencarian fleksibel jika format di DB berbeda
         if (!$user) {
-            return back()->withInput($request->only('email', 'nip'))->with('error', 'Akun dengan alamat email tersebut tidak ditemukan.');
+            $user = \App\Models\User::all()->first(function ($u) use ($cleanInputNip, $request) {
+                if (empty($u->nip)) {
+                    return false;
+                }
+                $cleanUserNip = preg_replace('/[^a-zA-Z0-9]/', '', $u->nip);
+                return $cleanUserNip === $cleanInputNip || $u->nip === $request->nip;
+            });
         }
 
-        // Bandingkan NIP dengan fleksibilitas pembersihan karakter non-alfanumerik
-        $cleanInputNip = preg_replace('/[^a-zA-Z0-9]/', '', $request->nip);
-        $cleanUserNip = preg_replace('/[^a-zA-Z0-9]/', '', $user->nip ?? '');
-
-        if (empty($user->nip) || ($cleanInputNip !== $cleanUserNip && $user->nip !== $request->nip)) {
-            return back()->withInput($request->only('email', 'nip'))->with('error', 'Nomor Induk Pegawai (NIP) tidak cocok dengan data akun terdaftar.');
+        if (!$user) {
+            return back()->withInput($request->only('nip'))
+                ->with('error', 'Nomor Induk Pegawai (NIP) tidak terdaftar pada sistem inventori.');
         }
 
         $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
         $user->save();
 
-        return redirect()->route('login')->with('success', 'Password berhasil diubah! Silakan masuk dengan kata sandi baru Anda.');
+        return redirect()->route('login')
+            ->with('success', 'Password berhasil diperbarui untuk akun ' . $user->name . '! Silakan masuk dengan kata sandi baru.');
     }
 
     public function logout(Request $request)

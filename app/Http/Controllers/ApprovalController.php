@@ -382,12 +382,11 @@ class ApprovalController extends Controller
                 'rejection_reason'    => null,
             ]);
 
-            // Kirim notifikasi ke pemohon bahwa barang pengadaan telah dibeli dan tersedia di daftar barang
+            // Kirim notifikasi konsolidasian ke pemohon bahwa barang pengadaan telah dibeli dan tersedia di daftar barang
             if ($item->user) {
-                foreach ($item->details as $det) {
-                    if ($det->product) {
-                        UserNotification::sendProcurementNotification($item, $det->product, $request->no_faktur);
-                    }
+                $purchasedProducts = $item->details->map(fn($det) => $det->product)->filter()->unique('id');
+                if ($purchasedProducts->isNotEmpty()) {
+                    UserNotification::sendConsolidatedProcurementNotification($item, $purchasedProducts, $request->no_faktur);
                 }
             }
 

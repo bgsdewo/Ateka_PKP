@@ -223,85 +223,29 @@
         </p>
 
         @php
-            $currentUser = auth()->user();
-            $picUser = null;
-
-            if ($requestItem->distributor) {
-                $picUser = $requestItem->distributor;
-            } elseif ($currentUser && $currentUser->isPicDistribusi()) {
-                $picUser = $currentUser;
-            } else {
-                // Cari akun PIC Distribusi resmi di database yang ditugaskan pada unit pemohon
-                $pemohonText = strtolower(($requestItem->user->subdit_name ?? '') . ' ' . ($requestItem->user->position ?? '') . ' ' . ($requestItem->user->name ?? ''));
-                
-                $picCandidates = \App\Models\User::where('role', 'pic_distribusi')->get();
-                
-                foreach ($picCandidates as $pic) {
-                    $picText = strtolower(($pic->position ?? '') . ' ' . ($pic->subdit_name ?? ''));
-                    if (str_contains($pemohonText, 'sdk') && str_contains($picText, 'sdk')) {
-                        $picUser = $pic;
-                        break;
-                    } elseif (str_contains($pemohonText, 'pjf') && str_contains($picText, 'pjf')) {
-                        $picUser = $pic;
-                        break;
-                    } elseif (str_contains($pemohonText, 'kbr') && str_contains($picText, 'kbr')) {
-                        $picUser = $pic;
-                        break;
-                    } elseif ((str_contains($pemohonText, 'tu') || str_contains($pemohonText, 'tata usaha')) && (str_contains($picText, 'tu') || str_contains($picText, 'tata usaha'))) {
-                        $picUser = $pic;
-                        break;
-                    }
-                }
-
-                if (!$picUser) {
-                    $picUser = $picCandidates->first();
-                }
-            }
-
-            if ($picUser) {
-                $namaPenyerah = $picUser->name_with_title ?: $picUser->name;
-                $jabatanPenyerah = $picUser->position ?: 'PIC Distribusi & Gudang';
-                $nipPenyerah = $picUser->nip;
-            } else {
-                $namaPenyerah = 'PIC Distribusi & Gudang';
-                $jabatanPenyerah = 'PIC Distribusi';
-                $nipPenyerah = null;
-            }
-
-            // Data Kasubag TU resmi dari database akun
-            $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
+            // Data Kasubag TU resmi dari akun verifikator atau akun role kasubag_tu di database
+            $kasubagUser = $requestItem->verifier ?? \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
             $namaKasubag = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
-            $nipKasubag = $kasubagUser ? ($kasubagUser->nip ?: '199812132025062010') : '199812132025062010';
+            $nipKasubag = $kasubagUser ? $kasubagUser->nip : null;
         @endphp
 
-        <!-- KOLOM TANDA TANGAN (3 PIHAK) -->
-        <div class="row text-center mt-4" style="font-size: 13px;">
-            <div class="col-4">
+        <!-- KOLOM TANDA TANGAN (2 PIHAK: PENERIMA & KASUBAG TU) -->
+        <div class="row text-center mt-5 justify-content-between" style="font-size: 13px;">
+            <div class="col-5">
                 <p class="mb-1">Yang Menerima,</p>
                 <p class="text-muted small mb-0">{{ $requestItem->type === 'subdit' ? 'Perwakilan Subdirektorat' : 'Pegawai Pemohon' }}</p>
-                <div style="height: 60px;"></div>
+                <div style="height: 65px;"></div>
                 <p class="mb-0 fw-bold"><u>{{ $requestItem->receiver_name ?? ($requestItem->user->name_with_title ?? ($requestItem->user->name ?? 'Penerima')) }}</u></p>
-                <small class="text-muted d-block">{{ $requestItem->user->position ?? 'Pegawai' }}</small>
+                <small class="text-muted d-block">{{ $requestItem->user->position ?? ($requestItem->type === 'subdit' ? 'Perwakilan Subdirektorat' : 'Pegawai') }}</small>
                 @if(!empty($requestItem->user->nip))
                     <small class="text-muted d-block">NIP. {{ $requestItem->user->nip }}</small>
                 @endif
             </div>
 
-            <div class="col-4">
-                <p class="mb-1">Yang Menyerahkan,</p>
-                <p class="text-muted small mb-0">PIC Distribusi &amp; Gudang</p>
-                <div style="height: 60px;"></div>
-                <p class="mb-0 fw-bold"><u>{{ $namaPenyerah }}</u></p>
-                <small class="text-muted d-block">{{ $jabatanPenyerah }}</small>
-                @if(!empty($nipPenyerah))
-                    <small class="text-muted d-block">NIP. {{ $nipPenyerah }}</small>
-                @endif
-            </div>
-
-            <div class="col-4">
+            <div class="col-5">
                 <p class="mb-1">Mengetahui &amp; Menyetujui,</p>
                 <p class="text-muted small mb-0">Kasubag Tata Usaha</p>
-                <div style="height: 60px;"></div>
+                <div style="height: 65px;"></div>
                 <p class="mb-0 fw-bold"><u>{{ $namaKasubag }}</u></p>
                 @if(!empty($nipKasubag))
                     <small class="text-muted d-block">NIP. {{ $nipKasubag }}</small>

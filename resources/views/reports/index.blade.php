@@ -11,19 +11,6 @@
 
 @section('page-header')
     <style>
-        .iq-navbar-header {
-            position: relative;
-            background-image: linear-gradient(rgba(0, 70, 80, 0.35), rgba(0, 70, 80, 0.35)), url("{{ asset('hope-ui/assets/images/dashboard/bg-2.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .iq-navbar-header .iq-container {
-            position: relative;
-            z-index: 2;
-        }
-
         .signature-section {
             display: none;
         }
@@ -42,10 +29,13 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-white">
                         <div>
-                            <h1 class="text-white fw-bold mb-1" style="text-shadow: 0 2px 4px rgba(0,0,0,0.35);">Laporan
-                                Persediaan Barang</h1>
-                            <p class="text-white mb-0" style="text-shadow: 0 1px 3px rgba(0,0,0,0.35); opacity: 0.9;">
-                                Pantau pergerakan transaksi keluar-masuk barang, ringkasan mutasi, dan ekspor dokumen resmi.
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                                <span class="badge-dot badge-dot-primary"></span>
+                                <span>Kementerian PKP RI &bull; Pelaporan &amp; Pengesahan Mutasi</span>
+                            </div>
+                            <h1 class="text-white fw-bold mb-1">Laporan Persediaan Barang</h1>
+                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
+                                Pantau pergerakan transaksi keluar-masuk barang, ringkasan mutasi, dan ekspor dokumen resmi berstandar instansi.
                             </p>
                         </div>
                     </div>

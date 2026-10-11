@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v=2.1" />
     @stack('styles')
     <style>
         /* ======================================================== */

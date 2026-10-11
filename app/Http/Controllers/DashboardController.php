@@ -197,8 +197,9 @@ class DashboardController extends Controller
         $recentProcurementNotifications = auth()->user()->notifications()
             ->where('type', 'procurement_available')
             ->where('is_read', false)
+            ->with('product')
             ->latest()
-            ->take(3)
+            ->take(15)
             ->get();
 
         // Periode text label
