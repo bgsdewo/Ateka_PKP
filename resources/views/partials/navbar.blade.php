@@ -12,9 +12,9 @@
                 <span class="text-muted d-none d-sm-block" style="font-size: 0.68rem; font-weight: 500; line-height: 1;">Kementerian PKP RI</span>
             </div>
         </a>
-        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
+        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Buka tutup sidebar">
             <i class="icon">
-                <svg width="20px" class="icon-20" viewBox="0 0 24 24">
+                <svg width="20px" class="icon-20" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill="currentColor"
                         d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
                 </svg>
@@ -22,14 +22,14 @@
         </div>
         <div class="input-group search-input d-none d-md-flex">
             <span class="input-group-text">
-                <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none">
+                <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" stroke-width="1.5"></circle>
                     <path d="M18.0186 18.4851L21.5426 22" stroke="currentColor" stroke-width="1.5"></path>
                 </svg>
             </span>
-            <input type="search" id="navbar-search" class="form-control" placeholder="Cari data persediaan atau transaksi...">
+            <input type="search" id="navbar-search" class="form-control" placeholder="Cari data persediaan atau transaksi..." aria-label="Cari data persediaan atau transaksi">
         </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">
             <span class="navbar-toggler-icon">
                 <span class="mt-2 navbar-toggler-bar bar1"></span>
                 <span class="navbar-toggler-bar bar2"></span>
@@ -148,8 +148,8 @@
                 @endphp
                 <li class="nav-item dropdown me-2">
                     <a href="#" class="nav-link position-relative p-2 rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border"
-                        id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px;" title="Notifikasi Sistem">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi Sistem" style="width: 40px; height: 40px;" title="Notifikasi Sistem">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
@@ -377,7 +377,7 @@
 
                 <li class="nav-item dropdown">
                     <a class="py-0 nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown">
+                        data-bs-toggle="dropdown" aria-label="Menu akun pengguna">
                         <div class="avatar avatar-40 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border border-primary-subtle">
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>

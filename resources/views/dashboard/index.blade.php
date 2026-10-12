@@ -564,7 +564,6 @@
         <!-- ======================================================== -->
         @if ($isKasubagTU || $isArsiparis || $isPicDistribusi)
             <div class="row g-3 mb-4">
-            <div class="row g-3 mb-4">
                 <div class="col-md-4 col-12">
                     <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-2">

@@ -28,9 +28,9 @@
                 <small class="text-muted sidebar-subtext" style="font-size: 0.7rem; white-space: nowrap;">Kementerian PKP RI</small>
             </div>
         </a>
-        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
+        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Tutup sidebar">
             <i class="icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M4.25 12.2744L19.25 12.2744" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round"></path>
                     <path d="M10.2998 18.2988L4.2498 12.2748L10.2998 6.24976" stroke="currentColor" stroke-width="1.5"
