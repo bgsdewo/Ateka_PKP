@@ -94,7 +94,7 @@ class RequestRecapController extends Controller
             ->with(['user', 'verifier', 'distributor', 'details.product.category'])
             ->latest('created_at')
             ->latest('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         // Tab 2: Rekapitulasi Kebutuhan per Barang ATK (mengelompokkan katalog & usulan pengadaan)

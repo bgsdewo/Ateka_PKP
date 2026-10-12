@@ -53,6 +53,24 @@ class DashboardController extends Controller
         $totalStockIn = (clone $periodTransactionsQuery)->where('type', 'masuk')->sum('quantity');
         $totalStockOut = (clone $periodTransactionsQuery)->where('type', 'keluar')->sum('quantity');
 
+        $totalStockInValue = (clone $periodTransactionsQuery)
+            ->where('type', 'masuk')
+            ->with('product')
+            ->get()
+            ->sum(function ($tx) {
+                $price = $tx->harga_perolehan > 0 ? $tx->harga_perolehan : ($tx->product->purchase_price ?? 0);
+                return (float) ($tx->quantity * $price);
+            });
+
+        $totalStockOutValue = (clone $periodTransactionsQuery)
+            ->where('type', 'keluar')
+            ->with('product')
+            ->get()
+            ->sum(function ($tx) {
+                $price = $tx->harga_perolehan > 0 ? $tx->harga_perolehan : ($tx->product->purchase_price ?? 0);
+                return (float) ($tx->quantity * $price);
+            });
+
         $totalStockOutSubdit = (clone $periodTransactionsQuery)
             ->where('type', 'keluar')
             ->where(function ($q) {
@@ -222,7 +240,9 @@ class DashboardController extends Controller
             'totalStock',
             'totalInventoryValue',
             'totalStockIn',
+            'totalStockInValue',
             'totalStockOut',
+            'totalStockOutValue',
             'totalStockOutSubdit',
             'totalStockOutIndividu',
             'lowStockCount',

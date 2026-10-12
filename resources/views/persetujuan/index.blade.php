@@ -186,65 +186,63 @@
         {{-- Filter Tab & Tabel Persetujuan --}}
         <div class="row">
             <div class="col-sm-12">
-                <div class="card shadow-sm border-0">
-                    <div
-                        class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            @if (($category ?? 'pengadaan') === 'persediaan')
-                                <h4 class="card-title mb-0 fw-bold">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
-                                <small class="text-muted">Periksa permohonan permintaan barang dari stok persediaan yang sudah tersedia sebelum diserahkan/didistribusikan oleh PIC Distribusi</small>
-                            @else
-                                <h4 class="card-title mb-0 fw-bold">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
-                                <small class="text-muted">Periksa kebutuhan barang baru dan kuantitas permintaan sebelum memberikan persetujuan untuk diproses pembelian offline oleh Kasubag TU</small>
-                            @endif
+                <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px;">
+                    <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.5rem 1.75rem 1.6rem 1.75rem !important;">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                            <div>
+                                @if (($category ?? 'pengadaan') === 'persediaan')
+                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
+                                    <small class="text-secondary">Periksa permohonan permintaan barang dari stok persediaan yang sudah tersedia sebelum diserahkan/didistribusikan oleh PIC Distribusi</small>
+                                @else
+                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
+                                    <small class="text-secondary">Periksa kebutuhan barang baru dan kuantitas permintaan sebelum memberikan persetujuan untuk diproses pembelian offline oleh Kasubag TU</small>
+                                @endif
+                            </div>
                         </div>
 
-                        {{-- Tombol Filter Status --}}
-                        <div class="d-flex align-items-center gap-1.5 flex-wrap" id="status-filter-tabs">
+                        {{-- Tombol Filter Status dengan jarak lega dari bar filter --}}
+                        <div class="d-flex align-items-center gap-2.5 flex-wrap mb-1" id="status-filter-tabs">
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan'])) }}"
-                                class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-primary' : 'btn-light border' }} rounded-pill px-3">
+                                class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5 fw-semibold" style="font-size: 0.82rem;">
                                 Semua ({{ $totalCount }})
                             </a>
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'pending'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold' : 'btn-light border' }} rounded-pill px-3">
+                                class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
                                 Menunggu Verifikasi ({{ $pendingCount }})
                             </a>
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'approved'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
+                                class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
                                 Disetujui ({{ $approvedCount }})
                             </a>
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'rejected'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold' : 'btn-light border' }} rounded-pill px-3">
+                                class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
                                 Ditolak ({{ $rejectedCount }})
                             </a>
                         </div>
                     </div>
 
-                    {{-- Filter Bar Periode, Tipe, & Pencarian --}}
-                    <div class="p-3 bg-light border-bottom">
+                    {{-- Filter Bar Periode, Tipe, & Pencarian dengan ruang yang lega dan proporsional --}}
+                    <div class="px-4 border-bottom" style="background-color: #f8fafc; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important;">
                         <form id="persetujuan-filter-form" action="{{ route('persetujuan.index') }}" method="GET"
-                            class="row g-2 align-items-center">
+                            class="d-flex align-items-center flex-wrap gap-2.5">
                             <input type="hidden" name="category" value="{{ $category ?? 'pengadaan' }}">
                             @if ($statusFilter)
                                 <input type="hidden" name="status" value="{{ $statusFilter }}">
                             @endif
 
                             {{-- Filter Tipe --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <div style="min-width: 145px;">
+                                <select name="type" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
                                     <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit
-                                        (Kolektif)</option>
-                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>
-                                        Individu (Pegawai)</option>
+                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>🏢 Subdit</option>
+                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>👤 Individu</option>
                                 </select>
                             </div>
 
                             {{-- Filter Bulan --}}
-                            <div class="col-12 col-sm-6 col-md-3">
-                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="all" {{ $isAllMonths ?? false ? 'selected' : '' }}>Semua Bulan
-                                        (Setahun)</option>
+                            <div style="min-width: 180px;">
+                                <select name="month" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                    <option value="all" {{ $isAllMonths ?? false ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                                     @php
                                         $allMonths = [
                                             1 => 'Januari',
@@ -271,10 +269,9 @@
                             </div>
 
                             {{-- Filter Tahun --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun
-                                    </option>
+                            <div style="min-width: 135px;">
+                                <select name="year" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
                                         <option value="{{ $y }}"
                                             {{ ($selectedYear ?? null) == $y ? 'selected' : '' }}>
@@ -285,35 +282,35 @@
                             </div>
 
                             {{-- Search Input --}}
-                            <div class="col-12 col-sm-6 col-md-3">
-                                <div class="input-group input-group-sm">
+                            <div class="flex-grow-1" style="min-width: 240px; max-width: 350px;">
+                                <div class="input-group input-group-sm" style="height: 38px;">
                                     <input type="text" id="persetujuan-search" name="search" class="form-control"
-                                        placeholder="Cari kode/pemohon..." value="{{ $search ?? '' }}"
-                                        autocomplete="off">
+                                        placeholder="Cari kode tiket / pemohon..." value="{{ $search ?? '' }}"
+                                        autocomplete="off" style="font-size: 0.84rem; border-color: #cbd5e1;">
                                     <button class="btn btn-outline-secondary" type="button" id="btn-clear-search"
-                                        style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
+                                        style="{{ empty($search) ? 'display: none;' : '' }}; border-color: #cbd5e1;" title="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </button>
-                                    <button class="btn btn-primary d-inline-flex align-items-center"
+                                    <button class="btn btn-primary d-inline-flex align-items-center px-3 shadow-sm"
                                         id="btn-persetujuan-search" type="submit" title="Cari">
                                         <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none"
                                             role="status"></span>
-                                        <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24"
-                                            fill="none" stroke="currentColor" stroke-width="2">
+                                        <svg id="search-icon" width="13" height="13" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2.5">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
-                                        <span class="d-none d-lg-inline ms-1">Cari</span>
+                                        <span class="ms-1 fw-semibold d-none d-sm-inline">Cari</span>
                                     </button>
                                 </div>
                             </div>
 
                             {{-- Reset Button --}}
-                            <div class="col-12 col-sm-6 col-md-2 text-md-end" id="persetujuan-reset-container">
+                            <div id="persetujuan-reset-container">
                                 @if (
                                     !empty($typeFilter) ||
                                         !empty($search) ||
@@ -327,8 +324,13 @@
                                         }
                                     @endphp
                                     <a href="{{ route('persetujuan.index', $resetParams) }}"
-                                        class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
-                                        Reset Filter
+                                        class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 text-nowrap px-3 shadow-none"
+                                        style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;" title="Reset Filter">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                            <path d="M3 3v5h5"></path>
+                                        </svg>
+                                        Reset
                                     </a>
                                 @endif
                             </div>
@@ -1345,21 +1347,22 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
-                        @if ($requests->hasPages())
-                            <div
-                                class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 border-top">
-                                <div class="text-muted small">
-                                    Menampilkan <strong>{{ $requests->firstItem() }}</strong> -
-                                    <strong>{{ $requests->lastItem() }}</strong> dari
-                                    <strong>{{ $requests->total() }}</strong> pengajuan
-                                </div>
+                    @if ($requests->total() > 0)
+                        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                            <div class="text-muted small">
+                                Menampilkan <strong>{{ $requests->firstItem() ?? 0 }}</strong> -
+                                <strong>{{ $requests->lastItem() ?? 0 }}</strong> dari
+                                <strong>{{ $requests->total() }}</strong> pengajuan (10 per halaman)
+                            </div>
+                            @if ($requests->hasPages())
                                 <div>
                                     {{ $requests->links() }}
                                 </div>
-                            </div>
-                        @endif
-                    </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -91,7 +91,7 @@ class ApprovalController extends Controller
             }
         }
 
-        $requests = $query->paginate(15)->withQueryString();
+        $requests = $query->paginate(10)->withQueryString();
 
         return view('persetujuan.index', compact(
             'requests',

@@ -64,4 +64,31 @@ class RekapitulasiSortingTest extends TestCase
         $this->assertNotFalse($posA);
         $this->assertLessThan($posA, $posZ, 'Kategori yang memiliki barang masuk harus tampil lebih dulu dibanding kategori kosong meskipun abjadnya lebih akhir.');
     }
+
+    public function test_rekapitulasi_categories_are_paginated_to_10_per_page(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('reports.rekapitulasi'));
+
+        $response->assertStatus(200);
+
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $categoriesRekap */
+        $categoriesRekap = $response->viewData('categoriesRekap');
+
+        $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $categoriesRekap);
+        $this->assertEquals(10, $categoriesRekap->perPage());
+        $this->assertLessThanOrEqual(10, $categoriesRekap->count());
+        $this->assertGreaterThan(10, $categoriesRekap->total());
+
+        // Test page 2 navigation
+        $responsePage2 = $this->actingAs($this->user)->get(route('reports.rekapitulasi', ['page' => 2]));
+        $responsePage2->assertStatus(200);
+
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $categoriesPage2 */
+        $categoriesPage2 = $responsePage2->viewData('categoriesRekap');
+        $this->assertEquals(2, $categoriesPage2->currentPage());
+        $this->assertEquals(11, $categoriesPage2->firstItem());
+
+        // Test response contains pagination text
+        $response->assertSee('10 kategori per halaman');
+    }
 }

@@ -355,7 +355,7 @@
                             </div>
                         </div>
                         <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1.5 small fw-semibold">
-                            {{ $categoriesRekap->count() }} Kategori Terdaftar
+                            {{ method_exists($categoriesRekap, 'total') ? $categoriesRekap->total() : $categoriesRekap->count() }} Kategori Terdaftar
                         </span>
                     </div>
 
@@ -388,7 +388,9 @@
                                             $sumNilai += $cat->total_value;
                                         @endphp
                                         <tr>
-                                            <td class="text-center text-muted fw-semibold">{{ $index + 1 }}</td>
+                                            <td class="text-center text-muted fw-semibold">
+                                                {{ method_exists($categoriesRekap, 'firstItem') && $categoriesRekap->firstItem() ? ($categoriesRekap->firstItem() + $loop->index) : ($index + 1) }}
+                                            </td>
                                             <td>
                                                 <strong class="text-dark">{{ $cat->name }}</strong>
                                             </td>
@@ -427,16 +429,33 @@
                                 </tbody>
                                 <tfoot class="border-top border-2" style="background-color: #f8fafc; font-weight: 700;">
                                     <tr>
-                                        <td colspan="3" class="text-center text-uppercase py-3 text-secondary" style="font-size: 0.8rem; letter-spacing: 0.05em;">Total Rekapitulasi Keseluruhan</td>
-                                        <td class="text-center text-success py-3">+{{ number_format($sumMasuk) }} <span class="small">Pcs</span></td>
-                                        <td class="text-center text-danger py-3">-{{ number_format($sumKeluar) }} <span class="small">Pcs</span></td>
-                                        <td class="text-center text-dark py-3">{{ number_format($sumStok) }} <span class="small">Pcs</span></td>
-                                        <td class="text-end text-primary font-monospace py-3 pe-3" style="font-size: 1.05rem;">Rp {{ number_format($sumNilai, 0, ',', '.') }}</td>
+                                        <td colspan="3" class="text-center text-uppercase py-3 text-secondary" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                                            Total Rekapitulasi Keseluruhan
+                                            @if(method_exists($categoriesRekap, 'total'))
+                                                <span class="badge bg-white text-secondary border rounded-pill ms-1 fw-normal" style="font-size: 0.72rem;">(Semua {{ $categoriesRekap->total() }} Kategori)</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center text-success py-3">+{{ number_format($grandTotalMasuk ?? $sumMasuk) }} <span class="small">Pcs</span></td>
+                                        <td class="text-center text-danger py-3">-{{ number_format($grandTotalKeluar ?? $sumKeluar) }} <span class="small">Pcs</span></td>
+                                        <td class="text-center text-dark py-3">{{ number_format($grandTotalStok ?? $sumStok) }} <span class="small">Pcs</span></td>
+                                        <td class="text-end text-primary font-monospace py-3 pe-3" style="font-size: 1.05rem;">Rp {{ number_format($grandTotalNilai ?? $sumNilai, 0, ',', '.') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
                     </div>
+                    @if (method_exists($categoriesRekap, 'total') && $categoriesRekap->total() > 0)
+                        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                            <div class="text-muted small">
+                                Menampilkan <strong>{{ $categoriesRekap->firstItem() ?? 0 }}</strong> - <strong>{{ $categoriesRekap->lastItem() ?? 0 }}</strong> dari <strong>{{ $categoriesRekap->total() }}</strong> kategori ATK (10 kategori per halaman)
+                            </div>
+                            @if ($categoriesRekap->hasPages())
+                                <div>
+                                    {{ $categoriesRekap->links() }}
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

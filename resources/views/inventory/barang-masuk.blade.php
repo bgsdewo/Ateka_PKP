@@ -169,12 +169,6 @@
                                     Filter: <strong>{{ $month ? \Carbon\Carbon::createFromDate(2026, (int)$month, 1)->translatedFormat('F') : '' }} {{ $year ?? '' }}</strong>
                                 </span>
                             @endif
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                                Total: <strong>{{ number_format($totalTransactions) }} Transaksi</strong>
-                                @if ($totalQuantity > 0)
-                                    &bull; <strong>+{{ number_format($totalQuantity) }} Unit</strong>
-                                @endif
-                            </span>
                         </div>
                     </div>
 

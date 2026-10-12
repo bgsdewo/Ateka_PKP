@@ -617,7 +617,7 @@
                         </div>
                         <div>
                             <h3 class="mb-0 fw-bold text-success fs-4">Rp {{ number_format($totalInventoryValue ?? 0, 0, ',', '.') }}</h3>
-                            <small class="text-muted" style="font-size: 0.75rem;">Total nilai perolehan persediaan</small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Sisa nilai fisik di gudang (Masuk &minus; Keluar)</small>
                         </div>
                     </div>
                 </div>
@@ -626,8 +626,13 @@
                     <div class="kpi-widget-card h-100 d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Barang Masuk (Pengadaan)</span>
-                            <h2 class="mb-0 fw-bold text-success fs-3">+{{ number_format($totalStockIn) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Penerimaan pada {{ $selectedPeriodLabel }}</small>
+                            <div class="d-flex align-items-baseline gap-2 mb-1 flex-wrap">
+                                <h2 class="mb-0 fw-bold text-success fs-3">+{{ number_format($totalStockIn) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold" style="font-size: 0.78rem;">
+                                    Rp {{ number_format($totalStockInValue ?? 0, 0, ',', '.') }}
+                                </span>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.75rem;">Total pengadaan pada {{ $selectedPeriodLabel }}</small>
                         </div>
                         <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald); width: 44px; height: 44px;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -642,7 +647,12 @@
                     <div class="kpi-widget-card h-100 d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Barang Keluar (Distribusi)</span>
-                            <h2 class="mb-0 fw-bold text-danger fs-3">-{{ number_format($totalStockOut) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
+                            <div class="d-flex align-items-baseline gap-2 mb-1 flex-wrap">
+                                <h2 class="mb-0 fw-bold text-danger fs-3">-{{ number_format($totalStockOut) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold" style="font-size: 0.78rem;">
+                                    -Rp {{ number_format($totalStockOutValue ?? 0, 0, ',', '.') }}
+                                </span>
+                            </div>
                             <small class="text-muted" style="font-size: 0.75rem;">
                                 Subdit: <strong class="text-info">{{ number_format($totalStockOutSubdit ?? 0) }} Pcs</strong> &bull; Individu: <strong class="text-secondary">{{ number_format($totalStockOutIndividu ?? 0) }} Pcs</strong>
                             </small>

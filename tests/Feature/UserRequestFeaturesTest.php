@@ -446,5 +446,24 @@ class UserRequestFeaturesTest extends TestCase
         $response->assertSee('title="Dashboard"', false);
         $response->assertSee('title="Permintaan ATK"', false);
     }
+
+    public function test_persetujuan_and_rekapitulasi_permintaan_paginated_to_10()
+    {
+        // Check persetujuan pagination
+        $resApproval = $this->actingAs($this->buUtami)->get(route('persetujuan.index'));
+        $resApproval->assertStatus(200);
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $requestsApproval */
+        $requestsApproval = $resApproval->viewData('requests');
+        $this->assertEquals(10, $requestsApproval->perPage());
+        $resApproval->assertSee('10 per halaman');
+
+        // Check rekapitulasi-permintaan pagination
+        $resRecap = $this->actingAs($this->buUtami)->get(route('rekapitulasi-permintaan.index'));
+        $resRecap->assertStatus(200);
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $requestsRecap */
+        $requestsRecap = $resRecap->viewData('requests');
+        $this->assertEquals(10, $requestsRecap->perPage());
+        $resRecap->assertSee('10 per halaman');
+    }
 }
 

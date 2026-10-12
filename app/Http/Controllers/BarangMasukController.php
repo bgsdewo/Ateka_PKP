@@ -63,6 +63,10 @@ class BarangMasukController extends Controller
 
         $totalQuantity = $transactions->sum('quantity');
         $totalTransactions = $transactions->count();
+        $totalNominal = $transactions->sum(function ($tx) {
+            $price = $tx->harga_perolehan > 0 ? $tx->harga_perolehan : ($tx->product->purchase_price ?? 0);
+            return (float) ($tx->quantity * $price);
+        });
 
         return view('inventory.barang-masuk', compact(
             'transactions',
@@ -72,7 +76,8 @@ class BarangMasukController extends Controller
             'endDate',
             'availableYears',
             'totalQuantity',
-            'totalTransactions'
+            'totalTransactions',
+            'totalNominal'
         ));
     }
 }

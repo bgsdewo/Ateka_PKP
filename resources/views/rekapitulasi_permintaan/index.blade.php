@@ -43,144 +43,184 @@
         {{-- 4 Kartu KPI Rekapitulasi --}}
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Total Usulan Masuk</span>
-                            <span class="badge bg-primary text-white rounded-pill">Tiket</span>
+                <div class="card h-100 shadow-sm border-0 p-3" style="border-radius: 14px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Usulan Masuk</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--brand-primary-light); color: var(--brand-primary); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-primary mb-0">{{ $totalRequests }}</h2>
-                        <small class="text-muted">{{ $subditCount }} Subdit &bull; {{ $individuCount }} Individu</small>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-1">
+                        <h2 class="fw-bold text-primary mb-0 fs-3">{{ $totalRequests }}</h2>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Tiket</span>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">{{ $subditCount }} Subdit &bull; {{ $individuCount }} Individu</small>
                 </div>
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Total Barang Diminta</span>
-                            <span class="badge bg-info text-white rounded-pill">Jenis</span>
+                <div class="card h-100 shadow-sm border-0 p-3" style="border-radius: 14px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Barang Diminta</span>
+                        <div class="kpi-icon-squircle" style="background-color: rgba(6, 182, 212, 0.12); color: #0891b2; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-info mb-0">{{ number_format($totalItemTypes) }}</h2>
-                        <small class="text-muted">Ragam jenis barang diajukan</small>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-1">
+                        <h2 class="fw-bold text-info mb-0 fs-3">{{ number_format($totalItemTypes) }}</h2>
+                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Jenis</span>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Ragam jenis barang diajukan</small>
                 </div>
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Total Disetujui TU</span>
-                            <span class="badge bg-success text-white rounded-pill">Tiket</span>
+                <div class="card h-100 shadow-sm border-0 p-3" style="border-radius: 14px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Disetujui TU</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-success mb-0">{{ $approvedRequestsCount }}</h2>
-                        <small class="text-muted">{{ $subditApprovedCount }} Subdit &bull; {{ $individuApprovedCount }} Individu</small>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-1">
+                        <h2 class="fw-bold text-success mb-0 fs-3">{{ $approvedRequestsCount }}</h2>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Tiket</span>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">{{ $subditApprovedCount }} Subdit &bull; {{ $individuApprovedCount }} Individu</small>
                 </div>
             </div>
 
             <div class="col-6 col-md-3">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase">Perlu Verifikasi</span>
-                            <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                <div class="card h-100 shadow-sm border-0 p-3" style="border-radius: 14px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Perlu Verifikasi</span>
+                        <div class="kpi-icon-squircle" style="background-color: var(--accent-amber-light); color: var(--accent-amber); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
                         </div>
-                        <h2 class="fw-bold text-warning mb-0">{{ $pendingCount }}</h2>
-                        <small class="text-muted">{{ $subditPendingCount }} Subdit &bull; {{ $individuPendingCount }} Individu</small>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-1">
+                        <h2 class="fw-bold text-warning mb-0 fs-3">{{ $pendingCount }}</h2>
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Pending</span>
+                    </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">{{ $subditPendingCount }} Subdit &bull; {{ $individuPendingCount }} Individu</small>
                 </div>
             </div>
         </div>
 
         {{-- Main Card --}}
-        <div class="card shadow-sm border-0">
-            <div class="card-header border-bottom py-3">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px;">
+            <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.35rem 1.75rem !important;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h4 class="card-title mb-0 fw-bold">Rekapitulasi Kebutuhan & Permintaan ATK</h4>
-                        <small class="text-muted">Periode: <strong>{{ $periodLabel }}</strong></small>
+                        <h4 class="card-title mb-1 fw-bold text-dark">Rekapitulasi Kebutuhan &amp; Permintaan ATK</h4>
+                        <small class="text-secondary">Periode: <strong>{{ $periodLabel }}</strong> &bull; Rekapitulasi seluruh usulan permohonan ATK</small>
                     </div>
                 </div>
+            </div>
 
-                {{-- Filter Bar --}}
-                <div class="p-3 bg-light rounded border">
-                    <form action="{{ route('rekapitulasi-permintaan.index') }}" method="GET" class="row g-2 align-items-center">
+            {{-- Filter Bar Toolbar Luas & Proporsional (Unclipped) --}}
+            <div class="px-4 py-3.5 border-bottom" style="background-color: #f8fafc; padding: 1.15rem 1.75rem !important;">
+                <form action="{{ route('rekapitulasi-permintaan.index') }}" method="GET" class="d-flex align-items-center flex-wrap gap-2.5">
 
-                        {{-- Filter Tipe --}}
-                        <div class="col-12 col-sm-6 col-md-2">
-                            <label class="form-label small fw-bold mb-1">Tipe Pemohon</label>
-                            <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="">Semua Tipe</option>
-                                <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
-                                <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
-                            </select>
+                    {{-- Filter Tipe --}}
+                    <div style="min-width: 145px;">
+                        <select name="type" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                            <option value="">Semua Tipe</option>
+                            <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>🏢 Subdit</option>
+                            <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>👤 Individu</option>
+                        </select>
+                    </div>
+
+                    {{-- Filter Status --}}
+                    <div style="min-width: 175px;">
+                        <select name="status" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                            <option value="all" {{ empty($statusFilter) || $statusFilter === 'all' ? 'selected' : '' }}>Semua Status</option>
+                            <option value="pending" {{ ($statusFilter ?? '') === 'pending' ? 'selected' : '' }}>Menunggu Verifikasi</option>
+                            <option value="approved" {{ ($statusFilter ?? '') === 'approved' ? 'selected' : '' }}>Disetujui TU</option>
+                            <option value="distributed" {{ ($statusFilter ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
+                            <option value="rejected" {{ ($statusFilter ?? '') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                    </div>
+
+                    {{-- Filter Bulan --}}
+                    <div style="min-width: 180px;">
+                        <select name="month" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                            <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
+                            @php
+                                $monthsList = [
+                                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                ];
+                            @endphp
+                            @foreach ($monthsList as $num => $mName)
+                                <option value="{{ $num }}" {{ !($isAllMonths ?? false) && ($selectedMonth ?? null) == $num ? 'selected' : '' }}>
+                                    {{ $mName }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Filter Tahun --}}
+                    <div style="min-width: 135px;">
+                        <select name="year" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                            <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                            @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                <option value="{{ $y }}" {{ ($selectedYear ?? null) == $y ? 'selected' : '' }}>
+                                    Tahun {{ $y }}
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    {{-- Search Input Group --}}
+                    <div class="flex-grow-1" style="min-width: 240px; max-width: 350px;">
+                        <div class="input-group input-group-sm" style="height: 38px;">
+                            <input type="text" name="search" class="form-control" placeholder="Cari kode / pemohon / barang..."
+                                value="{{ $search ?? '' }}" style="font-size: 0.84rem; border-color: #cbd5e1;">
+                            <button class="btn btn-primary d-inline-flex align-items-center px-3 shadow-sm fw-semibold" type="submit">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                Cari
+                            </button>
                         </div>
+                    </div>
 
-                        {{-- Filter Status --}}
-                        <div class="col-12 col-sm-6 col-md-2">
-                            <label class="form-label small fw-bold mb-1">Status Verifikasi</label>
-                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="all" {{ empty($statusFilter) || $statusFilter === 'all' ? 'selected' : '' }}>Semua Status</option>
-                                <option value="pending" {{ ($statusFilter ?? '') === 'pending' ? 'selected' : '' }}>Menunggu Verifikasi</option>
-                                <option value="approved" {{ ($statusFilter ?? '') === 'approved' ? 'selected' : '' }}>Disetujui TU</option>
-                                <option value="distributed" {{ ($statusFilter ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
-                                <option value="rejected" {{ ($statusFilter ?? '') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
-                        </div>
-
-                        {{-- Filter Bulan --}}
-                        <div class="col-12 col-sm-6 col-md-2">
-                            <label class="form-label small fw-bold mb-1">Bulan</label>
-                            <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan</option>
-                                @php
-                                    $monthsList = [
-                                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                                    ];
-                                @endphp
-                                @foreach ($monthsList as $num => $mName)
-                                    <option value="{{ $num }}" {{ !($isAllMonths ?? false) && ($selectedMonth ?? null) == $num ? 'selected' : '' }}>
-                                        {{ $mName }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Filter Tahun --}}
-                        <div class="col-12 col-sm-6 col-md-2">
-                            <label class="form-label small fw-bold mb-1">Tahun</label>
-                            <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
-                                @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                                    <option value="{{ $y }}" {{ ($selectedYear ?? null) == $y ? 'selected' : '' }}>
-                                        Tahun {{ $y }}
-                                    </option>
-                                @endfor
-                            </select>
-                        </div>
-
-                        {{-- Search Input --}}
-                        <div class="col-12 col-sm-8 col-md-3">
-                            <label class="form-label small fw-bold mb-1">Pencarian</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" name="search" class="form-control" placeholder="Cari kode/pemohon/barang..."
-                                    value="{{ $search ?? '' }}">
-                                <button class="btn btn-primary" type="submit">Cari</button>
-                            </div>
-                        </div>
-
-                        {{-- Reset --}}
-                        <div class="col-12 col-sm-4 col-md-1 d-flex align-items-end">
+                    {{-- Standalone Reset Button --}}
+                    @if (!empty($typeFilter) || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false) || (!empty($statusFilter) && $statusFilter !== 'all'))
+                        <div>
                             <a href="{{ route('rekapitulasi-permintaan.index') }}" 
-                               class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">Reset</a>
+                               class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 text-nowrap px-3 shadow-none" 
+                               style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;" 
+                               title="Reset Filter">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                    <path d="M3 3v5h5"></path>
+                                </svg>
+                                Reset
+                            </a>
                         </div>
-                    </form>
-                </div>
+                    @endif
+                </form>
             </div>
 
             <div class="card-body p-4">
@@ -409,13 +449,20 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
 
-                    {{-- Pagination --}}
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted">Menampilkan {{ $requests->firstItem() ?? 0 }} - {{ $requests->lastItem() ?? 0 }} dari {{ $requests->total() }} usulan</small>
-                        {{ $requests->links() }}
+                @if ($requests->total() > 0)
+                    <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                        <div class="text-muted small">
+                            Menampilkan <strong>{{ $requests->firstItem() ?? 0 }}</strong> - <strong>{{ $requests->lastItem() ?? 0 }}</strong> dari <strong>{{ $requests->total() }}</strong> usulan permohonan (10 per halaman)
+                        </div>
+                        @if ($requests->hasPages())
+                            <div>
+                                {{ $requests->links() }}
+                            </div>
+                        @endif
                     </div>
+                @endif
             </div>
-        </div>
     </div>
 @endsection

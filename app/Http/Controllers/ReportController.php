@@ -6,6 +6,8 @@ use App\Models\StockTransaction;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -217,16 +219,46 @@ class ReportController extends Controller
         $totalAllStock = Product::sum('stock');
         $totalAllValue = Product::all()->sum(fn($p) => $p->stock * ($p->purchase_price ?? 0));
 
-        return view('reports.rekapitulasi', compact(
-            'categoriesRekap',
-            'year',
-            'month',
-            'type',
-            'recipientType',
-            'totalAllProducts',
-            'totalAllStock',
-            'totalAllValue'
-        ));
+        // Grand totals mutasi seluruh kategori (untuk footer tabel)
+        $grandTotalMasuk = $categoriesRekap->sum('total_in');
+        $grandTotalKeluar = $categoriesRekap->sum('total_out');
+        $grandTotalStok = $categoriesRekap->sum('current_stock');
+        $grandTotalNilai = $categoriesRekap->sum('total_value');
+        $totalCategoriesCount = $categoriesRekap->count();
+
+        // Paginasi: 10 kategori per halaman
+        $perPage = (int) $request->get('per_page', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        $currentPage = Paginator::resolveCurrentPage('page') ?: 1;
+        $currentPageItems = $categoriesRekap->forPage($currentPage, $perPage)->values();
+
+        $categoriesPaginated = (new LengthAwarePaginator(
+            $currentPageItems,
+            $totalCategoriesCount,
+            $perPage,
+            $currentPage,
+            [
+                'path' => Paginator::resolveCurrentPath(),
+            ]
+        ))->withQueryString();
+
+        return view('reports.rekapitulasi', [
+            'categoriesRekap' => $categoriesPaginated,
+            'year' => $year,
+            'month' => $month,
+            'type' => $type,
+            'recipientType' => $recipientType,
+            'totalAllProducts' => $totalAllProducts,
+            'totalAllStock' => $totalAllStock,
+            'totalAllValue' => $totalAllValue,
+            'grandTotalMasuk' => $grandTotalMasuk,
+            'grandTotalKeluar' => $grandTotalKeluar,
+            'grandTotalStok' => $grandTotalStok,
+            'grandTotalNilai' => $grandTotalNilai,
+        ]);
     }
 
     /**
