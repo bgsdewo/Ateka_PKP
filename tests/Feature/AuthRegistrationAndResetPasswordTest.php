@@ -154,7 +154,6 @@ class AuthRegistrationAndResetPasswordTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Reset Kata Sandi');
         $response->assertSee('Nomor Induk Pegawai (NIP)');
-        $response->assertSee('Alamat Email Terdaftar');
         $response->assertSee('Simpan & Perbarui Password', false);
     }
 

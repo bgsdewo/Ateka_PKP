@@ -771,7 +771,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* ==============================================================================
    12. FORM CONTROLS & FLOATING LABELS
    ============================================================================== */
-.form-control, .form-select {
+.form-control {
     font-family: var(--font-sans) !important;
     border: 1px solid var(--border-subtle) !important;
     border-radius: var(--radius-sm) !important;
@@ -780,6 +780,28 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: #1e293b !important;
     background-color: #ffffff !important;
     transition: all 0.22s ease !important;
+}
+
+.form-select {
+    font-family: var(--font-sans) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-sm) !important;
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.55rem !important;
+    padding-left: 0.85rem !important;
+    padding-right: 2.25rem !important;
+    font-size: 0.9rem !important;
+    color: #1e293b !important;
+    background-color: #ffffff !important;
+    transition: all 0.22s ease !important;
+}
+
+.form-select-sm {
+    padding-top: 0.38rem !important;
+    padding-bottom: 0.38rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 2rem !important;
+    font-size: 0.825rem !important;
 }
 
 .form-control:focus, .form-select:focus {
@@ -834,3 +856,182 @@ body.modal-open .katalog-card-item {
     filter: none !important;
     perspective: none !important;
 }
+
+/* ==============================================================================
+   16. MODERN ALERTS & FLOATING TOAST SYSTEM (GOVTECH 2026)
+   ============================================================================== */
+.alert {
+    border-radius: var(--radius-lg, 16px) !important;
+    border: 1px solid transparent !important;
+    padding: 1rem 1.25rem !important;
+    position: relative !important;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(236, 253, 245, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%) !important;
+    border-color: rgba(16, 185, 129, 0.28) !important;
+    color: #064e3b !important;
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(255, 241, 242, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%) !important;
+    border-color: rgba(225, 29, 72, 0.28) !important;
+    color: #881337 !important;
+    box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(240, 249, 255, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%) !important;
+    border-color: rgba(2, 132, 199, 0.28) !important;
+    color: #082f49 !important;
+    box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(255, 251, 235, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%) !important;
+    border-color: rgba(217, 119, 6, 0.28) !important;
+    color: #78350f !important;
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.alert .btn-close {
+    border-radius: 50% !important;
+    padding: 0.65rem !important;
+    opacity: 0.55 !important;
+    transition: all 0.2s ease !important;
+}
+.alert .btn-close:hover {
+    opacity: 1 !important;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Modern Floating Toast Notification Card (Center Screen) */
+.modern-floating-toast {
+    position: fixed;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 490px;
+    max-width: calc(100vw - 32px);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    border-radius: 18px;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    box-shadow: 0 25px 45px -10px rgba(15, 23, 42, 0.18), 0 10px 20px -5px rgba(16, 185, 129, 0.14);
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    animation: modernToastSlideInCenter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modern-floating-toast.toast-error {
+    border-color: rgba(225, 29, 72, 0.28);
+    box-shadow: 0 25px 45px -10px rgba(15, 23, 42, 0.18), 0 10px 20px -5px rgba(225, 29, 72, 0.14);
+}
+
+.modern-floating-toast.toast-hiding {
+    transform: translate(-50%, -100%) scale(0.92);
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes modernToastSlideInCenter {
+    from {
+        transform: translate(-50%, -100%) scale(0.92);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modern-toast-icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    flex-shrink: 0;
+}
+
+.modern-toast-icon-badge.badge-error {
+    background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+}
+
+.btn-close-toast {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-close-toast:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.modern-toast-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3.5px;
+    width: 100%;
+    background: linear-gradient(90deg, #059669, #34d399);
+    transition: width 0.05s linear;
+}
+
+.modern-floating-toast.toast-error .modern-toast-progress-bar {
+    background: linear-gradient(90deg, #e11d48, #fb7185);
+}
+
+@media (max-width: 576px) {
+    .modern-floating-toast {
+        top: 16px !important;
+        left: 16px !important;
+        right: 16px !important;
+        transform: none !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+    @keyframes modernToastSlideInCenter {
+        from {
+            transform: translateY(-100%) scale(0.92);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+    .modern-floating-toast.toast-hiding {
+        transform: translateY(-100%) scale(0.92);
+        opacity: 0;
+    }
+}
+
+/* Safety Fallback: Ensure no elements are ever hidden by uninitialized AOS animation attributes */
+[data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+}
+

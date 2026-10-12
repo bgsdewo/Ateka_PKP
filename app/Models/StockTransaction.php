@@ -78,4 +78,39 @@ class StockTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function requestItem()
+    {
+        return $this->belongsTo(RequestItem::class, 'no_faktur', 'request_code');
+    }
+
+    public function getRecipientNameAttribute(): string
+    {
+        if ($this->type !== 'keluar') {
+            return '-';
+        }
+
+        // 1. Cek dari nama penerima fisik hasil serah terima distribusi
+        if ($this->requestItem && !empty($this->requestItem->receiver_name)) {
+            return $this->requestItem->receiver_name;
+        }
+
+        // 2. Cek uraian penerima
+        if (!empty($this->uraian)) {
+            return $this->uraian;
+        }
+
+        // 3. Cek nama pemohon di tiket RequestItem
+        if ($this->requestItem && $this->requestItem->user) {
+            $pos = $this->requestItem->user->position ? ' (' . $this->requestItem->user->position . ')' : '';
+            return $this->requestItem->user->name . $pos;
+        }
+
+        // 4. Coba ekstrak nama dari catatan transaksi pengeluaran
+        if (preg_match('/Pengeluaran.*?\buntuk\s+(.*?)\s+\[/i', $this->note ?? '', $m)) {
+            return trim($m[1]);
+        }
+
+        return '-';
+    }
 }

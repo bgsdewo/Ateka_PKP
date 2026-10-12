@@ -31,36 +31,74 @@
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
-        {{-- Flash Messages Banner --}}
+        {{-- Flash Notification Modern Floating Toast --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-3 p-3 mb-4 rounded-3" role="alert" style="background: linear-gradient(90deg, #d1e7dd 0%, #e8f5e9 100%); border-left: 5px solid #198754 !important;">
-                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
+            <div id="modern-toast-notification" class="modern-floating-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex align-items-start gap-3 p-3">
+                    <div class="modern-toast-icon-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="flex-grow-1 pe-2">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-0.5 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.04em;">BERHASIL DISETUJUI</span>
+                            <span class="text-muted" style="font-size: 0.72rem;">Inventori ATK &bull; Kemen PKP</span>
+                        </div>
+                        @php
+                            $cleanedSuccess = trim(preg_replace('/\s+/', ' ', preg_replace('/\s*\(\s*REQ-[A-Za-z0-9\-]+\s*\)\s*/i', ' ', session('success'))));
+                            if (str_contains(strtolower($cleanedSuccess), 'pengadaan')) {
+                                $toastTitle = 'Permintaan Pengadaan Berhasil Disetujui!';
+                            } elseif (str_contains(strtolower($cleanedSuccess), 'ditolak')) {
+                                $toastTitle = 'Permintaan Berhasil Ditolak';
+                            } else {
+                                $toastTitle = 'Permintaan Berhasil Disetujui!';
+                            }
+                        @endphp
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.93rem;">{{ $toastTitle }}</h6>
+                        <div class="text-secondary small toast-message" style="line-height: 1.45; font-size: 0.84rem;">
+                            {{ $cleanedSuccess }}
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-toast ms-auto" aria-label="Close" onclick="dismissModernToast()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <div class="flex-grow-1">
-                    <h6 class="alert-heading fw-bold mb-0 text-success">Permintaan Berhasil Disetujui!</h6>
-                    <div class="small text-dark mt-0.5">{{ session('success') }}</div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="modern-toast-progress-bar" id="toast-progress-bar"></div>
             </div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 d-flex align-items-center gap-3 p-3 mb-4 rounded-3" role="alert" style="background: linear-gradient(90deg, #f8d7da 0%, #ffebee 100%); border-left: 5px solid #dc3545 !important;">
-                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
+            <div id="modern-toast-notification" class="modern-floating-toast toast-error" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex align-items-start gap-3 p-3">
+                    <div class="modern-toast-icon-badge badge-error">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <div class="flex-grow-1 pe-2">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.04em;">PERHATIAN</span>
+                            <span class="text-muted" style="font-size: 0.72rem;">Inventori ATK &bull; Kemen PKP</span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.93rem;">Gagal Memproses Permintaan</h6>
+                        <div class="text-secondary small toast-message" style="line-height: 1.45; font-size: 0.84rem;">
+                            {{ session('error') }}
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-toast ms-auto" aria-label="Close" onclick="dismissModernToast()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <div class="flex-grow-1">
-                    <h6 class="alert-heading fw-bold mb-0 text-danger">Perhatian / Gagal Memproses</h6>
-                    <div class="small text-dark mt-0.5">{{ session('error') }}</div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="modern-toast-progress-bar" id="toast-progress-bar"></div>
             </div>
         @endif
 
@@ -324,16 +362,28 @@
                                             $rejectedProcurementsCount = $userPastProcurements->where('status', 'rejected')->count();
 
                                             // History item untuk deteksi stocking/hoarding
-                                            $currentItems = $req->details->pluck('item_name')->map(fn($n) => strtolower(trim($n)))->toArray();
-                                            $pastItemHistory = [];
+                                            $reqMonth = $req->created_at ? $req->created_at->format('Y-m') : now()->format('Y-m');
+                                            $currentItems = $req->details->map(function($d) {
+                                                $spec = trim($d->specification ?? '');
+                                                $name = trim($d->item_name);
+                                                return !empty($spec) && !str_contains(strtolower($name), strtolower($spec))
+                                                    ? strtolower($name . '__' . $spec)
+                                                    : strtolower($name);
+                                            })->toArray();
 
+                                            $pastItemHistory = [];
                                             foreach ($userPastRequests as $pastReq) {
                                                 foreach ($pastReq->details as $pd) {
-                                                    $normalizedName = strtolower(trim($pd->item_name));
-                                                    if (!isset($pastItemHistory[$normalizedName])) {
-                                                        $pastItemHistory[$normalizedName] = [];
+                                                    $pSpec = trim($pd->specification ?? '');
+                                                    $pName = trim($pd->item_name);
+                                                    $normKey = !empty($pSpec) && !str_contains(strtolower($pName), strtolower($pSpec))
+                                                        ? strtolower($pName . '__' . $pSpec)
+                                                        : strtolower($pName);
+
+                                                    if (!isset($pastItemHistory[$normKey])) {
+                                                        $pastItemHistory[$normKey] = [];
                                                     }
-                                                    $pastItemHistory[$normalizedName][] = [
+                                                    $pastItemHistory[$normKey][] = [
                                                         'request_code' => $pastReq->request_code,
                                                         'is_procurement' => $pastReq->is_procurement,
                                                         'date' => $pastReq->created_at,
@@ -346,11 +396,17 @@
                                             }
 
                                             // Cek apakah ada barang saat ini yang pernah diajukan sebelumnya oleh pemohon ini
+                                            $hasRepeatedItemsSameMonth = false;
                                             $hasRepeatedItems = false;
                                             foreach ($currentItems as $cItem) {
                                                 if (!empty($pastItemHistory[$cItem])) {
                                                     $hasRepeatedItems = true;
-                                                    break;
+                                                    foreach ($pastItemHistory[$cItem] as $pih) {
+                                                        if ($pih['date'] && $pih['date']->format('Y-m') === $reqMonth) {
+                                                            $hasRepeatedItemsSameMonth = true;
+                                                            break 2;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         @endphp
@@ -387,24 +443,30 @@
                                                         <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
                                                             style="font-size: 0.72rem;"
                                                             data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
-                                                            title="Lihat riwayat usulan pengadaan pemohon untuk mencegah penumpukan stok">
+                                                            title="Lihat riwayat akun pemohon untuk pengawasan kebutuhan ATK">
                                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <circle cx="12" cy="12" r="10"></circle>
                                                                 <polyline points="12 6 12 12 16 14"></polyline>
                                                             </svg>
-                                                            History Pengadaan ({{ $totalProcurementsCount }})
+                                                            Riwayat Akun Pemohon
                                                         </button>
 
-                                                        @if ($hasRepeatedItems)
-                                                            <span class="badge bg-warning-subtle text-dark border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
+                                                        @if ($hasRepeatedItemsSameMonth)
+                                                            <span class="badge bg-danger-subtle text-danger border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
                                                                 style="font-size: 0.68rem;"
-                                                                title="Peringatan: Pemohon ini pernah mengajukan barang serupa sebelumnya!">
-                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                title="Peringatan: Pemohon ini pernah mengajukan barang yang sama di bulan ini!">
+                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-danger">
                                                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                                                                     <line x1="12" y1="9" x2="12" y2="13"></line>
                                                                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                                                                 </svg>
-                                                                Pernah Minta Serupa
+                                                                Pernah Minta Serupa (Bulan Ini)
+                                                            </span>
+                                                        @elseif ($hasRepeatedItems)
+                                                            <span class="badge bg-warning-subtle text-dark border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
+                                                                style="font-size: 0.68rem;"
+                                                                title="Pemohon pernah mengajukan barang ini pada periode bulan sebelumnya">
+                                                                Pernah Minta Serupa (Bulan Lalu)
                                                             </span>
                                                         @endif
                                                     </div>
@@ -599,10 +661,10 @@
 
                                                                         {{-- Alert Pencegahan Penimbunan / Stocking Barang --}}
                                                                         @if (($category ?? 'pengadaan') !== 'persediaan' && ($totalProcurementsCount > 0 || $hasRepeatedItems))
-                                                                            <div class="alert alert-warning border mb-3 p-3 small rounded-3" style="background: #fffbeb; border-color: #fde68a !important;">
+                                                                            <div class="alert {{ $hasRepeatedItemsSameMonth ? 'alert-danger border-danger' : 'alert-warning border-warning' }} border mb-3 p-3 small rounded-3" style="background: {{ $hasRepeatedItemsSameMonth ? '#fff5f5' : '#fffbeb' }};">
                                                                                 <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
-                                                                                    <div class="d-flex align-items-center gap-1.5 fw-bold text-dark">
-                                                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                                    <div class="d-flex align-items-center gap-1.5 fw-bold {{ $hasRepeatedItemsSameMonth ? 'text-danger' : 'text-dark' }}">
+                                                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                                             <circle cx="12" cy="12" r="10"></circle>
                                                                                             <polyline points="12 6 12 12 16 14"></polyline>
                                                                                         </svg>
@@ -617,9 +679,13 @@
                                                                                 <div class="text-secondary">
                                                                                     Pemohon ini tercatat telah memiliki <strong>{{ $totalProcurementsCount }} usulan pengadaan</strong> sebelumnya 
                                                                                     ({{ $approvedProcurementsCount }} disetujui, {{ $rejectedProcurementsCount }} ditolak).
-                                                                                    @if ($hasRepeatedItems)
-                                                                                        <div class="mt-1 text-danger fw-semibold">
-                                                                                            ⚠️ Perhatian: Pemohon pernah mengajukan barang serupa pada pengajuan terdahulu. Pertimbangkan kuantitas yang disetujui untuk mencegah penumpukan/penimbunan stok di unit kerja pemohon.
+                                                                                    @if ($hasRepeatedItemsSameMonth)
+                                                                                        <div class="mt-1 text-danger fw-bold">
+                                                                                            ⚠️ Perhatian: Pemohon pernah mengajukan barang yang sama pada bulan ini ({{ $req->created_at->translatedFormat('F Y') }}). Harap tinjau kebutuhan riil agar tidak terjadi penumpukan stok barang di unit kerja pemohon.
+                                                                                        </div>
+                                                                                    @elseif ($hasRepeatedItems)
+                                                                                        <div class="mt-1 text-dark fw-medium">
+                                                                                            ℹ️ Informasi: Pemohon pernah mengajukan barang serupa pada periode bulan sebelumnya.
                                                                                         </div>
                                                                                     @endif
                                                                                 </div>
@@ -941,14 +1007,14 @@
                                                             </div>
                                                             <div class="modal-body p-4">
                                                                 {{-- Banner Edukasi / Kontrol Kasubag TU --}}
-                                                                <div class="alert alert-info py-2.5 px-3 small mb-3 border-0 rounded-3 d-flex align-items-center gap-2" style="background: #e0f2fe; border-left: 4px solid #0284c7 !important;">
+                                                                <div class="alert alert-info py-2 px-3 small mb-3 border-0 rounded-3 d-flex align-items-center gap-2" style="background: #e0f2fe; border-left: 4px solid #0284c7 !important;">
                                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info flex-shrink-0">
                                                                         <circle cx="12" cy="12" r="10"></circle>
                                                                         <line x1="12" y1="16" x2="12" y2="12"></line>
                                                                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                                                     </svg>
                                                                     <div>
-                                                                        <strong>Fitur Pengawasan Stok Kasubag TU:</strong> Gunakan data rekapitulasi riwayat pengadaan ini untuk memastikan pemohon tidak menimbun atau men-stock barang yang baru saja dibeli/diterima.
+                                                                        <strong>Pengawasan Stok:</strong> Pantau permintaan barang yang sama secara berulang dalam bulan ini.
                                                                     </div>
                                                                 </div>
 
@@ -995,29 +1061,85 @@
                                                                 {{-- Seksi 1: Ringkasan Akumulasi Barang yang Pernah Diterima Pemohon --}}
                                                                 @php
                                                                     $itemSummary = [];
+                                                                    $reqMonth = $req->created_at ? $req->created_at->format('Y-m') : now()->format('Y-m');
+                                                                    $reqMonthName = $req->created_at ? $req->created_at->translatedFormat('F Y') : now()->translatedFormat('F Y');
+
+                                                                    // Kumpulkan item dari riwayat lampau pemohon
                                                                     foreach ($userPastRequests as $pReq) {
                                                                         foreach ($pReq->details as $pDetail) {
-                                                                            $k = strtolower(trim($pDetail->item_name));
+                                                                            $pSpec = trim($pDetail->specification ?? '');
+                                                                            $pName = trim($pDetail->item_name);
+
+                                                                            if (!empty($pSpec) && !str_contains(strtolower($pName), strtolower($pSpec))) {
+                                                                                $displayName = $pName . ' (' . $pSpec . ')';
+                                                                                $k = strtolower($pName . '__' . $pSpec);
+                                                                            } else {
+                                                                                $displayName = $pName;
+                                                                                $k = strtolower($pName);
+                                                                            }
+
+                                                                            $pReqDate = $pReq->created_at;
+                                                                            $isThisMonth = ($pReqDate && $pReqDate->format('Y-m') === $reqMonth);
+
                                                                             if (!isset($itemSummary[$k])) {
                                                                                 $itemSummary[$k] = [
-                                                                                    'name' => $pDetail->item_name,
+                                                                                    'name' => $displayName,
                                                                                     'unit' => $pDetail->item_unit,
                                                                                     'total_requested' => 0,
                                                                                     'total_approved' => 0,
                                                                                     'frequency' => 0,
-                                                                                    'last_date' => $pReq->created_at,
+                                                                                    'last_date' => $pReqDate,
                                                                                     'last_status' => $pReq->status,
+                                                                                    'same_month_count' => 0,
+                                                                                    'same_month_dates' => collect(),
+                                                                                    'is_current_ticket_only' => false,
                                                                                 ];
                                                                             }
+
                                                                             $itemSummary[$k]['total_requested'] += $pDetail->quantity;
                                                                             if (in_array($pReq->status, ['approved', 'distributed'])) {
                                                                                 $itemSummary[$k]['total_approved'] += ($pDetail->effective_quantity ?? $pDetail->quantity);
                                                                             }
                                                                             $itemSummary[$k]['frequency']++;
-                                                                            if ($pReq->created_at > $itemSummary[$k]['last_date']) {
-                                                                                $itemSummary[$k]['last_date'] = $pReq->created_at;
+
+                                                                            if ($isThisMonth && $pReqDate) {
+                                                                                $itemSummary[$k]['same_month_count']++;
+                                                                                $itemSummary[$k]['same_month_dates']->push($pReqDate->format('d/m'));
+                                                                            }
+
+                                                                            if ($pReqDate && $pReqDate > $itemSummary[$k]['last_date']) {
+                                                                                $itemSummary[$k]['last_date'] = $pReqDate;
                                                                                 $itemSummary[$k]['last_status'] = $pReq->status;
                                                                             }
+                                                                        }
+                                                                    }
+
+                                                                    // Masukkan juga item dari permohonan saat ini jika belum ada di riwayat
+                                                                    foreach ($req->details as $cDetail) {
+                                                                        $cSpec = trim($cDetail->specification ?? '');
+                                                                        $cName = trim($cDetail->item_name);
+
+                                                                        if (!empty($cSpec) && !str_contains(strtolower($cName), strtolower($cSpec))) {
+                                                                            $cDisplay = $cName . ' (' . $cSpec . ')';
+                                                                            $cKey = strtolower($cName . '__' . $cSpec);
+                                                                        } else {
+                                                                            $cDisplay = $cName;
+                                                                            $cKey = strtolower($cName);
+                                                                        }
+
+                                                                        if (!isset($itemSummary[$cKey])) {
+                                                                            $itemSummary[$cKey] = [
+                                                                                'name' => $cDisplay,
+                                                                                'unit' => $cDetail->item_unit,
+                                                                                'total_requested' => $cDetail->quantity,
+                                                                                'total_approved' => 0,
+                                                                                'frequency' => 1,
+                                                                                'last_date' => $req->created_at,
+                                                                                'last_status' => $req->status,
+                                                                                'same_month_count' => 0,
+                                                                                'same_month_dates' => collect([$req->created_at ? $req->created_at->format('d/m') : now()->format('d/m')]),
+                                                                                'is_current_ticket_only' => true,
+                                                                            ];
                                                                         }
                                                                     }
                                                                 @endphp
@@ -1047,28 +1169,52 @@
                                                                                         @foreach ($itemSummary as $normKey => $iSum)
                                                                                             @php
                                                                                                 $isCurrentlyRequested = in_array($normKey, $currentItems);
+                                                                                                $hasPastInSameMonth = ($iSum['same_month_count'] > 0);
+                                                                                                $isRepeatedThisMonth = $isCurrentlyRequested && $hasPastInSameMonth;
                                                                                             @endphp
-                                                                                            <tr class="{{ $isCurrentlyRequested ? 'table-warning' : '' }}">
+                                                                                            <tr class="{{ $isRepeatedThisMonth ? 'table-danger' : ($isCurrentlyRequested ? 'table-warning' : '') }}">
                                                                                                 <td>
-                                                                                                    <strong>{{ $iSum['name'] }}</strong>
-                                                                                                    @if ($isCurrentlyRequested)
-                                                                                                        <span class="badge bg-warning text-dark ms-1" style="font-size: 0.68rem;">
-                                                                                                            ⚠️ Sedang Diajukan Lagi!
+                                                                                                    <strong class="text-dark">{{ $iSum['name'] }}</strong>
+                                                                                                    @if ($isRepeatedThisMonth)
+                                                                                                        <span class="badge bg-danger text-white ms-1" style="font-size: 0.68rem;">
+                                                                                                            ⚠️ Minta Berulang di Bulan Ini ({{ $iSum['same_month_dates']->unique()->join(', ') }})
+                                                                                                        </span>
+                                                                                                    @elseif ($isCurrentlyRequested)
+                                                                                                        <span class="badge bg-info-subtle text-primary border ms-1" style="font-size: 0.68rem;">
+                                                                                                            Sedang Diajukan (Tiket Ini)
                                                                                                         </span>
                                                                                                     @endif
                                                                                                 </td>
                                                                                                 <td class="text-center">{{ $iSum['total_requested'] }} {{ $iSum['unit'] }}</td>
                                                                                                 <td class="text-center fw-bold text-success">{{ $iSum['total_approved'] }} {{ $iSum['unit'] }}</td>
-                                                                                                <td class="text-center">{{ $iSum['frequency'] }} kali</td>
+                                                                                                <td class="text-center">
+                                                                                                    {{ $iSum['frequency'] }} kali
+                                                                                                    @if ($isRepeatedThisMonth)
+                                                                                                        <small class="text-danger d-block fw-semibold" style="font-size: 0.72rem;">
+                                                                                                            &bull; {{ $iSum['same_month_count'] + 1 }}x di {{ $reqMonthName }}
+                                                                                                        </small>
+                                                                                                    @endif
+                                                                                                </td>
                                                                                                 <td>{{ \Carbon\Carbon::parse($iSum['last_date'])->format('d/m/Y H:i') }}</td>
                                                                                                 <td class="text-center">
-                                                                                                    @if ($isCurrentlyRequested && $iSum['total_approved'] > 0)
+                                                                                                    @if ($isRepeatedThisMonth)
+                                                                                                        <span class="badge bg-danger-subtle text-danger border" style="font-size: 0.7rem;">
+                                                                                                            Waspada Penimbunan Stok (Bulan Ini)
+                                                                                                        </span>
+                                                                                                        <small class="text-muted d-block mt-0.5" style="font-size: 0.68rem;">
+                                                                                                            Pernah diajukan tgl {{ $iSum['same_month_dates']->unique()->join(', ') }}
+                                                                                                        </small>
+                                                                                                    @elseif ($isCurrentlyRequested && $iSum['total_approved'] > 0)
                                                                                                         <span class="badge bg-danger-subtle text-danger border" style="font-size: 0.7rem;">
                                                                                                             Waspada Penimbunan Stok
                                                                                                         </span>
                                                                                                     @elseif ($iSum['total_approved'] > 0)
                                                                                                         <span class="badge bg-success-subtle text-success border" style="font-size: 0.7rem;">
                                                                                                             Pernah Diterima
+                                                                                                        </span>
+                                                                                                    @elseif (!empty($iSum['is_current_ticket_only']))
+                                                                                                        <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.7rem;">
+                                                                                                            Pengajuan Baru Bulan Ini
                                                                                                         </span>
                                                                                                     @else
                                                                                                         <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
@@ -1222,6 +1368,16 @@
 
 @push('scripts')
     <script>
+        function dismissModernToast() {
+            const toast = document.getElementById('modern-toast-notification');
+            if (toast) {
+                toast.classList.add('toast-hiding');
+                setTimeout(() => {
+                    toast.remove();
+                }, 350);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('persetujuan-search');
             const clearBtn = document.getElementById('btn-clear-search');
@@ -1462,43 +1618,33 @@
                 });
             }
 
-            // SweetAlert2 Toast / Modal Notification
-            @if (session('success'))
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Permintaan Berhasil Disetujui!',
-                        html: `<div class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.5;">{!! addslashes(session('success')) !!}</div>`,
-                        confirmButtonText: '<i class="bi bi-check-circle me-1"></i> Selesai & Tutup',
-                        confirmButtonColor: '#198754',
-                        background: '#ffffff',
-                        customClass: {
-                            popup: 'rounded-4 shadow-lg border-0 p-4',
-                            title: 'fw-bold text-dark fs-4 mb-1',
-                            confirmButton: 'btn btn-success px-4 py-2 fw-bold rounded-pill shadow-sm'
-                        },
-                        timer: 6000,
-                        timerProgressBar: true
-                    });
-                }
-            @endif
+            // Modern Floating Toast auto dismiss and countdown progress bar
+            const toast = document.getElementById('modern-toast-notification');
+            const progressBar = document.getElementById('toast-progress-bar');
+            
+            if (toast && progressBar) {
+                const totalDuration = 6000; // 6 detik durasi tampilan
+                const intervalTime = 50;
+                let elapsed = 0;
+                let isPaused = false;
 
-            @if (session('error'))
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Perhatian / Terjadi Kesalahan',
-                        html: `<div class="text-secondary mt-2" style="font-size: 0.95rem; line-height: 1.5;">{!! addslashes(session('error')) !!}</div>`,
-                        confirmButtonText: 'Tutup',
-                        confirmButtonColor: '#dc3545',
-                        customClass: {
-                            popup: 'rounded-4 shadow-lg border-0 p-4',
-                            title: 'fw-bold text-danger fs-4 mb-1',
-                            confirmButton: 'btn btn-danger px-4 py-2 fw-bold rounded-pill shadow-sm'
+                // Jeda timer saat kursor mouse diarahkan ke toast
+                toast.addEventListener('mouseenter', () => isPaused = true);
+                toast.addEventListener('mouseleave', () => isPaused = false);
+
+                const timer = setInterval(() => {
+                    if (!isPaused) {
+                        elapsed += intervalTime;
+                        const remainingPercent = Math.max(0, 100 - (elapsed / totalDuration * 100));
+                        progressBar.style.width = remainingPercent + '%';
+
+                        if (elapsed >= totalDuration) {
+                            clearInterval(timer);
+                            dismissModernToast();
                         }
-                    });
-                }
-            @endif
+                    }
+                }, intervalTime);
+            }
 
             // Loading state on approval form submissions
             document.querySelectorAll('form[action*="/persetujuan/"], form[action*="/verifikasi/"]').forEach(form => {

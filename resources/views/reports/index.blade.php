@@ -296,7 +296,7 @@
         <div class="row g-3 mb-4">
             {{-- Card 1: Total Transaksi --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="150">
+                <div class="card kpi-card h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -324,7 +324,7 @@
 
             {{-- Card 2: Total Barang Masuk (Pcs) --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="200">
+                <div class="card kpi-card h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -350,7 +350,7 @@
 
             {{-- Card 3: Total Barang Keluar (Pcs) --}}
             <div class="col-12 col-md-4">
-                <div class="card kpi-card h-100" data-aos="fade-up" data-aos-delay="250">
+                <div class="card kpi-card h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small fw-bold text-uppercase"
@@ -378,7 +378,7 @@
         {{-- Card Filter Laporan (Responsive & User-Friendly) --}}
         <div class="row">
             <div class="col-sm-12">
-                <div class="card report-card mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card report-card mb-4">
                     <div
                         class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-2">
@@ -573,7 +573,7 @@
         {{-- Tabel Laporan Transaksi --}}
         <div class="row">
             <div class="col-sm-12">
-                <div class="card report-card mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card report-card mb-4">
                     <div
                         class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div class="d-flex align-items-center gap-2">
@@ -726,8 +726,8 @@
                                         <th width="6%">Stok Sisa</th>
                                         <th width="8%">Harga Satuan</th>
                                         <th width="9%">Nilai Saldo / Total</th>
-                                        <th width="8%">Petugas</th>
-                                        <th width="10%">Catatan</th>
+                                        <th width="9%">Nama Penerima</th>
+                                        <th width="9%">Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -848,10 +848,13 @@
                                                 data-order="{{ $nilaiSaldo }}">
                                                 {{ $formattedTotal }}
                                             </td>
-                                            {{-- 12. Petugas (Cukup Utami M tanpa bulatan U) --}}
+                                            {{-- 12. Nama Penerima --}}
                                             <td class="text-center text-nowrap">
-                                                <span
-                                                    class="text-dark small fw-medium">{{ $transaction->user->name ?? '-' }}</span>
+                                                @if ($transaction->type === 'keluar')
+                                                    <span class="text-dark small fw-semibold">{{ $transaction->recipient_name }}</span>
+                                                @else
+                                                    <span class="text-muted small">-</span>
+                                                @endif
                                             </td>
                                             {{-- 13. Catatan --}}
                                             <td class="col-catatan-teks" title="{{ $transaction->note ?? '' }}">
@@ -864,6 +867,18 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold bg-light text-dark">
+                                        <th colspan="6" class="text-center py-2 text-secondary">TOTAL REKAPITULASI</th>
+                                        <th class="text-center py-2" id="footerTotalStokAwal">0 Pcs</th>
+                                        <th class="text-center py-2" id="footerTotalStokDipinjam">0 Pcs</th>
+                                        <th class="text-center py-2" id="footerTotalStokSisa">0 Pcs</th>
+                                        <th class="text-end py-2 text-muted">-</th>
+                                        <th class="text-end py-2 text-primary" id="footerTotalNilaiSaldo">Rp 0</th>
+                                        <th class="text-center py-2 text-muted">-</th>
+                                        <th class="text-center py-2 text-muted">-</th>
+                                    </tr>
+                                </tfoot>
                             </table>
 
                         {{-- Tanda Tangan Khusus untuk Print / Tampilan Bawah (Arsiparis & Kasubag TU) --}}
@@ -953,49 +968,366 @@
                         [25, 50, 100, 'Semua']
                     ],
                     dom: '<"row align-items-center g-2 mb-3"<"col-sm-6"l><"col-sm-6 text-sm-end"f>><"table-responsive my-1"rt><"row align-items-center g-2 mt-3"<"col-sm-6 text-muted small"i><"col-sm-6 text-sm-end"p>>',
+                    footerCallback: function(row, data, start, end, display) {
+                        var api = this.api();
+                        var intVal = function(i) {
+                            if (typeof i === 'number') return i;
+                            var clean = String(i).replace(/<[^>]+>/g, '').replace(/[^\d]/g, '');
+                            return clean ? parseInt(clean, 10) : 0;
+                        };
+
+                        var totalAwal = api.column(6, { search: 'applied' }).data().reduce(function(a, b) {
+                            return a + intVal(b);
+                        }, 0);
+                        var totalDipinjam = api.column(7, { search: 'applied' }).data().reduce(function(a, b) {
+                            return a + intVal(b);
+                        }, 0);
+                        var totalSisa = api.column(8, { search: 'applied' }).data().reduce(function(a, b) {
+                            return a + intVal(b);
+                        }, 0);
+                        var totalNilai = api.column(10, { search: 'applied' }).data().reduce(function(a, b) {
+                            return a + intVal(b);
+                        }, 0);
+
+                        $('#footerTotalStokAwal').html(totalAwal.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
+                        $('#footerTotalStokDipinjam').html(totalDipinjam.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
+                        $('#footerTotalStokSisa').html(totalSisa.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
+                        $('#footerTotalNilaiSaldo').html('Rp ' + totalNilai.toLocaleString('id-ID'));
+                    },
                     buttons: [{
                             extend: 'excelHtml5',
-                            title: 'LAPORAN MUTASI PERSEDIAAN BARANG (ATK)',
+                            title: 'KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN',
+                            messageTop: 'LAPORAN MUTASI & PERSEDIAAN BARANG (ATK) - Periode: ' + periodeStr + ' | Dicetak pada: ' + tglHariIni,
                             filename: 'Laporan_Persediaan_ATK_' + new Date().toISOString().slice(0, 10),
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                format: {
+                                    header: function(data, columnIdx) {
+                                        return $('<div>').html(data).text().trim();
+                                    },
+                                    body: function(data, row, column, node) {
+                                        var cleanText = $('<div>').html(data).text().trim();
+                                        if (column === 0) {
+                                            var num = cleanText.replace(/[^\d]/g, '');
+                                            return num ? parseInt(num, 10) : (row + 1);
+                                        }
+                                        if (column === 5) {
+                                            if (cleanText.indexOf('Masuk') !== -1) return 'Masuk';
+                                            if (cleanText.indexOf('Subdit') !== -1) return 'Keluar (Subdit)';
+                                            if (cleanText.indexOf('Individu') !== -1) return 'Keluar (Individu)';
+                                            return 'Keluar';
+                                        }
+                                        if (column === 6 || column === 7 || column === 8) {
+                                            var num = cleanText.replace(/[^\d]/g, '');
+                                            return num ? parseInt(num, 10) : 0;
+                                        }
+                                        if (column === 9 || column === 10) {
+                                            var num = cleanText.replace(/[^\d]/g, '');
+                                            return num ? parseInt(num, 10) : 0;
+                                        }
+                                        return cleanText;
+                                    }
+                                }
+                            },
                             customize: function(xlsx) {
-                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                function xmlEscape(str) {
+                                    if (!str) return '';
+                                    return String(str)
+                                        .replace(/&/g, '&amp;')
+                                        .replace(/</g, '&lt;')
+                                        .replace(/>/g, '&gt;')
+                                        .replace(/"/g, '&quot;')
+                                        .replace(/'/g, '&apos;');
+                                }
 
-                                // Lebar kolom rapi agar teks dan angka di Excel tidak terpotong (###)
+                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                var styles = xlsx.xl['styles.xml'];
+
+                                // 1. Tambahkan Custom Styles ke styles.xml
+                                var numFmts = styles.getElementsByTagName('numFmts')[0];
+                                var numFmtIdRupiah = 170;
+                                var nf = styles.createElement('numFmt');
+                                nf.setAttribute('numFmtId', numFmtIdRupiah);
+                                nf.setAttribute('formatCode', '"Rp " #,##0;("Rp " #,##0);"Rp " 0');
+                                numFmts.appendChild(nf);
+                                numFmts.setAttribute('count', parseInt(numFmts.getAttribute('count') || '6') + 1);
+
+                                var fonts = styles.getElementsByTagName('fonts')[0];
+                                var fontCount = parseInt(fonts.getAttribute('count') || '5');
+                                function addFont(sz, name, bold, colorRgb) {
+                                    var f = styles.createElement('font');
+                                    if (bold) { f.appendChild(styles.createElement('b')); }
+                                    var s = styles.createElement('sz'); s.setAttribute('val', sz); f.appendChild(s);
+                                    if (colorRgb) {
+                                        var c = styles.createElement('color'); c.setAttribute('rgb', colorRgb); f.appendChild(c);
+                                    }
+                                    var n = styles.createElement('name'); n.setAttribute('val', name); f.appendChild(n);
+                                    fonts.appendChild(f);
+                                    fontCount++;
+                                }
+                                var fontHeaderIdx = fontCount;
+                                addFont('11', 'Calibri', true, 'FFFFFFFF');
+                                var fontTitleIdx = fontCount;
+                                addFont('13', 'Calibri', true, 'FF144B59');
+                                var fontSubtitleIdx = fontCount;
+                                addFont('10', 'Calibri', true, 'FF475569');
+                                var fontTotalIdx = fontCount;
+                                addFont('11', 'Calibri', true, 'FF0F172A');
+                                var fontDataIdx = fontCount;
+                                addFont('10', 'Calibri', false, 'FF1E293B');
+                                var fontBoldDataIdx = fontCount;
+                                addFont('10', 'Calibri', true, 'FF0F172A');
+                                var fontSigRoleIdx = fontCount;
+                                addFont('10', 'Calibri', true, 'FF334155');
+                                var fontSigNameIdx = fontCount;
+                                addFont('11', 'Calibri', true, 'FF0F172A');
+                                fonts.setAttribute('count', fontCount);
+
+                                var fills = styles.getElementsByTagName('fills')[0];
+                                var fillCount = parseInt(fills.getAttribute('count') || '6');
+                                function addFill(rgb) {
+                                    var fill = styles.createElement('fill');
+                                    var pf = styles.createElement('patternFill');
+                                    pf.setAttribute('patternType', 'solid');
+                                    var fg = styles.createElement('fgColor'); fg.setAttribute('rgb', rgb); pf.appendChild(fg);
+                                    var bg = styles.createElement('bgColor'); bg.setAttribute('indexed', '64'); pf.appendChild(bg);
+                                    fill.appendChild(pf);
+                                    fills.appendChild(fill);
+                                    fillCount++;
+                                }
+                                var fillHeaderIdx = fillCount; // Navy #144B59 (Kemen PKP)
+                                addFill('FF144B59');
+                                var fillTotalIdx = fillCount; // Slate Soft #E2E8F0
+                                addFill('FFE2E8F0');
+                                var fillZebraIdx = fillCount; // Zebra #F8FAFC
+                                addFill('FFF8FAFC');
+                                fills.setAttribute('count', fillCount);
+
+                                var borders = styles.getElementsByTagName('borders')[0];
+                                var borderCount = parseInt(borders.getAttribute('count') || '2');
+                                // Accounting border (thin top, double bottom)
+                                var bTotal = styles.createElement('border');
+                                bTotal.appendChild(styles.createElement('left'));
+                                bTotal.appendChild(styles.createElement('right'));
+                                var bTop = styles.createElement('top'); bTop.setAttribute('style', 'thin');
+                                var bTopColor = styles.createElement('color'); bTopColor.setAttribute('rgb', 'FF144B59'); bTop.appendChild(bTopColor);
+                                bTotal.appendChild(bTop);
+                                var bBot = styles.createElement('bottom'); bBot.setAttribute('style', 'double');
+                                var bBotColor = styles.createElement('color'); bBotColor.setAttribute('rgb', 'FF144B59'); bBot.appendChild(bBotColor);
+                                bTotal.appendChild(bBot);
+                                bTotal.appendChild(styles.createElement('diagonal'));
+                                borders.appendChild(bTotal);
+                                var borderTotalIdx = borderCount;
+                                borderCount++;
+                                borders.setAttribute('count', borderCount);
+
+                                var cellXfs = styles.getElementsByTagName('cellXfs')[0];
+                                var xfCount = parseInt(cellXfs.getAttribute('count') || '68');
+                                function addXf(numFmtId, fontId, fillId, borderId, hAlign, vAlign, wrap) {
+                                    var xf = styles.createElement('xf');
+                                    xf.setAttribute('numFmtId', numFmtId || '0');
+                                    xf.setAttribute('fontId', fontId || '0');
+                                    xf.setAttribute('fillId', fillId || '0');
+                                    xf.setAttribute('borderId', borderId !== undefined ? borderId : '0');
+                                    xf.setAttribute('xfId', '0');
+                                    xf.setAttribute('applyFont', '1');
+                                    if (fillId) xf.setAttribute('applyFill', '1');
+                                    if (borderId) xf.setAttribute('applyBorder', '1');
+                                    if (numFmtId) xf.setAttribute('applyNumberFormat', '1');
+                                    
+                                    var align = styles.createElement('alignment');
+                                    align.setAttribute('horizontal', hAlign || 'left');
+                                    align.setAttribute('vertical', vAlign || 'center');
+                                    if (wrap) align.setAttribute('wrapText', '1');
+                                    xf.appendChild(align);
+                                    xf.setAttribute('applyAlignment', '1');
+                                    
+                                    cellXfs.appendChild(xf);
+                                    var idx = xfCount;
+                                    xfCount++;
+                                    return idx;
+                                }
+
+                                var styleHeader = addXf('0', fontHeaderIdx, fillHeaderIdx, '1', 'center', 'center', true);
+                                var styleTextLeft = addXf('0', fontDataIdx, '0', '1', 'left', 'center', false);
+                                var styleTextCenter = addXf('0', fontDataIdx, '0', '1', 'center', 'center', false);
+                                var styleNumberInt = addXf('3', fontDataIdx, '0', '1', 'right', 'center', false);
+                                var styleCurrency = addXf(numFmtIdRupiah, fontDataIdx, '0', '1', 'right', 'center', false);
+                                var styleCurrencyBold = addXf(numFmtIdRupiah, fontBoldDataIdx, '0', '1', 'right', 'center', false);
+                                
+                                var styleZebraLeft = addXf('0', fontDataIdx, fillZebraIdx, '1', 'left', 'center', false);
+                                var styleZebraCenter = addXf('0', fontDataIdx, fillZebraIdx, '1', 'center', 'center', false);
+                                var styleZebraNumberInt = addXf('3', fontDataIdx, fillZebraIdx, '1', 'right', 'center', false);
+                                var styleZebraCurrency = addXf(numFmtIdRupiah, fontDataIdx, fillZebraIdx, '1', 'right', 'center', false);
+                                var styleZebraCurrencyBold = addXf(numFmtIdRupiah, fontBoldDataIdx, fillZebraIdx, '1', 'right', 'center', false);
+
+                                var styleTotalLabel = addXf('0', fontTotalIdx, fillTotalIdx, borderTotalIdx, 'center', 'center', false);
+                                var styleTotalNumberInt = addXf('3', fontTotalIdx, fillTotalIdx, borderTotalIdx, 'right', 'center', false);
+                                var styleTotalCurrency = addXf(numFmtIdRupiah, fontTotalIdx, fillTotalIdx, borderTotalIdx, 'right', 'center', false);
+
+                                var styleTitle = addXf('0', fontTitleIdx, '0', '0', 'center', 'center', false);
+                                var styleSubtitle = addXf('0', fontSubtitleIdx, '0', '0', 'center', 'center', false);
+                                var styleSigTitle = addXf('0', fontDataIdx, '0', '0', 'center', 'center', false);
+                                var styleSigRole = addXf('0', fontSigRoleIdx, '0', '0', 'center', 'center', false);
+                                var styleSigName = addXf('0', fontSigNameIdx, '0', '0', 'center', 'center', false);
+                                var styleSigNip = addXf('0', fontDataIdx, '0', '0', 'center', 'center', false);
+
+                                cellXfs.setAttribute('count', xfCount);
+
+                                // 2. Setup Grid Lines dan Lebar Kolom
+                                // Urutan tag OpenXML strictly valid: sheetViews -> cols -> sheetData -> mergeCells
+                                $('cols', sheet).remove();
+                                $('sheetViews', sheet).remove();
+
+                                // Sisipkan sheetViews sebelum sheetData
+                                $('sheetData', sheet).before('<sheetViews><sheetView showGridLines="1" workbookViewId="0"/></sheetViews>');
+
+                                // Sisipkan cols sebelum sheetData (otomatis berada tepat setelah sheetViews dan sebelum sheetData)
                                 var colWidthsXml = '<cols>' +
-                                    '<col min="1" max="1" width="5" customWidth="1"/>' +
-                                    '<col min="2" max="2" width="13" customWidth="1"/>' +
-                                    '<col min="3" max="3" width="13" customWidth="1"/>' +
-                                    '<col min="4" max="4" width="16" customWidth="1"/>' +
-                                    '<col min="5" max="5" width="26" customWidth="1"/>' +
-                                    '<col min="6" max="6" width="13" customWidth="1"/>' +
-                                    '<col min="7" max="7" width="12" customWidth="1"/>' +
+                                    '<col min="1" max="1" width="6" customWidth="1"/>' +
+                                    '<col min="2" max="2" width="14" customWidth="1"/>' +
+                                    '<col min="3" max="3" width="14" customWidth="1"/>' +
+                                    '<col min="4" max="4" width="18" customWidth="1"/>' +
+                                    '<col min="5" max="5" width="30" customWidth="1"/>' +
+                                    '<col min="6" max="6" width="16" customWidth="1"/>' +
+                                    '<col min="7" max="7" width="13" customWidth="1"/>' +
                                     '<col min="8" max="8" width="14" customWidth="1"/>' +
-                                    '<col min="9" max="9" width="12" customWidth="1"/>' +
-                                    '<col min="10" max="10" width="16" customWidth="1"/>' +
-                                    '<col min="11" max="11" width="18" customWidth="1"/>' +
-                                    '<col min="12" max="12" width="15" customWidth="1"/>' +
+                                    '<col min="9" max="9" width="13" customWidth="1"/>' +
+                                    '<col min="10" max="10" width="18" customWidth="1"/>' +
+                                    '<col min="11" max="11" width="22" customWidth="1"/>' +
+                                    '<col min="12" max="12" width="22" customWidth="1"/>' +
                                     '<col min="13" max="13" width="30" customWidth="1"/>' +
                                     '</cols>';
-
                                 $('sheetData', sheet).before(colWidthsXml);
 
-                                var tglSkr = 'Jakarta, ' + tglHariIni;
-                                var rowCount = $('row', sheet).length + 3;
+                                // 3. Styling Header & Subtitle
+                                $('row[r="1"]', sheet).attr('ht', '26').attr('customHeight', '1');
+                                $('row[r="1"] c[r="A1"]', sheet).attr('s', styleTitle);
 
-                                var signatureXml = '<row r="' + rowCount + '">' +
-                                    '<c t="inlineStr" r="E' + rowCount + '" s="55"><is><t>Disiapkan oleh,</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + rowCount + '" s="55"><is><t>' + tglSkr + '</t></is></c></row>' +
-                                    '<row r="' + (rowCount + 1) + '">' +
-                                    '<c t="inlineStr" r="E' + (rowCount + 1) + '" s="55"><is><t>Arsiparis (Pelaporan &amp; Administrasi)</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 1) + '" s="55"><is><t>Mengetahui &amp; Mengesahkan,</t></is></c></row>' +
-                                    '<row r="' + (rowCount + 2) + '">' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 2) + '" s="55"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
-                                    '<row r="' + (rowCount + 6) + '">' +
-                                    '<c t="inlineStr" r="E' + (rowCount + 6) + '" s="55"><is><t>{{ addslashes($arsiparisName) }}</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 6) + '" s="55"><is><t>{{ addslashes($kasubagName) }}</t></is></c></row>' +
-                                    '<row r="' + (rowCount + 7) + '">' +
-                                    '<c t="inlineStr" r="E' + (rowCount + 7) + '" s="55"><is><t>NIP. {{ $arsiparisNip }}</t></is></c>' +
-                                    '<c t="inlineStr" r="M' + (rowCount + 7) + '" s="55"><is><t>NIP. {{ $kasubagNip }}</t></is></c></row>';
+                                $('row[r="2"]', sheet).attr('ht', '20').attr('customHeight', '1');
+                                $('row[r="2"] c[r="A2"]', sheet).attr('s', styleSubtitle);
+
+                                // Table Header di Row 3
+                                $('row[r="3"]', sheet).attr('ht', '28').attr('customHeight', '1');
+                                $('row[r="3"] c', sheet).attr('s', styleHeader);
+
+                                // 4. Data Rows Styling & Formulasi
+                                var dataRows = $('row', sheet).filter(function() {
+                                    return parseInt($(this).attr('r')) >= 4;
+                                });
+
+                                var totalRows = dataRows.length;
+                                var startDataRow = 4;
+                                var endDataRow = 3 + totalRows;
+
+                                var runningTotalAwal = 0;
+                                var runningTotalDipinjam = 0;
+                                var runningTotalSisa = 0;
+                                var runningTotalSaldo = 0;
+
+                                dataRows.each(function(idx) {
+                                    var rowNode = $(this);
+                                    var rNum = parseInt(rowNode.attr('r'));
+                                    var isZebra = (idx % 2 === 1);
+
+                                    rowNode.attr('ht', '20').attr('customHeight', '1');
+
+                                    rowNode.find('c[r="A' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+                                    rowNode.find('c[r="B' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+                                    rowNode.find('c[r="C' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+                                    rowNode.find('c[r="D' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
+                                    rowNode.find('c[r="E' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
+                                    rowNode.find('c[r="F' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+
+                                    var cG = rowNode.find('c[r="G' + rNum + '"]');
+                                    cG.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
+                                    var valG = parseFloat(cG.find('v').text()) || 0;
+                                    runningTotalAwal += valG;
+
+                                    var cH = rowNode.find('c[r="H' + rNum + '"]');
+                                    cH.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
+                                    var valH = parseFloat(cH.find('v').text()) || 0;
+                                    runningTotalDipinjam += valH;
+
+                                    var cI = rowNode.find('c[r="I' + rNum + '"]');
+                                    cI.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
+                                    var valI = parseFloat(cI.find('v').text()) || 0;
+                                    runningTotalSisa += valI;
+
+                                    var cJ = rowNode.find('c[r="J' + rNum + '"]');
+                                    cJ.attr('s', isZebra ? styleZebraCurrency : styleCurrency);
+                                    var valJ = parseFloat(cJ.find('v').text()) || 0;
+
+                                    // PERUMUSAN EXCEL: Nilai Saldo = Stok Sisa * Harga Satuan (=I{rNum}*J{rNum})
+                                    var cK = rowNode.find('c[r="K' + rNum + '"]');
+                                    var expectedSaldo = Math.round(valI * valJ);
+                                    runningTotalSaldo += expectedSaldo;
+
+                                    cK.empty();
+                                    cK.attr('t', 'n');
+                                    cK.attr('s', isZebra ? styleZebraCurrencyBold : styleCurrencyBold);
+                                    cK.append('<f>I' + rNum + '*J' + rNum + '</f>');
+                                    cK.append('<v>' + expectedSaldo + '</v>');
+
+                                    rowNode.find('c[r="L' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+                                    rowNode.find('c[r="M' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
+                                });
+
+                                // 5. Baris Total Rekapitulasi (Formula SUM Excel)
+                                if (totalRows > 0) {
+                                    var totalRowNum = endDataRow + 1;
+                                    var totalRowXml = '<row r="' + totalRowNum + '" ht="24" customHeight="1">' +
+                                        '<c r="A' + totalRowNum + '" s="' + styleTotalLabel + '" t="inlineStr"><is><t>TOTAL REKAPITULASI</t></is></c>' +
+                                        '<c r="B' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="C' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="D' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="E' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="F' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="G' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
+                                            '<f>SUM(G' + startDataRow + ':G' + endDataRow + ')</f><v>' + runningTotalAwal + '</v></c>' +
+                                        '<c r="H' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
+                                            '<f>SUM(H' + startDataRow + ':H' + endDataRow + ')</f><v>' + runningTotalDipinjam + '</v></c>' +
+                                        '<c r="I' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
+                                            '<f>SUM(I' + startDataRow + ':I' + endDataRow + ')</f><v>' + runningTotalSisa + '</v></c>' +
+                                        '<c r="J' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="K' + totalRowNum + '" s="' + styleTotalCurrency + '" t="n">' +
+                                            '<f>SUM(K' + startDataRow + ':K' + endDataRow + ')</f><v>' + runningTotalSaldo + '</v></c>' +
+                                        '<c r="L' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="M' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '</row>';
+                                    $('sheetData', sheet).append(totalRowXml);
+
+                                    var mergeCells = $('mergeCells', sheet);
+                                    if (mergeCells.length) {
+                                        mergeCells.append('<mergeCell ref="A' + totalRowNum + ':F' + totalRowNum + '"/>');
+                                        mergeCells.attr('count', parseInt(mergeCells.attr('count') || '0') + 1);
+                                    } else {
+                                        $('sheetData', sheet).after('<mergeCells count="1"><mergeCell ref="A' + totalRowNum + ':F' + totalRowNum + '"/></mergeCells>');
+                                    }
+                                }
+
+                                // 6. Section Tanda Tangan Resmi
+                                var sigStartRow = (totalRows > 0 ? (endDataRow + 1) : 4) + 2;
+                                var tglSkrXml = xmlEscape('Jakarta, ' + tglHariIni);
+                                var arsiparisNameXml = xmlEscape(@json($arsiparisName));
+                                var arsiparisNipXml = xmlEscape('{{ $arsiparisNip }}');
+                                var kasubagNameXml = xmlEscape(@json($kasubagName));
+                                var kasubagNipXml = xmlEscape('{{ $kasubagNip }}');
+
+                                var signatureXml = '<row r="' + sigStartRow + '">' +
+                                    '<c r="D' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>Disiapkan &amp; Direkapitulasi oleh,</t></is></c>' +
+                                    '<c r="K' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>' + tglSkrXml + '</t></is></c></row>' +
+                                    '<row r="' + (sigStartRow + 1) + '">' +
+                                    '<c r="D' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Arsiparis (Pelaporan &amp; Administrasi)</t></is></c>' +
+                                    '<c r="K' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Mengetahui &amp; Mengesahkan,</t></is></c></row>' +
+                                    '<row r="' + (sigStartRow + 2) + '">' +
+                                    '<c r="K' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
+                                    '<row r="' + (sigStartRow + 6) + '">' +
+                                    '<c r="D' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + arsiparisNameXml + '</t></is></c>' +
+                                    '<c r="K' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + kasubagNameXml + '</t></is></c></row>' +
+                                    '<row r="' + (sigStartRow + 7) + '">' +
+                                    '<c r="D' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + arsiparisNipXml + '</t></is></c>' +
+                                    '<c r="K' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + kasubagNipXml + '</t></is></c></row>';
 
                                 $('sheetData', sheet).append(signatureXml);
                             }
@@ -1005,30 +1337,71 @@
                             orientation: 'landscape',
                             pageSize: 'A4',
                             filename: 'Laporan_Persediaan_ATK_' + new Date().toISOString().slice(0, 10),
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                format: {
+                                    header: function(data, columnIdx) {
+                                        return $('<div>').html(data).text().trim();
+                                    },
+                                    body: function(data, row, column, node) {
+                                        var cleanText = $('<div>').html(data).text().trim();
+                                        if (column === 5) {
+                                            if (cleanText.indexOf('Masuk') !== -1) return 'Masuk';
+                                            if (cleanText.indexOf('Subdit') !== -1) return 'Keluar (Subdit)';
+                                            if (cleanText.indexOf('Individu') !== -1) return 'Keluar (Individu)';
+                                            return 'Keluar';
+                                        }
+                                        return cleanText;
+                                    }
+                                }
+                            },
                             customize: function(doc) {
-                                doc.pageMargins = [20, 25, 20, 25];
+                                doc.pageMargins = [20, 20, 20, 28];
 
-                                // Header Resmi Dokumen PDF
+                                // Header Resmi Dokumen PDF Berstandar Kementerian PKP
                                 doc.content.splice(0, 1, {
-                                    text: 'KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN',
-                                    fontSize: 10,
-                                    alignment: 'center',
-                                    color: '#334155',
-                                    margin: [0, 0, 0, 2]
-                                }, {
-                                    text: 'LAPORAN MUTASI & PERSEDIAAN BARANG (ATK)',
-                                    fontSize: 13,
-                                    bold: true,
-                                    alignment: 'center',
-                                    color: '#0f172a',
-                                    margin: [0, 0, 0, 4]
-                                }, {
-                                    text: 'Periode: ' + periodeStr + '  |  Dicetak pada: ' +
-                                        tglHariIni,
-                                    fontSize: 8.5,
-                                    alignment: 'center',
-                                    color: '#64748b',
-                                    margin: [0, 0, 0, 14]
+                                    stack: [
+                                        {
+                                            text: 'KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN REPUBLIK INDONESIA',
+                                            fontSize: 10.5,
+                                            bold: true,
+                                            alignment: 'center',
+                                            color: '#144B59',
+                                            characterSpacing: 0.5,
+                                            margin: [0, 0, 0, 2]
+                                        },
+                                        {
+                                            text: 'SEKRETARIAT JENDERAL - PENGELOLAAN ARSIP & PERSEDIAAN BARANG (ATK)',
+                                            fontSize: 8,
+                                            alignment: 'center',
+                                            color: '#64748B',
+                                            margin: [0, 0, 0, 4]
+                                        },
+                                        {
+                                            canvas: [{
+                                                type: 'line',
+                                                x1: 0, y1: 0,
+                                                x2: 798, y2: 0,
+                                                lineWidth: 1.5,
+                                                lineColor: '#144B59'
+                                            }]
+                                        },
+                                        {
+                                            text: 'LAPORAN MUTASI & PERSEDIAAN BARANG (ATK)',
+                                            fontSize: 13,
+                                            bold: true,
+                                            alignment: 'center',
+                                            color: '#0F172A',
+                                            margin: [0, 8, 0, 3]
+                                        },
+                                        {
+                                            text: 'Periode: ' + periodeStr + '   |   Dicetak pada: ' + tglHariIni,
+                                            fontSize: 8,
+                                            alignment: 'center',
+                                            color: '#475569',
+                                            margin: [0, 0, 0, 10]
+                                        }
+                                    ]
                                 });
 
                                 var tableNode = doc.content.find(function(node) {
@@ -1036,74 +1409,118 @@
                                 });
 
                                 if (tableNode) {
-                                    tableNode.table.widths = [
-                                        '3%', // No
-                                        '7%', // Tanggal
-                                        '7%', // Kode
-                                        '8%', // Kategori
-                                        '13%', // Nama
-                                        '7%', // Jenis
-                                        '6%', // Stok Awal
-                                        '7%', // Stok Dipinjam
-                                        '6%', // Stok Sisa
-                                        '8%', // Harga Satuan
-                                        '9%', // Nilai Saldo/Total
-                                        '9%', // Petugas
-                                        '10%' // Catatan
-                                    ];
+                                    tableNode.table.widths = [22, 52, 52, 62, 110, 54, 46, 50, 46, 64, 78, 76, 86];
+
+                                    tableNode.layout = {
+                                        hLineWidth: function(i, node) {
+                                            return (i === 0 || i === 1 || i === node.table.body.length) ? 1 : 0.5;
+                                        },
+                                        vLineWidth: function(i, node) {
+                                            return 0.5;
+                                        },
+                                        hLineColor: function(i, node) {
+                                            return (i === 0 || i === 1) ? '#144B59' : '#CBD5E1';
+                                        },
+                                        vLineColor: function(i, node) {
+                                            return '#E2E8F0';
+                                        },
+                                        paddingLeft: function(i, node) { return 3; },
+                                        paddingRight: function(i, node) { return 3; },
+                                        paddingTop: function(i, node) { return 4; },
+                                        paddingBottom: function(i, node) { return 4; }
+                                    };
 
                                     var body = tableNode.table.body;
+                                    var sumAwal = 0;
+                                    var sumDipinjam = 0;
+                                    var sumSisa = 0;
+                                    var sumSaldo = 0;
+
                                     for (var i = 0; i < body.length; i++) {
                                         var row = body[i];
-                                        for (var j = 0; j < row.length; j++) {
-                                            if (i === 0) {
-                                                row[j].fillColor = '#1e293b';
-                                                row[j].color = '#ffffff';
+                                        if (i === 0) {
+                                            for (var j = 0; j < row.length; j++) {
+                                                row[j].fillColor = '#144B59';
+                                                row[j].color = '#FFFFFF';
                                                 row[j].fontSize = 7.5;
                                                 row[j].bold = true;
                                                 row[j].alignment = 'center';
-                                            } else {
+                                            }
+                                        } else {
+                                            var isEven = (i % 2 === 0);
+                                            var rowBg = isEven ? '#F8FAFC' : '#FFFFFF';
+
+                                            for (var j = 0; j < row.length; j++) {
                                                 row[j].fontSize = 7;
-                                                if (i % 2 === 0) {
-                                                    row[j].fillColor = '#f8fafc';
-                                                }
-                                                // center: No(0), Tanggal(1), Kode(2), Kategori(3), Jenis(5), StokAwal(6), StokDipinjam(7), StokSisa(8)
-                                                if (j === 0 || j === 1 || j === 2 || j === 3 ||
-                                                    j === 5 || j === 6 || j === 7 || j === 8) {
+                                                row[j].fillColor = rowBg;
+                                                row[j].color = '#1E293B';
+
+                                                if (j === 0 || j === 1 || j === 2 || j === 5) {
                                                     row[j].alignment = 'center';
-                                                    // right: HargaSatuan(9), NilaiTotal(10)
+                                                } else if (j === 6 || j === 7 || j === 8) {
+                                                    row[j].alignment = 'center';
                                                 } else if (j === 9 || j === 10) {
                                                     row[j].alignment = 'right';
                                                 } else {
                                                     row[j].alignment = 'left';
                                                 }
                                             }
+
+                                            var numAwal = parseInt(String(row[6].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numDipinjam = parseInt(String(row[7].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numSisa = parseInt(String(row[8].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numSaldo = parseInt(String(row[10].text || '').replace(/[^\d]/g, ''), 10) || 0;
+
+                                            sumAwal += numAwal;
+                                            sumDipinjam += numDipinjam;
+                                            sumSisa += numSisa;
+                                            sumSaldo += numSaldo;
                                         }
+                                    }
+
+                                    // Tambahkan Baris Total Rekapitulasi di akhir tabel PDF
+                                    if (body.length > 1) {
+                                        body.push([
+                                            { text: 'TOTAL REKAPITULASI', colSpan: 6, alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            {}, {}, {}, {}, {},
+                                            { text: sumAwal.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: sumDipinjam.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: sumSisa.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: 'Rp ' + sumSaldo.toLocaleString('id-ID'), alignment: 'right', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' }
+                                        ]);
                                     }
                                 }
 
                                 // Blok Dual Tanda Tangan Rapi: Arsiparis di Kiri, Kasubag TU di Kanan
                                 doc.content.push({
+                                    unbreakable: true,
+                                    margin: [0, 20, 0, 0],
                                     columns: [{
-                                            width: 220,
+                                            width: 250,
                                             alignment: 'center',
-                                            margin: [10, 20, 0, 0],
+                                            margin: [10, 0, 0, 0],
                                             stack: [{
                                                     text: 'Disiapkan & Direkapitulasi oleh,',
                                                     fontSize: 8.5,
-                                                    margin: [0, 0, 0, 3]
+                                                    color: '#334155',
+                                                    margin: [0, 0, 0, 2]
                                                 },
                                                 {
                                                     text: 'Arsiparis (Pelaporan & Administrasi)',
                                                     fontSize: 8.5,
                                                     bold: true,
-                                                    margin: [0, 0, 0, 40]
+                                                    color: '#0F172A',
+                                                    margin: [0, 0, 0, 42]
                                                 },
                                                 {
                                                     text: @json($arsiparisName),
                                                     fontSize: 8.5,
                                                     bold: true,
-                                                    decoration: 'underline'
+                                                    decoration: 'underline',
+                                                    color: '#0F172A'
                                                 },
                                                 {
                                                     text: 'NIP. {{ $arsiparisNip }}',
@@ -1117,39 +1534,64 @@
                                             text: ''
                                         },
                                         {
-                                            width: 220,
+                                            width: 250,
                                             alignment: 'center',
-                                            margin: [0, 20, 10, 0],
+                                            margin: [0, 0, 10, 0],
                                             stack: [{
                                                     text: 'Jakarta, ' + tglHariIni,
                                                     fontSize: 8.5,
-                                                    margin: [0, 0, 0, 3]
-                                                 },
-                                                 {
-                                                     text: 'Mengetahui & Mengesahkan,',
-                                                     fontSize: 8.5
-                                                 },
-                                                 {
-                                                     text: 'Kasubag TU (Approver / Pimpinan)',
-                                                     fontSize: 8.5,
-                                                     bold: true,
-                                                     margin: [0, 0, 0, 40]
-                                                 },
-                                                 {
-                                                     text: @json($kasubagName),
-                                                     fontSize: 8.5,
-                                                     bold: true,
-                                                     decoration: 'underline'
-                                                 },
-                                                 {
-                                                     text: 'NIP. {{ $kasubagNip }}',
-                                                     fontSize: 7.5,
-                                                     color: '#475569'
-                                                 }
+                                                    color: '#334155',
+                                                    margin: [0, 0, 0, 2]
+                                                },
+                                                {
+                                                    text: 'Mengetahui & Mengesahkan,',
+                                                    fontSize: 8.5,
+                                                    color: '#334155',
+                                                    margin: [0, 0, 0, 0]
+                                                },
+                                                {
+                                                    text: 'Kasubag TU (Approver / Pimpinan)',
+                                                    fontSize: 8.5,
+                                                    bold: true,
+                                                    color: '#0F172A',
+                                                    margin: [0, 0, 0, 42]
+                                                },
+                                                {
+                                                    text: @json($kasubagName),
+                                                    fontSize: 8.5,
+                                                    bold: true,
+                                                    decoration: 'underline',
+                                                    color: '#0F172A'
+                                                },
+                                                {
+                                                    text: 'NIP. {{ $kasubagNip }}',
+                                                    fontSize: 7.5,
+                                                    color: '#475569'
+                                                }
                                             ]
                                         }
                                     ]
                                 });
+
+                                // Footer Nomor Halaman
+                                doc.footer = function(currentPage, pageCount) {
+                                    return {
+                                        margin: [20, 10, 20, 0],
+                                        columns: [
+                                            {
+                                                text: 'Sistem Informasi Pengelolaan ATK (ATEKA) - Kementerian PKP RI',
+                                                fontSize: 7.5,
+                                                color: '#94A3B8'
+                                            },
+                                            {
+                                                text: 'Halaman ' + currentPage + ' dari ' + pageCount,
+                                                fontSize: 7.5,
+                                                alignment: 'right',
+                                                color: '#64748B'
+                                            }
+                                        ]
+                                    };
+                                };
                             }
                         },
                         {
@@ -1164,10 +1606,11 @@
                                 });
 
                                 $(win.document.body).prepend(`
-                                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                                        <h3 style="margin: 0; font-size: 13pt; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN</h3>
-                                        <h4 style="margin: 4px 0 0 0; font-size: 11pt; font-weight: 600;">LAPORAN MUTASI & PERSEDIAAN BARANG (ATK)</h4>
-                                        <p style="margin: 4px 0 0 0; font-size: 9pt; color: #555;">Periode: ${periodeStr} | Dicetak: ${tglHariIni}</p>
+                                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #144B59; padding-bottom: 10px;">
+                                        <h3 style="margin: 0; font-size: 13pt; text-transform: uppercase; font-weight: bold; color: #144B59; letter-spacing: 0.5px;">KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN REPUBLIK INDONESIA</h3>
+                                        <p style="margin: 3px 0 0 0; font-size: 8.5pt; color: #64748B;">SEKRETARIAT JENDERAL - PENGELOLAAN ARSIP &amp; PERSEDIAAN BARANG (ATK)</p>
+                                        <h4 style="margin: 6px 0 0 0; font-size: 11pt; font-weight: 700; color: #0F172A;">LAPORAN MUTASI &amp; PERSEDIAAN BARANG (ATK)</h4>
+                                        <p style="margin: 3px 0 0 0; font-size: 8.5pt; color: #475569;">Periode: ${periodeStr} | Dicetak: ${tglHariIni}</p>
                                     </div>
                                 `);
 
@@ -1177,29 +1620,37 @@
                                         'width': '100%',
                                         'border-collapse': 'collapse',
                                         'margin-top': '10px',
-                                        'font-size': '8.5pt'
+                                        'font-size': '8pt'
                                     });
 
                                 $(win.document.body).find('th').css({
-                                    'background-color': '#f1f5f9',
-                                    'border': '1px solid #333',
-                                    'padding': '6px 8px',
+                                    'background-color': '#144B59',
+                                    'color': '#ffffff',
+                                    'border': '1px solid #0e343e',
+                                    'padding': '6px 6px',
                                     'text-align': 'center'
                                 });
 
                                 $(win.document.body).find('td').css({
-                                    'border': '1px solid #ccc',
-                                    'padding': '5px 8px'
+                                    'border': '1px solid #cbd5e1',
+                                    'padding': '5px 6px'
                                 });
 
                                 $(win.document.body).append(`
-                                    <div style="margin-top: 35px; float: right; text-align: center; width: 230px; page-break-inside: avoid;">
-                                        <p style="margin-bottom: 4px; font-size: 9pt;">Jakarta, ${tglHariIni}</p>
-                                        <p style="margin-bottom: 50px; font-size: 9pt;">Mengetahui,<br><strong>Kasubag TU</strong></p>
-                                        <p style="margin-bottom: 0; font-size: 9pt;"><strong><u>Utami M.</u></strong><br>
-                                        <span style="color: #444; font-size: 8.5pt;">NIP. 199812132025062010</span></p>
+                                    <div style="margin-top: 40px; width: 100%; display: flex; justify-content: space-between; page-break-inside: avoid;">
+                                        <div style="text-align: center; width: 250px;">
+                                            <p style="margin-bottom: 3px; font-size: 8.5pt;">Disiapkan &amp; Direkapitulasi oleh,</p>
+                                            <p style="margin-bottom: 50px; font-size: 8.5pt;"><strong>Arsiparis (Pelaporan &amp; Administrasi)</strong></p>
+                                            <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($arsiparisName)}</u></strong><br>
+                                            <span style="color: #475569; font-size: 8pt;">NIP. {{ $arsiparisNip }}</span></p>
+                                        </div>
+                                        <div style="text-align: center; width: 250px;">
+                                            <p style="margin-bottom: 3px; font-size: 8.5pt;">Jakarta, ${tglHariIni}</p>
+                                            <p style="margin-bottom: 50px; font-size: 8.5pt;">Mengetahui &amp; Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
+                                            <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($kasubagName)}</u></strong><br>
+                                            <span style="color: #475569; font-size: 8pt;">NIP. {{ $kasubagNip }}</span></p>
+                                        </div>
                                     </div>
-                                    <div style="clear: both;"></div>
                                 `);
                             }
                         }

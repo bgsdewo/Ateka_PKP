@@ -67,7 +67,7 @@
 
         <div class="row">
             <div class="col-lg-6">
-                <div class="card" data-aos="fade-up" data-aos-delay="500">
+                <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="header-title">
                             <h4 class="card-title mb-1">Form Ubah Password</h4>

@@ -79,7 +79,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $response = $this->actingAs($this->buUtami)->get(route('rekapitulasi-permintaan.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Rekapitulasi Permintaan ATK (Subbag TU)');
+        $response->assertSee('Rekapitulasi Permintaan ATK');
         $response->assertDontSee('Buka Verifikasi Permintaan');
         $response->assertDontSee('Rekap per Pemohon / Tiket');
         $response->assertDontSee('Rekap Kebutuhan per Jenis Barang');
@@ -716,8 +716,8 @@ class SubbagTuVerificationAndRecapTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Kasubag TU melihat tombol History Pengadaan dan indikator barang pernah diminta
-        $response->assertSee('History Pengadaan');
+        // Kasubag TU melihat tombol Riwayat Akun Pemohon dan indikator barang pernah diminta
+        $response->assertSee('Riwayat Akun Pemohon');
         $response->assertSee('Pernah Minta Serupa');
         $response->assertSee('userHistoryModal' . $newReq->id);
         $response->assertSee('INV/PAST/2026/01');

@@ -357,23 +357,20 @@
                             @endif
                         </div>
 
-                        <div class="p-2 border-top text-center bg-light rounded-bottom d-flex justify-content-between align-items-center px-3">
+                        <div class="p-2 border-top text-center bg-light rounded-bottom">
                             @if($isKasubagTU)
-                                <a href="{{ route('persetujuan.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.74rem;">
+                                <a href="{{ route('persetujuan.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.76rem;">
                                     Menu Verifikasi &rarr;
                                 </a>
                             @elseif($isPicDistribusi)
-                                <a href="{{ route('distribusi.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.74rem;">
+                                <a href="{{ route('distribusi.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.76rem;">
                                     Menu Distribusi &rarr;
                                 </a>
                             @else
-                                <a href="{{ route('katalog-atk') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.74rem;">
+                                <a href="{{ route('katalog-atk') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.76rem;">
                                     Cek Stok ATK &rarr;
                                 </a>
                             @endif
-                            <a href="{{ route('notifications.index') }}" class="btn btn-link btn-sm text-secondary p-0 small text-decoration-none" style="font-size: 0.72rem;">
-                                Semua Riwayat &rarr;
-                            </a>
                         </div>
                     </div>
                 </li>

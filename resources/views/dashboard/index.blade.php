@@ -35,7 +35,7 @@
                         <div>
                             <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
                                 <span class="badge-dot badge-dot-success"></span>
-                                <span>Kementerian PKP RI &bull; Dashboard Inventori &bull; {{ $roleTitle }}</span>
+                                <span>Kementerian PKP RI &bull; Dashboard Inventori &mdash; {{ $roleTitle }}</span>
                             </div>
                             <h1 class="text-white fw-bold mb-1">Selamat Datang, {{ $user->name }}</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
@@ -87,7 +87,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-0 fw-bold text-dark">{{ $user->name }}</h5>
-                                <small class="text-muted">{{ $user->position ?? 'Pegawai' }} &bull; <strong class="text-primary">{{ $roleTitle }}</strong></small>
+                                <small class="text-muted">{{ $user->position ?? 'Pegawai' }} <span class="text-muted mx-1">&vert;</span> <strong class="text-primary">{{ $roleTitle }}</strong></small>
                             </div>
                         </div>
 

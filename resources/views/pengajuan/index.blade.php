@@ -25,18 +25,67 @@
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
-        {{-- Flash Messages --}}
+        {{-- Flash Notification Modern Floating Toast --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div id="modern-toast-notification" class="modern-floating-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex align-items-start gap-3 p-3">
+                    <div class="modern-toast-icon-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="flex-grow-1 pe-2">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-0.5 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.04em;">BERHASIL DIAJUKAN</span>
+                            <span class="text-muted" style="font-size: 0.72rem;">Inventori ATK &bull; Kemen PKP</span>
+                        </div>
+                        @php
+                            $cleanedSuccess = trim(preg_replace('/\s+/', ' ', preg_replace('/\s*\(\s*REQ-[A-Za-z0-9\-]+\s*\)\s*/i', ' ', session('success'))));
+                            $toastTitle = str_contains(strtolower($cleanedSuccess), 'pengadaan') ? 'Permintaan Pengadaan Berhasil Diajukan!' : 'Pengajuan Berhasil Dikirim!';
+                        @endphp
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.93rem;">{{ $toastTitle }}</h6>
+                        <div class="text-secondary small toast-message" style="line-height: 1.45; font-size: 0.84rem;">
+                            {{ $cleanedSuccess }}
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-toast ms-auto" aria-label="Close" onclick="dismissModernToast()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modern-toast-progress-bar" id="toast-progress-bar"></div>
             </div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div id="modern-toast-notification" class="modern-floating-toast toast-error" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex align-items-start gap-3 p-3">
+                    <div class="modern-toast-icon-badge badge-error">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <div class="flex-grow-1 pe-2">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.04em;">PERHATIAN</span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.92rem;">Pengajuan Tidak Dapat Diproses</h6>
+                        <div class="text-secondary small toast-message" style="line-height: 1.45; font-size: 0.83rem;">
+                            {{ session('error') }}
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close-toast ms-auto" aria-label="Close" onclick="dismissModernToast()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modern-toast-progress-bar" id="toast-progress-bar"></div>
             </div>
         @endif
 
@@ -389,5 +438,47 @@
                 </div>
             </div>
         </div>
-    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function dismissModernToast() {
+            const toast = document.getElementById('modern-toast-notification');
+            if (toast) {
+                toast.classList.add('toast-hiding');
+                setTimeout(() => {
+                    toast.remove();
+                }, 350);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('modern-toast-notification');
+            const progressBar = document.getElementById('toast-progress-bar');
+            
+            if (toast && progressBar) {
+                const totalDuration = 6000; // 6 detik tampilan
+                const intervalTime = 50;
+                let elapsed = 0;
+                let isPaused = false;
+
+                // Jeda timer saat kursor mouse diarahkan ke toast
+                toast.addEventListener('mouseenter', () => isPaused = true);
+                toast.addEventListener('mouseleave', () => isPaused = false);
+
+                const timer = setInterval(() => {
+                    if (!isPaused) {
+                        elapsed += intervalTime;
+                        const remainingPercent = Math.max(0, 100 - (elapsed / totalDuration * 100));
+                        progressBar.style.width = remainingPercent + '%';
+
+                        if (elapsed >= totalDuration) {
+                            clearInterval(timer);
+                            dismissModernToast();
+                        }
+                    }
+                }, intervalTime);
+            }
+        });
+    </script>
+@endpush

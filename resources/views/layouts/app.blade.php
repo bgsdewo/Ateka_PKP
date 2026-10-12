@@ -7,7 +7,6 @@
     <title>@yield('title', 'Pencatatan Stok Barang')</title>
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/vendor/aos/dist/aos.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />

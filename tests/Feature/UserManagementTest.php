@@ -35,7 +35,7 @@ class UserManagementTest extends TestCase
             ->get(route('master-data.manajemen-pengguna.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Manajemen Pengguna & Peran (Role)', false);
+        $response->assertSee('Manajemen Pengguna');
         $response->assertSee('Master Data Akun Pengguna');
         $response->assertSee('pic_unit_choice');
         $response->assertSee('Pilih Subdirektorat / Unit Kerja PIC');

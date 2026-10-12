@@ -67,7 +67,7 @@
 
         <div class="row">
             <div class="col-lg-4">
-                <div class="card" data-aos="fade-up" data-aos-delay="400">
+                <div class="card">
                     <div class="card-body text-center">
                         <img src="{{ asset('hope-ui/assets/images/avatars/01.png') }}" alt="{{ $user->name }}"
                             class="rounded-pill img-fluid avatar-130 mb-3">
@@ -99,7 +99,7 @@
             </div>
 
             <div class="col-lg-8">
-                <div class="card" data-aos="fade-up" data-aos-delay="500">
+                <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="header-title">
                             <h4 class="card-title mb-1">Informasi Profil</h4>

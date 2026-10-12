@@ -27,7 +27,7 @@ class ReportController extends Controller
         $endDate = $request->end_date;
         $categoryId = $request->category_id;
 
-        $query = StockTransaction::with(['product.category', 'user'])
+        $query = StockTransaction::with(['product.category', 'user', 'requestItem.user'])
             ->when($year, function ($q) use ($year) {
                 $q->whereYear('transaction_date', $year);
             })
