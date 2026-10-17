@@ -430,7 +430,7 @@
                                                 @endif
                                                 <br>
                                                 <small
-                                                    class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                    class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
                                             </td>
                                             <td>
                                                 <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
@@ -620,15 +620,15 @@
                                                     <div class="modal fade text-start"
                                                         id="approveModal{{ $req->id }}" tabindex="-1"
                                                         aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                                             <form action="{{ route('persetujuan.update', $req->id) }}"
-                                                                method="POST">
+                                                                method="POST" class="d-flex flex-column h-100 w-100 overflow-hidden">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <input type="hidden" name="status" value="approved">
                                                                 <input type="hidden" name="category" value="{{ $category ?? '' }}">
-                                                                <div class="modal-content" style="white-space: normal;">
-                                                                    <div class="modal-header bg-success text-white">
+                                                                <div class="modal-content d-flex flex-column h-100 overflow-hidden" style="white-space: normal;">
+                                                                    <div class="modal-header bg-success text-white flex-shrink-0">
                                                                         <h5 class="modal-title text-white">
                                                                             @if ($req->is_procurement)
                                                                                 Setujui Usulan Pengadaan (Akan Dibeli Offline TU)
@@ -640,7 +640,7 @@
                                                                             class="btn-close btn-close-white"
                                                                             data-bs-dismiss="modal"></button>
                                                                     </div>
-                                                                    <div class="modal-body p-4">
+                                                                    <div class="modal-body p-4 overflow-y-auto">
                                                                         <div class="row g-2 mb-3 bg-light border rounded p-3 small">
                                                                             <div class="col-sm-6">
                                                                                 <strong>Nomor Tiket:</strong>
@@ -709,7 +709,9 @@
                                                                                     @foreach ($req->details as $detail)
                                                                                         @php
                                                                                             $productStock = $detail->product ? (int) $detail->product->stock : null;
-                                                                                            $defaultApproved = min($detail->quantity, $productStock !== null ? $productStock : $detail->quantity);
+                                                                                            $defaultApproved = (!$req->is_procurement && $productStock !== null)
+                                                                                                ? min($detail->quantity, $productStock)
+                                                                                                : $detail->quantity;
                                                                                         @endphp
                                                                                         <tr>
                                                                                             <td>
@@ -789,7 +791,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="modal-footer">
+                                                                    <div class="modal-footer flex-shrink-0 bg-white border-top">
                                                                         <button type="button" class="btn btn-secondary"
                                                                             data-bs-dismiss="modal">Batal</button>
                                                                         <button type="submit" class="btn btn-success">Setujui Permintaan</button>
@@ -803,22 +805,21 @@
                                                     <div class="modal fade text-start"
                                                         id="rejectModal{{ $req->id }}" tabindex="-1"
                                                         aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                                             <form action="{{ route('persetujuan.update', $req->id) }}"
-                                                                method="POST">
+                                                                method="POST" class="d-flex flex-column h-100 w-100 overflow-hidden">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <input type="hidden" name="status" value="rejected">
                                                                 <input type="hidden" name="category" value="{{ $category ?? '' }}">
-                                                                <div class="modal-content" style="white-space: normal;">
-                                                                    <div class="modal-header bg-danger text-white">
-                                                                        <h5 class="modal-title text-white">Tolak Permintaan
-                                                                            ATK</h5>
+                                                                <div class="modal-content d-flex flex-column h-100 overflow-hidden" style="white-space: normal;">
+                                                                    <div class="modal-header bg-danger text-white flex-shrink-0">
+                                                                        <h5 class="modal-title text-white">Tolak Permintaan ATK</h5>
                                                                         <button type="button"
                                                                             class="btn-close btn-close-white"
                                                                             data-bs-dismiss="modal"></button>
                                                                     </div>
-                                                                    <div class="modal-body">
+                                                                    <div class="modal-body overflow-y-auto">
                                                                         <div class="mb-3">
                                                                             <label class="form-label fw-bold">Alasan
                                                                                 Penolakan (Akan Dilihat oleh Pemohon): <span
@@ -827,12 +828,11 @@
                                                                                 placeholder="Contoh: Stok barang saat ini habis atau permohonan melebihi kuota bulanan unit kerja."></textarea>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="modal-footer">
+                                                                    <div class="modal-footer flex-shrink-0 bg-white border-top">
                                                                         <button type="button" class="btn btn-secondary"
                                                                             data-bs-dismiss="modal">Batal</button>
                                                                         <button type="submit"
-                                                                            class="btn btn-danger">Konfirmasi
-                                                                            Tolak</button>
+                                                                            class="btn btn-danger">Konfirmasi Tolak</button>
                                                                     </div>
                                                                 </div>
                                                             </form>
@@ -859,9 +859,9 @@
 
                                                     {{-- Modal Detail Permintaan / Pengadaan Kasubag TU --}}
                                                     <div class="modal fade text-start" id="detailModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header bg-light">
+                                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                                            <div class="modal-content d-flex flex-column h-100 overflow-hidden">
+                                                                <div class="modal-header bg-light flex-shrink-0">
                                                                     <h5 class="modal-title d-flex align-items-center gap-2">
                                                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
                                                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -874,13 +874,13 @@
                                                                     </h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                                 </div>
-                                                                <div class="modal-body p-4">
+                                                                <div class="modal-body p-4 overflow-y-auto">
                                                                     {{-- Status & Pemohon Info --}}
                                                                     <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom flex-wrap gap-2">
                                                                         <div>
                                                                             <h6 class="fw-bold mb-1 text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? 'Pemohon') }}</h6>
                                                                             <small class="text-muted d-block">{{ $req->user->position ?? ($req->type === 'subdit' ? 'Subdirektorat' : 'Pegawai') }} &bull; NIP: {{ $req->user->nip ?: '-' }}</small>
-                                                                            <small class="text-muted">Diajukan: {{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                                            <small class="text-muted">Diajukan: {{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
                                                                         </div>
                                                                         <div class="text-end">
                                                                             <span class="badge {{ $req->status_badge }} px-2.5 py-1.5">{{ $req->status_label }}</span>
@@ -964,7 +964,7 @@
                                                                         </div>
                                                                     @endif
                                                                 </div>
-                                                                <div class="modal-footer d-flex justify-content-between">
+                                                                <div class="modal-footer d-flex justify-content-between flex-shrink-0 bg-white border-top">
                                                                     @if (($category ?? 'pengadaan') !== 'persediaan')
                                                                         <button type="button" class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1"
                                                                             data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}">
@@ -988,8 +988,8 @@
                                                     {{-- Modal Riwayat Pengadaan & Permintaan Pemohon (Pencegahan Stocking / Hoarding) --}}
                                                     <div class="modal fade text-start" id="userHistoryModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header bg-primary text-white">
+                                                        <div class="modal-content d-flex flex-column h-100 overflow-hidden">
+                                                            <div class="modal-header bg-primary text-white flex-shrink-0">
                                                                 <div>
                                                                     <h5 class="modal-title text-white d-flex align-items-center gap-2 mb-1">
                                                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1007,7 +1007,7 @@
                                                                 </div>
                                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                             </div>
-                                                            <div class="modal-body p-4">
+                                                            <div class="modal-body p-4 overflow-y-auto">
                                                                 {{-- Banner Edukasi / Kontrol Kasubag TU --}}
                                                                 <div class="alert alert-info py-2 px-3 small mb-3 border-0 rounded-3 d-flex align-items-center gap-2" style="background: #e0f2fe; border-left: 4px solid #0284c7 !important;">
                                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info flex-shrink-0">
@@ -1328,7 +1328,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="modal-footer">
+                                                            <div class="modal-footer flex-shrink-0 bg-white border-top">
                                                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup Riwayat</button>
                                                             </div>
                                                         </div>
@@ -1623,6 +1623,9 @@
 
             // Modern Floating Toast auto dismiss and countdown progress bar
             const toast = document.getElementById('modern-toast-notification');
+            if (toast && toast.parentElement !== document.body) {
+                document.body.appendChild(toast);
+            }
             const progressBar = document.getElementById('toast-progress-bar');
             
             if (toast && progressBar) {

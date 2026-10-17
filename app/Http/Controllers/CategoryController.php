@@ -10,8 +10,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi() && !auth()->user()->isArsiparis()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU, PIC Distribusi, dan Arsiparis.');
+        if (!auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
         }
 
         $categories = Category::orderBy('name', 'asc')->get();
@@ -21,6 +21,9 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        if (!auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
+        }
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
             'description' => ['nullable', 'string'],

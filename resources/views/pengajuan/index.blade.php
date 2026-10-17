@@ -13,7 +13,7 @@
                             </div>
                             <h1 class="text-white fw-bold mb-1">Pengajuan Kebutuhan ATK</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Riwayat dan pemantauan status permohonan Alat Tulis Kantor (Individu &amp; Subdirektorat) secara transparan dan akuntabel.
+                                Riwayat dan pemantauan status permohonan Alat Tulis Kantor secara transparan dan akuntabel.
                             </p>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                                                     </span>
                                                 @endif
                                                 <br>
-                                                <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                <small class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
                                             </td>
                                             <td>
                                                 <ul class="ps-3 mb-0 small">
@@ -269,26 +269,23 @@
                                                 <small class="text-secondary">{{ $req->notes ?? '-' }}</small>
                                             </td>
                                             <td>
-                                                @if ($req->status == 'pending')
-                                                    <span class="badge bg-warning text-dark">
-                                                        {{ $req->is_procurement ? 'Menunggu Pembelian TU' : 'Menunggu Kasubag TU' }}
+                                                <span class="badge {{ $req->status_badge }}">
+                                                    {{ $req->status_label }}
+                                                </span>
+                                                @if ($req->is_procurement && $req->purchase_invoice)
+                                                    <br><span class="badge bg-primary-subtle text-primary border mt-1" style="font-size: 0.7rem;">
+                                                        Faktur: {{ $req->purchase_invoice }}
                                                     </span>
-                                                @elseif($req->status == 'approved')
-                                                    <span class="badge bg-info text-white">
-                                                        Disetujui TU (Akan Dibeli)
-                                                    </span>
-                                                @elseif($req->status == 'distributed')
-                                                    <span class="badge bg-success">
-                                                        Selesai Diserahterimakan
-                                                    </span>
-                                                    @if ($req->receiver_name)
-                                                        <br><small class="text-muted">Penerima: {{ $req->receiver_name }}</small>
-                                                    @endif
-                                                @else
-                                                    <span class="badge bg-danger">Ditolak</span>
-                                                    @if ($req->rejection_reason)
-                                                        <br><small class="text-danger">Alasan: "{{ $req->rejection_reason }}"</small>
-                                                    @endif
+                                                @endif
+                                                @if ($req->is_procurement && $req->is_purchased)
+                                                    <br><a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border mt-1 text-decoration-none" style="font-size: 0.7rem;">
+                                                        Tersedia di Katalog &rarr;
+                                                    </a>
+                                                @endif
+                                                @if($req->status == 'distributed' && $req->receiver_name)
+                                                    <br><small class="text-muted">Penerima: {{ $req->receiver_name }}</small>
+                                                @elseif($req->status == 'rejected' && $req->rejection_reason)
+                                                    <br><small class="text-danger">Alasan: "{{ $req->rejection_reason }}"</small>
                                                 @endif
                                             </td>
                                             <td class="text-end">
@@ -320,7 +317,7 @@
                                                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                                                     <div>
                                                                         <strong class="font-monospace fs-6">{{ $req->request_code }}</strong><br>
-                                                                        <small class="text-muted">Diajukan: {{ $req->created_at->format('d F Y, H:i') }}</small>
+                                                                        <small class="text-muted">Diajukan: {{ $req->created_at->timezone('Asia/Jakarta')->format('d F Y, H:i') }} WIB</small>
                                                                     </div>
                                                                     <span class="badge {{ $req->status_badge }}">{{ $req->status_label }}</span>
                                                                 </div>
@@ -377,7 +374,7 @@
                                                                 @if ($req->status === 'distributed')
                                                                     <div class="alert alert-success py-2 mb-0 small">
                                                                         <strong>Telah Diterima:</strong> {{ $req->receiver_name ?? '-' }}<br>
-                                                                        <strong>Waktu Penyerahan:</strong> {{ $req->distributed_at ? $req->distributed_at->format('d/m/Y H:i') : '-' }}<br>
+                                                                        <strong>Waktu Penyerahan:</strong> {{ $req->distributed_at ? $req->distributed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}<br>
                                                                         @if ($req->distribution_notes)
                                                                             <strong>Catatan Gudang:</strong> {{ $req->distribution_notes }}<br>
                                                                         @endif
@@ -454,6 +451,9 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const toast = document.getElementById('modern-toast-notification');
+            if (toast && toast.parentElement !== document.body) {
+                document.body.appendChild(toast);
+            }
             const progressBar = document.getElementById('toast-progress-bar');
             
             if (toast && progressBar) {

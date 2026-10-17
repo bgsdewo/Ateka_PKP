@@ -320,6 +320,8 @@
 
     <!-- Script Library -->
     <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
+    <!-- Global Alert Dismiss & Auto-Dismiss System -->
+    <script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle Password Visibility

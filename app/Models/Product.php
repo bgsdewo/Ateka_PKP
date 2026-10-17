@@ -9,13 +9,36 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'code',
+        'bmn_code',
+        'bmn_group',
         'name',
         'unit',
+        'available_units',
         'stock',
         'minimum_stock',
-        'purchase_price', // <--- Tambahkan baris ini
+        'purchase_price',
         'description',
     ];
+
+    public function getUnitListAttribute(): array
+    {
+        $units = [];
+        if (!empty($this->available_units)) {
+            foreach (explode(',', $this->available_units) as $u) {
+                $uTrim = trim($u);
+                if ($uTrim !== '' && !in_array($uTrim, $units)) {
+                    $units[] = $uTrim;
+                }
+            }
+        }
+        if (!empty($this->unit)) {
+            $primary = trim($this->unit);
+            if ($primary !== '' && !in_array($primary, $units)) {
+                array_unshift($units, $primary);
+            }
+        }
+        return !empty($units) ? $units : ['Buah'];
+    }
 
     public function category()
     {
@@ -141,6 +164,9 @@ class Product extends Model
 
     public function getStockStatusAttribute()
     {
+        if ($this->stock <= 0) {
+            return 'Stok Belum Tersedia';
+        }
         return $this->stock < 10 ? 'Akan Habis' : 'Aman';
     }
 }

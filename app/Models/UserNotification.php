@@ -65,7 +65,10 @@ class UserNotification extends Model
      */
     public static function sendProcurementNotification(RequestItem $requestItem, Product $product, ?string $invoice = null): self
     {
-        // Cegah spam: jika notifikasi barang yang sama untuk user ini sudah ada dan belum dibaca, jangan buat baris baru
+        $title = 'Barang yang Diminta Sudah Tersedia!';
+        $message = "Barang \"{$product->name}\" pada pengajuan #{$requestItem->request_code} telah ditambahkan di Master Data dan kini stoknya sudah tersedia di Katalog ATK.";
+
+        // Cegah spam: jika notifikasi barang yang sama untuk user ini sudah ada dan belum dibaca, perbarui pesannya
         $existing = self::where('user_id', $requestItem->user_id)
             ->where('product_id', $product->id)
             ->where('type', 'procurement_available')
@@ -73,22 +76,34 @@ class UserNotification extends Model
             ->first();
 
         if ($existing) {
+            $existing->update([
+                'title' => $title,
+                'message' => $message,
+                'request_id' => $requestItem->id,
+                'link' => route('katalog-atk', ['search' => $product->code]),
+                'data' => [
+                    'product_name' => $product->name,
+                    'request_code' => $requestItem->request_code,
+                    'invoice' => $invoice,
+                ],
+            ]);
             $existing->touch();
             return $existing;
         }
 
         return self::create([
             'user_id' => $requestItem->user_id,
-            'title' => 'Barang Telah Tersedia',
-            'message' => "Barang \"{$product->name}\" telah dibeli Subbag TU dan kini tersedia di persediaan ATK.",
+            'title' => $title,
+            'message' => $message,
             'type' => 'procurement_available',
             'icon' => 'box',
-            'link' => route('katalog-atk'),
+            'link' => route('katalog-atk', ['search' => $product->code]),
             'request_id' => $requestItem->id,
             'product_id' => $product->id,
             'is_read' => false,
             'data' => [
                 'product_name' => $product->name,
+                'request_code' => $requestItem->request_code,
                 'invoice' => $invoice,
             ],
         ]);

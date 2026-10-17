@@ -200,7 +200,7 @@
                                                 $statusLabel = 'Tersedia';
                                                 $statusClass = 'bg-success';
                                             } else {
-                                                $statusLabel = 'Tidak Tersedia';
+                                                $statusLabel = 'Stok Belum Tersedia';
                                                 $statusClass = 'bg-danger';
                                             }
                                         @endphp
@@ -215,7 +215,28 @@
                                                 <small class="text-primary">{{ $transaction->product->code ?? '-' }}</small>
                                             </td>
 
-                                            <td>{{ $transaction->description ?? ($transaction->uraian ?? '-') }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column gap-1">
+                                                    <div>
+                                                        <span class="badge bg-light text-dark border me-1" style="font-size: 0.72rem;">Penerima</span>
+                                                        <strong>{{ $transaction->recipient_name }}</strong>
+                                                    </div>
+                                                    @if ($transaction->handed_over_by)
+                                                        <div class="small text-muted" style="font-size: 0.75rem;">
+                                                            <span class="text-success fw-semibold">Diserahkan oleh:</span> {{ $transaction->handed_over_by }}
+                                                        </div>
+                                                    @elseif ($transaction->user)
+                                                        <div class="small text-muted" style="font-size: 0.72rem;">
+                                                            <span class="text-secondary">Petugas Gudang:</span> {{ $transaction->user->name }}
+                                                        </div>
+                                                    @endif
+                                                    @if (!empty($transaction->uraian) && $transaction->uraian !== $transaction->recipient_name)
+                                                        <div class="small text-secondary" style="font-size: 0.72rem;">
+                                                            {{ $transaction->uraian }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </td>
                                             <td>{{ $transaction->kondisi ?? 'Baik' }}</td>
 
                                             <!-- Keluar -->

@@ -113,4 +113,40 @@ class StockTransaction extends Model
 
         return '-';
     }
+
+    public function getHandedOverByAttribute(): ?string
+    {
+        if ($this->requestItem && $this->requestItem->distributor) {
+            return $this->requestItem->distributor->name_with_title ?? $this->requestItem->distributor->name;
+        }
+        return null;
+    }
+
+    public function getFormattedNoteAttribute(): string
+    {
+        $productName = $this->product->name ?? 'Barang';
+
+        if ($this->type === 'masuk') {
+            return 'Pembelian ' . $productName;
+        }
+
+        if ($this->type === 'keluar') {
+            $recipient = $this->recipient_name;
+            if (empty($recipient) || $recipient === '-') {
+                if ($this->requestItem && $this->requestItem->user) {
+                    $recipient = $this->requestItem->user->name;
+                } elseif ($this->user) {
+                    $recipient = $this->user->name;
+                } else {
+                    $recipient = 'Pegawai';
+                }
+            } else {
+                $recipient = trim(preg_replace('/\s*\[.*?\]/', '', $recipient));
+            }
+            return 'Pengeluaran ' . $productName . ' Untuk ' . $recipient;
+        }
+
+        return $this->attributes['note'] ?? '-';
+    }
 }
+

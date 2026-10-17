@@ -190,7 +190,7 @@ class ApprovalController extends Controller
                             $pemohonUnit = $item->user->position ? ' (' . $item->user->position . ')' : '';
                             $uraianPenerima = $pemohonName . $pemohonUnit;
 
-                            $noteText = 'Pengeluaran persediaan ATK untuk ' . $pemohonName . ' [' . $item->request_code . ']';
+                            $noteText = 'Pengeluaran ' . $product->name . ' Untuk ' . $pemohonName;
                             if ($itemNote) {
                                 $noteText .= ' - ' . $itemNote;
                             } elseif ($request->filled('verification_notes')) {
@@ -332,7 +332,7 @@ class ApprovalController extends Controller
                     'kondisi'          => 'Baik',
                     'harga_perolehan'  => $price,
                     'transaction_date' => $request->purchase_date,
-                    'note'             => 'Pembelian pengadaan ATK oleh Kasubag TU untuk memenuhi permintaan: ' . ($item->user->name ?? 'Pemohon') . ' (' . $item->request_code . ')'
+                    'note'             => 'Pembelian ' . $product->name
                 ]);
 
                 // Update master produk harga & stok sementara masuk
@@ -365,7 +365,7 @@ class ApprovalController extends Controller
                     'kondisi'          => 'Baik',
                     'harga_perolehan'  => $price,
                     'transaction_date' => $request->purchase_date,
-                    'note'             => 'Pengeluaran pengadaan ATK untuk ' . ($item->user->name ?? 'Pegawai') . ' (' . $item->request_code . ') via Faktur ' . $request->no_faktur
+                    'note'             => 'Pengeluaran ' . $product->name . ' Untuk ' . ($item->user->name ?? 'Pegawai') . ' via Faktur ' . $request->no_faktur
                 ]);
             }
 

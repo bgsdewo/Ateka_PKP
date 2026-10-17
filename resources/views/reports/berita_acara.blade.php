@@ -238,24 +238,13 @@
         </p>
 
         @php
-            $arsiparisUser = \App\Models\User::where('role', 'arsiparis')->first();
             $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
-            $arsiparisName = $arsiparisUser ? ($arsiparisUser->name_with_title ?: $arsiparisUser->name) : 'Devi Ismiyanti';
-            $arsiparisNip = $arsiparisUser->nip ?? '199508142022032005';
             $kasubagName = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
             $kasubagNip = $kasubagUser->nip ?? '199812132025062010';
         @endphp
 
-        <!-- DUAL TANDA TANGAN: ARSIPARIS & KASUBAG TU -->
-        <div class="row text-center mt-5" style="font-size: 12px;">
-            <div class="col-6">
-                <p class="mb-1">Disiapkan & Direkapitulasi oleh,</p>
-                <p class="text-muted small mb-0"><strong>Arsiparis (Pelaporan & Administrasi)</strong></p>
-                <div style="height: 65px;"></div>
-                <p class="mb-0 fw-bold"><u>{{ $arsiparisName }}</u></p>
-                <small class="text-muted">NIP. {{ $arsiparisNip }}</small>
-            </div>
-
+        <!-- TANDA TANGAN TUNGGAL: KASUBAG TU -->
+        <div class="row justify-content-end text-center mt-5" style="font-size: 12px;">
             <div class="col-6">
                 <p class="mb-1">Mengetahui & Mengesahkan,</p>
                 <p class="text-muted small mb-0"><strong>Kasubag Tata Usaha (Pimpinan)</strong></p>

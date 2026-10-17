@@ -284,8 +284,10 @@ textarea:focus-visible,
     }
 }
 
-/* Page content smooth entrance - opacity only to prevent stacking context trapping */
+/* Page content smooth entrance - position: relative with z-index: 5 ensures alerts & cards sit above hero banner */
 .content-inner {
+    position: relative !important;
+    z-index: 5 !important;
     animation: atekaFadeIn 0.3s ease-out;
 }
 
@@ -967,8 +969,8 @@ textarea:focus-visible,
 }
 
 .modal.fade .modal-dialog {
-    transform: scale(0.94) translateY(-14px);
-    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease !important;
+    transform: scale(0.96) translateY(-10px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
 }
 
 .modal.show .modal-dialog {
@@ -993,10 +995,44 @@ textarea:focus-visible,
     pointer-events: auto !important;
 }
 
-/* Guard: When any modal is open, ensure no parent container establishes
-   a transform, filter, or perspective containing block that traps fixed modals behind backdrop */
+/* Modal Dialog Scrollable Support (Even when wrapped in <form>) */
+.modal-dialog-scrollable {
+    max-height: calc(100vh - 3.5rem);
+}
+
+.modal-dialog-scrollable form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+.modal-dialog-scrollable form .modal-content,
+.modal-dialog-scrollable .modal-content {
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-dialog-scrollable .modal-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Guard 1: When any modal is open, ensure parent containers DO NOT establish
+   a local stacking context, transform, filter, or animation that traps fixed modals */
+body.modal-open .content-inner {
+    position: static !important;
+    z-index: auto !important;
+}
+
 body.modal-open .content-inner,
 body.modal-open .card,
+body.modal-open .card-body,
 body.modal-open .table-responsive,
 body.modal-open table,
 body.modal-open tbody,
@@ -1009,6 +1045,32 @@ body.modal-open .katalog-card-item {
     perspective: none !important;
 }
 
+/* Guard 2: Demote sidebar, sidebar toggle, and navbar so backdrop (1050) cleanly dims them */
+body.modal-open .sidebar,
+body.modal-open .sidebar-toggle,
+body.modal-open .iq-navbar,
+body.modal-open .iq-navbar-header {
+    z-index: 1020 !important;
+}
+
+/* Guard 3: In desktop view with expanded sidebar, offset modal container so dialog
+   is centered right in front of the active main content area (never overlapped or clipped) */
+@media (min-width: 1200px) {
+    .sidebar:not(.sidebar-mini) ~ .main-content .modal,
+    body:not(.sidebar-mini) .modal {
+        padding-left: var(--sidebar-width, 17.5rem) !important;
+    }
+    .sidebar.sidebar-mini ~ .main-content .modal {
+        padding-left: 4.8rem !important;
+    }
+}
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .sidebar:not(.sidebar-mini) ~ .main-content .modal,
+    body:not(.sidebar-mini) .modal {
+        padding-left: var(--sidebar-width, 16rem) !important;
+    }
+}
+
 /* ==============================================================================
    16. MODERN ALERTS & FLOATING TOAST SYSTEM (GOVTECH 2026)
    ============================================================================== */
@@ -1017,9 +1079,10 @@ body.modal-open .katalog-card-item {
     border: 1px solid transparent !important;
     padding: 1rem 1.25rem !important;
     position: relative !important;
+    z-index: 10 !important;
     box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03) !important;
     backdrop-filter: blur(10px) !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: opacity 0.25s ease, transform 0.25s ease, margin 0.25s ease, padding 0.25s ease !important;
 }
 
 .alert-success {
@@ -1053,31 +1116,35 @@ body.modal-open .katalog-card-item {
 .alert .btn-close {
     border-radius: 50% !important;
     padding: 0.65rem !important;
-    opacity: 0.55 !important;
+    opacity: 0.65 !important;
     transition: all 0.2s ease !important;
+    position: relative !important;
+    z-index: 11 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
 }
 .alert .btn-close:hover {
     opacity: 1 !important;
     background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Modern Floating Toast Notification Card (Center Screen) */
+/* Modern Floating Toast Notification Card (Top-Right Floating below Navbar) */
 .modern-floating-toast {
     position: fixed;
-    top: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    width: 490px;
-    max-width: calc(100vw - 32px);
+    top: 84px;
+    right: 24px;
+    z-index: 99999;
+    width: 440px;
+    max-width: calc(100vw - 48px);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 18px;
     border: 1px solid rgba(16, 185, 129, 0.28);
     box-shadow: 0 25px 45px -10px rgba(15, 23, 42, 0.18), 0 10px 20px -5px rgba(16, 185, 129, 0.14);
     overflow: hidden;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-    animation: modernToastSlideInCenter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: modernToastSlideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .modern-floating-toast.toast-error {
@@ -1086,18 +1153,18 @@ body.modal-open .katalog-card-item {
 }
 
 .modern-floating-toast.toast-hiding {
-    transform: translate(-50%, -100%) scale(0.92);
+    transform: translateX(110%) scale(0.95);
     opacity: 0;
     pointer-events: none;
 }
 
-@keyframes modernToastSlideInCenter {
+@keyframes modernToastSlideInRight {
     from {
-        transform: translate(-50%, -100%) scale(0.92);
+        transform: translateX(110%);
         opacity: 0;
     }
     to {
-        transform: translate(-50%, 0) scale(1);
+        transform: translateX(0);
         opacity: 1;
     }
 }
@@ -1157,26 +1224,27 @@ body.modal-open .katalog-card-item {
 
 @media (max-width: 576px) {
     .modern-floating-toast {
-        top: 16px !important;
+        top: 80px !important;
         left: 16px !important;
         right: 16px !important;
-        transform: none !important;
         width: auto !important;
         max-width: none !important;
+        transform: none !important;
+        animation: modernToastSlideInMobile 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
-    @keyframes modernToastSlideInCenter {
+    @keyframes modernToastSlideInMobile {
         from {
-            transform: translateY(-100%) scale(0.92);
+            transform: translateY(-20px);
             opacity: 0;
         }
         to {
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
             opacity: 1;
         }
     }
     .modern-floating-toast.toast-hiding {
-        transform: translateY(-100%) scale(0.92);
-        opacity: 0;
+        transform: translateY(-20px) scale(0.95) !important;
+        opacity: 0 !important;
     }
 }
 
@@ -1224,6 +1292,14 @@ body.modal-open .katalog-card-item {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
+}
+
+/* Guard: Ensure page loader never traps user clicks or intercepts hit testing */
+#loading,
+.loader,
+.simple-loader,
+.loader-body {
+    pointer-events: none !important;
 }
 
 

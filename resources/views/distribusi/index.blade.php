@@ -9,7 +9,7 @@
                         <div>
                             <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
                                 <span class="badge-dot badge-dot-warning"></span>
-                                <span>Kementerian PKP RI &bull; Pengelolaan Gudang &bull; PIC Distribusi</span>
+                                <span>Kementerian PKP RI &bull; Pengelolaan Gudang &bull; Distribusi Barang</span>
                             </div>
                             <h1 class="text-white fw-bold mb-1">Koordinasi &amp; Distribusi Barang ATK</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
@@ -18,7 +18,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm">
-                                {{ auth()->user()->position ?? 'PIC Distribusi (Gudang)' }}
+                                {{ auth()->user()->position ?? 'Petugas Gudang' }}
                             </span>
                         </div>
                     </div>
@@ -364,7 +364,7 @@
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
                                             <td>
                                                 <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                                <small class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
                                             </td>
                                             <td>
                                                 <strong>{{ $req->user->name ?? '-' }}</strong><br>
@@ -417,7 +417,7 @@
                                              <td>
                                                 @if ($req->status === 'distributed')
                                                     <strong class="text-dark small">{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong><br>
-                                                    <small class="text-muted">{{ $req->distributed_at ? $req->distributed_at->format('d/m/Y H:i') : '-' }}</small>
+                                                    <small class="text-muted">{{ $req->distributed_at ? $req->distributed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}</small>
                                                     @if ($req->distribution_notes)
                                                         <br><small class="text-secondary fst-italic">"{{ $req->distribution_notes }}"</small>
                                                     @endif
@@ -574,7 +574,7 @@
                                                                                 <strong>Diserahkan oleh:</strong> {{ $req->distributor->name ?? 'PIC Gudang' }}
                                                                             </div>
                                                                             <div class="col-sm-6 text-sm-end">
-                                                                                <strong>Waktu:</strong> {{ $req->distributed_at ? $req->distributed_at->format('d/m/Y H:i') : '-' }}<br>
+                                                                                <strong>Waktu:</strong> {{ $req->distributed_at ? $req->distributed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}<br>
                                                                                 @if ($req->distribution_notes)
                                                                                     <span class="fst-italic text-secondary">"{{ $req->distribution_notes }}"</span>
                                                                                 @endif

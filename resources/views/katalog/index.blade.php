@@ -59,7 +59,7 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-3.5">
                         <form id="katalog-filter-form" action="{{ route('katalog-atk') }}" method="GET" class="row g-2 align-items-center">
-                            <div class="col-12 col-md-5">
+                            <div class="col-12 col-md-4">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted">
                                         <span id="search-spinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
@@ -69,7 +69,7 @@
                                         </svg>
                                     </span>
                                     <input type="text" id="katalog-search" name="search" class="form-control border-start-0 ps-0"
-                                        placeholder="Cari nama barang atau kode ATK (misal: Map, Clear Holder, Kertas)..." value="{{ $search }}" autocomplete="off">
+                                        placeholder="Cari nama barang atau kode ATK (misal: Map, Kertas, Binder)..." value="{{ $search }}" autocomplete="off">
                                     <button class="btn btn-outline-secondary border-start-0" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -79,9 +79,9 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <select name="category_id" class="form-select" onchange="this.form.submit()">
-                                    <option value="">-- Semua Kategori ATK --</option>
+                                    <option value="">-- Semua Kategori ({{ $categories->count() }}) --</option>
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>
                                             {{ $cat->name }}
@@ -90,9 +90,17 @@
                                 </select>
                             </div>
 
-                            <div class="col-12 col-md-3 d-flex gap-2" id="katalog-reset-container">
+                            <div class="col-12 col-md-3">
+                                <select name="stock_status" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Semua Status Stok --</option>
+                                    <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia di Gudang</option>
+                                    <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Stok Belum Tersedia (Bisa Dipesan)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-2 d-flex gap-2" id="katalog-reset-container">
                                 <button type="submit" id="btn-katalog-search" class="btn btn-primary flex-grow-1">Cari Barang</button>
-                                @if ($search || $categoryId)
+                                @if ($search || $categoryId || !empty($stockStatus))
                                     <a href="{{ route('katalog-atk') }}" class="btn btn-light border px-3" title="Reset Filter">
                                         Reset
                                     </a>
@@ -192,7 +200,7 @@
                                     </span>
                                     @if ($item->stock <= 0)
                                         <span class="badge bg-danger">
-                                            <span class="badge-dot badge-dot-danger"></span>Stok Habis
+                                            <span class="badge-dot badge-dot-danger"></span>Stok Belum Tersedia
                                         </span>
                                     @else
                                         <span class="badge bg-success">
@@ -205,8 +213,11 @@
                                 <h6 class="fw-bold text-dark mb-1" style="min-height: 40px; line-height: 1.35;" title="{{ $item->name }}">
                                     {{ $item->name }}
                                 </h6>
-                                <small class="text-muted d-block mb-2" style="font-size: 0.78rem;">
+                                <small class="text-muted d-block mb-1" style="font-size: 0.78rem;">
                                     Kategori: <strong class="text-secondary">{{ $item->category->name ?? '-' }}</strong>
+                                </small>
+                                <small class="text-muted d-block mb-2" style="font-size: 0.74rem;">
+                                    Satuan Standar: <span class="badge bg-light text-dark border">{{ implode(' / ', $item->unit_list) }}</span>
                                 </small>
                             </div>
 
@@ -241,7 +252,8 @@
                                         data-code="{{ $item->code }}"
                                         data-name="{{ $item->name }}"
                                         data-category="{{ $item->category->name ?? '-' }}"
-                                        data-unit="{{ $item->unit ?? 'Unit' }}">
+                                        data-unit="{{ $item->unit ?? 'Buah' }}"
+                                        data-available-units="{{ implode(',', $item->unit_list) }}">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                                             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -268,7 +280,23 @@
             @endforelse
         </div>
 
-        {{-- Modal Pesan Barang Habis / Restock Langsung dari Katalog --}}
+        {{-- Pagination Katalog (8 Barang per Halaman) --}}
+        <div class="mt-4" id="katalog-pagination-container">
+            @if ($products->hasPages())
+                <div class="card shadow-sm border-0">
+                    <div class="card-body py-2.5 px-3.5 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="small text-muted">
+                            Menampilkan <strong>{{ $products->firstItem() ?? 0 }}</strong> &ndash; <strong>{{ $products->lastItem() ?? 0 }}</strong> dari total <strong>{{ $products->total() }}</strong> barang ATK
+                        </div>
+                        <div class="katalog-pagination-links">
+                            {{ $products->onEachSide(1)->links() }}
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Modal Pesan Barang (Stok Belum Tersedia) / Restock Langsung dari Katalog --}}
         <div class="modal fade" id="modalPesanKatalog" tabindex="-1" aria-labelledby="modalPesanKatalogLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
@@ -286,7 +314,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h5 class="modal-title fw-bold text-dark mb-0" id="modalPesanKatalogLabel">Pesan Barang ATK (Stok Habis)</h5>
+                                    <h5 class="modal-title fw-bold text-dark mb-0" id="modalPesanKatalogLabel">Pesan Barang ATK (Stok Belum Tersedia)</h5>
                                     <small class="text-dark-50" style="font-size: 0.78rem;">Pemesanan otomatis diteruskan ke Kasubag TU untuk pengadaan</small>
                                 </div>
                             </div>
@@ -302,7 +330,7 @@
                                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                 </svg>
                                 <div>
-                                    <strong>Stok barang ini di gudang kosong (0).</strong> Anda tidak perlu membuka menu Permintaan Pengadaan secara terpisah. Pesanan ini akan langsung dicatat sebagai usulan pengadaan ke Subbag TU.
+                                    <strong>Stok barang ini belum tersedia di gudang (0).</strong> Anda tidak perlu membuka menu Permintaan Pengadaan secara terpisah. Pesanan ini akan langsung dicatat sebagai usulan pengadaan ke Subbag TU.
                                 </div>
                             </div>
 
@@ -311,7 +339,7 @@
                                 <div class="card-body p-3">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span class="badge bg-secondary font-monospace" id="modal-product-code" style="font-size: 0.75rem;">-</span>
-                                        <span class="badge bg-danger">Stok Habis (0)</span>
+                                        <span class="badge bg-danger">Stok Belum Tersedia (0)</span>
                                     </div>
                                     <h6 class="fw-bold text-dark mb-1" id="modal-product-name">-</h6>
                                     <small class="text-muted d-block">
@@ -325,11 +353,8 @@
                                 <div class="col-12 col-md-6">
                                     <label class="form-label fw-bold small text-secondary">Jenis Permintaan <span class="text-danger">*</span></label>
                                     <select name="type" class="form-select form-select-sm" required>
-                                        <option value="individu" {{ auth()->user()->role !== 'subdit' ? 'selected' : '' }}>
+                                        <option value="individu" selected>
                                             Individu (Staf / Pegawai)
-                                        </option>
-                                        <option value="subdit" {{ (auth()->user()->role === 'subdit' || old('type') === 'subdit') ? 'selected' : '' }}>
-                                            Subdirektorat (Kolektif Unit)
                                         </option>
                                     </select>
                                 </div>
@@ -340,12 +365,15 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label fw-bold small text-secondary">Jumlah yang Dipesan <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-bold small text-secondary">Jumlah & Satuan yang Dipesan <span class="text-danger">*</span></label>
                                     <div class="input-group input-group-sm">
                                         <input type="number" name="quantity" id="modal-quantity" class="form-control fw-bold" min="1" value="1" required>
-                                        <span class="input-group-text font-monospace" id="modal-product-unit">Pcs</span>
+                                        <select name="custom_unit" id="modal-product-unit-select" class="form-select fw-semibold bg-light" style="max-width: 145px;">
+                                            <option value="Buah">Buah</option>
+                                        </select>
                                     </div>
-                                    <small class="text-muted" style="font-size: 0.75rem;">Tentukan berapa unit barang yang dibutuhkan oleh unit/staf.</small>
+                                    <span class="d-none" id="modal-product-unit">Buah</span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Tentukan jumlah dan pilih satuan standar barang yang dibutuhkan.</small>
                                 </div>
 
                                 <div class="col-12">
@@ -495,6 +523,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentReset.innerHTML = newReset.innerHTML;
             }
 
+            const newPagination = doc.getElementById('katalog-pagination-container');
+            const currentPagination = document.getElementById('katalog-pagination-container');
+            if (newPagination && currentPagination) {
+                currentPagination.innerHTML = newPagination.innerHTML;
+            }
+
             // Sync URL in address bar without reload
             window.history.replaceState(null, '', url);
 
@@ -575,8 +609,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Intercept pagination link clicks for smooth AJAX navigation
+    document.addEventListener('click', function(e) {
+        const pageLink = e.target.closest('#katalog-pagination-container a.page-link');
+        if (pageLink && pageLink.href) {
+            e.preventDefault();
+            performServerSearch(pageLink.href);
+            const gridEl = document.getElementById('katalog-filter-form');
+            if (gridEl) {
+                gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    });
+
     // Modal Pesan Barang Habis dari Katalog
     const modalEl = document.getElementById('modalPesanKatalog');
+    const standardUnits = ['Buah', 'Dus', 'Rim', 'Pak', 'Kotak', 'Doz', 'Set', 'Roll', 'Slop', 'Buku', 'Tube', 'Box', 'Botol', 'Lusin', 'Pcs'];
     if (modalEl) {
         modalEl.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget ? (event.relatedTarget.closest('[data-bs-toggle="modal"]') || event.relatedTarget) : null;
@@ -586,13 +634,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const code = button.getAttribute('data-code') || '';
             const name = button.getAttribute('data-name') || '';
             const category = button.getAttribute('data-category') || '';
-            const unit = button.getAttribute('data-unit') || 'Stok';
+            const unit = button.getAttribute('data-unit') || 'Buah';
+            const availUnitsStr = button.getAttribute('data-available-units') || unit;
+            const availUnits = availUnitsStr.split(',').map(u => u.trim()).filter(Boolean);
 
             const inputId = document.getElementById('modal-product-id');
             const spanCode = document.getElementById('modal-product-code');
             const spanName = document.getElementById('modal-product-name');
             const spanCat = document.getElementById('modal-product-category');
             const spanUnit = document.getElementById('modal-product-unit');
+            const unitSelect = document.getElementById('modal-product-unit-select');
             const inputQty = document.getElementById('modal-quantity');
             const linkLengkap = document.getElementById('modal-link-form-lengkap');
 
@@ -601,6 +652,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (spanName) spanName.textContent = name;
             if (spanCat) spanCat.textContent = category;
             if (spanUnit) spanUnit.textContent = unit;
+            if (unitSelect) {
+                unitSelect.innerHTML = '';
+                const added = new Set();
+                availUnits.forEach(u => {
+                    added.add(u.toLowerCase());
+                    const opt = document.createElement('option');
+                    opt.value = u;
+                    opt.textContent = u + ' (Standar)';
+                    if (u.toLowerCase() === unit.toLowerCase()) opt.selected = true;
+                    unitSelect.appendChild(opt);
+                });
+                standardUnits.forEach(u => {
+                    if (!added.has(u.toLowerCase())) {
+                        const opt = document.createElement('option');
+                        opt.value = u;
+                        opt.textContent = u;
+                        unitSelect.appendChild(opt);
+                    }
+                });
+            }
             if (inputQty) inputQty.value = '1';
             if (linkLengkap) {
                 linkLengkap.href = "{{ route('pengajuan.create') }}?product_id=" + encodeURIComponent(id);

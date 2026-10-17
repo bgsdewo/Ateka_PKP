@@ -3,15 +3,14 @@
     $role = $currentUser->role ?? 'pegawai';
 
     $isKasubagTU = in_array($role, ['kasubag_tu', 'admin']);
-    $isArsiparis = $role === 'arsiparis';
     $isPicDistribusi = $role === 'pic_distribusi';
-    $isSubdit = $role === 'subdit';
-    $isRequester = in_array($role, ['pegawai', 'subdit', 'member']) || empty($role);
+    $isPegawaiGudang = $role === 'pegawai_gudang';
+    $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'member']) || empty($role);
 
     $pendingApprovalsCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->count() : 0;
     $pendingProcurementCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count() : 0;
     $pendingStockCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
-    $readyDistribusiCount = ($isPicDistribusi || $isKasubagTU) ? \App\Models\RequestItem::where('status', 'approved')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
+    $readyDistribusiCount = ($isKasubagTU || $isPegawaiGudang) ? \App\Models\RequestItem::where('status', 'approved')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
 @endphp
 
 <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all">
@@ -55,12 +54,10 @@
                             <small class="text-primary fw-semibold" style="font-size: 0.72rem;">
                                 @if ($isKasubagTU)
                                     Kasubag TU (Approver)
-                                @elseif ($isArsiparis)
-                                    Arsiparis (Pelaporan)
                                 @elseif ($isPicDistribusi)
                                     {{ $currentUser->position ?? ('PIC Distribusi (' . ($currentUser->subdit_name ?? 'Gudang') . ')') }}
-                                @elseif ($isSubdit)
-                                    Subdirektorat (Pemohon Kolektif)
+                                @elseif ($isPegawaiGudang)
+                                    Pegawai Gudang
                                 @else
                                     Pegawai (Pemohon Individu)
                                 @endif
@@ -160,9 +157,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 2. MENU KHUSUS PIC DISTRIBUSI (Pengelola / Gudang) -->
+                <!-- 2. MENU DISTRIBUSI BARANG (Kasubag TU & Pegawai Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isPicDistribusi)
+                @if ($isKasubagTU || $isPegawaiGudang)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
@@ -177,9 +174,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 3. MENU OPERASIONAL GUDANG (Kasubag TU & PIC Distribusi) -->
+                <!-- 3. MENU OPERASIONAL GUDANG (Kasubag TU, Pegawai Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isKasubagTU || $isPicDistribusi)
+                @if ($isKasubagTU || $isPegawaiGudang)
                     @php
                         $transaksiActive = request()->routeIs('barang-masuk') || request()->routeIs('barang-keluar');
                     @endphp
@@ -219,9 +216,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 4. MENU PENGAJUAN ATK (Pegawai & Subdirektorat) -->
+                <!-- 4. MENU PENGAJUAN ATK (Pegawai & PIC) -->
                 <!-- ======================================================== -->
-                @if ($isRequester || $isKasubagTU || $isPicDistribusi)
+                @if ($isRequester || $isKasubagTU)
                     @php
                         $pengajuanActive = request()->routeIs('pengajuan.*') || request()->routeIs('katalog-atk');
                     @endphp
@@ -277,9 +274,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 5. MENU LAPORAN & ARSIP (Kasubag TU, Arsiparis, PIC Distribusi) -->
+                <!-- 5. MENU LAPORAN & ARSIP (Kasubag TU, Pegawai Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isKasubagTU || $isArsiparis || $isPicDistribusi)
+                @if ($isKasubagTU || $isPegawaiGudang)
                     @php
                         $laporanActive = request()->routeIs('reports.*');
                     @endphp
@@ -321,9 +318,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 6. MASTER DATA (Kasubag TU & PIC Distribusi/Arsiparis untuk view) -->
+                <!-- 6. MASTER DATA (Kasubag TU, Pegawai Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isKasubagTU || $isPicDistribusi || $isArsiparis)
+                @if ($isKasubagTU || $isPegawaiGudang)
                     @php
                         $masterActive =
                             request()->routeIs('master-data.kategori-barang.*') ||
@@ -351,18 +348,20 @@
                             </i>
                         </a>
                         <ul class="sub-nav collapse {{ $masterActive ? 'show' : '' }}" id="master-data" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('master-data.kategori-barang.*') ? 'active' : '' }}"
-                                    href="{{ route('master-data.kategori-barang.index') }}" title="Kategori Barang">
-                                    <i class="icon">
-                                        <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="12" r="8" />
-                                        </svg>
-                                    </i>
-                                    <i class="sidenav-mini-icon">K</i>
-                                    <span class="item-name">Kategori Barang</span>
-                                </a>
-                            </li>
+                            @if ($isKasubagTU)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('master-data.kategori-barang.*') ? 'active' : '' }}"
+                                        href="{{ route('master-data.kategori-barang.index') }}" title="Kategori Barang">
+                                        <i class="icon">
+                                            <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
+                                                <circle cx="12" cy="12" r="8" />
+                                            </svg>
+                                        </i>
+                                        <i class="sidenav-mini-icon">K</i>
+                                        <span class="item-name">Kategori Barang</span>
+                                    </a>
+                                </li>
+                            @endif
 
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('master-data.daftar-barang.*') ? 'active' : '' }}"

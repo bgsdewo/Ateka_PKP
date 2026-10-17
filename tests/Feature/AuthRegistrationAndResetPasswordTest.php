@@ -11,108 +11,31 @@ class AuthRegistrationAndResetPasswordTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function test_register_page_displays_nip_field_and_subdit_options(): void
+    public function test_register_page_displays_nip_field_and_does_not_display_subdit_role(): void
     {
         $response = $this->get(route('register'));
 
         $response->assertStatus(200);
         $response->assertSee('Nomor Induk Pegawai (NIP)');
-        $response->assertSee('subdit_choice');
-        $response->assertSee('Subdirektorat SDK');
-        $response->assertSee('Subdirektorat PJF');
-        $response->assertSee('Subdirektorat KBR');
-        $response->assertSee('Subbagian TU');
+        $response->assertSee('Pegawai');
+        $response->assertDontSee('subdit_choice');
+        $response->assertDontSee('Pemohon Kolektif');
     }
 
-    public function test_register_subdit_sets_position_and_subdit_name_with_nip(): void
+    public function test_register_rejects_subdit_role(): void
     {
         $response = $this->post(route('register.store'), [
             'name' => 'Admin Subdit SDK Baru',
             'email' => 'subdit_sdk_baru@perumahan.go.id',
             'nip' => '19950510 202012 1 002',
             'role' => 'subdit',
-            'subdit_choice' => 'Subdirektorat SDK',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect(route('dashboard'));
-
-        $this->assertDatabaseHas('users', [
+        $response->assertSessionHasErrors(['role']);
+        $this->assertDatabaseMissing('users', [
             'email' => 'subdit_sdk_baru@perumahan.go.id',
-            'role' => 'subdit',
-            'position' => 'Subdirektorat SDK',
-            'subdit_name' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
-            'nip' => '19950510 202012 1 002',
-        ]);
-    }
-
-    public function test_register_subdit_pjf_sets_official_full_name(): void
-    {
-        $response = $this->post(route('register.store'), [
-            'name' => 'Admin Subdit PJF Baru',
-            'email' => 'subdit_pjf_baru@perumahan.go.id',
-            'nip' => '19960412 202101 2 005',
-            'role' => 'subdit',
-            'subdit_choice' => 'Subdirektorat PJF',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        $response->assertRedirect(route('dashboard'));
-
-        $this->assertDatabaseHas('users', [
-            'email' => 'subdit_pjf_baru@perumahan.go.id',
-            'role' => 'subdit',
-            'position' => 'Subdirektorat PJF',
-            'subdit_name' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
-            'nip' => '19960412 202101 2 005',
-        ]);
-    }
-
-    public function test_register_subdit_kbr_sets_official_full_name(): void
-    {
-        $response = $this->post(route('register.store'), [
-            'name' => 'Admin Subdit KBR Baru',
-            'email' => 'subdit_kbr_baru@perumahan.go.id',
-            'nip' => '19970928 202203 2 006',
-            'role' => 'subdit',
-            'subdit_choice' => 'Subdirektorat KBR',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        $response->assertRedirect(route('dashboard'));
-
-        $this->assertDatabaseHas('users', [
-            'email' => 'subdit_kbr_baru@perumahan.go.id',
-            'role' => 'subdit',
-            'position' => 'Subdirektorat KBR',
-            'subdit_name' => 'Subdirektorat Kendala Bangunan Rumah',
-            'nip' => '19970928 202203 2 006',
-        ]);
-    }
-
-    public function test_register_subdit_tu_sets_official_full_name(): void
-    {
-        $response = $this->post(route('register.store'), [
-            'name' => 'Admin Subbag TU Baru',
-            'email' => 'subbag_tu_baru@perumahan.go.id',
-            'nip' => '19920310 201603 2 003',
-            'role' => 'subdit',
-            'subdit_choice' => 'Subbagian TU',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        $response->assertRedirect(route('dashboard'));
-
-        $this->assertDatabaseHas('users', [
-            'email' => 'subbag_tu_baru@perumahan.go.id',
-            'role' => 'subdit',
-            'position' => 'Subbagian TU',
-            'subdit_name' => 'Subbagian Tata Usaha',
-            'nip' => '19920310 201603 2 003',
         ]);
     }
 

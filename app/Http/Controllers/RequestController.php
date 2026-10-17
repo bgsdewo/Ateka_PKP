@@ -26,20 +26,23 @@ class RequestController extends Controller
     public function create(Request $request)
     {
         $products = Product::with('category')->orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
         $selectedProductId = $request->get('product_id');
-        return view('pengajuan.create', compact('products', 'selectedProductId'));
+        return view('pengajuan.create', compact('products', 'categories', 'selectedProductId'));
     }
 
     // Menyimpan data pengajuan baru ke database
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:individu,subdit',
+            'type' => 'nullable|in:individu',
             'notes' => 'nullable|string',
             'product_id' => 'required|array',
             'product_id.*' => 'exists:products,id',
             'quantity' => 'required|array',
             'quantity.*' => 'integer|min:1',
+            'custom_unit' => 'nullable|array',
+            'custom_unit.*' => 'nullable|string|max:50',
         ]);
 
         // Cek apakah ada barang yang diajukan yang stoknya kosong atau kurang sehingga membutuhkan pengadaan
@@ -61,22 +64,24 @@ class RequestController extends Controller
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->type,
+            'type' => $request->input('type', 'individu') ?: 'individu',
             'is_procurement' => $requiresProcurement,
             'status' => 'pending', // Menunggu persetujuan Kasubag TU
             'notes' => $request->notes,
         ]);
 
         // Simpan detail barang yang diajukan
+        $units = $request->input('custom_unit', []);
         foreach ($request->product_id as $index => $productId) {
             $qty = $request->quantity[$index];
             $product = Product::find($productId);
+            $selectedUnit = !empty($units[$index]) ? trim($units[$index]) : ($product ? ($product->unit ?: 'Pcs') : 'Pcs');
             if ($qty > 0) {
                 RequestDetail::create([
                     'request_id' => $requestItem->id,
                     'product_id' => $productId,
                     'custom_product_name' => $product ? $product->name : null,
-                    'custom_unit' => $product ? ($product->unit ?: 'Pcs') : 'Pcs',
+                    'custom_unit' => $selectedUnit,
                     'specification' => $product ? ('Barang Katalog (' . $product->code . ')') : null,
                     'quantity' => $qty,
                 ]);
@@ -84,7 +89,7 @@ class RequestController extends Controller
         }
 
         $successMsg = $requiresProcurement
-            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Karena terdapat barang dengan stok habis di gudang, pengajuan otomatis diarahkan ke alur pengadaan Kasubag TU.'
+            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Karena terdapat barang dengan stok belum tersedia di gudang, pengajuan otomatis diarahkan ke alur pengadaan Kasubag TU.'
             : 'Pengajuan permintaan ATK berhasil dikirim dan menunggu persetujuan Kasubag TU.';
 
         return redirect()->route('pengajuan.index')->with('success', $successMsg);
@@ -97,13 +102,13 @@ class RequestController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'type' => 'required|in:individu,subdit',
+            'type' => 'nullable|in:individu',
             'quantity' => 'required|integer|min:1',
+            'custom_unit' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:1000',
         ], [
             'product_id.required' => 'Barang wajib dipilih.',
             'product_id.exists' => 'Barang tidak ditemukan dalam sistem.',
-            'type.required' => 'Jenis permintaan wajib dipilih.',
             'quantity.required' => 'Jumlah pesanan wajib diisi.',
             'quantity.min' => 'Jumlah pesanan minimal 1 unit.',
         ]);
@@ -116,10 +121,12 @@ class RequestController extends Controller
             ? trim($request->notes)
             : 'Pemesanan langsung barang habis dari katalog (' . $product->name . ')';
 
+        $selectedUnit = $request->filled('custom_unit') ? trim($request->custom_unit) : ($product->unit ?: 'Pcs');
+
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->type,
+            'type' => $request->input('type', 'individu') ?: 'individu',
             'is_procurement' => true,
             'status' => 'pending',
             'notes' => $notes,
@@ -129,12 +136,12 @@ class RequestController extends Controller
             'request_id' => $requestItem->id,
             'product_id' => $product->id,
             'custom_product_name' => $product->name,
-            'custom_unit' => $product->unit ?: 'Pcs',
+            'custom_unit' => $selectedUnit,
             'specification' => 'Barang Katalog (' . $product->code . ') - Kategori: ' . ($product->category->name ?? 'Umum'),
             'quantity' => (int) $request->quantity,
         ]);
 
-        $unitName = $product->unit ?: 'Stok';
+        $unitName = $selectedUnit ?: 'Stok';
         $successMsg = 'Pesanan barang "' . $product->name . '" sebanyak ' . $request->quantity . ' ' . $unitName . ' berhasil diajukan (' . $requestCode . ')! Permintaan telah otomatis diteruskan ke Kasubag TU untuk diproses tanpa perlu mengisi formulir pengadaan terpisah.';
 
         return redirect()->back()->with('success', $successMsg);
@@ -143,15 +150,16 @@ class RequestController extends Controller
     // Menampilkan form untuk usulan pengadaan barang baru (beli ke supplier)
     public function createProcurement(Request $request)
     {
-        $existingProducts = Product::orderBy('name', 'asc')->get();
-        return view('pengajuan.pengadaan', compact('existingProducts'));
+        $existingProducts = Product::with('category')->orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        return view('pengajuan.pengadaan', compact('existingProducts', 'categories'));
     }
 
     // Menyimpan data usulan pengadaan barang ke database
     public function storeProcurement(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:individu,subdit',
+            'type' => 'nullable|in:individu',
             'notes' => 'nullable|string',
             'item_name' => 'required|array|min:1',
             'item_name.*' => 'required|string|max:255',
@@ -172,7 +180,7 @@ class RequestController extends Controller
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->type,
+            'type' => $request->input('type', 'individu') ?: 'individu',
             'is_procurement' => true,
             'status' => 'pending',
             'notes' => $request->notes,

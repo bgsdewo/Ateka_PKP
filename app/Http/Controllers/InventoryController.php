@@ -13,6 +13,10 @@ class InventoryController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Gudang & Stok hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+        }
+
         $products = Product::with('category')
             ->orderBy('name', 'asc')
             ->get();
@@ -43,6 +47,10 @@ class InventoryController extends Controller
 
     public function storeTransaction(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki hak akses untuk mencatat transaksi gudang.');
+        }
+
         if (!$request->has('tanggal_faktur') && $request->has('transaction_date')) {
             $request->merge(['tanggal_faktur' => $request->transaction_date]);
         }
@@ -122,7 +130,7 @@ class InventoryController extends Controller
                 'uraian' => $request->uraian,
                 'kondisi' => $request->kondisi,
                 'harga_perolehan' => $hargaPerolehan,
-                'note' => $request->keterangan,
+                'note' => $request->keterangan ?: ($request->type === 'masuk' ? ('Pembelian ' . $product->name) : ('Pengeluaran ' . $product->name . ' Untuk ' . ($request->uraian ?: 'Pegawai'))),
             ]);
 
             $productUpdateData = ['stock' => $stockAfter];

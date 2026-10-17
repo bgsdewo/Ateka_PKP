@@ -10,8 +10,8 @@ class BarangKeluarController extends Controller
 {
     public function index(Request $request)
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Gudang hanya dapat diakses oleh Kasubag TU dan PIC Distribusi.');
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Gudang hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
         }
 
         $month = $request->get('month');
@@ -19,7 +19,7 @@ class BarangKeluarController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $query = StockTransaction::with(['product.category', 'user'])
+        $query = StockTransaction::with(['product.category', 'user', 'requestItem.distributor', 'requestItem.user'])
             ->where('type', 'keluar');
 
         if ($startDate && $endDate) {

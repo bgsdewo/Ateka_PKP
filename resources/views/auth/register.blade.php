@@ -317,17 +317,16 @@
                                             </div>
                                         </div>
 
-                                        <!-- Pilihan Role (Hanya Subdit dan Pegawai) -->
+                                        <!-- Peran Akun (Pegawai) -->
                                         <div class="col-12">
                                             <label class="form-label text-uppercase mb-2">
-                                                Pilih Jenis Pemohon (Role) <span class="text-danger">*</span>
+                                                Peran Akun (Role)
                                             </label>
                                             <div class="row g-3">
-                                                <!-- Opsi 1: Pegawai (Individu) -->
-                                                <div class="col-md-6 col-12">
-                                                    <label class="role-radio-card d-block {{ (old('role') == 'pegawai' || !old('role')) ? 'active' : '' }}" for="role_pegawai">
+                                                <div class="col-12">
+                                                    <label class="role-radio-card d-block active" for="role_pegawai">
                                                         <div class="d-flex align-items-start gap-2">
-                                                            <input type="radio" id="role_pegawai" name="role" value="pegawai" class="mt-1" {{ (old('role') == 'pegawai' || !old('role')) ? 'checked' : '' }} required>
+                                                            <input type="radio" id="role_pegawai" name="role" value="pegawai" class="mt-1" checked required>
                                                             <div>
                                                                 <div class="d-flex align-items-center gap-2">
                                                                     <strong class="text-dark">Pegawai</strong>
@@ -335,24 +334,6 @@
                                                                 </div>
                                                                 <small class="text-muted d-block mt-1" style="font-size: 0.78rem; line-height: 1.4;">
                                                                     Untuk staf / pegawai perorangan yang mengajukan kebutuhan ATK harian operasional.
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </label>
-                                                </div>
-
-                                                <!-- Opsi 2: Subdirektorat (Kolektif) -->
-                                                <div class="col-md-6 col-12">
-                                                    <label class="role-radio-card d-block {{ old('role') == 'subdit' ? 'active' : '' }}" for="role_subdit">
-                                                        <div class="d-flex align-items-start gap-2">
-                                                            <input type="radio" id="role_subdit" name="role" value="subdit" class="mt-1" {{ old('role') == 'subdit' ? 'checked' : '' }}>
-                                                            <div>
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <strong class="text-dark">Subdirektorat</strong>
-                                                                    <span class="badge-role bg-primary text-white" style="background-color: #0284c7 !important;">Pemohon Kolektif</span>
-                                                                </div>
-                                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem; line-height: 1.4;">
-                                                                    Mewakili unit kerja / Subdirektorat untuk mengajukan permohonan ATK kolektif tim.
                                                                 </small>
                                                             </div>
                                                         </div>
@@ -366,38 +347,13 @@
                                                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                                 </svg>
                                                 <span class="fst-italic" style="font-size: 0.78rem;">
-                                                    Akun struktural <strong>Kasubag TU</strong>, <strong>Arsiparis</strong>, dan <strong>PIC Distribusi</strong> ditambahkan langsung oleh Kasubag TU melalui <strong>Manajemen Pengguna</strong>.
+                                                    Akun struktural <strong>Kasubag TU</strong> dan <strong>PIC Distribusi</strong> ditambahkan langsung oleh Kasubag TU melalui <strong>Manajemen Pengguna</strong>.
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <!-- Opsi Khusus Subdirektorat (Dropdown Muncul Otomatis saat Subdit dipilih) -->
-                                        <div class="col-12" id="subdit-choice-container" style="display: {{ old('role') === 'subdit' ? 'block' : 'none' }};">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label text-uppercase">
-                                                    Pilih Subdirektorat / Unit Kerja <span class="text-danger">*</span>
-                                                </label>
-                                                <select name="subdit_choice" id="subdit_choice" class="form-select">
-                                                    <option value="" disabled {{ old('subdit_choice') ? '' : 'selected' }}>-- Pilih Unit Subdirektorat --</option>
-                                                    <option value="Subdirektorat SDK" {{ old('subdit_choice') == 'Subdirektorat SDK' ? 'selected' : '' }}>
-                                                        Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Pemukiman)
-                                                    </option>
-                                                    <option value="Subdirektorat PJF" {{ old('subdit_choice') == 'Subdirektorat PJF' ? 'selected' : '' }}>
-                                                        Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)
-                                                    </option>
-                                                    <option value="Subdirektorat KBR" {{ old('subdit_choice') == 'Subdirektorat KBR' ? 'selected' : '' }}>
-                                                        Subdirektorat KBR (Kendala Bangunan Rumah)
-                                                    </option>
-                                                    <option value="Subbagian TU" {{ old('subdit_choice') == 'Subbagian TU' ? 'selected' : '' }}>
-                                                        Subbagian TU (Tata Usaha)
-                                                    </option>
-                                                </select>
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">Pilih unit Subdirektorat resmi yang Anda wakili.</small>
-                                            </div>
-                                        </div>
-
-                                        <!-- Jabatan Khusus Pegawai (Muncul saat Pegawai dipilih) -->
-                                        <div class="col-12" id="pegawai-position-container" style="display: {{ (old('role') === 'pegawai' || !old('role')) ? 'block' : 'none' }};">
+                                        <!-- Jabatan Khusus Pegawai -->
+                                        <div class="col-12" id="pegawai-position-container">
                                             <div class="form-group mb-2">
                                                 <label class="form-label text-uppercase">
                                                     Jabatan / Posisi Kerja <span class="text-muted fw-normal">(Opsional)</span>
@@ -454,82 +410,17 @@
 
     <!-- Script Library -->
     <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
+    <!-- Global Alert Dismiss & Auto-Dismiss System -->
+    <script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const roleInputs = document.querySelectorAll('input[name="role"]');
-            const roleCards = document.querySelectorAll('.role-radio-card');
-            const subditContainer = document.getElementById('subdit-choice-container');
-            const pegawaiContainer = document.getElementById('pegawai-position-container');
-            const subditSelect = document.getElementById('subdit_choice');
             const form = document.querySelector('form');
             const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
-
-            function updateRoleUI(selectedRole) {
-                if (selectedRole === 'subdit') {
-                    if (subditContainer) subditContainer.style.display = 'block';
-                    if (pegawaiContainer) pegawaiContainer.style.display = 'none';
-                    if (subditSelect) subditSelect.setAttribute('required', 'required');
-                } else {
-                    if (subditContainer) subditContainer.style.display = 'none';
-                    if (pegawaiContainer) pegawaiContainer.style.display = 'block';
-                    if (subditSelect) {
-                        subditSelect.removeAttribute('required');
-                        subditSelect.value = '';
-                    }
-                }
-            }
-
-            function selectRole(roleVal) {
-                const targetRadio = document.querySelector(`input[name="role"][value="${roleVal}"]`);
-                if (targetRadio) {
-                    targetRadio.checked = true;
-                }
-                roleCards.forEach(c => {
-                    const r = c.querySelector('input[name="role"]');
-                    if (r && r.value === roleVal) {
-                        c.classList.add('active');
-                    } else {
-                        c.classList.remove('active');
-                    }
-                });
-                updateRoleUI(roleVal);
-            }
-
-            roleCards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    const r = this.querySelector('input[name="role"]');
-                    if (r) {
-                        selectRole(r.value);
-                    }
-                });
-            });
-
-            roleInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    if (this.checked) {
-                        selectRole(this.value);
-                    }
-                });
-            });
-
-            function syncInitialRole() {
-                const activeRadio = document.querySelector('input[name="role"]:checked');
-                if (activeRadio) {
-                    selectRole(activeRadio.value);
-                } else {
-                    selectRole('pegawai');
-                }
-            }
-
-            // Inisialisasi awal
-            syncInitialRole();
 
             // Cegah isu BFCache:
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted) {
                     window.location.reload();
-                } else {
-                    syncInitialRole();
                 }
             });
 

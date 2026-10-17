@@ -161,4 +161,175 @@ class UserManagementTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
     }
+
+    public function test_kasubag_tu_can_add_pegawai_gudang_without_nip(): void
+    {
+        $response = $this->actingAs($this->kasubagTu)
+            ->post(route('master-data.manajemen-pengguna.store'), [
+                'name' => 'Staf Gudang Tanpa NIP',
+                'email' => 'gudang.tanpanip@perumahan.go.id',
+                'nip' => '',
+                'role' => 'pegawai_gudang',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ]);
+
+        $response->assertRedirect(route('master-data.manajemen-pengguna.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'gudang.tanpanip@perumahan.go.id',
+            'role' => 'pegawai_gudang',
+            'nip' => null,
+            'position' => 'Pegawai Gudang',
+        ]);
+    }
+
+    public function test_kasubag_tu_can_add_pegawai_gudang_with_nip(): void
+    {
+        $response = $this->actingAs($this->kasubagTu)
+            ->post(route('master-data.manajemen-pengguna.store'), [
+                'name' => 'Staf Gudang Ber-NIP',
+                'email' => 'gudang.ber.nip@perumahan.go.id',
+                'nip' => '19951212 202101 1 005',
+                'role' => 'pegawai_gudang',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ]);
+
+        $response->assertRedirect(route('master-data.manajemen-pengguna.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'gudang.ber.nip@perumahan.go.id',
+            'role' => 'pegawai_gudang',
+            'nip' => '19951212 202101 1 005',
+            'position' => 'Pegawai Gudang',
+        ]);
+    }
+
+    public function test_pegawai_gudang_permissions_and_restrictions(): void
+    {
+        $pegawaiGudang = User::firstOrCreate(
+            ['email' => 'gudang.staff@perumahan.go.id'],
+            [
+                'name' => 'Budi Gudang',
+                'role' => 'pegawai_gudang',
+                'nip' => null,
+                'position' => 'Pegawai Gudang',
+                'password' => bcrypt('password123'),
+            ]
+        );
+
+        // 1. Dilarang akses halaman terbatas
+        $this->actingAs($pegawaiGudang)
+            ->get(route('master-data.manajemen-pengguna.index'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('persetujuan.index'))
+            ->assertRedirect(route('dashboard'));
+
+        // 2. Berhak akses distribusi, stok barang masuk, barang keluar, daftar barang, dan laporan
+        $this->actingAs($pegawaiGudang)
+            ->get(route('distribusi.index'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('barang-masuk'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('barang-keluar'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('master-data.daftar-barang.index'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('reports.index'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('reports.rekapitulasi'))
+            ->assertStatus(200);
+
+        $this->actingAs($pegawaiGudang)
+            ->get(route('reports.berita-acara'))
+            ->assertStatus(200);
+
+        // 3. Pegawai gudang hanya cek stok, dilarang menambah atau menghapus barang master
+        $storeResponse = $this->actingAs($pegawaiGudang)
+            ->post(route('master-data.daftar-barang.store'), [
+                'name' => 'Coba Tambah',
+                'code' => 'BRG-COBA-999',
+            ]);
+        $storeResponse->assertRedirect();
+        $storeResponse->assertSessionHas('error');
+    }
+
+    public function test_pic_distribusi_permissions_and_restrictions(): void
+    {
+        $pic = User::firstOrCreate(
+            ['email' => 'pic.test@perumahan.go.id'],
+            [
+                'name' => 'PIC Test',
+                'role' => 'pic_distribusi',
+                'nip' => null,
+                'position' => 'PIC Distribusi',
+                'password' => bcrypt('password123'),
+            ]
+        );
+
+        // 1. Dilarang akses Gudang & Stok, Laporan & Arsip, Master Data, dan Distribusi Barang
+        $this->actingAs($pic)
+            ->get(route('distribusi.index'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('barang-masuk'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('barang-keluar'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('reports.index'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('reports.rekapitulasi'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('reports.berita-acara'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('master-data.kategori-barang.index'))
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($pic)
+            ->get(route('master-data.daftar-barang.index'))
+            ->assertRedirect(route('dashboard'));
+
+        // 2. Berhak akses Dashboard & Permintaan ATK
+        $this->actingAs($pic)
+            ->get(route('dashboard'))
+            ->assertStatus(200);
+
+        $this->actingAs($pic)
+            ->get(route('katalog-atk'))
+            ->assertStatus(200);
+
+        $this->actingAs($pic)
+            ->get(route('pengajuan.create'))
+            ->assertStatus(200);
+
+        $this->actingAs($pic)
+            ->get(route('pengajuan.index'))
+            ->assertStatus(200);
+    }
 }

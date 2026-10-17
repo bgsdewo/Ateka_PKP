@@ -195,14 +195,11 @@
                                         Jenis Permintaan <span class="text-danger">*</span>
                                     </label>
                                     <select name="type" class="form-select" required>
-                                        <option value="individu" {{ old('type') == 'individu' ? 'selected' : '' }}>
+                                        <option value="individu" selected>
                                             Individu (Staf / Pegawai)
                                         </option>
-                                        <option value="subdit" {{ (old('type') == 'subdit' || auth()->user()->role === 'subdit') ? 'selected' : '' }}>
-                                            Subdirektorat (Kolektif Unit Kerja)
-                                        </option>
                                     </select>
-                                    <small class="text-muted">Pilih "Subdirektorat" jika mewakili kebutuhan kolektif satu unit kerja.</small>
+                                    <small class="text-muted">Permohonan pengadaan diajukan atas nama pegawai pemohon.</small>
                                 </div>
 
                                 <div class="col-md-6">
@@ -235,50 +232,92 @@
                             {{-- Datalist produk yang pernah ada sebagai rekomendasi autocomplete --}}
                             <datalist id="existingProductList">
                                 @foreach ($existingProducts as $p)
-                                    <option value="{{ $p->name }}" data-unit="{{ $p->unit }}" data-id="{{ $p->id }}">{{ $p->code }} - {{ $p->category->name ?? 'ATK' }}</option>
+                                    <option value="{{ $p->name }}" data-unit="{{ $p->unit }}" data-available-units="{{ implode(',', $p->unit_list) }}" data-category-id="{{ $p->category_id }}" data-category="{{ $p->category->name ?? 'ATK' }}" data-code="{{ $p->code }}" data-id="{{ $p->id }}">{{ $p->code }} - {{ $p->category->name ?? 'ATK' }}</option>
                                 @endforeach
                             </datalist>
 
                             @php
                                 $unitOptions = [
-                                    'Pcs' => 'Pcs',
-                                    'Rim' => 'Rim',
-                                    'Dos' => 'Dos / Dus',
-                                    'Pak' => 'Pak',
-                                    'Buku' => 'Buku',
                                     'Buah' => 'Buah',
-                                    'Lembar' => 'Lembar',
+                                    'Dus' => 'Dus / Dos',
+                                    'Rim' => 'Rim',
+                                    'Pak' => 'Pak',
+                                    'Kotak' => 'Kotak',
+                                    'Doz' => 'Doz',
                                     'Set' => 'Set',
                                     'Roll' => 'Roll',
-                                    'Box' => 'Box',
-                                    'Kotak' => 'Kotak',
-                                    'Batang' => 'Batang',
+                                    'Slop' => 'Slop',
+                                    'Pak/Slop' => 'Pak/Slop',
+                                    'Buku' => 'Buku',
                                     'Tube' => 'Tube',
-                                    'Bungkus' => 'Bungkus',
+                                    'Box' => 'Box',
                                     'Botol' => 'Botol',
                                     'Lusin' => 'Lusin',
+                                    'Lembar' => 'Lembar',
+                                    'Batang' => 'Batang',
+                                    'Bungkus' => 'Bungkus',
+                                    'Pcs' => 'Pcs',
                                     'Unit' => 'Unit',
                                     'Meter' => 'Meter',
                                 ];
 
                                 if (isset($existingProducts)) {
-                                    foreach ($existingProducts->pluck('unit')->filter()->unique() as $extUnit) {
-                                        $extUnitTrim = trim($extUnit);
-                                        if ($extUnitTrim !== '' && !isset($unitOptions[$extUnitTrim])) {
-                                            $unitOptions[$extUnitTrim] = $extUnitTrim;
+                                    foreach ($existingProducts as $prodItem) {
+                                        foreach ($prodItem->unit_list as $extUnit) {
+                                            $extUnitTrim = trim($extUnit);
+                                            if ($extUnitTrim !== '' && !isset($unitOptions[$extUnitTrim])) {
+                                                $unitOptions[$extUnitTrim] = $extUnitTrim;
+                                            }
                                         }
                                     }
                                 }
                             @endphp
 
                             <div id="procure-rows">
-                                <div class="procure-row p-3 mb-3 rounded border bg-light">
-                                    <div class="row g-2 align-items-center">
+                                <div class="procure-row p-3 mb-3 rounded-3 border bg-light shadow-xs">
+                                    {{-- Baris Bantu Pilih Cepat dari Standar LIST ATK --}}
+                                    <div class="row g-2 mb-2 pb-2 border-bottom border-secondary-subtle">
+                                        <div class="col-md-4 col-12">
+                                            <label class="form-label small text-secondary fw-semibold mb-1">
+                                                Filter Kategori LIST ATK (Opsional)
+                                            </label>
+                                            <select class="form-select form-select-sm procure-cat-filter bg-white">
+                                                <option value="">-- Semua Kategori ({{ isset($categories) ? $categories->count() : 0 }} Kategori) --</option>
+                                                @if (isset($categories))
+                                                    @foreach ($categories as $cat)
+                                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                        <div class="col-md-8 col-12">
+                                            <label class="form-label small text-secondary fw-semibold mb-1 d-flex justify-content-between">
+                                                <span>Pilih Cepat dari Standar LIST ATK (Otomatis Isi Nama & Satuan)</span>
+                                                <span class="badge bg-primary-subtle text-primary procure-count-badge" style="font-size: 0.7rem;">{{ $existingProducts->count() }} barang standar</span>
+                                            </label>
+                                            <select class="form-select form-select-sm procure-template-select bg-white">
+                                                <option value="">-- Pilih Barang dari Standar LIST ATK atau Ketik Manual di Bawah --</option>
+                                                @foreach ($existingProducts as $p)
+                                                    <option value="{{ $p->id }}"
+                                                        data-name="{{ $p->name }}"
+                                                        data-code="{{ $p->code }}"
+                                                        data-category-id="{{ $p->category_id }}"
+                                                        data-category-name="{{ $p->category->name ?? 'ATK' }}"
+                                                        data-unit="{{ $p->unit ?: 'Buah' }}"
+                                                        data-available-units="{{ implode(',', $p->unit_list) }}">
+                                                        [{{ $p->category->name ?? 'ATK' }}] {{ $p->name }} (Satuan: {{ implode('/', $p->unit_list) }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2 align-items-start">
                                         <div class="col-md-5 col-12">
                                             <label class="form-label fw-bold small">Nama Barang yang Diminta <span class="text-danger">*</span></label>
                                             <input type="text" name="item_name[]" class="form-control item-name-input" 
                                                 list="existingProductList" 
-                                                placeholder="Contoh: Map Gantung Folio, Spidol Whiteboard..." required autocomplete="off">
+                                                placeholder="Ketik nama barang atau pilih dari LIST ATK di atas..." required autocomplete="off">
                                             <input type="hidden" name="product_id[]" class="item-product-id">
                                         </div>
 
@@ -292,7 +331,7 @@
                                             <label class="form-label fw-bold small">Satuan</label>
                                             <div class="custom-unit-dropdown position-relative">
                                                 <button type="button" class="form-control custom-unit-trigger d-flex justify-content-between align-items-center bg-white text-dark text-start" aria-expanded="false">
-                                                    <span class="custom-unit-label fw-semibold">Pcs</span>
+                                                    <span class="custom-unit-label fw-semibold">Buah</span>
                                                     <svg class="custom-unit-chevron text-secondary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                         <polyline points="6 9 12 15 18 9"></polyline>
                                                     </svg>
@@ -300,8 +339,11 @@
 
                                                 <div class="custom-unit-menu shadow-lg bg-white">
                                                     @foreach ($unitOptions as $val => $label)
-                                                        <div class="custom-unit-item d-flex align-items-center justify-content-between {{ $val === 'Pcs' ? 'active' : '' }}" data-value="{{ $val }}">
-                                                            <span class="unit-text">{{ $label }}</span>
+                                                        <div class="custom-unit-item d-flex align-items-center justify-content-between {{ $val === 'Buah' ? 'active' : '' }}" data-value="{{ $val }}">
+                                                            <div class="d-flex align-items-center gap-1">
+                                                                <span class="unit-text">{{ $label }}</span>
+                                                                <span class="badge bg-primary-subtle text-primary unit-recommended-badge d-none" style="font-size: 0.62rem;">Standar</span>
+                                                            </div>
                                                             <svg class="check-icon text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                                             </svg>
@@ -309,15 +351,16 @@
                                                     @endforeach
                                                 </div>
 
-                                                <input type="hidden" name="custom_unit[]" class="item-unit-input" value="Pcs">
+                                                <input type="hidden" name="custom_unit[]" class="item-unit-input" value="Buah">
                                             </div>
+                                            <div class="recommended-units-pills mt-1 d-none"></div>
                                         </div>
 
                                         <div class="col-md-3 col-12">
                                             <div class="d-flex align-items-end gap-2">
                                                 <div class="flex-grow-1">
                                                     <label class="form-label fw-bold small">Spesifikasi / Merk (Opsional)</label>
-                                                    <input type="text" name="specification[]" class="form-control" 
+                                                    <input type="text" name="specification[]" class="form-control item-spec-input" 
                                                         placeholder="Misal: Warna Biru / Joyko">
                                                 </div>
                                                 <button type="button" class="btn btn-outline-danger btn-sm remove-procure-row" title="Hapus baris ini" style="height: 38px;">
@@ -370,11 +413,19 @@
 
                 // Map product options for auto-filling unit and hidden id
                 const productOptions = {};
+                const masterTemplateItems = [];
                 document.querySelectorAll('#existingProductList option').forEach(opt => {
-                    productOptions[opt.value.toLowerCase()] = {
-                        unit: opt.getAttribute('data-unit') || 'Pcs',
+                    const itemObj = {
+                        name: opt.value,
+                        unit: opt.getAttribute('data-unit') || 'Buah',
+                        availableUnits: opt.getAttribute('data-available-units') || (opt.getAttribute('data-unit') || 'Buah'),
+                        categoryId: opt.getAttribute('data-category-id') || '',
+                        categoryName: opt.getAttribute('data-category') || 'ATK',
+                        code: opt.getAttribute('data-code') || '',
                         id: opt.getAttribute('data-id') || ''
                     };
+                    productOptions[opt.value.toLowerCase()] = itemObj;
+                    masterTemplateItems.push(itemObj);
                 });
 
                 function closeAllDropdowns() {
@@ -395,13 +446,13 @@
                     const menu = dropdown.querySelector('.custom-unit-menu');
                     if (!hiddenInput || !labelElem || !menu) return;
 
-                    const target = (targetUnit || 'Pcs').trim().toLowerCase();
+                    const target = (targetUnit || 'Buah').trim().toLowerCase();
                     let matchedItem = null;
 
                     menu.querySelectorAll('.custom-unit-item').forEach(item => {
                         const val = (item.getAttribute('data-value') || '').toLowerCase();
                         const txt = (item.querySelector('.unit-text')?.textContent || '').toLowerCase();
-                        if (val === target || txt === target || (target === 'dus' && val === 'dos')) {
+                        if (val === target || txt === target || (target === 'dus' && val === 'dos') || (target === 'dos' && val === 'dus')) {
                             matchedItem = item;
                         }
                     });
@@ -411,7 +462,10 @@
                         matchedItem.className = 'custom-unit-item d-flex align-items-center justify-content-between';
                         matchedItem.setAttribute('data-value', targetUnit);
                         matchedItem.innerHTML = `
-                            <span class="unit-text">${targetUnit}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="unit-text">${targetUnit}</span>
+                                <span class="badge bg-primary-subtle text-primary unit-recommended-badge d-none" style="font-size: 0.62rem;">Standar</span>
+                            </div>
                             <svg class="check-icon text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
@@ -428,6 +482,57 @@
 
                     hiddenInput.value = finalVal;
                     labelElem.textContent = finalLabel;
+
+                    const pillsContainer = row.querySelector('.recommended-units-pills');
+                    if (pillsContainer) {
+                        pillsContainer.querySelectorAll('.btn-unit-pill').forEach(btn => {
+                            if ((btn.getAttribute('data-unit') || '').toLowerCase() === finalVal.toLowerCase()) {
+                                btn.classList.remove('btn-outline-secondary', 'bg-white');
+                                btn.classList.add('btn-primary', 'text-white');
+                            } else {
+                                btn.classList.remove('btn-primary', 'text-white');
+                                btn.classList.add('btn-outline-secondary', 'bg-white');
+                            }
+                        });
+                    }
+                }
+
+                function updateRecommendedUnits(row, availableUnitsStr) {
+                    const dropdown = row.querySelector('.custom-unit-dropdown');
+                    const pillsContainer = row.querySelector('.recommended-units-pills');
+                    if (!dropdown) return;
+                    const menu = dropdown.querySelector('.custom-unit-menu');
+                    const units = (availableUnitsStr || '').split(',').map(u => u.trim()).filter(Boolean);
+                    const unitsLower = units.map(u => u.toLowerCase());
+
+                    menu.querySelectorAll('.custom-unit-item').forEach(item => {
+                        const val = (item.getAttribute('data-value') || '').toLowerCase();
+                        const badge = item.querySelector('.unit-recommended-badge');
+                        if (badge) {
+                            if (unitsLower.includes(val) || (val === 'dus' && unitsLower.includes('dos'))) {
+                                badge.classList.remove('d-none');
+                            } else {
+                                badge.classList.add('d-none');
+                            }
+                        }
+                    });
+
+                    if (pillsContainer) {
+                        if (units.length > 1) {
+                            pillsContainer.classList.remove('d-none');
+                            pillsContainer.innerHTML = '<small class="text-muted d-block mb-1" style="font-size: 0.68rem;">Pilih cepat satuan standar:</small><div class="d-flex flex-wrap gap-1">' +
+                                units.map(u => `<button type="button" class="btn btn-xs btn-outline-secondary bg-white py-0 px-2 btn-unit-pill" data-unit="${u}" style="font-size: 0.72rem; border-radius: 6px;">${u}</button>`).join('') +
+                                '</div>';
+                            pillsContainer.querySelectorAll('.btn-unit-pill').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    setRowUnit(row, this.getAttribute('data-unit'));
+                                });
+                            });
+                        } else {
+                            pillsContainer.classList.add('d-none');
+                            pillsContainer.innerHTML = '';
+                        }
+                    }
                 }
 
                 function bindItemClick(item, dropdown, row) {
@@ -465,17 +570,77 @@
                     });
                 }
 
+                function filterTemplateOptions(row) {
+                    const catFilter = row.querySelector('.procure-cat-filter');
+                    const tplSelect = row.querySelector('.procure-template-select');
+                    const badge = row.querySelector('.procure-count-badge');
+                    if (!tplSelect) return;
+
+                    const catVal = catFilter ? catFilter.value : '';
+                    const filtered = masterTemplateItems.filter(it => !catVal || it.categoryId === catVal);
+
+                    tplSelect.innerHTML = `<option value="">-- Pilih Barang dari Standar LIST ATK (${filtered.length} Barang) --</option>`;
+                    filtered.forEach(it => {
+                        const opt = document.createElement('option');
+                        opt.value = it.id;
+                        opt.setAttribute('data-name', it.name);
+                        opt.setAttribute('data-code', it.code);
+                        opt.setAttribute('data-category-id', it.categoryId);
+                        opt.setAttribute('data-category-name', it.categoryName);
+                        opt.setAttribute('data-unit', it.unit);
+                        opt.setAttribute('data-available-units', it.availableUnits);
+                        const uText = it.availableUnits.split(',').join('/');
+                        opt.textContent = `[${it.categoryName}] ${it.name} (Satuan: ${uText})`;
+                        tplSelect.appendChild(opt);
+                    });
+
+                    if (badge) {
+                        badge.textContent = filtered.length + ' barang standar';
+                    }
+                }
+
                 function attachRowEvents(row) {
                     const nameInput = row.querySelector('.item-name-input');
                     const idInput = row.querySelector('.item-product-id');
+                    const specInput = row.querySelector('.item-spec-input');
                     const removeBtn = row.querySelector('.remove-procure-row');
+                    const catFilter = row.querySelector('.procure-cat-filter');
+                    const tplSelect = row.querySelector('.procure-template-select');
 
                     attachDropdownEvents(row);
+
+                    if (catFilter) {
+                        catFilter.addEventListener('change', function() {
+                            filterTemplateOptions(row);
+                        });
+                    }
+
+                    if (tplSelect) {
+                        tplSelect.addEventListener('change', function() {
+                            const opt = this.options[this.selectedIndex];
+                            if (this.value && opt) {
+                                const pName = opt.getAttribute('data-name') || '';
+                                const pUnit = opt.getAttribute('data-unit') || 'Buah';
+                                const pAvail = opt.getAttribute('data-available-units') || pUnit;
+                                const pCat = opt.getAttribute('data-category-name') || '';
+                                const pCode = opt.getAttribute('data-code') || '';
+
+                                if (nameInput) nameInput.value = pName;
+                                if (idInput) idInput.value = this.value;
+                                if (specInput && !specInput.value) {
+                                    specInput.value = `Kategori: ${pCat} (${pCode})`;
+                                }
+                                updateRecommendedUnits(row, pAvail);
+                                setRowUnit(row, pUnit);
+                            }
+                        });
+                    }
 
                     if (nameInput) {
                         nameInput.addEventListener('input', function() {
                             const val = this.value.trim().toLowerCase();
                             if (productOptions[val]) {
+                                updateRecommendedUnits(row, productOptions[val].availableUnits);
                                 if (productOptions[val].unit) {
                                     setRowUnit(row, productOptions[val].unit);
                                 }
@@ -495,7 +660,8 @@
                                 row.remove();
                                 closeAllDropdowns();
                             } else {
-                                // Reset fields if only 1 row
+                                if (catFilter) catFilter.value = '';
+                                filterTemplateOptions(row);
                                 row.querySelectorAll('input:not(.item-unit-input)').forEach(input => {
                                     if (input.type === 'number') {
                                         input.value = '1';
@@ -503,7 +669,8 @@
                                         input.value = '';
                                     }
                                 });
-                                setRowUnit(row, 'Pcs');
+                                updateRecommendedUnits(row, '');
+                                setRowUnit(row, 'Buah');
                                 closeAllDropdowns();
                             }
                         });
@@ -532,7 +699,9 @@
                     const firstRow = container.querySelector('.procure-row');
                     const newRow = firstRow.cloneNode(true);
 
-                    // Reset values in newRow
+                    const catFilter = newRow.querySelector('.procure-cat-filter');
+                    if (catFilter) catFilter.value = '';
+
                     newRow.querySelectorAll('input:not(.item-unit-input)').forEach(input => {
                         if (input.type === 'number') {
                             input.value = '1';
@@ -549,7 +718,9 @@
                     }
 
                     container.appendChild(newRow);
-                    setRowUnit(newRow, 'Pcs');
+                    filterTemplateOptions(newRow);
+                    updateRecommendedUnits(newRow, '');
+                    setRowUnit(newRow, 'Buah');
                     attachRowEvents(newRow);
                     newRow.querySelector('.item-name-input').focus();
                 });

@@ -58,7 +58,7 @@ class User extends Authenticatable
 
     public function isArsiparis(): bool
     {
-        return $this->role === 'arsiparis';
+        return false;
     }
 
     public function isPicDistribusi(): bool
@@ -130,7 +130,7 @@ class User extends Authenticatable
 
     public function isSubdit(): bool
     {
-        return $this->role === 'subdit';
+        return false;
     }
 
     public function isPegawai(): bool
@@ -138,9 +138,14 @@ class User extends Authenticatable
         return $this->role === 'pegawai';
     }
 
+    public function isPegawaiGudang(): bool
+    {
+        return $this->role === 'pegawai_gudang';
+    }
+
     public function isRequester(): bool
     {
-        return in_array($this->role, ['pegawai', 'subdit', 'member']) || empty($this->role);
+        return in_array($this->role, ['pegawai', 'pic_distribusi', 'member']) || empty($this->role);
     }
 
     public function requests()
@@ -172,9 +177,8 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
-            'arsiparis' => 'Arsiparis (Pelaporan & Administrasi)',
             'pic_distribusi' => 'PIC Distribusi (Pengelola / Gudang)',
-            'subdit' => 'Subdirektorat (Pemohon Kolektif)',
+            'pegawai_gudang' => 'Pegawai Gudang',
             'pegawai' => 'Pegawai (Pemohon Individu)',
             default => 'Pegawai (Pemohon Individu)',
         };
@@ -184,9 +188,8 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'kasubag_tu', 'admin' => 'bg-primary',
-            'arsiparis' => 'bg-info',
             'pic_distribusi' => 'bg-warning text-dark',
-            'subdit' => 'bg-success',
+            'pegawai_gudang' => 'bg-dark',
             default => 'bg-secondary',
         };
     }

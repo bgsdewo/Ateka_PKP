@@ -17,19 +17,31 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPicDistribusi() && !auth()->user()->isArsiparis()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU, PIC Distribusi, dan Arsiparis.');
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
         }
 
         $month = $request->get('month');
         $year = $request->get('year');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+        $categoryId = $request->get('category_id');
+        $stockStatus = $request->get('stock_status');
 
         $query = Product::with(['category', 'stockTransactions' => function ($q) {
                 $q->orderBy('transaction_date', 'asc')->orderBy('id', 'asc');
             }])
             ->withCount('stockTransactions');
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        if ($stockStatus === 'available') {
+            $query->where('stock', '>', 0);
+        } elseif ($stockStatus === 'empty') {
+            $query->where('stock', '<=', 0);
+        }
 
         if ($startDate && $endDate) {
             $minDate = min($startDate, $endDate);
@@ -133,13 +145,15 @@ class ProductController extends Controller
 
         $totalProducts = $products->count();
 
-        // Ambil usulan pengadaan yang disetujui / pending dan belum terpenuhi master barangnya
+        // Ambil usulan pengadaan yang disetujui / pending dan belum dibeli / ditambahkan stoknya di master data
         $unfulfilledProcurements = RequestDetail::whereHas('requestItem', function ($q) {
             $q->where('is_procurement', true)
-              ->whereIn('status', ['pending', 'approved']);
+              ->whereIn('status', ['pending', 'approved'])
+              ->whereNull('purchase_invoice')
+              ->whereNull('purchase_date');
         })
-        ->whereNull('product_id')
-        ->with(['requestItem.user'])
+        ->with(['requestItem.user', 'product.category'])
+        ->latest('id')
         ->get();
 
         return view('master_data.products', compact(
@@ -149,6 +163,8 @@ class ProductController extends Controller
             'year',
             'startDate',
             'endDate',
+            'categoryId',
+            'stockStatus',
             'availableYears',
             'totalProducts',
             'unfulfilledProcurements'
@@ -157,9 +173,22 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
+        }
+
+        // Cek apakah barang dengan kode atau nama yang sama sudah ada di master data (misal dari standar LIST ATK bersaldo 0)
+        $existingProduct = Product::where('code', trim((string) $request->code))
+            ->orWhereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
+            ->first();
+
+        $codeRule = $existingProduct
+            ? ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($existingProduct->id)]
+            : ['required', 'string', 'max:255', 'unique:products,code'];
+
         $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
-            'code' => ['required', 'string', 'max:255', 'unique:products,code'],
+            'code' => $codeRule,
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -187,48 +216,66 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1. Simpan data produk baru
-            $product = Product::create([
-                'category_id' => $request->category_id,
-                'code' => $request->code,
-                'name' => $request->name,
-                'unit' => $request->unit,
-                'stock' => $request->stock,
-                'minimum_stock' => $request->minimum_stock ?? 0,
-                'purchase_price' => $request->purchase_price,
-                'description' => $request->description,
-            ]);
+            $addedQty = (int) $request->stock;
 
-            // 2. Jika stok awal > 0, otomatis catat ke transaksi Barang Masuk beserta No Faktur, Tgl Faktur & Uraiannya
-            if ($product->stock > 0) {
+            if ($existingProduct) {
+                $newTotalStock = $addedQty > 0 ? ((int) $existingProduct->stock + $addedQty) : (int) $existingProduct->stock;
+                $existingProduct->update([
+                    'category_id' => $request->category_id ?: $existingProduct->category_id,
+                    'unit' => $request->unit ?: $existingProduct->unit,
+                    'stock' => $newTotalStock,
+                    'minimum_stock' => $request->minimum_stock ?? $existingProduct->minimum_stock ?? 0,
+                    'purchase_price' => (float) $request->purchase_price > 0 ? $request->purchase_price : $existingProduct->purchase_price,
+                    'description' => $request->description ?: $existingProduct->description,
+                ]);
+                $product = $existingProduct;
+            } else {
+                // 1. Simpan data produk baru
+                $product = Product::create([
+                    'category_id' => $request->category_id,
+                    'code' => $request->code,
+                    'name' => $request->name,
+                    'unit' => $request->unit,
+                    'stock' => $addedQty,
+                    'minimum_stock' => $request->minimum_stock ?? 0,
+                    'purchase_price' => $request->purchase_price,
+                    'description' => $request->description,
+                ]);
+            }
+
+            // 2. Jika stok yang ditambahkan > 0, otomatis catat ke transaksi Barang Masuk beserta No Faktur, Tgl Faktur & Uraiannya
+            if ($addedQty > 0) {
                 StockTransaction::create([
                     'product_id'       => $product->id,
                     'user_id'          => Auth::id() ?? 1,
                     'type'             => 'masuk',
-                    'quantity'         => $product->stock,
+                    'quantity'         => $addedQty,
                     'stock_after'      => $product->stock,
                     'harga_perolehan'  => $product->purchase_price,
                     'no_faktur'        => $request->no_faktur ?: '-',
-                    'uraian'           => $request->uraian ?: 'Pencatatan Stok Awal Master Barang',
+                    'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
                     'transaction_date' => $request->transaction_date ?: now(),
-                    'note'             => 'Pencatatan Stok Awal / Penambahan Master Barang Baru (' . $product->code . ')'
+                    'note'             => 'Pembelian ' . $product->name
                 ]);
             }
 
-            // 3. Hubungkan dengan usulan pengadaan yang cocok & kirim notifikasi real-time ke pemohon
-            $notifiedNames = $this->fulfillMatchingProcurements(
-                $product,
-                $request->no_faktur,
-                $request->transaction_date,
-                $request->uraian,
-                $request->filled('request_detail_id') ? (int) $request->request_detail_id : null
-            );
+            // 3. Hubungkan dengan usulan pengadaan yang cocok & kirim notifikasi real-time ke pemohon (jika stok > 0)
+            $notifiedNames = [];
+            if ($product->stock > 0) {
+                $notifiedNames = $this->fulfillMatchingProcurements(
+                    $product,
+                    $request->no_faktur,
+                    $request->transaction_date,
+                    $request->uraian,
+                    $request->filled('request_detail_id') ? (int) $request->request_detail_id : null
+                );
+            }
 
             DB::commit();
 
             $successMsg = 'Barang berhasil ditambahkan dan tercatat di Barang Masuk.';
             if (!empty($notifiedNames)) {
-                $successMsg .= ' Usulan pengadaan terpenuhi dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+                $successMsg .= ' Status pengajuan pengadaan telah diperbarui menjadi Tersedia dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
             }
 
             return redirect()
@@ -243,6 +290,10 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $daftar_barang)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
+        }
+
         $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
             'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($daftar_barang->id)],
@@ -328,7 +379,7 @@ class ProductController extends Controller
                     'no_faktur'        => $request->no_faktur ?: '-',
                     'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
                     'transaction_date' => $request->transaction_date ?: now(),
-                    'note'             => 'Pencatatan Stok / Pembaruan Master Barang (' . $daftar_barang->code . ')'
+                    'note'             => 'Pembelian ' . $daftar_barang->name
                 ]);
             }
 
@@ -349,19 +400,23 @@ class ProductController extends Controller
                 $tx->save();
             }
 
-            // 4. Sinkronkan dengan usulan pengadaan yang cocok (jika ada usulan yang belum terpenuhi)
-            $notifiedNames = $this->fulfillMatchingProcurements(
-                $daftar_barang,
-                $request->no_faktur,
-                $request->transaction_date,
-                $request->uraian
-            );
+            // 4. Sinkronkan dengan usulan pengadaan yang cocok (jika stok > 0 dan ada usulan yang belum terpenuhi)
+            $notifiedNames = [];
+            if ($daftar_barang->stock > 0) {
+                $notifiedNames = $this->fulfillMatchingProcurements(
+                    $daftar_barang,
+                    $request->no_faktur,
+                    $request->transaction_date,
+                    $request->uraian,
+                    $request->filled('request_detail_id') ? (int) $request->request_detail_id : null
+                );
+            }
 
             DB::commit();
 
             $successMsg = 'Barang berhasil diperbarui dan riwayat di Barang Masuk tersinkronisasi secara real-time.';
             if (!empty($notifiedNames)) {
-                $successMsg .= ' Usulan pengadaan terpenuhi dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+                $successMsg .= ' Status pengajuan pengadaan telah diperbarui menjadi Tersedia dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
             }
 
             return redirect()
@@ -375,6 +430,10 @@ class ProductController extends Controller
 
     public function destroy(Product $daftar_barang)
     {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menghapus data master barang.');
+        }
+
         DB::beginTransaction();
         try {
             // 1. Hapus riwayat transaksi stok terkait (Barang Masuk & Keluar) secara real-time
@@ -403,11 +462,18 @@ class ProductController extends Controller
     {
         $categoryId = $request->category_id;
         $search = $request->search;
+        $stockStatus = $request->stock_status;
 
         $query = Product::with('category');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
+        }
+
+        if ($stockStatus === 'available') {
+            $query->where('stock', '>', 0);
+        } elseif ($stockStatus === 'empty') {
+            $query->where('stock', '<=', 0);
         }
 
         if ($search) {
@@ -417,10 +483,10 @@ class ProductController extends Controller
             });
         }
 
-        $products = $query->orderBy('name', 'asc')->get();
+        $products = $query->orderBy('name', 'asc')->paginate(8)->withQueryString();
         $categories = Category::orderBy('name', 'asc')->get();
 
-        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search'));
+        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search', 'stockStatus'));
     }
 
     /**
@@ -509,6 +575,10 @@ class ProductController extends Controller
      */
     public function fulfillMatchingProcurements(Product $product, ?string $noFaktur = null, ?string $transactionDate = null, ?string $uraian = null, ?int $specificDetailId = null): array
     {
+        if ($product->stock <= 0) {
+            return [];
+        }
+
         $fulfilledReqDetails = collect();
 
         if ($specificDetailId) {
@@ -519,7 +589,8 @@ class ProductController extends Controller
         } else {
             $openDetails = RequestDetail::whereHas('requestItem', function ($q) {
                 $q->where('is_procurement', true)
-                  ->whereIn('status', ['pending', 'approved']);
+                  ->whereIn('status', ['pending', 'approved'])
+                  ->whereNull('purchase_invoice');
             })
             ->where(function ($subQ) use ($product) {
                 $subQ->whereNull('product_id')
@@ -545,8 +616,8 @@ class ProductController extends Controller
                     'purchase_invoice'   => $noFaktur ?: ($reqItem->purchase_invoice ?: '-'),
                     'purchase_date'      => $transactionDate ?: ($reqItem->purchase_date ?: now()),
                     'purchase_price'     => ($product->purchase_price ?? 0) * ($det->approved_quantity ?: $det->quantity),
-                    'purchase_notes'     => $uraian ?: ($reqItem->purchase_notes ?: 'Barang dibeli dan dimasukkan ke Daftar Barang'),
-                    'verification_notes' => $reqItem->verification_notes ?: 'Barang telah dibeli oleh Subbag TU dan kini tersedia di daftar barang/katalog.',
+                    'purchase_notes'     => $uraian ?: ($reqItem->purchase_notes ?: 'Barang telah ditambahkan di Master Data dan stok tersedia'),
+                    'verification_notes' => $reqItem->verification_notes ?: 'Barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.',
                     'status'             => 'approved',
                     'verified_at'        => $reqItem->verified_at ?: now(),
                     'verified_by'        => $reqItem->verified_by ?: (Auth::id() ?? 1),

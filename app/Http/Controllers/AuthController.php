@@ -61,8 +61,7 @@ class AuthController extends Controller
             'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'nip' => ['required', 'string', 'max:50'],
-            'role' => ['required', 'string', 'in:pegawai,subdit'],
-            'subdit_choice' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'string', 'in:pegawai'],
             'position' => ['nullable', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ], [
@@ -71,39 +70,22 @@ class AuthController extends Controller
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Alamat email ini sudah terdaftar. Silakan masuk (login) dengan akun tersebut atau gunakan email dinas lain.',
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi untuk keamanan akun.',
-            'role.required' => 'Silakan pilih peran (role) Anda.',
-            'role.in' => 'Pilihan role pendaftaran hanya untuk Pegawai atau Subdirektorat.',
+            'role.in' => 'Pilihan role pendaftaran hanya untuk Pegawai.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         $titleInput = $validated['title'] ?? ($validated['gelar'] ?? null);
-
-        if ($validated['role'] === 'subdit') {
-            $subditChoice = $request->input('subdit_choice');
-            if (empty($subditChoice)) {
-                return back()->withInput()->withErrors(['subdit_choice' => 'Silakan pilih unit Subdirektorat Anda.']);
-            }
-            $position = $subditChoice;
-            $subditName = match ($subditChoice) {
-                'Subdirektorat SDK' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
-                'Subdirektorat PJF' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
-                'Subdirektorat KBR' => 'Subdirektorat Kendala Bangunan Rumah',
-                'Subbagian TU' => 'Subbagian Tata Usaha',
-                default => $subditChoice,
-            };
-        } else {
-            $position = $validated['position'] ?: 'Pegawai Staf';
-            $subditName = 'Pegawai Perorangan';
-        }
+        $position = !empty($validated['position']) ? $validated['position'] : 'Pegawai Staf';
+        $subditName = 'Pegawai Perorangan';
 
         $user = \App\Models\User::create([
             'name' => $validated['name'],
             'title' => $titleInput ? trim($titleInput) : null,
             'email' => $validated['email'],
             'nip' => $validated['nip'],
-            'role' => $validated['role'],
+            'role' => 'pegawai',
             'position' => $position,
             'subdit_name' => $subditName,
             'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),

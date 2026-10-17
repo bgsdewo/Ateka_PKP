@@ -27,20 +27,7 @@ class AdminSeeder extends Seeder
         // Akun-akun dummy sebelumnya dinonaktifkan karena sistem beralih ke data asli pengguna.
         // Hanya akun Kasubag TU yang dipertahankan.
         /*
-        // 2. Role: Arsiparis (Laporan)
-        User::updateOrCreate(
-            ['email' => 'devi@gmail.com'],
-            [
-                'name' => 'Devi Ismiyanti',
-                'position' => 'Arsiparis Ahli Pertama',
-                'nip' => '19900815 201503 2 004',
-                'subdit_name' => 'Subbagian Tata Usaha',
-                'password' => Hash::make('password123'),
-                'role' => 'arsiparis',
-            ]
-        );
-
-        // 3. Role: PIC Distribusi (4 Petugas PIC Distribusi Unit/Divisi)
+        // 2. Role: PIC Distribusi (4 Petugas PIC Distribusi Unit/Divisi)
         // 3A. PIC Distribusi SDK - Fairuz Armina Nur Azizah, S.T.
         User::updateOrCreate(
             ['email' => 'fairuz@gmail.com'],
@@ -93,60 +80,7 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        // 4. Role: Subdirektorat (Pemohon Kolektif - Akses Murni Requester Sama Seperti Pegawai)
-        // 4A. SUBDIT SDK
-        User::updateOrCreate(
-            ['email' => 'sdk@gmail.com'],
-            [
-                'name' => 'Subdirektorat SDK',
-                'position' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
-                'nip' => '19940115 201902 1 001',
-                'subdit_name' => 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman',
-                'password' => Hash::make('password123'),
-                'role' => 'subdit',
-            ]
-        );
-
-        // 4B. SUBDIT PJF
-        User::updateOrCreate(
-            ['email' => 'pjf@gmail.com'],
-            [
-                'name' => 'Subdirektorat PJF',
-                'position' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
-                'nip' => '19930720 201801 1 002',
-                'subdit_name' => 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi',
-                'password' => Hash::make('password123'),
-                'role' => 'subdit',
-            ]
-        );
-
-        // 4C. SUBDIT TU (Subbag TU Pemohon Kolektif)
-        User::updateOrCreate(
-            ['email' => 'tu@gmail.com'],
-            [
-                'name' => 'Subbagian Tata Usaha',
-                'position' => 'Subbagian Tata Usaha',
-                'nip' => '19920310 201603 2 003',
-                'subdit_name' => 'Subbagian Tata Usaha',
-                'password' => Hash::make('password123'),
-                'role' => 'subdit',
-            ]
-        );
-
-        // 4D. SUBDIT KBR
-        User::updateOrCreate(
-            ['email' => 'kbr@gmail.com'],
-            [
-                'name' => 'Subdirektorat KBR',
-                'position' => 'Subdirektorat Kendala Bangunan Rumah',
-                'nip' => '19950825 202012 1 004',
-                'subdit_name' => 'Subdirektorat Kendala Bangunan Rumah',
-                'password' => Hash::make('password123'),
-                'role' => 'subdit',
-            ]
-        );
-
-        // 5. Role: Pegawai Perorangan (Pemohon Individu - Akses Murni Requester)
+        // 4. Role: Pegawai Perorangan (Pemohon Individu - Akses Murni Requester)
         User::updateOrCreate(
             ['email' => 'pegawai@gmail.com'],
             [
@@ -160,19 +94,7 @@ class AdminSeeder extends Seeder
         );
         */
 
-        // Daftar Kategori ATK
-        $categories = [
-            'Amplop', 'Balliner', 'Ballpoint', 'Tinta', 'Batterey Alkaline',
-            'Binder', 'Box', 'Buku', 'Clear Holder',
-            'Celotif', 'Compact Disc', 'Container CB', 'Cutter',
-            'Double Tape', 'Elevated Tray', 'Flashdisk', 'Gunting', 'Isi Stapler',
-            'Kamper', 'Kertas HVS', 'Label Sticker', 'Lakband', 'Lem', 'Map', 'Mouse', 'Ordner',
-            'Paper Clip', 'Penggaris', 'Penghapus', 'Pensil', 'Pita', 'POST', 'Punch/Pembolong',
-            'Stabilo', 'Toner',
-        ];
-
-        foreach ($categories as $catName) {
-            Category::firstOrCreate(['name' => $catName]);
-        }
+        // Sinkronisasi Katalog Standar ATK (Lembar 2) - 56 Kategori & 572 Barang ATK
+        $this->call(Lembar2AtkCatalogSeeder::class);
     }
 }

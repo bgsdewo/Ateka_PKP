@@ -244,7 +244,7 @@
                                         <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $idx + 1 }}</td>
                                         <td>
                                             <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                            <small class="text-muted">{{ $req->created_at->format('d/m/Y H:i') }}</small>
+                                            <small class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
                                         </td>
                                         <td>
                                             <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
@@ -368,7 +368,7 @@
                                                                 @if ($req->verified_at)
                                                                     <div class="col-sm-6">
                                                                         <small class="text-muted d-block">Diverifikasi Oleh:</small>
-                                                                        <strong>{{ $req->verifier->name ?? 'Subbag TU' }} ({{ $req->verified_at->format('d/m/Y H:i') }})</strong>
+                                                                        <strong>{{ $req->verifier->name ?? 'Subbag TU' }} ({{ $req->verified_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB)</strong>
                                                                     </div>
                                                                 @endif
                                                                 @if ($req->purchase_invoice)

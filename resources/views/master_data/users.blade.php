@@ -13,7 +13,7 @@
                             </div>
                             <h1 class="text-white fw-bold mb-1">Manajemen Pengguna &amp; Peran</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Kelola hak akses akun pengguna untuk seluruh hierarki peran instansi: Kasubag TU, Arsiparis, PIC Distribusi, Subdirektorat, dan Pegawai.
+                                Kelola hak akses akun pengguna untuk seluruh hierarki peran instansi: Kasubag TU, PIC Distribusi, Pegawai Gudang, dan Pegawai.
                             </p>
                         </div>
                     </div>
@@ -86,16 +86,14 @@
                                         @php
                                             $roleBadge = match ($user->role) {
                                                 'kasubag_tu', 'admin' => 'bg-primary',
-                                                'arsiparis' => 'bg-info text-white',
                                                 'pic_distribusi' => 'bg-warning text-dark',
-                                                'subdit' => 'bg-success text-white',
+                                                'pegawai_gudang' => 'bg-dark text-white',
                                                 default => 'bg-secondary text-white',
                                             };
                                             $roleLabel = match ($user->role) {
                                                 'kasubag_tu', 'admin' => 'Kasubag TU (Approver)',
-                                                'arsiparis' => 'Arsiparis (Pelaporan)',
                                                 'pic_distribusi' => 'PIC Distribusi (Gudang)',
-                                                'subdit' => 'Subdirektorat (Kolektif)',
+                                                'pegawai_gudang' => 'Pegawai Gudang',
                                                 default => 'Pegawai (Individu)',
                                             };
                                         @endphp
@@ -237,11 +235,11 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
+                                    Nomor Induk Pegawai (NIP) <span class="text-danger" id="nipRequiredAsterisk">*</span> <span class="text-muted font-normal d-none" id="nipOptionalLabel">(Opsional)</span>
                                 </label>
                                 <input type="text" name="nip" id="nip" class="form-control"
                                     placeholder="Contoh: 19950510 202012 1 002" required>
-                                <small class="text-muted" style="font-size: 0.75rem;">
+                                <small class="text-muted" id="nipHelpText" style="font-size: 0.75rem;">
                                     Wajib diisi untuk identitas dinas & verifikasi keamanan lupa password.
                                 </small>
                             </div>
@@ -260,9 +258,8 @@
                                 </label>
                                 <select name="role" id="role" class="form-select" required>
                                     <option value="kasubag_tu">Kasubag TU (Approver / Pimpinan)</option>
-                                    <option value="arsiparis">Arsiparis (Pelaporan & Administrasi)</option>
                                     <option value="pic_distribusi">PIC Distribusi (Pengelola / Gudang)</option>
-                                    <option value="subdit">Subdirektorat (Pemohon Kolektif)</option>
+                                    <option value="pegawai_gudang">Pegawai Gudang</option>
                                     <option value="pegawai" selected>Pegawai (Pemohon Individu)</option>
                                 </select>
                             </div>
@@ -282,28 +279,13 @@
                                 <small class="text-muted" style="font-size: 0.75rem;">Pilih unit penugasan resmi untuk penyerahan barang dan dokumen bukti distribusi.</small>
                             </div>
 
-                            {{-- Pilihan Unit Subdirektorat (Jika role == subdit) --}}
-                            <div class="col-md-6 d-none" id="subditUnitContainer">
-                                <label class="form-label fw-bold small text-uppercase">
-                                    Pilih Subdirektorat / Unit Kerja <span class="text-danger">*</span>
-                                </label>
-                                <select name="subdit_unit_choice" id="subdit_unit_choice" class="form-select">
-                                    <option value="" disabled selected>-- Pilih Unit Subdirektorat --</option>
-                                    <option value="Subdirektorat SDK">Subdirektorat SDK (Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman)</option>
-                                    <option value="Subdirektorat PJF">Subdirektorat PJF (Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi)</option>
-                                    <option value="Subdirektorat KBR">Subdirektorat KBR (Kendala Bangunan Rumah)</option>
-                                    <option value="Subbagian TU">Subbagian TU (Tata Usaha)</option>
-                                </select>
-                                <small class="text-muted" style="font-size: 0.75rem;">Pilih unit Subdirektorat resmi yang diwakili.</small>
-                            </div>
-
                             <div class="col-md-6" id="positionContainer">
                                 <label class="form-label fw-bold small text-uppercase">
                                     Jabatan / Posisi Kerja <span class="text-muted font-normal">(Opsional)</span>
                                 </label>
                                 <input type="text" name="position" id="position" class="form-control"
                                     placeholder="Contoh: PIC Distribusi Subdirektorat SDK / Staf Keuangan">
-                                <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih perwakilan PIC/Subdit, atau dapat disesuaikan.</small>
+                                <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih unit penugasan PIC, atau dapat disesuaikan.</small>
                             </div>
 
                             <div class="col-md-6 password-wrapper">
@@ -354,13 +336,14 @@
                 const $name = $('#name');
                 const $userTitle = $('#userTitle');
                 const $nip = $('#nip');
+                const $nipRequiredAsterisk = $('#nipRequiredAsterisk');
+                const $nipOptionalLabel = $('#nipOptionalLabel');
+                const $nipHelpText = $('#nipHelpText');
                 const $email = $('#email');
                 const $role = $('#role');
                 const $position = $('#position');
                 const $picUnitContainer = $('#picUnitContainer');
                 const $picUnitChoice = $('#pic_unit_choice');
-                const $subditUnitContainer = $('#subditUnitContainer');
-                const $subditUnitChoice = $('#subdit_unit_choice');
                 const $password = $('#password');
                 const $passwordConfirmation = $('#password_confirmation');
                 const $passwordWrapper = $('.password-wrapper');
@@ -378,18 +361,26 @@
                     const roleVal = $role.val();
                     if (roleVal === 'pic_distribusi') {
                         $picUnitContainer.removeClass('d-none');
-                        $subditUnitContainer.addClass('d-none');
-                    } else if (roleVal === 'subdit') {
-                        $subditUnitContainer.removeClass('d-none');
-                        $picUnitContainer.addClass('d-none');
                     } else {
                         $picUnitContainer.addClass('d-none');
-                        $subditUnitContainer.addClass('d-none');
-                        if (roleVal === 'arsiparis' && !$position.val()) {
-                            $position.val('Arsiparis Ahli Pertama');
-                        } else if (roleVal === 'kasubag_tu' && !$position.val()) {
+                        if (roleVal === 'kasubag_tu' && !$position.val()) {
                             $position.val('Kasubag TU');
+                        } else if (roleVal === 'pegawai_gudang' && !$position.val()) {
+                            $position.val('Pegawai Gudang');
                         }
+                    }
+
+                    // Dinamis: Ketika role adalah Pegawai Gudang, field NIP menjadi opsional
+                    if (roleVal === 'pegawai_gudang') {
+                        $nip.prop('required', false);
+                        $nipRequiredAsterisk.addClass('d-none');
+                        $nipOptionalLabel.removeClass('d-none');
+                        $nipHelpText.text('Opsional untuk Pegawai Gudang. Wajib diisi untuk ASN/pegawai dinas lainnya.');
+                    } else {
+                        $nip.prop('required', true);
+                        $nipRequiredAsterisk.removeClass('d-none');
+                        $nipOptionalLabel.addClass('d-none');
+                        $nipHelpText.text('Wajib diisi untuk identitas dinas & verifikasi keamanan lupa password.');
                     }
                 }
 
@@ -412,13 +403,6 @@
                     }
                 });
 
-                $subditUnitChoice.on('change', function() {
-                    const val = $(this).val();
-                    if (val) {
-                        $position.val(val);
-                    }
-                });
-
                 function resetModalUser() {
                     $form[0].reset();
                     $form.attr('action', storeUrl);
@@ -430,9 +414,8 @@
                     $role.prop('disabled', false).val('pegawai');
                     $position.prop('readonly', false).val('');
                     $picUnitChoice.val('').prop('disabled', false);
-                    $subditUnitChoice.val('').prop('disabled', false);
                     $picUnitContainer.addClass('d-none');
-                    $subditUnitContainer.addClass('d-none');
+                    updateRoleContainers();
                     $password.prop('readonly', false).val('');
                     $passwordConfirmation.prop('readonly', false).val('');
                     $passwordWrapper.removeClass('d-none');
@@ -492,11 +475,6 @@
                         else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('Subdirektorat KBR');
                         else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('Subdirektorat SDK');
                         else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('Subdirektorat PJF');
-                    } else if ($(this).data('role') === 'subdit') {
-                        if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
-                        else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
-                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $subditUnitChoice.val('Subdirektorat SDK');
-                        else if (pos.includes('pjf') || sub.includes('fungsional')) $subditUnitChoice.val('Subdirektorat PJF');
                     }
 
                     // Pada edit, password boleh kosong
@@ -535,7 +513,6 @@
 
                     updateRoleContainers();
                     $picUnitChoice.prop('disabled', true);
-                    $subditUnitChoice.prop('disabled', true);
 
                     const pos = (position || '').toString().toLowerCase();
                     const sub = (subditName || '').toString().toLowerCase();
@@ -545,11 +522,6 @@
                         else if (pos.includes('kbr') || sub.includes('kendala')) $picUnitChoice.val('Subdirektorat KBR');
                         else if (pos.includes('sdk') || sub.includes('sumber daya')) $picUnitChoice.val('Subdirektorat SDK');
                         else if (pos.includes('pjf') || sub.includes('fungsional')) $picUnitChoice.val('Subdirektorat PJF');
-                    } else if (role === 'subdit') {
-                        if (pos.includes('tu') || sub.includes('tata usaha')) $subditUnitChoice.val('Subbagian TU');
-                        else if (pos.includes('kbr') || sub.includes('kendala')) $subditUnitChoice.val('Subdirektorat KBR');
-                        else if (pos.includes('sdk') || sub.includes('sumber daya')) $subditUnitChoice.val('Subdirektorat SDK');
-                        else if (pos.includes('pjf') || sub.includes('fungsional')) $subditUnitChoice.val('Subdirektorat PJF');
                     }
 
                     $passwordWrapper.addClass('d-none');

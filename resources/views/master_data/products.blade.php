@@ -61,7 +61,7 @@
                                 <small class="text-secondary">Saring riwayat faktur & persediaan barang berdasarkan bulan, tahun, atau rentang tanggal tertentu</small>
                             </div>
                         </div>
-                        @if ($month || $year || $startDate || $endDate)
+                        @if ($month || $year || $startDate || $endDate || !empty($categoryId) || !empty($stockStatus))
                             <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-outline-danger btn-sm">
                                 <svg class="icon-16 me-1" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -73,8 +73,35 @@
                     <div class="card-body p-3">
                         <form method="GET" action="{{ route('master-data.daftar-barang.index') }}" id="filterForm">
                             <div class="row g-3 align-items-end">
-                                {{-- Periode Bulan --}}
+                                {{-- Filter Kategori ATK --}}
                                 <div class="col-12 col-sm-6 col-md-3">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Kategori Barang ATK
+                                    </label>
+                                    <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Semua Kategori ({{ $categories->count() }})</option>
+                                        @foreach ($categories as $cat)
+                                            <option value="{{ $cat->id }}" {{ ($categoryId ?? '') == $cat->id ? 'selected' : '' }}>
+                                                {{ $cat->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Filter Status Stok --}}
+                                <div class="col-12 col-sm-6 col-md-2">
+                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                                        Status Stok
+                                    </label>
+                                    <select name="stock_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Semua Status</option>
+                                        <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia (Stok &gt; 0)</option>
+                                        <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Stok Belum Tersedia (0)</option>
+                                    </select>
+                                </div>
+
+                                {{-- Periode Bulan --}}
+                                <div class="col-12 col-sm-6 col-md-2">
                                     <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
                                         Periode Bulan
                                     </label>
@@ -89,36 +116,34 @@
                                 </div>
 
                                 {{-- Periode Tahun (Dinamis jangka panjang) --}}
-                                <div class="col-12 col-sm-6 col-md-3">
+                                <div class="col-12 col-sm-6 col-md-1">
                                     <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
                                         Periode Tahun
                                     </label>
                                     <select name="year" class="form-select form-select-sm">
-                                        <option value="">Semua Tahun</option>
+                                        <option value="">Semua</option>
                                         @foreach ($availableYears as $y)
                                             <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
-                                                Tahun {{ $y }}
+                                                {{ $y }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
 
                                 {{-- Dari Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-2">
+                                <div class="col-12 col-sm-6 col-md-1">
                                     <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
                                         Dari Tanggal
                                     </label>
                                     <input type="date" name="start_date" value="{{ $startDate ?? '' }}" class="form-control form-control-sm">
-                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">*Isi 1 tanggal untuk filter harian</small>
                                 </div>
 
                                 {{-- Sampai Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-2">
+                                <div class="col-12 col-sm-6 col-md-1">
                                     <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
                                         Sampai Tanggal
                                     </label>
                                     <input type="date" name="end_date" value="{{ $endDate ?? '' }}" class="form-control form-control-sm">
-                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">*Opsional (rentang tanggal)</small>
                                 </div>
 
                                 {{-- Tombol Aksi --}}
@@ -136,6 +161,74 @@
                 </div>
             </div>
         </div>
+
+        @if(isset($unfulfilledProcurements) && $unfulfilledProcurements->isNotEmpty())
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #f59e0b !important;">
+                        <div class="card-body p-3.5">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2.5">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <span class="badge bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark">Permintaan Pengadaan Menunggu Penambahan Barang / Stok di Master Data ({{ $unfulfilledProcurements->count() }} Item)</h6>
+                                        <small class="text-secondary">Klik tombol <strong>"+ Tambahkan / Isi Stok"</strong> di bawah ketika barang sudah dibeli agar status di akun Pegawai / PIC otomatis berubah menjadi <strong>Tersedia</strong> disertai notifikasi.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                @foreach($unfulfilledProcurements as $upDetail)
+                                    @php
+                                        $upReq = $upDetail->requestItem;
+                                        $upProd = $upDetail->product;
+                                        $upQty = $upDetail->approved_quantity ?: $upDetail->quantity;
+                                        $upUnit = $upDetail->custom_unit ?: ($upProd->unit ?? 'Buah');
+                                        $upName = $upProd->name ?? ($upDetail->custom_product_name ?: 'Barang Pengadaan');
+                                        $upCode = $upProd->code ?? ('ATK-' . strtoupper(\Illuminate\Support\Str::random(4)));
+                                        $upCatId = $upProd->category_id ?? ($categories->first()->id ?? '');
+                                    @endphp
+                                    <div class="col-12 col-md-6 col-xl-4">
+                                        <div class="bg-white rounded-3 p-2.5 border shadow-xs d-flex justify-content-between align-items-center gap-2 h-100">
+                                            <div class="min-w-0">
+                                                <div class="d-flex align-items-center gap-1.5 flex-wrap mb-0.5">
+                                                    <span class="badge bg-primary-subtle text-primary border font-monospace" style="font-size: 0.68rem;">{{ $upReq->request_code ?? '-' }}</span>
+                                                    <span class="badge {{ ($upReq->status ?? '') === 'approved' ? 'bg-info text-white' : 'bg-warning text-dark' }}" style="font-size: 0.68rem;">
+                                                        {{ ($upReq->status ?? '') === 'approved' ? 'Disetujui TU' : 'Menunggu Review' }}
+                                                    </span>
+                                                </div>
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.86rem;" title="{{ $upName }}">{{ $upName }}</div>
+                                                <small class="text-muted d-block" style="font-size: 0.74rem;">
+                                                    Pemohon: <strong>{{ $upReq->user->name ?? 'Pegawai' }}</strong> &bull; Butuh: <strong class="text-success">{{ $upQty }} {{ $upUnit }}</strong>
+                                                </small>
+                                            </div>
+                                            <button type="button"
+                                                class="btn btn-sm btn-success text-white fw-bold flex-shrink-0 btn-fulfill-procurement shadow-sm"
+                                                style="font-size: 0.75rem;"
+                                                data-detail-id="{{ $upDetail->id }}"
+                                                data-product-id="{{ $upProd->id ?? '' }}"
+                                                data-category-id="{{ $upCatId }}"
+                                                data-code="{{ $upCode }}"
+                                                data-name="{{ $upName }}"
+                                                data-unit="{{ $upUnit }}"
+                                                data-qty="{{ $upQty }}"
+                                                data-price="{{ $upProd->purchase_price ?? 0 }}">
+                                                + Isi Stok
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="row">
             <div class="col-sm-12">
@@ -169,7 +262,7 @@
                                 Total: <strong>{{ number_format($totalProducts) }} Barang</strong>
                             </span>
                             <button type="button" class="btn btn-primary btn-sm btn-create-barang">
-                                Tambah Barang
+                                + Tambah / Isi Stok Barang
                             </button>
                         </div>
                     </div>
@@ -231,7 +324,7 @@
                                                     {{ number_format($totalNilai, 0, ',', '.') }}</strong></td>
                                             <td>
                                                 @if ($product->stock <= 0)
-                                                    <span class="badge bg-dark">Stok Habis</span>
+                                                    <span class="badge bg-dark">Stok Belum Tersedia</span>
                                                 @else
                                                     <span class="badge bg-success">Tersedia</span>
                                                 @endif
@@ -273,16 +366,18 @@
                                                         data-description="{{ e($product->description) }}">
                                                         Edit
                                                     </button>
-                                                    <form
-                                                        action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
-                                                        method="POST"
-                                                        onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            Hapus
-                                                        </button>
-                                                    </form>
+                                                    @if (!auth()->user()->isPegawaiGudang())
+                                                        <form
+                                                            action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                Hapus
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -303,6 +398,7 @@
                 <form id="formBarang" method="POST">
                     @csrf
                     <input type="hidden" name="_method" id="formMethod" value="" disabled>
+                    <input type="hidden" name="request_detail_id" id="request_detail_id" value="">
 
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalBarangLabel">Form Barang</h5>
@@ -331,6 +427,32 @@
                             </div>
                         </div>
 
+                        <div id="quickCatalogRestockBox" class="alert alert-light border border-primary-subtle mb-3 p-3">
+                            <label class="form-label fw-bold small text-primary mb-1">
+                                Pilih Cepat dari Katalog Standar LIST ATK (Opsional — Untuk Isi Stok / Input Faktur Barang yang Sudah Ada)
+                            </label>
+                            <select id="quick_existing_product" class="form-select form-select-sm bg-white">
+                                <option value="">-- Buat Barang Baru Manual atau Pilih Barang Standar di Sini untuk Isi Stok --</option>
+                                @foreach ($products as $pItem)
+                                    <option value="{{ $pItem->id }}"
+                                        data-category-id="{{ $pItem->category_id }}"
+                                        data-code="{{ $pItem->code }}"
+                                        data-name="{{ $pItem->name }}"
+                                        data-unit="{{ $pItem->unit }}"
+                                        data-stock="{{ $pItem->stock }}"
+                                        data-price="{{ $pItem->purchase_price ?? 0 }}"
+                                        data-faktur="{{ $pItem->initial_no_faktur }}"
+                                        data-uraian="{{ $pItem->initial_uraian }}"
+                                        data-desc="{{ $pItem->description }}">
+                                        [{{ $pItem->category->name ?? 'ATK' }}] {{ $pItem->code }} - {{ $pItem->name }} (Stok: {{ $pItem->stock }} {{ $pItem->unit }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
+                                Jika barang sudah ada di LIST ATK, pilih di atas agar otomatis masuk ke mode pengisian stok &amp; faktur tanpa perlu ketik ulang.
+                            </small>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Kategori Barang <span class="text-danger">*</span></label>
@@ -345,7 +467,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Kode Barang <span class="text-danger">*</span></label>
                                 <input type="text" name="code" id="code" class="form-control"
-                                    placeholder="Contoh: BRG-001" required>
+                                    placeholder="Contoh: ATK-0573" required>
                             </div>
 
                             <div class="col-md-12 mb-3">
@@ -376,16 +498,24 @@
                                 <label class="form-label">Satuan <span class="text-danger">*</span></label>
                                 <select name="unit" id="unit" class="form-select" required>
                                     <option value="">Pilih Satuan</option>
-                                    <option value="Pak">Pak</option>
-                                    <option value="Lembar">Lembar</option>
-                                    <option value="Dos">Dos / Dus</option>
-                                    <option value="Batang">Batang</option>
-                                    <option value="Set">Set</option>
-                                    <option value="Rim">Rim</option>
-                                    <option value="Buku">Buku</option>
                                     <option value="Buah">Buah</option>
+                                    <option value="Dus">Dus</option>
+                                    <option value="Dos">Dos</option>
+                                    <option value="Rim">Rim</option>
+                                    <option value="Pak">Pak</option>
+                                    <option value="Kotak">Kotak</option>
+                                    <option value="Doz">Doz</option>
+                                    <option value="Set">Set</option>
                                     <option value="Roll">Roll</option>
+                                    <option value="Slop">Slop</option>
+                                    <option value="Pak/Slop">Pak/Slop</option>
+                                    <option value="Buku">Buku</option>
                                     <option value="Tube">Tube</option>
+                                    <option value="Box">Box</option>
+                                    <option value="Botol">Botol</option>
+                                    <option value="Lusin">Lusin</option>
+                                    <option value="Lembar">Lembar</option>
+                                    <option value="Batang">Batang</option>
                                     <option value="Bungkus">Bungkus</option>
                                     <option value="Pcs">Pcs</option>
                                 </select>
@@ -483,22 +613,28 @@
                 const $detailTransactionCount = $('#detailTransactionCount');
                 const $detailCreatedAt = $('#detailCreatedAt');
                 const $detailUpdatedAt = $('#detailUpdatedAt');
+                const $quickBox = $('#quickCatalogRestockBox');
+                const $quickSelect = $('#quick_existing_product');
+                const $requestDetailId = $('#request_detail_id');
 
                 function resetModalBarang() {
                     $form[0].reset();
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
+                    $requestDetailId.val('');
                     $categoryId.prop('disabled', false).val('');
                     $code.prop('readonly', false).val('');
                     $name.prop('readonly', false).val('');
                     $noFaktur.prop('readonly', false).val('');
                     $transactionDate.prop('readonly', false).val('');
                     $uraian.prop('readonly', false).val('');
-                    $unit.prop('readonly', false).val('Pcs');
+                    $unit.prop('readonly', false).val('Buah');
                     $stock.prop('readonly', false).val(0);
                     $purchasePrice.prop('readonly', false).val(0);
                     $description.prop('readonly', false).val('');
                     $detailInfo.addClass('d-none');
+                    $quickBox.addClass('d-none');
+                    $quickSelect.val('');
                     $detailStatusStok.text('-');
                     $detailTransactionCount.text('0 Transaksi');
                     $detailCreatedAt.text('-');
@@ -507,13 +643,87 @@
                     $btnSubmit.removeClass('d-none').text('Simpan Barang');
                 }
 
+                // Event listener untuk tombol + Isi Stok dari Banner Usulan Pengadaan
+                $(document).on('click', '.btn-fulfill-procurement', function() {
+                    resetModalBarang();
+                    const detailId = $(this).data('detail-id') || '';
+                    const productId = $(this).data('product-id') || '';
+                    const catId = $(this).data('category-id') || '';
+                    const code = $(this).data('code') || '';
+                    const name = $(this).data('name') || '';
+                    const unit = $(this).data('unit') || 'Buah';
+                    const qty = parseInt($(this).data('qty')) || 1;
+                    const price = $(this).data('price') || 0;
+
+                    $requestDetailId.val(detailId);
+                    if (productId) {
+                        const updateUrl = updateUrlTemplate.replace(':id', productId);
+                        $form.attr('action', updateUrl);
+                        $method.prop('disabled', false).val('PUT');
+                    } else {
+                        $form.attr('action', storeUrl);
+                        $method.prop('disabled', true).val('');
+                    }
+
+                    $categoryId.val(catId);
+                    $code.val(code);
+                    $name.val(name);
+                    if ($unit.find('option[value="' + unit + '"]').length === 0 && unit) {
+                        $unit.append(new Option(unit, unit, true, true));
+                    }
+                    $unit.val(unit);
+                    $stock.val(qty);
+                    $purchasePrice.val(price);
+                    $transactionDate.val(new Date().toISOString().split('T')[0]);
+                    $title.text('Tambahkan / Isi Stok Barang Pengadaan: ' + name);
+                    $btnSubmit.text('Simpan Stok & Kirim Notifikasi');
+                    $modal.modal('show');
+                    setTimeout(() => $stock.focus(), 300);
+                });
+
                 // Event listener untuk tombol Tambah Barang
                 $(document).on('click', '.btn-create-barang', function() {
                     resetModalBarang();
-                    $title.text('Tambah Barang');
+                    $quickBox.removeClass('d-none');
+                    $title.text('Tambah Barang / Isi Stok dari Standar ATK');
                     $btnSubmit.text('Simpan Barang');
                     $transactionDate.val(new Date().toISOString().split('T')[0]);
                     $modal.modal('show');
+                });
+
+                // Pilih cepat dari standar LIST ATK di dalam modal Tambah Barang
+                $quickSelect.on('change', function() {
+                    const selectedId = $(this).val();
+                    const $opt = $(this).find('option:selected');
+                    if (selectedId && $opt.length) {
+                        const updateUrl = updateUrlTemplate.replace(':id', selectedId);
+                        $form.attr('action', updateUrl);
+                        $method.prop('disabled', false).val('PUT');
+                        $categoryId.val($opt.data('category-id'));
+                        $code.val($opt.data('code'));
+                        $name.val($opt.data('name'));
+                        $unit.val($opt.data('unit'));
+                        $stock.val($opt.data('stock') || 0);
+                        $purchasePrice.val($opt.data('price') || 0);
+                        $noFaktur.val($opt.data('faktur') || '');
+                        $uraian.val($opt.data('uraian') || '');
+                        $description.val($opt.data('desc') || '');
+                        $title.text('Isi Stok / Update Barang Standar ATK');
+                        $btnSubmit.text('Simpan Stok & Perubahan');
+                        $stock.focus();
+                    } else {
+                        $form.attr('action', storeUrl);
+                        $method.prop('disabled', true).val('');
+                        $categoryId.val('');
+                        $code.val('');
+                        $name.val('');
+                        $unit.val('Buah');
+                        $stock.val(0);
+                        $purchasePrice.val(0);
+                        $description.val('');
+                        $title.text('Tambah Barang Baru');
+                        $btnSubmit.text('Simpan Barang');
+                    }
                 });
 
                 $(document).on('click', '.btn-edit-barang', function() {
@@ -527,14 +737,14 @@
                     $code.val($(this).data('code'));
                     $name.val($(this).data('name'));
                     $noFaktur.val($(this).data('no-faktur') || '');
-                    $transactionDate.val($(this).data('transaction-date') || '');
+                    $transactionDate.val($(this).data('transaction-date') || new Date().toISOString().split('T')[0]);
                     $uraian.val($(this).data('uraian') || '');
                     $unit.val($(this).data('unit'));
                     $stock.val($(this).data('stock'));
                     $purchasePrice.val($(this).data('purchase-price'));
                     $description.val($(this).data('description'));
 
-                    $title.text('Edit Barang');
+                    $title.text('Edit / Isi Stok Barang');
                     $btnSubmit.text('Simpan Perubahan');
                     $modal.modal('show');
                 });
@@ -578,7 +788,7 @@
                     $description.prop('readonly', true);
 
                     if (stock <= 0) {
-                        $detailStatusStok.html('<span class="badge bg-dark">Stok Habis</span>');
+                        $detailStatusStok.html('<span class="badge bg-dark">Stok Belum Tersedia</span>');
                     } else {
                         $detailStatusStok.html('<span class="badge bg-success">Tersedia</span>');
                     }

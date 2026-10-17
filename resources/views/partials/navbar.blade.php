@@ -388,16 +388,14 @@
                                     $userRole = auth()->user()->role ?? 'pegawai';
                                     $roleBadge = match ($userRole) {
                                         'kasubag_tu', 'admin' => 'bg-primary text-white',
-                                        'arsiparis' => 'bg-info text-white',
                                         'pic_distribusi' => 'bg-warning text-dark',
-                                        'subdit' => 'bg-success text-white',
+                                        'pegawai_gudang' => 'bg-dark text-white',
                                         default => 'bg-secondary text-white',
                                     };
                                     $roleTitle = match ($userRole) {
                                         'kasubag_tu', 'admin' => 'Kasubag TU',
-                                        'arsiparis' => 'Arsiparis',
                                         'pic_distribusi' => 'PIC Distribusi',
-                                        'subdit' => 'Subdirektorat',
+                                        'pegawai_gudang' => 'Pegawai Gudang',
                                         default => 'Pegawai',
                                     };
                                 @endphp

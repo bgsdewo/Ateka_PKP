@@ -20,7 +20,7 @@
     <!-- RTL Css -->
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
 
-    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v=2.1" />
+    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v=2.2" />
 
     <!-- Penyesuaian UI/UX: Official Kementerian PKP RI Palette & Modern GovTech Styling -->
     <style>
@@ -309,6 +309,8 @@
     <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
     <!-- App Script -->
     <script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}" defer></script>
+    <!-- Global Alert Dismiss & Auto-Dismiss System -->
+    <script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Password Show/Hide Toggle

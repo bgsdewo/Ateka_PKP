@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v=2.1" />
+    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.3' }}" />
     @stack('styles')
     <style>
         /* ======================================================== */
@@ -77,7 +77,7 @@
             position: absolute !important;
             right: -12px !important;
             top: 18px !important;
-            z-index: 1050 !important;
+            z-index: 1000 !important;
         }
 
         /* 2. Profil Avatar Pengguna */

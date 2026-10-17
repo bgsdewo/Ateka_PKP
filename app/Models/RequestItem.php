@@ -124,12 +124,7 @@ class RequestItem extends Model
         if (!$this->is_procurement) {
             return false;
         }
-        if (!empty($this->purchase_invoice)) {
-            return true;
-        }
-        return $this->relationLoaded('details')
-            ? $this->details->contains(fn($d) => !empty($d->product_id))
-            : $this->details()->whereNotNull('product_id')->exists();
+        return !empty($this->purchase_invoice) || !empty($this->purchase_date);
     }
 
     public function getStatusLabelAttribute(): string
@@ -137,7 +132,7 @@ class RequestItem extends Model
         return match ($this->status) {
             'pending' => $this->is_procurement ? 'Menunggu Verifikasi Pengadaan' : 'Menunggu Verifikasi Subbag TU',
             'approved' => $this->is_procurement
-                ? ($this->is_purchased ? 'Disetujui & Telah Dibeli (Tersedia)' : 'Disetujui TU (Akan Dibeli)')
+                ? ($this->is_purchased ? 'Disetujui & Telah Dibeli (Tersedia)' : 'Disetujui Kasubag TU')
                 : 'Disetujui TU (Siap Diambil)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',

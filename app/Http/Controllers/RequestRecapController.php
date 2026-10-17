@@ -17,7 +17,7 @@ class RequestRecapController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        if (!$user || !in_array($user->role, ['kasubag_tu', 'admin', 'pic_distribusi', 'arsiparis'])) {
+        if (!$user || !in_array($user->role, ['kasubag_tu', 'admin'])) {
             return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki hak akses ke halaman Rekapitulasi Subbag TU.');
         }
 
@@ -203,7 +203,7 @@ class RequestRecapController extends Controller
     public function printRecap(Request $request, $id = null)
     {
         $user = auth()->user();
-        if (!$user || !in_array($user->role, ['kasubag_tu', 'admin', 'pic_distribusi', 'arsiparis', 'subdit', 'pegawai'])) {
+        if (!$user || !in_array($user->role, ['kasubag_tu', 'admin', 'pic_distribusi', 'pegawai'])) {
             return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki hak akses ke halaman Cetak Dokumen.');
         }
 

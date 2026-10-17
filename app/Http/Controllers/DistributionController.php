@@ -16,11 +16,10 @@ class DistributionController extends Controller
      */
     public function index(Request $request)
     {
-        if (!auth()->user()->isPicDistribusi()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh PIC Distribusi.');
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
         }
 
-        $picUser = auth()->user();
         $filterType = $request->get('type'); // individu, subdit, or null
         $filterStatus = $request->get('status', 'all'); // default to 'all' so handed over items remain visible
         $search = $request->get('search');
@@ -39,7 +38,6 @@ class DistributionController extends Controller
                 $q->where('is_procurement', false)
                   ->orWhereNull('is_procurement');
             })
-            ->forPic($picUser)
             ->when($filterType, function ($q) use ($filterType) {
                 $q->where('type', $filterType);
             })
@@ -95,7 +93,7 @@ class DistributionController extends Controller
                 });
             });
 
-        // Rekap statistik untuk PIC Distribusi
+        // Rekap statistik untuk Distribusi Barang
         $totalReady = (clone $baseQuery)->where('status', 'approved')->count();
         $totalDistributed = (clone $baseQuery)->where('status', 'distributed')->count();
         $totalSubditReady = (clone $baseQuery)->where('status', 'approved')->where('type', 'subdit')->count();
@@ -143,17 +141,14 @@ class DistributionController extends Controller
      */
     public function confirmHandover(Request $request, $id)
     {
-        if (!auth()->user()->isPicDistribusi()) {
-            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh PIC Distribusi.');
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh Kasubag TU dan Pegawai Gudang.');
         }
-
-        $picUser = auth()->user();
 
         $requestItem = RequestItem::with(['user', 'details.product'])
             ->where(function ($q) {
                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
             })
-            ->forPic($picUser)
             ->findOrFail($id);
 
         $request->validate([
@@ -196,16 +191,13 @@ class DistributionController extends Controller
      */
     public function uploadProof(Request $request, $id)
     {
-        if (!auth()->user()->isPicDistribusi()) {
-            return redirect()->route('dashboard')->with('error', 'Aksi ini hanya dapat dilakukan oleh PIC Distribusi.');
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Aksi ini hanya dapat dilakukan oleh Kasubag TU dan Pegawai Gudang.');
         }
-
-        $picUser = auth()->user();
 
         $requestItem = RequestItem::where(function ($q) {
                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
             })
-            ->forPic($picUser)
             ->findOrFail($id);
 
         $request->validate([
@@ -246,13 +238,8 @@ class DistributionController extends Controller
             })
             ->findOrFail($id);
 
-        // Jika PIC Distribusi yang mengakses, pastikan hanya bukti dari divisi yang ditanganinya
-        if ($currentUser && $currentUser->isPicDistribusi() && !$currentUser->canHandleRequest($requestItem)) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mencetak bukti serah terima barang dari divisi ini.');
-        }
-
-        // Jika Pegawai atau Subdit: hanya tampilkan bukti upload foto yang diunggah oleh PIC
-        if ($currentUser && ($currentUser->isPegawai() || $currentUser->isSubdit())) {
+        // Jika Pemohon (Pegawai atau PIC): hanya tampilkan bukti upload foto untuk permintaannya sendiri
+        if ($currentUser && ($currentUser->isPegawai() || $currentUser->isPicDistribusi())) {
             if ($requestItem->user_id !== $currentUser->id) {
                 abort(403, 'Anda tidak memiliki hak akses untuk melihat bukti serah terima permintaan ini.');
             }

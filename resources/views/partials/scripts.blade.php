@@ -43,4 +43,6 @@
 <script src="{{ asset('hope-ui/assets/js/plugins/sweetalert2.all.min.js') }}"></script>
 <!-- App Script -->
 <script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}" defer></script>
+<!-- Global Alert Dismiss & Auto-Dismiss System -->
+<script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
 

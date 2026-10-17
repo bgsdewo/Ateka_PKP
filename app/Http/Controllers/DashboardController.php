@@ -172,11 +172,6 @@ class DashboardController extends Controller
                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
             });
 
-        if (auth()->check() && auth()->user()->isPicDistribusi()) {
-            $readyDistribusiQuery->forPic(auth()->user());
-            $totalDistributedQuery->forPic(auth()->user());
-        }
-
         $readyDistribusiCount = $readyDistribusiQuery->count();
         $totalDistributedCount = $totalDistributedQuery->count();
 
@@ -198,6 +193,14 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        // Daftar pengajuan untuk widget Pelacakan Status (prioritaskan yang sedang berjalan / terbaru)
+        $trackedRequests = RequestItem::with('details.product')
+            ->where('user_id', $userId)
+            ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
+            ->latest()
+            ->limit(8)
+            ->get();
+
         $userPendingCount = (clone $userRequestsQuery)->where('status', 'pending')->count();
         $userApprovedCount = (clone $userRequestsQuery)->where('status', 'approved')->count();
         $userDistributedCount = (clone $userRequestsQuery)->where('status', 'distributed')->count();
@@ -208,7 +211,7 @@ class DashboardController extends Controller
             ->where('status', 'approved')
             ->where(function ($q) {
                 $q->whereNotNull('purchase_invoice')
-                  ->orWhereHas('details', fn($dq) => $dq->whereNotNull('product_id'));
+                  ->orWhereNotNull('purchase_date');
             })
             ->count();
 
@@ -257,6 +260,7 @@ class DashboardController extends Controller
             'readyDistribusiCount',
             'totalDistributedCount',
             'userRequests',
+            'trackedRequests',
             'userPendingCount',
             'userApprovedCount',
             'userDistributedCount',

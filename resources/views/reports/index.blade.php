@@ -1,10 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $arsiparisUser = \App\Models\User::where('role', 'arsiparis')->first();
     $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
-    $arsiparisName = $arsiparisUser ? ($arsiparisUser->name_with_title ?: $arsiparisUser->name) : 'Devi Ismiyanti';
-    $arsiparisNip = $arsiparisUser->nip ?? '199508142022032005';
     $kasubagName = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
     $kasubagNip = $kasubagUser->nip ?? '199812132025062010';
 @endphp
@@ -716,11 +713,12 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th width="3%">No</th>
-                                        <th width="7%">Tanggal</th>
-                                        <th width="7%">Kode</th>
+                                        <th width="7%">Tanggal Faktur</th>
+                                        <th width="7%">Kode Barang</th>
                                         <th width="8%">Kategori</th>
-                                        <th width="13%">Nama</th>
-                                        <th width="8%">Jenis</th>
+                                        <th width="11%">Nama Barang</th>
+                                        <th width="10%">Uraian</th>
+                                        <th width="7%">Jenis</th>
                                         <th width="6%">Stok Awal</th>
                                         <th width="7%">Stok Dipinjam</th>
                                         <th width="6%">Stok Sisa</th>
@@ -756,11 +754,11 @@
                                             <td class="text-center text-muted fw-semibold">
                                                 {{ $loop->iteration }}
                                             </td>
-                                            {{-- 2. Tanggal --}}
+                                            {{-- 2. Tanggal Faktur --}}
                                             <td class="text-center text-nowrap fw-semibold text-dark">
                                                 {{ $transaction->transaction_date ? \Carbon\Carbon::parse($transaction->transaction_date)->format('d-m-Y') : '-' }}
                                             </td>
-                                            {{-- 3. Kode --}}
+                                            {{-- 3. Kode Barang --}}
                                             <td class="text-center text-nowrap">
                                                 <span
                                                     class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1">
@@ -773,12 +771,20 @@
                                                     {{ $transaction->product->category->name ?? '-' }}
                                                 </span>
                                             </td>
-                                            {{-- 5. Nama --}}
+                                            {{-- 5. Nama Barang --}}
                                             <td class="col-nama-barang">
                                                 <span
                                                     class="fw-bold text-dark">{{ $transaction->product->name ?? '-' }}</span>
                                             </td>
-                                            {{-- 6. Jenis --}}
+                                            {{-- 6. Uraian --}}
+                                            <td class="col-uraian text-break">
+                                                @if ($transaction->type === 'masuk')
+                                                    <span class="text-dark small fw-medium">{{ $transaction->uraian ?? '-' }}</span>
+                                                @else
+                                                    <span class="text-muted small">-</span>
+                                                @endif
+                                            </td>
+                                            {{-- 7. Jenis --}}
                                             <td class="text-center text-nowrap">
                                                 @if ($transaction->type === 'masuk')
                                                     <span
@@ -809,7 +815,7 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            {{-- 7. Jumlah Stok Awal --}}
+                                            {{-- 8. Jumlah Stok Awal --}}
                                             <td class="text-center text-nowrap">
                                                 @if ($stockAwal > 0)
                                                     <span
@@ -822,7 +828,7 @@
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
-                                            {{-- 8. Jumlah Stok Dipinjam (Barang Keluar) --}}
+                                            {{-- 9. Jumlah Stok Dipinjam (Barang Keluar) --}}
                                             <td class="text-center text-nowrap">
                                                 @if ($stockDipinjam > 0)
                                                     <span
@@ -832,23 +838,23 @@
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
-                                            {{-- 9. Jumlah Stok Sisa --}}
+                                            {{-- 10. Jumlah Stok Sisa --}}
                                             <td class="text-center text-nowrap">
                                                 <span
                                                     class="fw-semibold {{ $stockSisa < 5 ? 'text-danger' : 'text-success' }}">{{ number_format($stockSisa) }}</span>
                                                 <span class="text-muted small ms-1">Pcs</span>
                                             </td>
-                                            {{-- 10. Harga Satuan --}}
+                                            {{-- 11. Harga Satuan --}}
                                             <td class="text-end font-monospace text-secondary text-nowrap"
                                                 data-order="{{ $harga }}">
                                                 {{ $formattedHarga }}
                                             </td>
-                                            {{-- 11. Nilai Saldo / Total --}}
+                                            {{-- 12. Nilai Saldo / Total --}}
                                             <td class="text-end font-monospace fw-bold text-dark text-nowrap"
                                                 data-order="{{ $nilaiSaldo }}">
                                                 {{ $formattedTotal }}
                                             </td>
-                                            {{-- 12. Nama Penerima --}}
+                                            {{-- 13. Nama Penerima --}}
                                             <td class="text-center text-nowrap">
                                                 @if ($transaction->type === 'keluar')
                                                     <span class="text-dark small fw-semibold">{{ $transaction->recipient_name }}</span>
@@ -856,20 +862,16 @@
                                                     <span class="text-muted small">-</span>
                                                 @endif
                                             </td>
-                                            {{-- 13. Catatan --}}
-                                            <td class="col-catatan-teks" title="{{ $transaction->note ?? '' }}">
-                                                @if ($transaction->note)
-                                                    <span class="text-secondary small">{{ $transaction->note }}</span>
-                                                @else
-                                                    <span class="text-muted small">-</span>
-                                                @endif
+                                            {{-- 14. Catatan --}}
+                                            <td class="col-catatan-teks" title="{{ $transaction->formatted_note ?? ($transaction->note ?? '') }}">
+                                                <span class="text-secondary small">{{ $transaction->formatted_note ?? ($transaction->note ?? '-') }}</span>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr class="fw-bold bg-light text-dark">
-                                        <th colspan="6" class="text-center py-2 text-secondary">TOTAL REKAPITULASI</th>
+                                        <th colspan="7" class="text-center py-2 text-secondary">TOTAL REKAPITULASI</th>
                                         <th class="text-center py-2" id="footerTotalStokAwal">0 Pcs</th>
                                         <th class="text-center py-2" id="footerTotalStokDipinjam">0 Pcs</th>
                                         <th class="text-center py-2" id="footerTotalStokSisa">0 Pcs</th>
@@ -881,18 +883,9 @@
                                 </tfoot>
                             </table>
 
-                        {{-- Tanda Tangan Khusus untuk Print / Tampilan Bawah (Arsiparis & Kasubag TU) --}}
+                        {{-- Tanda Tangan Khusus untuk Print / Tampilan Bawah (Kasubag TU) --}}
                         <div class="signature-section mt-5 pt-3">
-                            <div class="row text-center" style="width: 100%;">
-                                <div class="col-6">
-                                    <p class="mb-1">Disiapkan & Direkapitulasi oleh,</p>
-                                    <p class="mb-5"><strong>Arsiparis (Pelaporan & Administrasi)</strong></p>
-                                    <div style="height: 50px;"></div>
-                                    <p class="mb-0">
-                                        <strong><u>{{ $arsiparisName }}</u></strong><br>
-                                        <small class="text-muted">NIP. {{ $arsiparisNip }}</small>
-                                    </p>
-                                </div>
+                            <div class="row justify-content-end text-center" style="width: 100%;">
                                 <div class="col-6">
                                     <p class="mb-1">Jakarta, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                                     <p class="mb-5">Mengetahui & Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
@@ -976,16 +969,16 @@
                             return clean ? parseInt(clean, 10) : 0;
                         };
 
-                        var totalAwal = api.column(6, { search: 'applied' }).data().reduce(function(a, b) {
+                        var totalAwal = api.column(7, { search: 'applied' }).data().reduce(function(a, b) {
                             return a + intVal(b);
                         }, 0);
-                        var totalDipinjam = api.column(7, { search: 'applied' }).data().reduce(function(a, b) {
+                        var totalDipinjam = api.column(8, { search: 'applied' }).data().reduce(function(a, b) {
                             return a + intVal(b);
                         }, 0);
-                        var totalSisa = api.column(8, { search: 'applied' }).data().reduce(function(a, b) {
+                        var totalSisa = api.column(9, { search: 'applied' }).data().reduce(function(a, b) {
                             return a + intVal(b);
                         }, 0);
-                        var totalNilai = api.column(10, { search: 'applied' }).data().reduce(function(a, b) {
+                        var totalNilai = api.column(11, { search: 'applied' }).data().reduce(function(a, b) {
                             return a + intVal(b);
                         }, 0);
 
@@ -1000,7 +993,7 @@
                             messageTop: 'LAPORAN MUTASI & PERSEDIAAN BARANG (ATK) - Periode: ' + periodeStr + ' | Dicetak pada: ' + tglHariIni,
                             filename: 'Laporan_Persediaan_ATK_' + new Date().toISOString().slice(0, 10),
                             exportOptions: {
-                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
                                 format: {
                                     header: function(data, columnIdx) {
                                         return $('<div>').html(data).text().trim();
@@ -1011,17 +1004,17 @@
                                             var num = cleanText.replace(/[^\d]/g, '');
                                             return num ? parseInt(num, 10) : (row + 1);
                                         }
-                                        if (column === 5) {
+                                        if (column === 6) {
                                             if (cleanText.indexOf('Masuk') !== -1) return 'Masuk';
                                             if (cleanText.indexOf('Subdit') !== -1) return 'Keluar (Subdit)';
                                             if (cleanText.indexOf('Individu') !== -1) return 'Keluar (Individu)';
                                             return 'Keluar';
                                         }
-                                        if (column === 6 || column === 7 || column === 8) {
+                                        if (column === 7 || column === 8 || column === 9) {
                                             var num = cleanText.replace(/[^\d]/g, '');
                                             return num ? parseInt(num, 10) : 0;
                                         }
-                                        if (column === 9 || column === 10) {
+                                        if (column === 10 || column === 11) {
                                             var num = cleanText.replace(/[^\d]/g, '');
                                             return num ? parseInt(num, 10) : 0;
                                         }
@@ -1188,15 +1181,16 @@
                                     '<col min="2" max="2" width="14" customWidth="1"/>' +
                                     '<col min="3" max="3" width="14" customWidth="1"/>' +
                                     '<col min="4" max="4" width="18" customWidth="1"/>' +
-                                    '<col min="5" max="5" width="30" customWidth="1"/>' +
-                                    '<col min="6" max="6" width="16" customWidth="1"/>' +
-                                    '<col min="7" max="7" width="13" customWidth="1"/>' +
-                                    '<col min="8" max="8" width="14" customWidth="1"/>' +
+                                    '<col min="5" max="5" width="28" customWidth="1"/>' +
+                                    '<col min="6" max="6" width="22" customWidth="1"/>' +
+                                    '<col min="7" max="7" width="14" customWidth="1"/>' +
+                                    '<col min="8" max="8" width="12" customWidth="1"/>' +
                                     '<col min="9" max="9" width="13" customWidth="1"/>' +
-                                    '<col min="10" max="10" width="18" customWidth="1"/>' +
-                                    '<col min="11" max="11" width="22" customWidth="1"/>' +
-                                    '<col min="12" max="12" width="22" customWidth="1"/>' +
-                                    '<col min="13" max="13" width="30" customWidth="1"/>' +
+                                    '<col min="10" max="10" width="12" customWidth="1"/>' +
+                                    '<col min="11" max="11" width="16" customWidth="1"/>' +
+                                    '<col min="12" max="12" width="20" customWidth="1"/>' +
+                                    '<col min="13" max="13" width="22" customWidth="1"/>' +
+                                    '<col min="14" max="14" width="32" customWidth="1"/>' +
                                     '</cols>';
                                 $('sheetData', sheet).before(colWidthsXml);
 
@@ -1237,40 +1231,41 @@
                                     rowNode.find('c[r="C' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
                                     rowNode.find('c[r="D' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
                                     rowNode.find('c[r="E' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
-                                    rowNode.find('c[r="F' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
-
-                                    var cG = rowNode.find('c[r="G' + rNum + '"]');
-                                    cG.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
-                                    var valG = parseFloat(cG.find('v').text()) || 0;
-                                    runningTotalAwal += valG;
+                                    rowNode.find('c[r="F' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
+                                    rowNode.find('c[r="G' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
 
                                     var cH = rowNode.find('c[r="H' + rNum + '"]');
                                     cH.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
                                     var valH = parseFloat(cH.find('v').text()) || 0;
-                                    runningTotalDipinjam += valH;
+                                    runningTotalAwal += valH;
 
                                     var cI = rowNode.find('c[r="I' + rNum + '"]');
                                     cI.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
                                     var valI = parseFloat(cI.find('v').text()) || 0;
-                                    runningTotalSisa += valI;
+                                    runningTotalDipinjam += valI;
 
                                     var cJ = rowNode.find('c[r="J' + rNum + '"]');
-                                    cJ.attr('s', isZebra ? styleZebraCurrency : styleCurrency);
+                                    cJ.attr('s', isZebra ? styleZebraNumberInt : styleNumberInt);
                                     var valJ = parseFloat(cJ.find('v').text()) || 0;
+                                    runningTotalSisa += valJ;
 
-                                    // PERUMUSAN EXCEL: Nilai Saldo = Stok Sisa * Harga Satuan (=I{rNum}*J{rNum})
                                     var cK = rowNode.find('c[r="K' + rNum + '"]');
-                                    var expectedSaldo = Math.round(valI * valJ);
+                                    cK.attr('s', isZebra ? styleZebraCurrency : styleCurrency);
+                                    var valK = parseFloat(cK.find('v').text()) || 0;
+
+                                    // PERUMUSAN EXCEL: Nilai Saldo = Stok Sisa * Harga Satuan (=J{rNum}*K{rNum})
+                                    var cL = rowNode.find('c[r="L' + rNum + '"]');
+                                    var expectedSaldo = Math.round(valJ * valK);
                                     runningTotalSaldo += expectedSaldo;
 
-                                    cK.empty();
-                                    cK.attr('t', 'n');
-                                    cK.attr('s', isZebra ? styleZebraCurrencyBold : styleCurrencyBold);
-                                    cK.append('<f>I' + rNum + '*J' + rNum + '</f>');
-                                    cK.append('<v>' + expectedSaldo + '</v>');
+                                    cL.empty();
+                                    cL.attr('t', 'n');
+                                    cL.attr('s', isZebra ? styleZebraCurrencyBold : styleCurrencyBold);
+                                    cL.append('<f>J' + rNum + '*K' + rNum + '</f>');
+                                    cL.append('<v>' + expectedSaldo + '</v>');
 
-                                    rowNode.find('c[r="L' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
-                                    rowNode.find('c[r="M' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
+                                    rowNode.find('c[r="M' + rNum + '"]').attr('s', isZebra ? styleZebraCenter : styleTextCenter);
+                                    rowNode.find('c[r="N' + rNum + '"]').attr('s', isZebra ? styleZebraLeft : styleTextLeft);
                                 });
 
                                 // 5. Baris Total Rekapitulasi (Formula SUM Excel)
@@ -1283,51 +1278,46 @@
                                         '<c r="D' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
                                         '<c r="E' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
                                         '<c r="F' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
-                                        '<c r="G' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
-                                            '<f>SUM(G' + startDataRow + ':G' + endDataRow + ')</f><v>' + runningTotalAwal + '</v></c>' +
+                                        '<c r="G' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
                                         '<c r="H' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
-                                            '<f>SUM(H' + startDataRow + ':H' + endDataRow + ')</f><v>' + runningTotalDipinjam + '</v></c>' +
+                                            '<f>SUM(H' + startDataRow + ':H' + endDataRow + ')</f><v>' + runningTotalAwal + '</v></c>' +
                                         '<c r="I' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
-                                            '<f>SUM(I' + startDataRow + ':I' + endDataRow + ')</f><v>' + runningTotalSisa + '</v></c>' +
-                                        '<c r="J' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
-                                        '<c r="K' + totalRowNum + '" s="' + styleTotalCurrency + '" t="n">' +
-                                            '<f>SUM(K' + startDataRow + ':K' + endDataRow + ')</f><v>' + runningTotalSaldo + '</v></c>' +
-                                        '<c r="L' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                            '<f>SUM(I' + startDataRow + ':I' + endDataRow + ')</f><v>' + runningTotalDipinjam + '</v></c>' +
+                                        '<c r="J' + totalRowNum + '" s="' + styleTotalNumberInt + '" t="n">' +
+                                            '<f>SUM(J' + startDataRow + ':J' + endDataRow + ')</f><v>' + runningTotalSisa + '</v></c>' +
+                                        '<c r="K' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="L' + totalRowNum + '" s="' + styleTotalCurrency + '" t="n">' +
+                                            '<f>SUM(L' + startDataRow + ':L' + endDataRow + ')</f><v>' + runningTotalSaldo + '</v></c>' +
                                         '<c r="M' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
+                                        '<c r="N' + totalRowNum + '" s="' + styleTotalLabel + '"/>' +
                                         '</row>';
                                     $('sheetData', sheet).append(totalRowXml);
 
                                     var mergeCells = $('mergeCells', sheet);
                                     if (mergeCells.length) {
-                                        mergeCells.append('<mergeCell ref="A' + totalRowNum + ':F' + totalRowNum + '"/>');
+                                        mergeCells.append('<mergeCell ref="A' + totalRowNum + ':G' + totalRowNum + '"/>');
                                         mergeCells.attr('count', parseInt(mergeCells.attr('count') || '0') + 1);
                                     } else {
-                                        $('sheetData', sheet).after('<mergeCells count="1"><mergeCell ref="A' + totalRowNum + ':F' + totalRowNum + '"/></mergeCells>');
+                                        $('sheetData', sheet).after('<mergeCells count="1"><mergeCell ref="A' + totalRowNum + ':G' + totalRowNum + '"/></mergeCells>');
                                     }
                                 }
 
-                                // 6. Section Tanda Tangan Resmi
+                                // 6. Section Tanda Tangan Resmi (Kasubag TU)
                                 var sigStartRow = (totalRows > 0 ? (endDataRow + 1) : 4) + 2;
                                 var tglSkrXml = xmlEscape('Jakarta, ' + tglHariIni);
-                                var arsiparisNameXml = xmlEscape(@json($arsiparisName));
-                                var arsiparisNipXml = xmlEscape('{{ $arsiparisNip }}');
                                 var kasubagNameXml = xmlEscape(@json($kasubagName));
                                 var kasubagNipXml = xmlEscape('{{ $kasubagNip }}');
 
                                 var signatureXml = '<row r="' + sigStartRow + '">' +
-                                    '<c r="D' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>Disiapkan &amp; Direkapitulasi oleh,</t></is></c>' +
-                                    '<c r="K' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>' + tglSkrXml + '</t></is></c></row>' +
+                                    '<c r="L' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>' + tglSkrXml + '</t></is></c></row>' +
                                     '<row r="' + (sigStartRow + 1) + '">' +
-                                    '<c r="D' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Arsiparis (Pelaporan &amp; Administrasi)</t></is></c>' +
-                                    '<c r="K' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Mengetahui &amp; Mengesahkan,</t></is></c></row>' +
+                                    '<c r="L' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Mengetahui &amp; Mengesahkan,</t></is></c></row>' +
                                     '<row r="' + (sigStartRow + 2) + '">' +
-                                    '<c r="K' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
+                                    '<c r="L' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
                                     '<row r="' + (sigStartRow + 6) + '">' +
-                                    '<c r="D' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + arsiparisNameXml + '</t></is></c>' +
-                                    '<c r="K' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + kasubagNameXml + '</t></is></c></row>' +
+                                    '<c r="L' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + kasubagNameXml + '</t></is></c></row>' +
                                     '<row r="' + (sigStartRow + 7) + '">' +
-                                    '<c r="D' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + arsiparisNipXml + '</t></is></c>' +
-                                    '<c r="K' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + kasubagNipXml + '</t></is></c></row>';
+                                    '<c r="L' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + kasubagNipXml + '</t></is></c></row>';
 
                                 $('sheetData', sheet).append(signatureXml);
                             }
@@ -1338,14 +1328,14 @@
                             pageSize: 'A4',
                             filename: 'Laporan_Persediaan_ATK_' + new Date().toISOString().slice(0, 10),
                             exportOptions: {
-                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
                                 format: {
                                     header: function(data, columnIdx) {
                                         return $('<div>').html(data).text().trim();
                                     },
                                     body: function(data, row, column, node) {
                                         var cleanText = $('<div>').html(data).text().trim();
-                                        if (column === 5) {
+                                        if (column === 6) {
                                             if (cleanText.indexOf('Masuk') !== -1) return 'Masuk';
                                             if (cleanText.indexOf('Subdit') !== -1) return 'Keluar (Subdit)';
                                             if (cleanText.indexOf('Individu') !== -1) return 'Keluar (Individu)';
@@ -1409,7 +1399,7 @@
                                 });
 
                                 if (tableNode) {
-                                    tableNode.table.widths = [22, 52, 52, 62, 110, 54, 46, 50, 46, 64, 78, 76, 86];
+                                    tableNode.table.widths = [20, 50, 48, 55, 95, 65, 45, 42, 44, 42, 58, 70, 70, 80];
 
                                     tableNode.layout = {
                                         hLineWidth: function(i, node) {
@@ -1455,21 +1445,21 @@
                                                 row[j].fillColor = rowBg;
                                                 row[j].color = '#1E293B';
 
-                                                if (j === 0 || j === 1 || j === 2 || j === 5) {
+                                                if (j === 0 || j === 1 || j === 2 || j === 6) {
                                                     row[j].alignment = 'center';
-                                                } else if (j === 6 || j === 7 || j === 8) {
+                                                } else if (j === 7 || j === 8 || j === 9) {
                                                     row[j].alignment = 'center';
-                                                } else if (j === 9 || j === 10) {
+                                                } else if (j === 10 || j === 11) {
                                                     row[j].alignment = 'right';
                                                 } else {
                                                     row[j].alignment = 'left';
                                                 }
                                             }
 
-                                            var numAwal = parseInt(String(row[6].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numDipinjam = parseInt(String(row[7].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numSisa = parseInt(String(row[8].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numSaldo = parseInt(String(row[10].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numAwal = parseInt(String(row[7].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numDipinjam = parseInt(String(row[8].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numSisa = parseInt(String(row[9].text || '').replace(/[^\d]/g, ''), 10) || 0;
+                                            var numSaldo = parseInt(String(row[11].text || '').replace(/[^\d]/g, ''), 10) || 0;
 
                                             sumAwal += numAwal;
                                             sumDipinjam += numDipinjam;
@@ -1481,8 +1471,8 @@
                                     // Tambahkan Baris Total Rekapitulasi di akhir tabel PDF
                                     if (body.length > 1) {
                                         body.push([
-                                            { text: 'TOTAL REKAPITULASI', colSpan: 6, alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            {}, {}, {}, {}, {},
+                                            { text: 'TOTAL REKAPITULASI', colSpan: 7, alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
+                                            {}, {}, {}, {}, {}, {},
                                             { text: sumAwal.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
                                             { text: sumDipinjam.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
                                             { text: sumSisa.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
@@ -1494,41 +1484,11 @@
                                     }
                                 }
 
-                                // Blok Dual Tanda Tangan Rapi: Arsiparis di Kiri, Kasubag TU di Kanan
+                                // Blok Tanda Tangan Tunggal: Kasubag TU di Kanan
                                 doc.content.push({
                                     unbreakable: true,
                                     margin: [0, 20, 0, 0],
-                                    columns: [{
-                                            width: 250,
-                                            alignment: 'center',
-                                            margin: [10, 0, 0, 0],
-                                            stack: [{
-                                                    text: 'Disiapkan & Direkapitulasi oleh,',
-                                                    fontSize: 8.5,
-                                                    color: '#334155',
-                                                    margin: [0, 0, 0, 2]
-                                                },
-                                                {
-                                                    text: 'Arsiparis (Pelaporan & Administrasi)',
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    color: '#0F172A',
-                                                    margin: [0, 0, 0, 42]
-                                                },
-                                                {
-                                                    text: @json($arsiparisName),
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    decoration: 'underline',
-                                                    color: '#0F172A'
-                                                },
-                                                {
-                                                    text: 'NIP. {{ $arsiparisNip }}',
-                                                    fontSize: 7.5,
-                                                    color: '#475569'
-                                                }
-                                            ]
-                                        },
+                                    columns: [
                                         {
                                             width: '*',
                                             text: ''
@@ -1637,13 +1597,7 @@
                                 });
 
                                 $(win.document.body).append(`
-                                    <div style="margin-top: 40px; width: 100%; display: flex; justify-content: space-between; page-break-inside: avoid;">
-                                        <div style="text-align: center; width: 250px;">
-                                            <p style="margin-bottom: 3px; font-size: 8.5pt;">Disiapkan &amp; Direkapitulasi oleh,</p>
-                                            <p style="margin-bottom: 50px; font-size: 8.5pt;"><strong>Arsiparis (Pelaporan &amp; Administrasi)</strong></p>
-                                            <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($arsiparisName)}</u></strong><br>
-                                            <span style="color: #475569; font-size: 8pt;">NIP. {{ $arsiparisNip }}</span></p>
-                                        </div>
+                                    <div style="margin-top: 40px; width: 100%; display: flex; justify-content: flex-end; page-break-inside: avoid;">
                                         <div style="text-align: center; width: 250px;">
                                             <p style="margin-bottom: 3px; font-size: 8.5pt;">Jakarta, ${tglHariIni}</p>
                                             <p style="margin-bottom: 50px; font-size: 8.5pt;">Mengetahui &amp; Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
