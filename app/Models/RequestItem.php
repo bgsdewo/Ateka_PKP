@@ -31,6 +31,9 @@ class RequestItem extends Model
         'receiver_name',
         'distribution_notes',
         'distribution_proof',
+        'signed_proof',
+        'signed_at',
+        'signed_by',
         'created_at',
     ];
 
@@ -39,6 +42,7 @@ class RequestItem extends Model
         'verified_at' => 'datetime',
         'distributed_at' => 'datetime',
         'purchase_date' => 'date',
+        'signed_at' => 'datetime',
     ];
 
     public function user()
@@ -54,6 +58,11 @@ class RequestItem extends Model
     public function distributor()
     {
         return $this->belongsTo(User::class, 'distributed_by');
+    }
+
+    public function signedBy()
+    {
+        return $this->belongsTo(User::class, 'signed_by');
     }
 
     public function details()
@@ -119,6 +128,11 @@ class RequestItem extends Model
             });
     }
 
+    public function scopeForPicDivision($query, User $picUser)
+    {
+        return $this->scopeForPic($query, $picUser);
+    }
+
     public function getIsPurchasedAttribute(): bool
     {
         if (!$this->is_procurement) {
@@ -157,5 +171,21 @@ class RequestItem extends Model
             return null;
         }
         return asset('storage/' . $this->distribution_proof);
+    }
+
+    public function getSignedProofUrlAttribute(): ?string
+    {
+        if (!$this->signed_proof) {
+            return null;
+        }
+        return asset('storage/' . $this->signed_proof);
+    }
+
+    public function getIsSignedProofPdfAttribute(): bool
+    {
+        if (!$this->signed_proof) {
+            return false;
+        }
+        return strtolower(pathinfo($this->signed_proof, PATHINFO_EXTENSION)) === 'pdf';
     }
 }

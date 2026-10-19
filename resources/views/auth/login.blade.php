@@ -4,23 +4,26 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Nonaktifkan Pengindeksan Mesin Pencari / SEO (Aplikasi Internal Kementerian PKP RI) -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="description" content="Login Sistem Informasi Pencatatan dan E-Katalog Persediaan ATK Kementerian PKP RI">
     <title>Login | Pencatatan Stok Barang</title>
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
-    <!-- Library / Plugin Css Build -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
-    <!-- Hope Ui Design System Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
-    <!-- Custom Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
-    <!-- Dark Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
-    <!-- Customizer Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
-    <!-- RTL Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
 
-    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v=2.2" />
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.4' }}" />
 
     <!-- Penyesuaian UI/UX: Official Kementerian PKP RI Palette & Modern GovTech Styling -->
     <style>
@@ -183,7 +186,7 @@
                                 <div class="text-center mb-4">
                                     <div class="mb-3">
                                         <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}"
-                                            class="brand-logo-img" alt="Logo Kementerian PKP">
+                                            class="brand-logo-img" alt="Logo Kementerian PKP" width="64" height="64">
                                     </div>
                                     <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.025em;">
                                         Inventori ATK
@@ -306,7 +309,7 @@
     </div>
 
     <!-- Library Bundle Script -->
-    <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
+    <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}" defer></script>
     <!-- App Script -->
     <script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}" defer></script>
     <!-- Global Alert Dismiss & Auto-Dismiss System -->

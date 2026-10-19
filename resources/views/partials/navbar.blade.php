@@ -4,7 +4,7 @@
             <div class="logo-main">
                 <div class="logo-normal">
                     <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP"
-                        style="width: 40px; height: 40px; object-fit: contain;">
+                        width="40" height="40" style="width: 40px; height: 40px; object-fit: contain;">
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
@@ -404,6 +404,9 @@
                                 </span>
                             </div>
                         </div>
+                        <svg class="ms-2 text-muted dropdown-arrow-icon d-none d-md-block" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="navbarDropdown">
                         <li class="px-3 py-2 border-bottom d-md-none">

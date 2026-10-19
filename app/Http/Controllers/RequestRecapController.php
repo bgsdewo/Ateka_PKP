@@ -216,7 +216,8 @@ class RequestRecapController extends Controller
 
         // 1. JIKA CETAK PER TIKET (DARI KOLOM AKSI):
         if ($requestId) {
-            $singleReq = RequestItem::with(['user', 'details.product.category'])->findOrFail($requestId);
+            $singleReq = RequestItem::with(['user', 'details.product.category', 'distributor', 'verifier', 'signedBy'])->findOrFail($requestId);
+            $requestItem = $singleReq;
             $reqUser = $singleReq->user;
 
             $signerInfo = $this->resolveSignerInfo($reqUser, $singleReq->type);
@@ -260,6 +261,8 @@ class RequestRecapController extends Controller
             $statusFilter = $singleReq->status;
 
             return view('rekapitulasi_permintaan.cetak', compact(
+                'requestItem',
+                'singleReq',
                 'query',
                 'productRecap',
                 'items',

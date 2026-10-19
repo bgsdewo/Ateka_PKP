@@ -307,12 +307,9 @@ const resizePlugins = () => {
 -----------------------------------------------------------------------*/
 const loaderInit = () => {
   const loader = document.querySelector('.loader')
-  setTimeout(() => {
-    loader.classList.add('animate__animated', 'animate__fadeOut')
-    setTimeout(() => {
-      loader.classList.add('d-none')
-    }, 500)
-  }, 500)
+  if (loader) {
+    loader.classList.add('d-none')
+  }
 }
 /*---------------------------------------------------------------------
               Sidebar Toggle

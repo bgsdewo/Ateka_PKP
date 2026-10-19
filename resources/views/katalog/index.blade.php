@@ -7,10 +7,6 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-success"></span>
-                                <span>Kementerian PKP RI &bull; E-Katalog Persediaan ATK</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Katalog Alat Tulis Kantor</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
                                 Cek ketersediaan stok fisik ATK di gudang secara real-time. Jika persediaan habis, Anda dapat memesan restock secara instan langsung dari kartu barang tanpa membuka formulir terpisah.
@@ -69,8 +65,8 @@
                                         </svg>
                                     </span>
                                     <input type="text" id="katalog-search" name="search" class="form-control border-start-0 ps-0"
-                                        placeholder="Cari nama barang atau kode ATK (misal: Map, Kertas, Binder)..." value="{{ $search }}" autocomplete="off">
-                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
+                                        placeholder="Cari nama barang atau kode ATK (misal: Map, Kertas, Binder)..." value="{{ $search }}" autocomplete="off" aria-label="Cari nama barang atau kode ATK">
+                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian" aria-label="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -80,7 +76,7 @@
                             </div>
 
                             <div class="col-12 col-md-3">
-                                <select name="category_id" class="form-select" onchange="this.form.submit()">
+                                <select name="category_id" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan kategori ATK">
                                     <option value="">-- Semua Kategori ({{ $categories->count() }}) --</option>
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>
@@ -91,7 +87,7 @@
                             </div>
 
                             <div class="col-12 col-md-3">
-                                <select name="stock_status" class="form-select" onchange="this.form.submit()">
+                                <select name="stock_status" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan status ketersediaan stok ATK">
                                     <option value="">-- Semua Status Stok --</option>
                                     <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia di Gudang</option>
                                     <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Stok Belum Tersedia (Bisa Dipesan)</option>

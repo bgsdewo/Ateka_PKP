@@ -39,14 +39,11 @@ class RequestDetail extends Model
     }
 
     /**
-     * Satuan barang
+     * Satuan barang (pada alur permintaan diseragamkan sebagai Stock)
      */
     public function getItemUnitAttribute(): string
     {
-        if ($this->product) {
-            return $this->product->unit ?? 'Pcs';
-        }
-        return $this->custom_unit ?: 'Pcs';
+        return 'Stock';
     }
 
     /**

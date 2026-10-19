@@ -99,26 +99,36 @@
                 </div>
             @endif
 
+            @php
+                $distributorUser = $requestItem->distributor;
+                if (!$distributorUser || $distributorUser->name === 'tes') {
+                    $distributorUser = \App\Models\User::where('role', 'pegawai_gudang')->where('is_distributor', true)->where('name', '!=', 'tes')->latest('id')->first()
+                                    ?? \App\Models\User::where('role', 'pegawai_gudang')->where('name', '!=', 'tes')->first()
+                                    ?? $requestItem->distributor;
+                }
+                $isPicOrSubdit = ($requestItem->type === 'subdit') || ($requestItem->user && $requestItem->user->isPicDistribusi());
+            @endphp
+
             <!-- Rincian Serah Terima -->
             <div class="card bg-light border-0 mb-3">
                 <div class="card-body p-3">
                     <div class="row g-2 small">
                         <div class="col-sm-6">
-                            <span class="text-muted d-block">Penerima Barang Fisik:</span>
-                            <strong class="text-dark fs-6">{{ $requestItem->receiver_name ?? ($requestItem->user->name ?? '-') }}</strong>
-                            <small class="text-muted d-block">{{ $requestItem->user->position ?? '-' }}</small>
+                            <span class="text-muted d-block">{{ $isPicOrSubdit ? 'Penerima Barang (Perwakilan Subdirektorat):' : 'Penerima Barang Fisik:' }}</span>
+                            <strong class="text-dark fs-6">{{ $requestItem->receiver_name ?? ($requestItem->user->name_with_title ?? ($requestItem->user->name ?? '-')) }}</strong>
+                            <small class="text-muted d-block">{{ $isPicOrSubdit ? ($requestItem->user->subdit_name ?? ($requestItem->user->position ?? 'Subdirektorat')) : ($requestItem->user->position ?? '-') }}</small>
                         </div>
                         <div class="col-sm-6">
-                            <span class="text-muted d-block">Diserahkan oleh PIC:</span>
-                            <strong class="text-dark fs-6">{{ $requestItem->distributor->name_with_title ?? ($requestItem->distributor->name ?? 'PIC Gudang') }}</strong>
-                            <small class="text-muted d-block">{{ $requestItem->distributor->position ?? 'PIC Distribusi' }}</small>
+                            <span class="text-muted d-block">Diserahkan oleh Petugas Gudang:</span>
+                            <strong class="text-dark fs-6">{{ $distributorUser->name_with_title ?? ($distributorUser->name ?? 'Petugas Gudang') }}</strong>
+                            <small class="text-muted d-block">{{ $distributorUser->position ?? 'Petugas Distribusi Gudang ATK' }}</small>
                         </div>
                         <div class="col-sm-6 mt-2 pt-2 border-top">
                             <span class="text-muted d-block">Waktu Penyerahan:</span>
                             <strong class="text-dark">{{ $requestItem->distributed_at ? $requestItem->distributed_at->locale('id')->translatedFormat('l, d F Y - H:i') . ' WIB' : '-' }}</strong>
                         </div>
                         <div class="col-sm-6 mt-2 pt-2 border-top">
-                            <span class="text-muted d-block">Catatan Penyerahan PIC:</span>
+                            <span class="text-muted d-block">Catatan Penyerahan:</span>
                             <span class="text-dark fst-italic">{{ $requestItem->distribution_notes ?: '-' }}</span>
                         </div>
                     </div>

@@ -7,10 +7,6 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-warning"></span>
-                                <span>Kementerian PKP RI &bull; Usulan Pengadaan Barang</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Permintaan Pengadaan Barang ATK (Beli Baru)</h1>
                             <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
                                 Usulkan kebutuhan barang ATK yang belum ada di gudang agar dibeli langsung oleh Subbag TU dari penyedia/supplier resmi.
@@ -627,11 +623,19 @@
 
                                 if (nameInput) nameInput.value = pName;
                                 if (idInput) idInput.value = this.value;
-                                if (specInput && !specInput.value) {
-                                    specInput.value = `Kategori: ${pCat} (${pCode})`;
+                                if (specInput) {
+                                    specInput.value = pCode ? `Kategori: ${pCat} (${pCode})` : `Kategori: ${pCat}`;
                                 }
                                 updateRecommendedUnits(row, pAvail);
                                 setRowUnit(row, pUnit);
+                            } else {
+                                if (nameInput) nameInput.value = '';
+                                if (idInput) idInput.value = '';
+                                if (specInput && specInput.value.startsWith('Kategori:')) {
+                                    specInput.value = '';
+                                }
+                                updateRecommendedUnits(row, '');
+                                setRowUnit(row, 'Buah');
                             }
                         });
                     }
@@ -640,15 +644,29 @@
                         nameInput.addEventListener('input', function() {
                             const val = this.value.trim().toLowerCase();
                             if (productOptions[val]) {
-                                updateRecommendedUnits(row, productOptions[val].availableUnits);
-                                if (productOptions[val].unit) {
-                                    setRowUnit(row, productOptions[val].unit);
+                                const matched = productOptions[val];
+                                updateRecommendedUnits(row, matched.availableUnits);
+                                if (matched.unit) {
+                                    setRowUnit(row, matched.unit);
                                 }
                                 if (idInput) {
-                                    idInput.value = productOptions[val].id;
+                                    idInput.value = matched.id;
+                                }
+                                if (specInput && (!specInput.value || specInput.value.startsWith('Kategori:'))) {
+                                    specInput.value = matched.code
+                                        ? `Kategori: ${matched.categoryName} (${matched.code})`
+                                        : `Kategori: ${matched.categoryName}`;
+                                }
+                                if (tplSelect && tplSelect.value !== matched.id) {
+                                    const hasOpt = Array.from(tplSelect.options).some(o => o.value === matched.id);
+                                    if (hasOpt) tplSelect.value = matched.id;
                                 }
                             } else {
                                 if (idInput) idInput.value = '';
+                                if (tplSelect) tplSelect.value = '';
+                                if (specInput && specInput.value.startsWith('Kategori:')) {
+                                    specInput.value = '';
+                                }
                             }
                         });
                     }

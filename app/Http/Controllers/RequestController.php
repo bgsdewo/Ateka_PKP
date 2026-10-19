@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\RequestItem;
 use App\Models\RequestDetail;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class RequestController extends Controller
@@ -14,10 +16,21 @@ class RequestController extends Controller
     // Menampilkan daftar riwayat pengajuan milik user yang login
     public function index()
     {
-        $requests = RequestItem::with(['details.product'])
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $user = Auth::user();
+        $query = RequestItem::with(['details.product', 'signedBy', 'distributor']);
+
+        if ($user && $user->isPicDistribusi()) {
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere(function ($sub) use ($user) {
+                      $sub->forPic($user);
+                  });
+            });
+        } else {
+            $query->where('user_id', Auth::id());
+        }
+
+        $requests = $query->latest()->get();
 
         return view('pengajuan.index', compact('requests'));
     }
@@ -28,14 +41,17 @@ class RequestController extends Controller
         $products = Product::with('category')->orderBy('name', 'asc')->get();
         $categories = \App\Models\Category::orderBy('name', 'asc')->get();
         $selectedProductId = $request->get('product_id');
-        return view('pengajuan.create', compact('products', 'categories', 'selectedProductId'));
+        $selectedQuantity = $request->get('quantity');
+        $fromRequestId = $request->get('from_request');
+
+        return view('pengajuan.create', compact('products', 'categories', 'selectedProductId', 'selectedQuantity'));
     }
 
     // Menyimpan data pengajuan baru ke database
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'nullable|in:individu',
+            'type' => 'nullable|in:individu,subdit',
             'notes' => 'nullable|string',
             'product_id' => 'required|array',
             'product_id.*' => 'exists:products,id',
@@ -60,11 +76,14 @@ class RequestController extends Controller
         $prefix = $requiresProcurement ? 'REQ-BUY-' : 'REQ-';
         $requestCode = $prefix . date('Ymd') . '-' . strtoupper(Str::random(4));
 
+        $currentUser = Auth::user();
+        $requestType = ($currentUser && $currentUser->isPicDistribusi()) ? 'subdit' : ($request->input('type', 'individu') ?: 'individu');
+
         // Simpan ke tabel header (requests)
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->input('type', 'individu') ?: 'individu',
+            'type' => $requestType,
             'is_procurement' => $requiresProcurement,
             'status' => 'pending', // Menunggu persetujuan Kasubag TU
             'notes' => $request->notes,
@@ -123,10 +142,13 @@ class RequestController extends Controller
 
         $selectedUnit = $request->filled('custom_unit') ? trim($request->custom_unit) : ($product->unit ?: 'Pcs');
 
+        $currentUser = Auth::user();
+        $requestType = ($currentUser && $currentUser->isPicDistribusi()) ? 'subdit' : ($request->input('type', 'individu') ?: 'individu');
+
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->input('type', 'individu') ?: 'individu',
+            'type' => $requestType,
             'is_procurement' => true,
             'status' => 'pending',
             'notes' => $notes,
@@ -177,10 +199,13 @@ class RequestController extends Controller
 
         $requestCode = 'REQ-BUY-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
+        $currentUser = Auth::user();
+        $requestType = ($currentUser && $currentUser->isPicDistribusi()) ? 'subdit' : ($request->input('type', 'individu') ?: 'individu');
+
         $requestItem = RequestItem::create([
             'user_id' => Auth::id(),
             'request_code' => $requestCode,
-            'type' => $request->input('type', 'individu') ?: 'individu',
+            'type' => $requestType,
             'is_procurement' => true,
             'status' => 'pending',
             'notes' => $request->notes,
@@ -212,5 +237,55 @@ class RequestController extends Controller
 
         return redirect()->route('pengajuan.index')
             ->with('success', 'Permintaan pengadaan barang (' . $requestCode . ') berhasil diajukan! Usulan ini akan direkapitulasi oleh Subbag TU untuk dibeli langsung ke supplier.');
+    }
+
+    /**
+     * Upload berkas bukti serah terima bertanda tangan oleh PIC / Pegawai
+     */
+    public function uploadSignedProof(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $requestItem = RequestItem::findOrFail($id);
+
+        $canUpload = $user->isKasubagTU()
+            || $user->isPegawaiGudang()
+            || $user->isAdmin()
+            || ($requestItem->user_id === $user->id)
+            || ($user->isPicDistribusi() && $user->canHandleRequest($requestItem));
+
+        if (!$canUpload) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengunggah bukti tanda tangan pada pengajuan ini.');
+        }
+
+        $request->validate([
+            'signed_proof' => 'required|file|mimes:pdf,jpeg,png,jpg,webp|max:10240',
+        ], [
+            'signed_proof.required' => 'Silakan pilih file dokumen tanda tangan (PDF / Gambar) terlebih dahulu.',
+            'signed_proof.file' => 'File yang diunggah tidak valid.',
+            'signed_proof.mimes' => 'Format file harus berupa PDF, JPEG, PNG, JPG, atau WEBP.',
+            'signed_proof.max' => 'Ukuran file tidak boleh melebihi 10 MB.',
+        ]);
+
+        if ($requestItem->signed_proof && Storage::disk('public')->exists($requestItem->signed_proof)) {
+            Storage::disk('public')->delete($requestItem->signed_proof);
+        }
+
+        $file = $request->file('signed_proof');
+        $ext = $file->getClientOriginalExtension();
+        $filename = 'signed_' . $requestItem->request_code . '_' . time() . '.' . $ext;
+        $path = $file->storeAs('signed_proofs', $filename, 'public');
+
+        $requestItem->update([
+            'signed_proof' => $path,
+            'signed_at' => now(),
+            'signed_by' => $user->id,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Dokumen bukti serah terima bertanda tangan untuk pengajuan ' . $requestItem->request_code . ' berhasil diunggah.');
     }
 }

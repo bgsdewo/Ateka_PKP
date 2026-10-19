@@ -7,14 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-success"></span>
-                                <span>Kementerian PKP RI &bull; Permohonan Persediaan</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Pengajuan Kebutuhan ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Riwayat dan pemantauan status permohonan Alat Tulis Kantor secara transparan dan akuntabel.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -174,7 +167,6 @@
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h4 class="card-title mb-0 fw-bold">Daftar Riwayat Permintaan Anda</h4>
-                            <small class="text-muted">Pantau status persetujuan dari Kasubag TU hingga penyerahan fisik barang oleh PIC Gudang</small>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-success btn-sm fw-bold d-inline-flex align-items-center gap-1 shadow-sm" title="Ajukan kebutuhan barang yang belum ada di gudang agar dibeli oleh Subbag TU">
@@ -190,118 +182,155 @@
                             </a>
                         </div>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle">
+                    <div class="card-body p-2.5 p-md-3">
+                        <div class="table-responsive table-responsive-no-scroll">
+                            <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100" style="table-layout: fixed;">
+                                <colgroup>
+                                    <col style="width: 4%;">
+                                    <col style="width: 19%;">
+                                    <col style="width: 11%;">
+                                    <col style="width: 31%;">
+                                    <col style="width: 10%;">
+                                    <col style="width: 12%;">
+                                    <col style="width: 13%;">
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th width="4%">No</th>
+                                        <th class="text-center">No</th>
                                         <th>Kode Pengajuan</th>
                                         <th>Tipe & Tanggal</th>
                                         <th>Barang yang Diminta</th>
                                         <th>Keperluan</th>
-                                        <th>Status Pengajuan</th>
-                                        <th width="14%" class="text-end">Aksi</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($requests as $index => $req)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td class="text-center text-muted" style="font-size: 0.72rem;">{{ $index + 1 }}</td>
                                             <td>
-                                                <strong class="font-monospace text-primary">{{ $req->request_code }}</strong>
+                                                <div class="font-monospace fw-bold text-primary" style="font-size: 0.72rem; letter-spacing: -0.03em; word-break: break-all;">{{ $req->request_code }}</div>
                                                 @if ($req->is_procurement)
-                                                    <br><span class="badge bg-warning-subtle text-dark border px-2 py-0.5 mt-1" style="font-size: 0.72rem;">
+                                                    <span class="badge bg-warning-subtle text-dark border px-1 py-0.2 mt-0.5" style="font-size: 0.6rem;">
                                                         Pengadaan (Beli TU)
                                                     </span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($req->type === 'subdit')
-                                                    <span class="badge bg-info-subtle text-info border px-2 py-0.5 rounded-pill">
-                                                        Kolektif Subdit
+                                                    <span class="badge bg-info-subtle text-info border px-1 py-0.2 rounded-pill" style="font-size: 0.62rem;">
+                                                        Kolektif
                                                     </span>
                                                 @else
-                                                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-0.5 rounded-pill">
+                                                    <span class="badge bg-secondary-subtle text-secondary border px-1 py-0.2 rounded-pill" style="font-size: 0.62rem;">
                                                         Individu
                                                     </span>
                                                 @endif
-                                                <br>
-                                                <small class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
+                                                <div class="text-dark fw-semibold mt-0.5" style="font-size: 0.68rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                                                <div class="text-muted" style="font-size: 0.64rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
                                             </td>
                                             <td>
-                                                <ul class="ps-3 mb-0 small">
+                                                <ul class="ps-3 mb-0" style="font-size: 0.73rem; word-break: break-word;">
                                                     @foreach ($req->details as $detail)
-                                                        <li class="mb-1">
+                                                        <li class="mb-0.5">
                                                             <strong>{{ $detail->item_name }}</strong>
                                                             @if (in_array($req->status, ['approved', 'distributed']))
-                                                                @if ($detail->approved_quantity !== null && $detail->approved_quantity != $detail->quantity)
-                                                                    <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
-                                                                    <small class="text-muted">(Diminta: {{ $detail->quantity }} {{ $detail->item_unit }})</small>
-                                                                @else
-                                                                    <span class="badge bg-success-subtle text-success border px-1.5 py-0.5">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
-                                                                @endif
+                                                                <span class="badge bg-success-subtle text-success border px-1 py-0.2" style="font-size: 0.63rem;">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
                                                             @else
-                                                                <span class="text-secondary">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
+                                                                <span class="text-secondary" style="font-size: 0.68rem;">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
                                                             @endif
 
                                                             @if ($detail->specification)
-                                                                <small class="text-muted d-block fst-italic">Spesifikasi: {{ $detail->specification }}</small>
+                                                                <div class="text-muted fst-italic" style="font-size: 0.68rem; line-height: 1.2;">Spesifikasi: {{ $detail->specification }}</div>
                                                             @endif
 
                                                             @if ($detail->verification_note)
-                                                                <small class="text-primary d-block fw-semibold fst-italic mt-0.5">
-                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                                                    Catatan Kasubag TU: "{{ $detail->verification_note }}"
-                                                                </small>
+                                                                <div class="text-primary fw-semibold fst-italic" style="font-size: 0.68rem; line-height: 1.2;">
+                                                                    Catatan TU: "{{ $detail->verification_note }}"
+                                                                </div>
                                                             @endif
                                                         </li>
                                                     @endforeach
                                                 </ul>
 
-                                                @if ($req->verification_notes)
-                                                    <div class="mt-1 pt-1 border-top small text-primary fst-italic" style="font-size: 0.75rem;">
-                                                        <strong>Catatan Kasubag TU:</strong> {{ $req->verification_notes }}
+                                                @if ($req->verification_notes && (!isset($detail) || $req->verification_notes !== $detail->verification_note))
+                                                    <div class="mt-0.5 pt-0.5 border-top text-primary fst-italic" style="font-size: 0.68rem;">
+                                                        <strong>Catatan TU:</strong> {{ $req->verification_notes }}
                                                     </div>
                                                 @endif
                                             </td>
                                             <td>
-                                                <small class="text-secondary">{{ $req->notes ?? '-' }}</small>
+                                                <div class="text-secondary" style="font-size: 0.7rem; word-break: break-word; line-height: 1.25;">{{ $req->notes ?: '-' }}</div>
                                             </td>
                                             <td>
-                                                <span class="badge {{ $req->status_badge }}">
-                                                    {{ $req->status_label }}
+                                                @php
+                                                    $shortStatus = match ($req->status) {
+                                                        'pending' => $req->is_procurement ? 'Pending Pengadaan' : 'Pending TU',
+                                                        'approved' => $req->is_procurement ? ($req->is_purchased ? 'Tersedia' : 'Disetujui TU') : 'Disetujui TU',
+                                                        'distributed' => 'Selesai',
+                                                        'rejected' => 'Ditolak',
+                                                        default => ucfirst($req->status),
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $req->status_badge }}" style="font-size: 0.66rem; padding: 0.18rem 0.35rem;" title="{{ $req->status_label }}">
+                                                    {{ $shortStatus }}
                                                 </span>
                                                 @if ($req->is_procurement && $req->purchase_invoice)
-                                                    <br><span class="badge bg-primary-subtle text-primary border mt-1" style="font-size: 0.7rem;">
-                                                        Faktur: {{ $req->purchase_invoice }}
-                                                    </span>
+                                                    <div class="mt-0.5">
+                                                        <span class="badge bg-primary-subtle text-primary border text-truncate d-inline-block" style="font-size: 0.62rem; padding: 0.15rem 0.3rem; max-width: 85px;" title="Faktur: {{ $req->purchase_invoice }}">
+                                                            Faktur: {{ $req->purchase_invoice }}
+                                                        </span>
+                                                    </div>
                                                 @endif
                                                 @if ($req->is_procurement && $req->is_purchased)
-                                                    <br><a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border mt-1 text-decoration-none" style="font-size: 0.7rem;">
-                                                        Tersedia di Katalog &rarr;
-                                                    </a>
+                                                    <div class="mt-0.5">
+                                                        <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none" style="font-size: 0.62rem; padding: 0.15rem 0.3rem;">
+                                                            Katalog &rarr;
+                                                        </a>
+                                                    </div>
                                                 @endif
                                                 @if($req->status == 'distributed' && $req->receiver_name)
-                                                    <br><small class="text-muted">Penerima: {{ $req->receiver_name }}</small>
+                                                    <div class="text-muted mt-0.5" style="font-size: 0.66rem;">Penerima: {{ $req->receiver_name }}</div>
                                                 @elseif($req->status == 'rejected' && $req->rejection_reason)
-                                                    <br><small class="text-danger">Alasan: "{{ $req->rejection_reason }}"</small>
+                                                    <div class="text-danger mt-0.5" style="font-size: 0.66rem;">Alasan: "{{ $req->rejection_reason }}"</div>
                                                 @endif
                                             </td>
                                             <td class="text-end">
-                                                <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                                <div class="d-flex flex-column gap-1 align-items-stretch" style="width: 86px; max-width: 100%; margin-left: auto;">
                                                     <!-- Tombol Detail Modal -->
-                                                    <button type="button" class="btn btn-sm btn-outline-info"
-                                                        data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}">
+                                                    <button type="button" class="btn btn-xs btn-outline-info py-0.5 px-1 fw-semibold w-100"
+                                                        data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}"
+                                                        style="font-size: 0.68rem; border-radius: 4px;"
+                                                        title="Lihat rincian lengkap permintaan">
                                                         Detail
                                                     </button>
 
-                                                    <!-- Tombol Cetak Bukti Serah Terima (Hanya jika sudah diserahterimakan/didistribusikan) -->
-                                                    @if ($req->status === 'distributed')
+                                                    <!-- Tombol Cetak Dokumen Bukti Serah Terima ATK Resmi -->
+                                                    @if (in_array($req->status, ['approved', 'distributed']))
                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                            class="btn btn-sm btn-outline-secondary" title="Lihat Bukti Foto Serah Terima">
-                                                            Bukti
+                                                            class="btn btn-xs btn-outline-success py-0.5 px-1 fw-semibold w-100 text-nowrap"
+                                                            style="font-size: 0.68rem; border-radius: 4px;"
+                                                            title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
+                                                            Cetak Bukti
                                                         </a>
+
+                                                        <!-- Tombol Unggah / Status Berkas Dokumen -->
+                                                        @if ($req->signed_proof)
+                                                            <button type="button" class="btn btn-xs btn-success text-white py-0.5 px-1 fw-semibold w-100 text-nowrap"
+                                                                data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}"
+                                                                style="font-size: 0.68rem; border-radius: 4px;"
+                                                                title="Berkas telah diunggah. Klik untuk melihat atau ganti berkas.">
+                                                                Upload Berkas &check;
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="btn btn-xs btn-warning text-dark py-0.5 px-1 fw-semibold w-100 text-nowrap"
+                                                                data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}"
+                                                                style="font-size: 0.68rem; border-radius: 4px;"
+                                                                title="Unggah berkas dokumen serah terima">
+                                                                Upload Berkas
+                                                            </button>
+                                                        @endif
                                                     @endif
                                                 </div>
 
@@ -393,29 +422,164 @@
                                                                         <strong>Alasan Penolakan:</strong> {{ $req->rejection_reason ?? '-' }}
                                                                     </div>
                                                                 @endif
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                @if ($req->status === 'distributed')
-                                                                    <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                                        class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                                                            <polyline points="21 15 16 10 5 21"></polyline>
-                                                                        </svg>
-                                                                        Lihat Bukti Foto PIC
-                                                                    </a>
-                                                                @elseif ($req->is_procurement && $req->status === 'approved')
-                                                                    <span class="badge bg-warning-subtle text-dark border me-auto py-2 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.75rem;">
-                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                            <circle cx="12" cy="12" r="10"></circle>
-                                                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                                                        </svg>
-                                                                        Barang dalam proses pembelian Subbag TU
-                                                                    </span>
+
+                                                                @if ($req->signed_proof)
+                                                                    <div class="card bg-success-subtle border border-success-subtle p-2.5 my-2">
+                                                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                            <div>
+                                                                                <strong class="text-success small d-block">&#10003; Berkas Fisik Telah Diunggah:</strong>
+                                                                                <span class="text-muted" style="font-size: 0.72rem;">Diunggah {{ $req->signed_at ? $req->signed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') : '-' }} WIB @if($req->signedBy) oleh {{ $req->signedBy->name }} @endif</span>
+                                                                            </div>
+                                                                            <div class="d-flex gap-1">
+                                                                                <a href="{{ $req->signed_proof_url }}" target="_blank" class="btn btn-sm btn-success text-white">
+                                                                                    Lihat Berkas
+                                                                                </a>
+                                                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
+                                                                                    Ganti Berkas
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @elseif (in_array($req->status, ['approved', 'distributed']))
+                                                                    <div class="card bg-light border p-2.5 my-2">
+                                                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                            <div>
+                                                                                <small class="text-muted d-block">Status Berkas Dokumen:</small>
+                                                                                <span class="badge bg-warning text-dark">Belum Diunggah</span>
+                                                                            </div>
+                                                                            <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
+                                                                                + Upload Berkas
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
                                                                 @endif
-                                                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Tutup</button>
                                                             </div>
+                                                            <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
+                                                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                                    <!-- Tombol Cetak Bukti Resmi -->
+                                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                                        <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
+                                                                            class="btn btn-primary btn-sm text-white d-inline-flex align-items-center gap-1.5 fw-semibold shadow-sm"
+                                                                            title="Cetak Dokumen Bukti Serah Terima ATK Resmi">
+                                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                                                                <rect x="6" y="14" width="12" height="8"></rect>
+                                                                            </svg>
+                                                                            Cetak Bukti
+                                                                        </a>
+                                                                    @endif
+
+                                                                    <!-- Tombol Unggah Berkas Dokumen -->
+                                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                                        <button type="button" class="btn btn-warning btn-sm text-dark fw-bold d-inline-flex align-items-center gap-1"
+                                                                            data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
+                                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                                            </svg>
+                                                                            {{ $req->signed_proof ? 'Ganti Berkas' : 'Upload Berkas' }}
+                                                                        </button>
+                                                                    @endif
+
+                                                                    @if ($req->distribution_proof)
+                                                                        <a href="{{ route('distribusi.bukti', ['id' => $req->id, 'view' => 'foto']) }}" target="_blank"
+                                                                            class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1">
+                                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                                                <polyline points="21 15 16 10 5 21"></polyline>
+                                                                            </svg>
+                                                                            Foto Dokumentasi
+                                                                        </a>
+                                                                    @endif
+                                                                </div>
+                                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Modal Upload Berkas Dokumen --}}
+                                                <div class="modal fade text-start" id="uploadTtdModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content border-0 shadow">
+                                                            <div class="modal-header bg-light">
+                                                                <h5 class="modal-title fw-bold text-dark">
+                                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-primary">
+                                                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                                                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                                                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                                                    </svg>
+                                                                    Unggah Berkas Dokumen Serah Terima
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <form action="{{ route('pengajuan.uploadSignedProof', $req->id) }}" method="POST" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <div class="modal-body p-4">
+                                                                    <!-- Informasi Pengajuan -->
+                                                                    <div class="card border mb-3 shadow-none" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
+                                                                        <div class="card-body p-3">
+                                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                                <span class="small text-muted fw-semibold">Nomor Pengajuan:</span>
+                                                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1 fs-6">{{ $req->request_code }}</span>
+                                                                            </div>
+                                                                            <p class="small text-secondary mb-0" style="font-size: 0.82rem; line-height: 1.45;">
+                                                                                Silakan unggah berkas dokumen fisik serah terima (hasil scan / foto) yang telah ditandatangani.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Status Berkas Terunggah (Jika Sudah Ada) -->
+                                                                    @if ($req->signed_proof)
+                                                                        <div class="card bg-success-subtle border-success-subtle mb-3 shadow-none">
+                                                                            <div class="card-body p-3">
+                                                                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                                    <div>
+                                                                                        <strong class="text-success small d-block">&#10003; Berkas Saat Ini Telah Terunggah:</strong>
+                                                                                        <small class="text-muted">Diunggah {{ $req->signed_at ? $req->signed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') : '-' }} WIB</small>
+                                                                                    </div>
+                                                                                    <a href="{{ $req->signed_proof_url }}" target="_blank" class="btn btn-sm btn-success text-white">
+                                                                                        Buka Berkas
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endif
+
+                                                                    <!-- Area Input Upload Berkas dalam Kotak yang Rapi -->
+                                                                    <div class="card border mb-0 shadow-none" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
+                                                                        <div class="card-body p-3">
+                                                                            <label class="form-label fw-bold small text-dark mb-1.5">
+                                                                                Pilih Berkas Dokumen (PDF / Scan Gambar) <span class="text-danger">*</span>
+                                                                            </label>
+                                                                            <input type="file" name="signed_proof" class="form-control bg-white mb-2" accept=".pdf,.png,.jpg,.jpeg,.webp" required>
+                                                                            <div class="small text-muted d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-secondary flex-shrink-0">
+                                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                                </svg>
+                                                                                <span>Format didukung: <strong class="text-dark">PDF, JPG, JPEG, PNG, WEBP</strong> (Maks. 10 MB).</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer bg-light py-2">
+                                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                                        </svg>
+                                                                        {{ $req->signed_proof ? 'Perbarui Berkas' : 'Simpan & Unggah Berkas' }}
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -141,6 +141,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/pengajuan', [RequestController::class, 'store'])
         ->name('pengajuan.store');
 
+    Route::post('/pengajuan/{id}/upload-signed-proof', [RequestController::class, 'uploadSignedProof'])
+        ->name('pengajuan.uploadSignedProof');
+
     Route::get('/pengajuan/pengadaan', [RequestController::class, 'createProcurement'])
         ->name('pengajuan.pengadaan.create');
 

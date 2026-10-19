@@ -193,12 +193,29 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // Daftar pengajuan untuk widget Pelacakan Status (prioritaskan yang sedang berjalan / terbaru)
+        // Daftar pengajuan untuk widget Pelacakan Status:
+        // Hanya tampilkan pengajuan yang sedang berjalan (pending, approved),
+        // atau yang baru diserahterimakan (distributed) namun belum mengunggah berkas fisik tanda tangan (maksimal 24 jam).
+        // Begitu berkas tanda tangan diunggah atau telah lewat 24 jam, otomatis disembunyikan agar tidak menumpuk.
         $trackedRequests = RequestItem::with('details.product')
             ->where('user_id', $userId)
+            ->where(function ($q) {
+                $q->whereIn('status', ['pending', 'approved'])
+                  ->orWhere(function ($sub) {
+                      $sub->where('status', 'distributed')
+                          ->whereNull('signed_proof')
+                          ->where(function ($timeQ) {
+                              $timeQ->where('distributed_at', '>=', now()->subHours(24))
+                                    ->orWhere(function ($fallbackQ) {
+                                        $fallbackQ->whereNull('distributed_at')
+                                                  ->where('updated_at', '>=', now()->subHours(24));
+                                    });
+                          });
+                  });
+            })
             ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
             ->latest()
-            ->limit(8)
+            ->limit(5)
             ->get();
 
         $userPendingCount = (clone $userRequestsQuery)->where('status', 'pending')->count();

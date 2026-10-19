@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_distributor',
         'position',
         'nip',
         'subdit_name',
@@ -48,12 +49,23 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_distributor' => 'boolean',
         ];
+    }
+
+    public function isDistributor(): bool
+    {
+        return (bool) $this->is_distributor;
     }
 
     public function isKasubagTU(): bool
     {
         return in_array($this->role, ['kasubag_tu', 'admin']);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 
     public function isArsiparis(): bool
@@ -179,8 +191,8 @@ class User extends Authenticatable
             'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
             'pic_distribusi' => 'PIC Distribusi (Pengelola / Gudang)',
             'pegawai_gudang' => 'Pegawai Gudang',
-            'pegawai' => 'Pegawai (Pemohon Individu)',
-            default => 'Pegawai (Pemohon Individu)',
+            'pegawai' => 'Pegawai',
+            default => 'Pegawai',
         };
     }
 

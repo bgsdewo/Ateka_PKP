@@ -19,7 +19,7 @@
             <div class="logo-main">
                 <div class="logo-normal">
                     <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP" class="img-fluid"
-                        style="width: 50px; height: 50px; object-fit: contain;">
+                        width="50" height="50" style="width: 50px; height: 50px; object-fit: contain;">
                 </div>
             </div>
             <div class="ms-2 sidebar-brand-text">
@@ -43,28 +43,6 @@
         <div class="sidebar-list">
             <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
 
-                {{-- Role Badge Indicator in Sidebar --}}
-                <li class="nav-item mb-2 px-3 pt-3 sidebar-user-item">
-                    <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center gap-2 sidebar-user-card">
-                        <div class="avatar avatar-35 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center sidebar-user-avatar">
-                            {{ strtoupper(substr($currentUser->name ?? 'U', 0, 1)) }}
-                        </div>
-                        <div class="sidebar-user-info" style="line-height: 1.2; overflow: hidden;">
-                            <div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">{{ $currentUser->name ?? 'Pengguna' }}</div>
-                            <small class="text-primary fw-semibold" style="font-size: 0.72rem;">
-                                @if ($isKasubagTU)
-                                    Kasubag TU (Approver)
-                                @elseif ($isPicDistribusi)
-                                    {{ $currentUser->position ?? ('PIC Distribusi (' . ($currentUser->subdit_name ?? 'Gudang') . ')') }}
-                                @elseif ($isPegawaiGudang)
-                                    Pegawai Gudang
-                                @else
-                                    Pegawai (Pemohon Individu)
-                                @endif
-                            </small>
-                        </div>
-                    </div>
-                </li>
 
                 <li class="nav-item static-item">
                     <a class="nav-link static-item disabled" href="#" tabindex="-1">

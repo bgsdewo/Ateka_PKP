@@ -447,6 +447,18 @@
                                                                 + Upload Bukti Foto
                                                             </button>
                                                         @endif
+                                                        @if ($req->signed_proof)
+                                                            <a href="{{ $req->signed_proof_url }}" target="_blank" download class="btn btn-xs btn-success text-white rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
+                                                                style="font-size: 0.72rem;"
+                                                                title="Download Berkas Serah Terima yang diunggah PIC / Pemohon">
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                                                </svg>
+                                                                Download Berkas
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 @else
                                                     <span class="text-muted small">Menunggu pengambilan</span>
@@ -463,7 +475,7 @@
                                                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                                                             <rect x="6" y="14" width="12" height="8"></rect>
                                                         </svg>
-                                                        Bukti
+                                                        Cetak Bukti
                                                     </a>
 
                                                     @if ($req->status === 'approved')
@@ -480,165 +492,6 @@
                                                             Selesai
                                                         </span>
                                                     @endif
-                                                </div>
-
-                                                {{-- Modal Konfirmasi Penyerahan Barang --}}
-                                                <div class="modal fade text-start" id="handoverModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <form action="{{ route('distribusi.handover', $req->id) }}" method="POST" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-content">
-                                                                <div class="modal-header bg-success text-white">
-                                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2">
-                                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                                                        </svg>
-                                                                        Konfirmasi Penyerahan ATK
-                                                                    </h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="alert alert-light border mb-3">
-                                                                        <div class="d-flex justify-content-between">
-                                                                            <strong class="font-monospace text-primary">{{ $req->request_code }}</strong>
-                                                                            <span class="badge bg-info text-capitalize">{{ $req->type }}</span>
-                                                                        </div>
-                                                                        <div class="small text-muted mt-1">
-                                                                            Pemohon: <strong>{{ $req->user->name ?? '-' }}</strong> ({{ $req->user->position ?? '-' }})
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label fw-bold">Nama Penerima Barang Fisik <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="receiver_name" class="form-control"
-                                                                            value="{{ $req->user->name ?? '' }}" required
-                                                                            placeholder="Nama pegawai yang mengambil barang">
-                                                                        <small class="text-muted">Bisa diisi nama pemohon langsung atau perwakilan yang mengambil barang.</small>
-                                                                    </div>
-
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label fw-bold">Foto Bukti Penyerahan (Dokumentasi)</label>
-                                                                        <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp"
-                                                                            onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}')">
-                                                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                            Unggah foto serah terima barang (JPG, JPEG, PNG, WEBP, maks 5MB). Opsional namun sangat disarankan.
-                                                                        </small>
-                                                                        <div id="proofPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
-                                                                            <img id="proofPreview{{ $req->id }}" src="" alt="Pratinjau Foto Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label fw-bold">Catatan Penyerahan (Opsional)</label>
-                                                                        <textarea name="distribution_notes" class="form-control" rows="2"
-                                                                            placeholder="Contoh: Barang diserahkan lengkap dalam kondisi baik."></textarea>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                                    <button type="submit" class="btn btn-success fw-bold">
-                                                                        Simpan &amp; Tandai Diserahkan
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-
-                                                {{-- Modal Pratinjau Foto Bukti Serah Terima --}}
-                                                @if ($req->distribution_proof)
-                                                    <div class="modal fade text-start" id="photoModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header bg-primary text-white">
-                                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2">
-                                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                                                            <polyline points="21 15 16 10 5 21"></polyline>
-                                                                        </svg>
-                                                                        Foto Bukti Serah Terima ({{ $req->request_code }})
-                                                                    </h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                                </div>
-                                                                <div class="modal-body text-center p-3">
-                                                                    <div class="p-2 border rounded bg-light mb-3">
-                                                                        <img src="{{ $req->distribution_proof_url }}" alt="Bukti Penyerahan {{ $req->request_code }}"
-                                                                            class="img-fluid rounded border shadow-sm w-100" style="max-height: 480px; object-fit: contain;">
-                                                                    </div>
-                                                                    <div class="alert alert-light border text-start small mb-0">
-                                                                        <div class="row">
-                                                                            <div class="col-sm-6">
-                                                                                <strong>Penerima:</strong> {{ $req->receiver_name ?? ($req->user->name ?? '-') }}<br>
-                                                                                <strong>Diserahkan oleh:</strong> {{ $req->distributor->name ?? 'PIC Gudang' }}
-                                                                            </div>
-                                                                            <div class="col-sm-6 text-sm-end">
-                                                                                <strong>Waktu:</strong> {{ $req->distributed_at ? $req->distributed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}<br>
-                                                                                @if ($req->distribution_notes)
-                                                                                    <span class="fst-italic text-secondary">"{{ $req->distribution_notes }}"</span>
-                                                                                @endif
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer d-flex justify-content-between">
-                                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}">
-                                                                        Ganti / Perbarui Foto
-                                                                    </button>
-                                                                    <div class="d-flex gap-2">
-                                                                        <a href="{{ $req->distribution_proof_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                            Buka Ukuran Penuh
-                                                                        </a>
-                                                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-
-                                                {{-- Modal Upload / Perbarui Foto Bukti --}}
-                                                <div class="modal fade text-start" id="uploadModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <form action="{{ route('distribusi.uploadProof', $req->id) }}" method="POST" enctype="multipart/form-data">
-                                                            @csrf
-                                                            <div class="modal-content">
-                                                                <div class="modal-header bg-info text-white">
-                                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2">
-                                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                                                                        </svg>
-                                                                        Upload Foto Bukti Penyerahan
-                                                                    </h5>
-                                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="alert alert-light border mb-3">
-                                                                        <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                                        <small class="text-muted">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
-                                                                    </div>
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label fw-bold">Pilih File Foto Bukti <span class="text-danger">*</span></label>
-                                                                        <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" required
-                                                                            onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')">
-                                                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                            Format yang didukung: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
-                                                                        </small>
-                                                                        <div id="proofReuploadPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
-                                                                            <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                                    <button type="submit" class="btn btn-info text-white fw-bold">Simpan Foto Bukti</button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -663,6 +516,223 @@
                                 </div>
                             </div>
                         @endif
+
+                        {{-- KUMPULAN MODAL (DI LUAR TABEL AGAR POSISI TIDAK TERPENGARUH KELOMPOK TABEL & TERTATA RAPI DI TENGAH LAYAR) --}}
+                        <div id="distribusi-modals-wrapper">
+                            @foreach ($requests as $req)
+                                {{-- 1. Modal Konfirmasi Penyerahan Barang --}}
+                                @if ($req->status === 'approved')
+                                    <div class="modal fade" id="handoverModal{{ $req->id }}" tabindex="-1" aria-labelledby="handoverModalLabel{{ $req->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
+                                            <form action="{{ route('distribusi.handover', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
+                                                @csrf
+                                                <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
+                                                    <div class="modal-header bg-success text-white px-4 py-3 border-0">
+                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" id="handoverModalLabel{{ $req->id }}" style="font-size: 1.05rem;">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                                            </svg>
+                                                            Konfirmasi Penyerahan ATK
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4">
+                                                        {{-- Alert Info Pengajuan --}}
+                                                        <div class="alert alert-light border rounded-3 mb-3 p-3">
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <strong class="font-monospace text-primary fs-6">{{ $req->request_code }}</strong>
+                                                                <span class="badge {{ $req->type === 'subdit' || ($req->user && $req->user->isPicDistribusi()) ? 'bg-info-subtle text-info border border-info' : 'bg-secondary-subtle text-secondary border border-secondary' }} rounded-pill px-2.5 py-1">
+                                                                    {{ $req->type === 'subdit' || ($req->user && $req->user->isPicDistribusi()) ? 'Subdit' : 'Individu' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="small text-muted">
+                                                                Pemohon: <strong class="text-dark">{{ $req->user->name_with_title ?: ($req->user->name ?? '-') }}</strong> 
+                                                                ({{ $req->user->position ?? ($req->type === 'subdit' ? 'Perwakilan Subdirektorat' : 'Pegawai') }})
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Petugas Gudang yang Menyerahkan (Otomatis dari Akun Ditunjuk Kasubag TU, Tanpa Dropdown) --}}
+                                                        @php
+                                                            $assignedDist = $defaultDistributor ?? auth()->user();
+                                                        @endphp
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                                Petugas Gudang yang Menyerahkan
+                                                            </label>
+                                                            <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between">
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; min-width: 38px;">
+                                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                                            <circle cx="12" cy="7" r="4"></circle>
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong class="text-dark d-block" style="font-size: 0.92rem;">
+                                                                            {{ $assignedDist->name_with_title ?: $assignedDist->name }}
+                                                                        </strong>
+                                                                        <small class="text-muted d-block">{{ $assignedDist->position ?: 'Petugas Distribusi Gudang ATK' }}</small>
+                                                                    </div>
+                                                                </div>
+                                                                <span class="badge bg-success-subtle text-success border border-success px-2.5 py-1 rounded-pill small fw-semibold">
+                                                                    Petugas Ditunjuk
+                                                                </span>
+                                                            </div>
+                                                            <input type="hidden" name="distributed_by" value="{{ $assignedDist->id ?? auth()->id() }}">
+                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                                Nama petugas ini otomatis dicatat di Bukti Serah Terima sebagai pihak yang menyerahkan barang.
+                                                            </small>
+                                                        </div>
+
+                                                        {{-- Nama Penerima Fisik --}}
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                                Nama Penerima Barang Fisik <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input type="text" name="receiver_name" class="form-control"
+                                                                value="{{ $req->receiver_name ?? ($req->user->name ?? '') }}" required
+                                                                placeholder="Nama yang mengambil barang fisik">
+                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                                Bisa diisi nama pemohon langsung atau perwakilan yang mengambil barang.
+                                                            </small>
+                                                        </div>
+
+                                                        {{-- Foto Bukti Penyerahan --}}
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                                Foto Bukti Penyerahan (Dokumentasi)
+                                                            </label>
+                                                            <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                                                onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}')">
+                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                                Unggah foto serah terima barang (JPG, JPEG, PNG, WEBP, maks 5MB). Opsional namun sangat disarankan.
+                                                            </small>
+                                                            <div id="proofPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
+                                                                <img id="proofPreview{{ $req->id }}" src="" alt="Pratinjau Foto Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Catatan Penyerahan --}}
+                                                        <div class="mb-0">
+                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                                Catatan Penyerahan (Opsional)
+                                                            </label>
+                                                            <textarea name="distribution_notes" class="form-control" rows="2"
+                                                                placeholder="Contoh: Barang diserahkan lengkap dalam kondisi baik.">{{ $req->distribution_notes }}</textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
+                                                        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-success fw-bold px-4 shadow-sm">
+                                                            Simpan &amp; Tandai Diserahkan
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- 2. Modal Pratinjau Foto Bukti Serah Terima --}}
+                                @if ($req->distribution_proof)
+                                    <div class="modal fade" id="photoModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
+                                                <div class="modal-header bg-primary text-white px-4 py-3 border-0">
+                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                                        </svg>
+                                                        Foto Bukti Serah Terima ({{ $req->request_code }})
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body p-4 text-center">
+                                                    <div class="p-2 border rounded bg-light mb-3">
+                                                        <img src="{{ $req->distribution_proof_url }}" alt="Bukti Penyerahan {{ $req->request_code }}"
+                                                            class="img-fluid rounded border shadow-sm w-100" style="max-height: 480px; object-fit: contain;">
+                                                    </div>
+                                                    <div class="alert alert-light border text-start small mb-0">
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <strong>Penerima:</strong> {{ $req->receiver_name ?? ($req->user->name ?? '-') }}<br>
+                                                                <strong>Diserahkan oleh:</strong> {{ $req->distributor->name ?? 'Petugas Gudang' }}
+                                                            </div>
+                                                            <div class="col-sm-6 text-sm-end">
+                                                                <strong>Waktu:</strong> {{ $req->distributed_at ? $req->distributed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}<br>
+                                                                @if ($req->distribution_notes)
+                                                                    <span class="fst-italic text-secondary">"{{ $req->distribution_notes }}"</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}">
+                                                        Ganti / Perbarui Foto
+                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ $req->distribution_proof_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            Buka Ukuran Penuh
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- 3. Modal Upload / Perbarui Foto Bukti --}}
+                                <div class="modal fade" id="uploadModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+                                        <form action="{{ route('distribusi.uploadProof', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
+                                            @csrf
+                                            <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
+                                                <div class="modal-header bg-info text-white px-4 py-3 border-0">
+                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                        </svg>
+                                                        Upload Foto Bukti Penyerahan
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="alert alert-light border mb-3">
+                                                        <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
+                                                        <small class="text-muted">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                            Pilih File Foto Bukti <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" required
+                                                            onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')">
+                                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                            Format yang didukung: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
+                                                        </small>
+                                                        <div id="proofReuploadPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
+                                                            <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
+                                                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" class="btn btn-info text-white fw-bold px-4 shadow-sm">Simpan Foto Bukti</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -701,6 +771,14 @@ function previewProofImage(input, previewImgId, previewWrapId) {
 window.previewProofImage = previewProofImage;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Pastikan posisi popup modal selalu tepat di tengah layar viewport saat dibuka
+    document.addEventListener('show.bs.modal', function (event) {
+        const modal = event.target;
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    });
+
     const searchInput = document.getElementById('distribusi-search');
     const clearBtn = document.getElementById('btn-clear-search');
     const filterForm = document.getElementById('distribusi-filter-form');

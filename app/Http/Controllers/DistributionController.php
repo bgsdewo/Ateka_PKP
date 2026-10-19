@@ -118,6 +118,23 @@ class DistributionController extends Controller
 
         $requests = $query->paginate(15)->withQueryString();
 
+        // Akun Pegawai Gudang yang ditunjuk Kasubag TU sebagai Petugas Distribusi resmi
+        $defaultDistributor = \App\Models\User::where('role', 'pegawai_gudang')
+            ->where('is_distributor', true)
+            ->where('name', '!=', 'tes')
+            ->latest('id')
+            ->first()
+            ?? \App\Models\User::where('role', 'pegawai_gudang')
+            ->where('name', '!=', 'tes')
+            ->latest('id')
+            ->first()
+            ?? auth()->user();
+
+        $gudangUsers = \App\Models\User::whereIn('role', ['pegawai_gudang', 'pic_distribusi'])
+            ->orderByDesc('is_distributor')
+            ->orderBy('name')
+            ->get();
+
         return view('distribusi.index', compact(
             'requests',
             'totalReady',
@@ -125,6 +142,8 @@ class DistributionController extends Controller
             'totalSubditReady',
             'totalIndividuReady',
             'subditGroups',
+            'gudangUsers',
+            'defaultDistributor',
             'filterType',
             'filterStatus',
             'search',
@@ -152,6 +171,7 @@ class DistributionController extends Controller
             ->findOrFail($id);
 
         $request->validate([
+            'distributed_by' => 'nullable|exists:users,id',
             'receiver_name' => 'required|string|max:255',
             'distribution_notes' => 'nullable|string',
             'distribution_proof' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -172,10 +192,20 @@ class DistributionController extends Controller
             $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
         }
 
+        $distributedById = $request->input('distributed_by');
+        if (!$distributedById) {
+            $defaultDist = \App\Models\User::where('role', 'pegawai_gudang')
+                ->where('is_distributor', true)
+                ->where('name', '!=', 'tes')
+                ->latest('id')
+                ->first();
+            $distributedById = $defaultDist ? $defaultDist->id : Auth::id();
+        }
+
         $requestItem->update([
             'status' => 'distributed',
             'distributed_at' => now(),
-            'distributed_by' => Auth::id(),
+            'distributed_by' => $distributedById,
             'receiver_name' => $request->receiver_name,
             'distribution_notes' => $request->distribution_notes,
             'distribution_proof' => $proofPath,
@@ -238,14 +268,19 @@ class DistributionController extends Controller
             })
             ->findOrFail($id);
 
-        // Jika Pemohon (Pegawai atau PIC): hanya tampilkan bukti upload foto untuk permintaannya sendiri
+        // Jika Pemohon (Pegawai atau PIC): pastikan permohonan miliknya sendiri atau ditangani oleh PIC tersebut
         if ($currentUser && ($currentUser->isPegawai() || $currentUser->isPicDistribusi())) {
-            if ($requestItem->user_id !== $currentUser->id) {
+            if ($requestItem->user_id !== $currentUser->id && !$currentUser->canHandleRequest($requestItem)) {
                 abort(403, 'Anda tidak memiliki hak akses untuk melihat bukti serah terima permintaan ini.');
             }
+        }
+
+        // Jika parameter ?view=foto, tampilkan foto dokumentasi
+        if (request('view') === 'foto') {
             return view('distribusi.bukti_foto', compact('requestItem'));
         }
 
+        // Tampilkan Dokumen Resmi Bukti Serah Terima Barang ATK (Gambar 3)
         return view('distribusi.bukti', compact('requestItem'));
     }
 }

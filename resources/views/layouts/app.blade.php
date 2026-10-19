@@ -4,15 +4,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Nonaktifkan Pengindeksan Mesin Pencari / SEO (Aplikasi Internal Kementerian PKP RI) -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="description" content="Sistem Informasi Pencatatan dan E-Katalog Persediaan ATK Kementerian Perumahan dan Kawasan Permukiman RI">
     <title>@yield('title', 'Pencatatan Stok Barang')</title>
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
+
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+    <!-- Core Styles -->
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.3' }}" />
+    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.4' }}" />
     @stack('styles')
     <style>
         /* ======================================================== */
@@ -80,34 +90,6 @@
             z-index: 1000 !important;
         }
 
-        /* 2. Profil Avatar Pengguna */
-        .sidebar.sidebar-mini .sidebar-user-item {
-            padding: 0.6rem 0 !important;
-            margin: 0 auto 0.25rem auto !important;
-            display: flex !important;
-            justify-content: center !important;
-            width: 100% !important;
-        }
-        .sidebar.sidebar-mini .sidebar-user-card {
-            background: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 auto !important;
-            justify-content: center !important;
-            width: auto !important;
-            gap: 0 !important;
-            box-shadow: none !important;
-        }
-        .sidebar.sidebar-mini .sidebar-user-avatar {
-            width: 38px !important;
-            height: 38px !important;
-            min-width: 38px !important;
-            margin: 0 auto !important;
-            background-color: #ebf0fe !important;
-            border: 1.5px solid rgba(58, 87, 232, 0.3) !important;
-            color: var(--bs-primary) !important;
-            box-shadow: 0 2px 5px rgba(58, 87, 232, 0.12) !important;
-        }
 
         /* 3. Garis Pemisah / Static Item Dash (-) */
         .sidebar.sidebar-mini .nav-item.static-item {
@@ -364,7 +346,7 @@
         </div>
     </div>
     @include('partials.sidebar')
-    <main class="main-content">
+    <main class="main-content" role="main" aria-label="Konten Utama">
         <div class="position-relative iq-banner">
             @include('partials.navbar')
             @yield('page-header')

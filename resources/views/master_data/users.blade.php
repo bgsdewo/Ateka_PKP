@@ -111,6 +111,17 @@
                                                 <span class="badge {{ $roleBadge }} px-2.5 py-1">
                                                     {{ $roleLabel }}
                                                 </span>
+                                                @if ($user->role === 'pegawai_gudang' && $user->is_distributor)
+                                                    <span class="badge bg-success-subtle text-success border ms-1 px-2 py-0.5" style="font-size: 0.72rem;" title="Ditugaskan sebagai Petugas yang Mendistribusikan Barang (Yang Menyerahkan pada Bukti Serah Terima)">
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5">
+                                                            <path d="M1 3h15v13H1z"></path>
+                                                            <path d="M16 8h4l3 3v5h-7V8z"></path>
+                                                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                                        </svg>
+                                                        Petugas Distribusi
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="font-monospace small">{{ $user->email }}</span>
@@ -128,6 +139,7 @@
                                                         data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
+                                                        data-is-distributor="{{ $user->is_distributor ? '1' : '0' }}"
                                                         data-position="{{ e($user->position) }}"
                                                         data-subdit-name="{{ e($user->subdit_name) }}"
                                                         data-role-label="{{ $roleLabel }}"
@@ -143,6 +155,7 @@
                                                         data-nip="{{ e($user->nip) }}"
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
+                                                        data-is-distributor="{{ $user->is_distributor ? '1' : '0' }}"
                                                         data-position="{{ e($user->position) }}"
                                                         data-subdit-name="{{ e($user->subdit_name) }}">
                                                         Edit
@@ -213,6 +226,10 @@
                                     <small class="text-muted d-block">Terakhir Diupdate</small>
                                     <strong id="detailUpdatedAt">-</strong>
                                 </div>
+                                <div class="col-md-12 d-none" id="detailDistributorWrap">
+                                    <small class="text-muted d-block">Wewenang Penyerahan Barang</small>
+                                    <div id="detailDistributorStatus" class="mt-1">-</div>
+                                </div>
                             </div>
                         </div>
 
@@ -260,7 +277,7 @@
                                     <option value="kasubag_tu">Kasubag TU (Approver / Pimpinan)</option>
                                     <option value="pic_distribusi">PIC Distribusi (Pengelola / Gudang)</option>
                                     <option value="pegawai_gudang">Pegawai Gudang</option>
-                                    <option value="pegawai" selected>Pegawai (Pemohon Individu)</option>
+                                    <option value="pegawai" selected>Pegawai</option>
                                 </select>
                             </div>
 
@@ -286,6 +303,25 @@
                                 <input type="text" name="position" id="position" class="form-control"
                                     placeholder="Contoh: PIC Distribusi Subdirektorat SDK / Staf Keuangan">
                                 <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih unit penugasan PIC, atau dapat disesuaikan.</small>
+                            </div>
+
+                            {{-- Pengaturan Wewenang Distribusi untuk Pegawai Gudang --}}
+                            <div class="col-12 d-none" id="gudangDistribusiContainer">
+                                <div class="p-3 border rounded-3 bg-light border-primary-subtle shadow-xs">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div style="max-width: 80%;">
+                                            <label class="form-check-label fw-bold text-dark mb-0 d-block" for="is_distributor">
+                                                Tugaskan Sebagai Petugas Distribusi (Yang Menyerahkan Barang)
+                                            </label>
+                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                Aktifkan jika akun Pegawai Gudang ini bertugas menyerahkan barang ke pemohon. Namanya akan otomatis diambil dan dicantumkan pada <strong>Bukti Serah Terima Barang</strong>.
+                                            </small>
+                                        </div>
+                                        <div class="form-check form-switch fs-4 mb-0">
+                                            <input class="form-check-input" type="checkbox" name="is_distributor" id="is_distributor" value="1">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-6 password-wrapper">
@@ -344,6 +380,8 @@
                 const $position = $('#position');
                 const $picUnitContainer = $('#picUnitContainer');
                 const $picUnitChoice = $('#pic_unit_choice');
+                const $gudangDistribusiContainer = $('#gudangDistribusiContainer');
+                const $isDistributor = $('#is_distributor');
                 const $password = $('#password');
                 const $passwordConfirmation = $('#password_confirmation');
                 const $passwordWrapper = $('.password-wrapper');
@@ -356,17 +394,27 @@
                 const $detailSubditName = $('#detailSubditName');
                 const $detailCreatedAt = $('#detailCreatedAt');
                 const $detailUpdatedAt = $('#detailUpdatedAt');
+                const $detailDistributorWrap = $('#detailDistributorWrap');
+                const $detailDistributorStatus = $('#detailDistributorStatus');
 
                 function updateRoleContainers() {
                     const roleVal = $role.val();
                     if (roleVal === 'pic_distribusi') {
                         $picUnitContainer.removeClass('d-none');
+                        $gudangDistribusiContainer.addClass('d-none');
+                        $isDistributor.prop('checked', false);
+                    } else if (roleVal === 'pegawai_gudang') {
+                        $picUnitContainer.addClass('d-none');
+                        $gudangDistribusiContainer.removeClass('d-none');
+                        if (!$position.val()) {
+                            $position.val('Pegawai Gudang');
+                        }
                     } else {
                         $picUnitContainer.addClass('d-none');
+                        $gudangDistribusiContainer.addClass('d-none');
+                        $isDistributor.prop('checked', false);
                         if (roleVal === 'kasubag_tu' && !$position.val()) {
                             $position.val('Kasubag TU');
-                        } else if (roleVal === 'pegawai_gudang' && !$position.val()) {
-                            $position.val('Pegawai Gudang');
                         }
                     }
 
@@ -385,6 +433,18 @@
                 }
 
                 $role.on('change', updateRoleContainers);
+
+                $isDistributor.on('change', function() {
+                    if ($(this).is(':checked')) {
+                        if (!$position.val() || $position.val() === 'Pegawai Gudang') {
+                            $position.val('Petugas Distribusi Gudang ATK');
+                        }
+                    } else {
+                        if ($position.val() === 'Petugas Distribusi Gudang ATK') {
+                            $position.val('Pegawai Gudang');
+                        }
+                    }
+                });
 
                 $picUnitChoice.on('change', function() {
                     const val = $(this).val();
@@ -415,6 +475,10 @@
                     $position.prop('readonly', false).val('');
                     $picUnitChoice.val('').prop('disabled', false);
                     $picUnitContainer.addClass('d-none');
+                    $isDistributor.prop('checked', false).prop('disabled', false);
+                    $gudangDistribusiContainer.addClass('d-none');
+                    $detailDistributorWrap.addClass('d-none');
+                    $detailDistributorStatus.text('-');
                     updateRoleContainers();
                     $password.prop('readonly', false).val('');
                     $passwordConfirmation.prop('readonly', false).val('');
@@ -466,6 +530,9 @@
 
                     updateRoleContainers();
 
+                    const isDist = $(this).data('is-distributor') == '1';
+                    $isDistributor.prop('checked', isDist).prop('disabled', false);
+
                     const subditName = ($(this).data('subdit-name') || '').toString();
                     const pos = ($(this).data('position') || '').toString().toLowerCase();
                     const sub = subditName.toLowerCase();
@@ -503,6 +570,7 @@
                     const subditName = $(this).data('subdit-name') || '';
                     const createdAt = $(this).data('created-at');
                     const updatedAt = $(this).data('updated-at');
+                    const isDist = $(this).data('is-distributor') == '1';
 
                     $name.val(name).prop('readonly', true);
                     $userTitle.val(titleVal).prop('readonly', true);
@@ -513,6 +581,16 @@
 
                     updateRoleContainers();
                     $picUnitChoice.prop('disabled', true);
+                    $isDistributor.prop('checked', isDist).prop('disabled', true);
+
+                    if (role === 'pegawai_gudang') {
+                        $detailDistributorWrap.removeClass('d-none');
+                        $detailDistributorStatus.html(isDist 
+                            ? '<span class="badge bg-success-subtle text-success border px-2.5 py-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M1 3h15v13H1z"></path><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>Petugas Distribusi Resmi (Yang Menyerahkan pada Bukti Serah Terima)</span>' 
+                            : '<span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Staf Gudang Umum (Bukan Petugas Distribusi)</span>');
+                    } else {
+                        $detailDistributorWrap.addClass('d-none');
+                    }
 
                     const pos = (position || '').toString().toLowerCase();
                     const sub = (subditName || '').toString().toLowerCase();

@@ -330,7 +330,6 @@
                                                             <div>
                                                                 <div class="d-flex align-items-center gap-2">
                                                                     <strong class="text-dark">Pegawai</strong>
-                                                                    <span class="badge-role bg-secondary text-white">Pemohon Individu</span>
                                                                 </div>
                                                                 <small class="text-muted d-block mt-1" style="font-size: 0.78rem; line-height: 1.4;">
                                                                     Untuk staf / pegawai perorangan yang mengajukan kebutuhan ATK harian operasional.

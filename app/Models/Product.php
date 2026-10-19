@@ -147,7 +147,7 @@ class Product extends Model
         if ($tx && $tx->transaction_date) {
             return \Carbon\Carbon::parse($tx->transaction_date)->format('Y-m-d');
         }
-        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
+        return null;
     }
 
     public function getInitialTransactionDateFormattedAttribute(): string
@@ -155,9 +155,6 @@ class Product extends Model
         $tx = $this->initial_stock_transaction;
         if ($tx && $tx->transaction_date) {
             return \Carbon\Carbon::parse($tx->transaction_date)->format('d/m/Y');
-        }
-        if ($this->created_at) {
-            return $this->created_at->format('d/m/Y');
         }
         return '-';
     }

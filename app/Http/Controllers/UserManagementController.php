@@ -71,7 +71,8 @@ class UserManagementController extends Controller
             $position = $position ?: 'Kasubag TU';
             $subditName = 'Subbagian Tata Usaha';
         } elseif ($request->role === 'pegawai_gudang') {
-            $position = $position ?: 'Pegawai Gudang';
+            $isDistributor = $request->boolean('is_distributor');
+            $position = $position ?: ($isDistributor ? 'Petugas Distribusi Gudang ATK' : 'Pegawai Gudang');
             $subditName = 'Gudang Persediaan ATK';
         } elseif ($request->role === 'pegawai') {
             $subditName = 'Pegawai Perorangan';
@@ -86,6 +87,7 @@ class UserManagementController extends Controller
             'nip' => $request->nip,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'is_distributor' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_distributor') : false,
             'position' => $position,
             'subdit_name' => $subditName,
         ]);
@@ -105,6 +107,7 @@ class UserManagementController extends Controller
             'nip' => [$request->role === 'pegawai_gudang' ? 'nullable' : 'required', 'string', 'max:50'],
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
             'role' => ['required', 'string', 'in:kasubag_tu,pic_distribusi,pegawai,admin,pegawai_gudang'],
+            'is_distributor' => ['nullable'],
             'position' => ['nullable', 'string', 'max:255'],
             'pic_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
@@ -138,7 +141,8 @@ class UserManagementController extends Controller
                 $subditName = 'Subbagian Tata Usaha';
             }
         } elseif ($request->role === 'pegawai_gudang') {
-            $position = $position ?: 'Pegawai Gudang';
+            $isDist = $request->boolean('is_distributor');
+            $position = $position ?: ($isDist ? 'Petugas Distribusi Gudang ATK' : 'Pegawai Gudang');
             $subditName = $subditName ?: 'Gudang Persediaan ATK';
         } elseif ($request->role === 'pegawai') {
             $subditName = 'Pegawai Perorangan';
@@ -152,6 +156,7 @@ class UserManagementController extends Controller
             'email' => $request->email,
             'nip' => $request->nip,
             'role' => $request->role,
+            'is_distributor' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_distributor') : false,
             'position' => $position,
             'subdit_name' => $subditName,
         ];

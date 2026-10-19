@@ -157,7 +157,7 @@ class ApprovalController extends Controller
                     if (!$item->is_procurement && $detail->product_id) {
                         $product = Product::find($detail->product_id);
                         if ($product && $approvedQty > $product->stock) {
-                            return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $product->name . '" (' . $approvedQty . ' ' . $product->unit . ') melebihi sisa stok gudang (' . $product->stock . ' ' . $product->unit . ').');
+                            return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $product->name . '" (' . $approvedQty . ' Stock) melebihi sisa stok gudang (' . $product->stock . ' Stock).');
                         }
                     }
                 }
@@ -214,6 +214,56 @@ class ApprovalController extends Controller
                             ]);
                         }
                     }
+
+                    // Jika pengadaan barang & disetujui > 0: otomatis tambahkan stok ke gudang dan catat Barang Masuk!
+                    if ($item->is_procurement && $approvedQty > 0) {
+                        $product = null;
+                        if ($detail->product_id) {
+                            $product = Product::lockForUpdate()->find($detail->product_id);
+                        }
+                        if (!$product) {
+                            $itemName = $detail->custom_product_name ?: $detail->item_name;
+                            $product = Product::where('name', $itemName)->first();
+                            if (!$product) {
+                                $category = Category::where('name', 'like', "%{$detail->specification}%")->first()
+                                    ?? Category::firstOrCreate(['name' => 'Alat Tulis']);
+                                $product = Product::create([
+                                    'category_id'    => $category->id,
+                                    'code'           => 'ATK-' . strtoupper(Str::random(5)),
+                                    'name'           => $itemName,
+                                    'unit'           => $detail->custom_unit ?: 'Pcs',
+                                    'stock'          => 0,
+                                    'minimum_stock'  => 5,
+                                    'purchase_price' => 0,
+                                ]);
+                            }
+                            $detail->update(['product_id' => $product->id]);
+                        }
+
+                        if ($product) {
+                            $stockAfter = $product->stock + $approvedQty;
+                            $product->stock = $stockAfter;
+                            $product->save();
+
+                            $pemohonName = $item->user->name ?? 'Pemohon';
+                            $pemohonUnit = $item->user->position ? ' (' . $item->user->position . ')' : '';
+
+                            StockTransaction::create([
+                                'product_id'       => $product->id,
+                                'user_id'          => Auth::id(),
+                                'type'             => 'masuk',
+                                'recipient_type'   => $item->type ?? 'individu',
+                                'quantity'         => $approvedQty,
+                                'stock_after'      => $stockAfter,
+                                'transaction_date' => now()->toDateString(),
+                                'no_faktur'        => $item->request_code,
+                                'uraian'           => 'Pengadaan ATK disetujui Kasubag TU untuk ' . $pemohonName . $pemohonUnit,
+                                'kondisi'          => 'Baik',
+                                'harga_perolehan'  => $product->purchase_price ?? 0,
+                                'note'             => 'Penambahan stok dari usulan pengadaan ' . $item->request_code . ' (' . $approvedQty . ' ' . ($product->unit ?: 'Pcs') . ')',
+                            ]);
+                        }
+                    }
                 }
 
                 // Update status tiket pengajuan
@@ -226,7 +276,30 @@ class ApprovalController extends Controller
                 ]);
 
                 if ($item->is_procurement) {
-                    $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Barang akan diproses untuk pembelian offline oleh Kasubag TU.';
+                    // Kirim notifikasi konsolidasi ke pemohon
+                    if ($item->user) {
+                        foreach ($item->details as $d) {
+                            if ($d->product && $d->approved_quantity > 0) {
+                                UserNotification::create([
+                                    'user_id'    => $item->user_id,
+                                    'title'      => 'Pengadaan Disetujui: Stok Tersedia!',
+                                    'message'    => "Usulan pengadaan \"{$d->product->name}\" telah disetujui Kasubag TU sebanyak {$d->approved_quantity} {$d->product->unit}. Stok kini sudah otomatis bertambah dan siap Anda minta.",
+                                    'type'       => 'procurement_available',
+                                    'icon'       => 'box',
+                                    'link'       => route('pengajuan.index'),
+                                    'request_id' => $item->id,
+                                    'product_id' => $d->product->id,
+                                    'is_read'    => false,
+                                    'data'       => [
+                                        'product_name' => $d->product->name,
+                                        'request_code' => $item->request_code,
+                                        'approved_quantity' => $d->approved_quantity,
+                                    ],
+                                ]);
+                            }
+                        }
+                    }
+                    $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Stok telah otomatis bertambah ke gudang dan siap diminta oleh pemohon.';
                 } else {
                     $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
                 }

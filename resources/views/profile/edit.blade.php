@@ -65,14 +65,32 @@
             </div>
         @endif
 
+        @php
+            $role = $user->role ?? 'pegawai';
+            $roleLabel = match ($role) {
+                'kasubag_tu', 'admin' => 'Kasubag TU',
+                'pic_distribusi' => 'PIC Distribusi',
+                'pegawai_gudang' => 'Pegawai Gudang',
+                default => 'Pegawai',
+            };
+            $roleSubtitle = match ($role) {
+                'kasubag_tu', 'admin' => $user->position ?: 'Kasubag TU (Approver)',
+                'pic_distribusi' => $user->position ?: ('PIC Distribusi' . ($user->subdit_name ? ' - ' . $user->subdit_name : '')),
+                'pegawai_gudang' => $user->position ?: 'Pegawai Gudang',
+                default => $user->position ?: 'Pegawai',
+            };
+        @endphp
+
         <div class="row">
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <img src="{{ asset('hope-ui/assets/images/avatars/01.png') }}" alt="{{ $user->name }}"
-                            class="rounded-pill img-fluid avatar-130 mb-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center border border-primary-subtle mb-3"
+                            style="width: 90px; height: 90px; font-size: 2rem;">
+                            {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
+                        </div>
                         <h4 class="mb-1">{{ $user->name }}</h4>
-                        <p class="text-muted mb-2">Administrator</p>
+                        <p class="text-muted mb-2">{{ $roleSubtitle }}</p>
                         <span class="badge rounded-pill bg-primary">Aktif</span>
                         <hr>
                         <div class="text-start">
@@ -82,8 +100,14 @@
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Role</span>
-                                <span class="fw-semibold">Admin</span>
+                                <span class="fw-semibold text-end">{{ $roleLabel }}</span>
                             </div>
+                            @if ($user->position)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Jabatan</span>
+                                    <span class="fw-semibold text-end">{{ $user->position }}</span>
+                                </div>
+                            @endif
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Status Akun</span>
                                 <span class="fw-semibold">Aktif</span>
@@ -134,13 +158,13 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Role</label>
-                                    <input type="text" class="form-control" value="Admin" readonly>
-                                    <small class="text-muted">Field role belum tersedia pada tabel users.</small>
+                                    <input type="text" class="form-control bg-light" value="{{ $roleSubtitle }}" readonly>
+                                    <small class="text-muted">Peran dan hak akses disesuaikan dengan akun pengguna yang aktif.</small>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Status Akun</label>
-                                    <input type="text" class="form-control" value="Aktif" readonly>
+                                    <input type="text" class="form-control bg-light" value="Aktif" readonly>
                                     <small class="text-muted">Status ditampilkan sebagai informasi akun aktif.</small>
                                 </div>
                             </div>
