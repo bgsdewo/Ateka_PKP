@@ -48,34 +48,34 @@
         {{-- Card Filter Periode Transaksi / Pengadaan --}}
         <div class="row mb-4">
             <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary-subtle text-primary p-2 rounded-circle">
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <span class="badge bg-primary-subtle text-primary p-2 rounded-3">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                                 </svg>
                             </span>
                             <div>
-                                <h5 class="card-title mb-0 fw-bold">Filter Periode Daftar Barang</h5>
-                                <small class="text-secondary">Saring riwayat faktur & persediaan barang berdasarkan bulan, tahun, atau rentang tanggal tertentu</small>
+                                <h6 class="card-title mb-0 fw-bold text-dark">Filter Data Barang ATK</h6>
+                                <small class="text-secondary" style="font-size: 0.76rem;">Saring master barang berdasarkan kategori, ketersediaan stok, atau riwayat faktur pengadaan</small>
                             </div>
                         </div>
                         @if ($month || $year || $startDate || $endDate || !empty($categoryId) || !empty($stockStatus))
-                            <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-outline-danger btn-sm">
-                                <svg class="icon-16 me-1" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-outline-danger btn-sm px-2.5 py-1 d-inline-flex align-items-center gap-1.5" style="font-size: 0.78rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                                 Reset Filter
                             </a>
                         @endif
                     </div>
-                    <div class="card-body p-3">
+                    <div class="card-body p-3 p-md-3.5">
                         <form method="GET" action="{{ route('master-data.daftar-barang.index') }}" id="filterForm">
-                            <div class="row g-3 align-items-end">
-                                {{-- Filter Kategori ATK --}}
-                                <div class="col-12 col-sm-6 col-md-3">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
+                            <div class="row g-2.5 mb-2.5">
+                                {{-- 1. Kategori ATK --}}
+                                <div class="col-12 col-md-7 col-lg-7">
+                                    <label class="form-label text-dark small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                         Kategori Barang ATK
                                     </label>
                                     <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
@@ -88,71 +88,92 @@
                                     </select>
                                 </div>
 
-                                {{-- Filter Status Stok --}}
-                                <div class="col-12 col-sm-6 col-md-2">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Status Stok
+                                {{-- 2. Status Stok --}}
+                                <div class="col-12 col-md-5 col-lg-5">
+                                    <label class="form-label text-dark small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
+                                        Status Ketersediaan Stok
                                     </label>
                                     <select name="stock_status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="">Semua Status</option>
+                                        <option value="">Semua Status Stok</option>
                                         <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia (Stok &gt; 0)</option>
-                                        <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Stok Belum Tersedia (0)</option>
+                                        <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Habis / Belum Tersedia (0)</option>
                                     </select>
                                 </div>
+                            </div>
 
-                                {{-- Periode Bulan --}}
-                                <div class="col-12 col-sm-6 col-md-2">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Periode Bulan
+                            <div class="row g-2.5">
+                                {{-- 3. Periode Bulan & Tahun --}}
+                                <div class="col-12 col-md-5 col-lg-5">
+                                    <label class="form-label text-dark small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
+                                        Periode Bulan &amp; Tahun
                                     </label>
-                                    <select name="month" class="form-select form-select-sm">
-                                        <option value="">Semua Bulan (Tahunan)</option>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ sprintf('%02d', $m) }}" {{ ($month ?? '') == sprintf('%02d', $m) ? 'selected' : '' }}>
-                                                {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
-                                            </option>
-                                        @endfor
-                                    </select>
+                                    <div class="input-group input-group-sm">
+                                        <select name="month" class="form-select">
+                                            <option value="">Semua Bulan (Tahunan)</option>
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                <option value="{{ sprintf('%02d', $m) }}" {{ ($month ?? '') == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::createFromDate(2026, $m, 1)->translatedFormat('F') }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <select name="year" class="form-select" style="max-width: 115px;">
+                                            <option value="">Semua Tahun</option>
+                                            @foreach ($availableYears as $y)
+                                                <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
+                                                    {{ $y }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
 
-                                {{-- Periode Tahun (Dinamis jangka panjang) --}}
-                                <div class="col-12 col-sm-6 col-md-1">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Periode Tahun
+                                {{-- 4. Rentang Tanggal Faktur --}}
+                                <div class="col-12 col-md-7 col-lg-7">
+                                    <label class="form-label text-dark small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
+                                        Rentang Tanggal Faktur
                                     </label>
-                                    <select name="year" class="form-select form-select-sm">
-                                        <option value="">Semua</option>
-                                        @foreach ($availableYears as $y)
-                                            <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
-                                                {{ $y }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm w-100">
+                                                <span class="input-group-text px-2 bg-light text-muted" style="font-size: 0.72rem;">Dari</span>
+                                                <input type="date" name="start_date" value="{{ $startDate ?? '' }}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm w-100">
+                                                <span class="input-group-text px-2 bg-light text-muted" style="font-size: 0.72rem;">Sampai</span>
+                                                <input type="date" name="end_date" value="{{ $endDate ?? '' }}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
 
-                                {{-- Dari Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-1">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Dari Tanggal
-                                    </label>
-                                    <input type="date" name="start_date" value="{{ $startDate ?? '' }}" class="form-control form-control-sm">
+                            {{-- Baris Bawah: Info & Tombol Aksi --}}
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2.5 mt-2.5 border-top">
+                                <div class="d-flex align-items-center gap-1.5 text-muted small" style="font-size: 0.76rem;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary flex-shrink-0">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    <span>Pilih kriteria filter lalu klik <strong>Terapkan Filter</strong> untuk menyaring data barang.</span>
                                 </div>
-
-                                {{-- Sampai Tanggal --}}
-                                <div class="col-12 col-sm-6 col-md-1">
-                                    <label class="form-label text-secondary small fw-bold text-uppercase mb-1">
-                                        Sampai Tanggal
-                                    </label>
-                                    <input type="date" name="end_date" value="{{ $endDate ?? '' }}" class="form-control form-control-sm">
-                                </div>
-
-                                {{-- Tombol Aksi --}}
-                                <div class="col-12 col-sm-12 col-md-2 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                                        <svg class="icon-16 me-1" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                <div class="d-flex align-items-center gap-2 ms-auto">
+                                    @if ($month || $year || $startDate || $endDate || !empty($categoryId) || !empty($stockStatus))
+                                        <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.8rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                            Reset Filter
+                                        </a>
+                                    @endif
+                                    <button type="submit" class="btn btn-primary btn-sm px-3.5 d-inline-flex align-items-center gap-1.5 fw-semibold shadow-xs" style="font-size: 0.82rem;">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                                         </svg>
-                                        Terapkan
+                                        Terapkan Filter
                                     </button>
                                 </div>
                             </div>
