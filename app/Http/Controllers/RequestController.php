@@ -262,12 +262,12 @@ class RequestController extends Controller
         }
 
         $request->validate([
-            'signed_proof' => 'required|file|mimes:pdf,jpeg,png,jpg,webp|max:10240',
+            'signed_proof' => 'required|file|mimes:pdf,jpeg,png,jpg,webp|max:5120',
         ], [
             'signed_proof.required' => 'Silakan pilih file dokumen tanda tangan (PDF / Gambar) terlebih dahulu.',
             'signed_proof.file' => 'File yang diunggah tidak valid.',
             'signed_proof.mimes' => 'Format file harus berupa PDF, JPEG, PNG, JPG, atau WEBP.',
-            'signed_proof.max' => 'Ukuran file tidak boleh melebihi 10 MB.',
+            'signed_proof.max' => 'Ukuran file tidak boleh melebihi 5 MB.',
         ]);
 
         if ($requestItem->signed_proof && Storage::disk('public')->exists($requestItem->signed_proof)) {

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Box of staples -->
+    <rect x="36" y="52" width="88" height="56" rx="5" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <rect x="44" y="60" width="72" height="24" rx="3" fill="#ffffff"/>
+    <text x="80" y="76" font-family="Arial" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">No. 10</text>
+    <!-- Row of silver staples peaking -->
+    <rect x="48" y="90" width="64" height="10" rx="1" fill="#cbd5e1" stroke="#64748b" stroke-width="1"/>
+    <line x1="56" y1="90" x2="56" y2="100" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="68" y1="90" x2="68" y2="100" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="80" y1="90" x2="80" y2="100" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="92" y1="90" x2="92" y2="100" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="104" y1="90" x2="104" y2="100" stroke="#94a3b8" stroke-width="1"/>
+
+  </g>
+</svg>

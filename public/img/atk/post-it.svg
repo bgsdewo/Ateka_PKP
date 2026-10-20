@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fefce8"/>
+      <stop offset="100%" stop-color="#fef9c3"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Pastel Yellow Sticky Note with peeled corner -->
+    <polygon points="36,36 124,36 124,104 104,124 36,124" fill="#fef08a" stroke="#eab308" stroke-width="2"/>
+    <!-- Peeling fold -->
+    <polygon points="104,104 124,104 104,124" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+    <!-- Note handwriting lines -->
+    <line x1="48" y1="54" x2="110" y2="54" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"/>
+    <line x1="48" y1="68" x2="100" y2="68" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"/>
+    <line x1="48" y1="82" x2="90" y2="82" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"/>
+
+  </g>
+</svg>

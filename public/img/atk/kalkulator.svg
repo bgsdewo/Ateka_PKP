@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Desktop Calculator Body -->
+    <rect x="40" y="26" width="80" height="108" rx="8" fill="#334155" stroke="#1e293b" stroke-width="2"/>
+    <!-- Solar panel + LCD Display -->
+    <rect x="48" y="36" width="64" height="26" rx="4" fill="#0f172a"/>
+    <rect x="52" y="40" width="56" height="18" rx="2" fill="#bef264"/>
+    <text x="104" y="54" font-family="Courier, monospace" font-size="13" font-weight="bold" fill="#14532d" text-anchor="end">12,500</text>
+    <!-- Buttons grid -->
+    <!-- Row 1 -->
+    <rect x="48" y="70" width="12" height="10" rx="2" fill="#ef4444"/>
+    <rect x="65" y="70" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="82" y="70" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="99" y="70" width="13" height="10" rx="2" fill="#f59e0b"/>
+    <!-- Row 2 -->
+    <rect x="48" y="84" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="65" y="84" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="82" y="84" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="99" y="84" width="13" height="10" rx="2" fill="#f59e0b"/>
+    <!-- Row 3 -->
+    <rect x="48" y="98" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="65" y="98" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="82" y="98" width="12" height="10" rx="2" fill="#64748b"/>
+    <rect x="99" y="98" width="13" height="24" rx="2" fill="#10b981"/>
+    <!-- Row 4 -->
+    <rect x="48" y="112" width="29" height="10" rx="2" fill="#64748b"/>
+    <rect x="82" y="112" width="12" height="10" rx="2" fill="#64748b"/>
+
+  </g>
+</svg>

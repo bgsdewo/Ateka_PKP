@@ -8,9 +8,6 @@
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
                             <h1 class="text-white fw-bold mb-1">Katalog Alat Tulis Kantor</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Cek ketersediaan stok fisik ATK di gudang secara real-time. Jika persediaan habis, Anda dapat memesan restock secara instan langsung dari kartu barang tanpa membuka formulir terpisah.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -20,6 +17,21 @@
 @endsection
 
 @section('content')
+    <style>
+        .katalog-card-visual-wrapper .katalog-product-img {
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .katalog-card-item:hover .katalog-product-img {
+            transform: scale(1.08) translateY(-3px);
+        }
+        .katalog-card-item .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .katalog-card-item:hover .card {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+    </style>
     <div class="container-fluid content-inner mt-n5 py-0">
         {{-- Flash Notification Alerts --}}
         @if (session('success'))
@@ -55,7 +67,7 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-3.5">
                         <form id="katalog-filter-form" action="{{ route('katalog-atk') }}" method="GET" class="row g-2 align-items-center">
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-6 col-lg-4">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted">
                                         <span id="search-spinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></span>
@@ -66,7 +78,7 @@
                                     </span>
                                     <input type="text" id="katalog-search" name="search" class="form-control border-start-0 ps-0"
                                         placeholder="Cari nama barang atau kode ATK (misal: Map, Kertas, Binder)..." value="{{ $search }}" autocomplete="off" aria-label="Cari nama barang atau kode ATK">
-                                    <button class="btn btn-outline-secondary border-start-0" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian" aria-label="Hapus pencarian">
+                                    <button class="btn btn-outline-secondary border-start-0 d-flex align-items-center px-2.5" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian" aria-label="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -75,7 +87,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-3">
                                 <select name="category_id" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan kategori ATK">
                                     <option value="">-- Semua Kategori ({{ $categories->count() }}) --</option>
                                     @foreach ($categories as $cat)
@@ -86,7 +98,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-12 col-md-3">
+                            <div class="col-12 col-md-6 col-lg-2">
                                 <select name="stock_status" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan status ketersediaan stok ATK">
                                     <option value="">-- Semua Status Stok --</option>
                                     <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia di Gudang</option>
@@ -94,11 +106,21 @@
                                 </select>
                             </div>
 
-                            <div class="col-12 col-md-2 d-flex gap-2" id="katalog-reset-container">
-                                <button type="submit" id="btn-katalog-search" class="btn btn-primary flex-grow-1">Cari Barang</button>
+                            <div class="col-12 col-md-6 col-lg-3 d-flex gap-2" id="katalog-reset-container">
+                                <button type="submit" id="btn-katalog-search" class="btn btn-primary text-nowrap flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1.5" style="white-space: nowrap;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <span>Cari Barang</span>
+                                </button>
                                 @if ($search || $categoryId || !empty($stockStatus))
-                                    <a href="{{ route('katalog-atk') }}" class="btn btn-light border px-3" title="Reset Filter">
-                                        Reset
+                                    <a href="{{ route('katalog-atk') }}" class="btn btn-light border text-nowrap px-3 d-inline-flex align-items-center justify-content-center gap-1" style="white-space: nowrap;" title="Reset Filter">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                            <path d="M3 3v5h5"></path>
+                                        </svg>
+                                        <span>Reset</span>
                                     </a>
                                 @endif
                             </div>
@@ -113,26 +135,6 @@
             @forelse ($products as $item)
                 @php
                     $isAvailable = $item->stock > 0;
-                    $catNameLower = strtolower($item->category->name ?? '');
-                    $itemNameLower = strtolower($item->name ?? '');
-
-                    // Visual theme selector based on category / product name
-                    if (str_contains($catNameLower, 'holder') || str_contains($itemNameLower, 'holder') || str_contains($catNameLower, 'ordner')) {
-                        $visualClass = 'bg-cat-holder';
-                        $iconType = 'holder';
-                    } elseif (str_contains($catNameLower, 'map') || str_contains($itemNameLower, 'map') || str_contains($catNameLower, 'folder')) {
-                        $visualClass = 'bg-cat-folder';
-                        $iconType = 'folder';
-                    } elseif (str_contains($catNameLower, 'kertas') || str_contains($itemNameLower, 'kertas') || str_contains($catNameLower, 'hvs') || str_contains($itemNameLower, 'buku')) {
-                        $visualClass = 'bg-cat-paper';
-                        $iconType = 'paper';
-                    } elseif (str_contains($catNameLower, 'pena') || str_contains($itemNameLower, 'pena') || str_contains($itemNameLower, 'pulpen') || str_contains($catNameLower, 'alat tulis') || str_contains($itemNameLower, 'spidol')) {
-                        $visualClass = 'bg-cat-pen';
-                        $iconType = 'pen';
-                    } else {
-                        $visualClass = 'bg-cat-general';
-                        $iconType = 'general';
-                    }
 
                     // Stock percentage calculation for visual progress meter
                     if ($item->stock <= 0) {
@@ -152,54 +154,31 @@
                     <div class="card h-100 shadow-sm border-0 position-relative">
                         <div class="card-body p-3 d-flex flex-column justify-content-between">
                             <div>
-                                {{-- Visual Container with Floating Category Badge --}}
-                                <div class="katalog-card-visual {{ $visualClass }}">
-                                    <span class="position-absolute top-0 end-0 m-2 px-2 py-0.5 rounded-pill font-monospace" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(6px); font-size: 0.65rem; color: #334155; font-weight: 600;">
+                                {{-- Visual Container with Real Product Graphic & Floating Category Badge --}}
+                                <div class="katalog-card-visual-wrapper position-relative text-center mb-3 rounded-3 overflow-hidden d-flex align-items-center justify-content-center"
+                                     style="height: 145px; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); border: 1px solid #e2e8f0;">
+                                    <span class="position-absolute top-0 end-0 m-2 px-2.5 py-0.5 rounded-pill font-monospace shadow-xs" 
+                                          style="background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(4px); font-size: 0.68rem; color: #334155; font-weight: 600; z-index: 2; border: 1px solid rgba(226, 232, 240, 0.9);">
                                         {{ $item->category->name ?? 'ATK' }}
                                     </span>
-                                    @if ($iconType === 'folder')
-                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                    @elseif ($iconType === 'holder')
-                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="9" y1="3" x2="9" y2="21"></line>
-                                            <line x1="3" y1="9" x2="9" y2="9"></line>
-                                            <line x1="3" y1="15" x2="9" y2="15"></line>
-                                        </svg>
-                                    @elseif ($iconType === 'paper')
-                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                                            <polyline points="10 9 9 9 8 9"></polyline>
-                                        </svg>
-                                    @elseif ($iconType === 'pen')
-                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M12 20h9"></path>
-                                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                                        </svg>
-                                    @else
-                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                        </svg>
-                                    @endif
+                                    <img src="{{ asset($item->image_url) }}" 
+                                         alt="{{ $item->name }}" 
+                                         class="img-fluid katalog-product-img transition-transform" 
+                                         style="max-height: 115px; max-width: 82%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));"
+                                         loading="lazy">
                                 </div>
 
                                 {{-- Baris Kode & Status Badge --}}
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.72rem;">
-                                        {{ $item->code }}
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mb-2">
+                                    <span class="badge bg-light text-primary border font-monospace" style="font-size: 0.72rem;" title="Kode Rincian BMN: {{ $item->code }}">
+                                        Kode Rincian: {{ $item->code }}
                                     </span>
                                     @if ($item->stock <= 0)
-                                        <span class="badge bg-danger">
-                                            <span class="badge-dot badge-dot-danger"></span>Stok Belum Tersedia
+                                        <span class="badge bg-danger" style="font-size: 0.7rem;">
+                                            <span class="badge-dot badge-dot-danger"></span>Belum Tersedia
                                         </span>
                                     @else
-                                        <span class="badge bg-success">
+                                        <span class="badge bg-success" style="font-size: 0.7rem;">
                                             <span class="badge-dot badge-dot-success"></span>Tersedia
                                         </span>
                                     @endif
@@ -213,14 +192,14 @@
                                     Kategori: <strong class="text-secondary">{{ $item->category->name ?? '-' }}</strong>
                                 </small>
                                 <small class="text-muted d-block mb-2" style="font-size: 0.74rem;">
-                                    Satuan Standar: <span class="badge bg-light text-dark border">{{ implode(' / ', $item->unit_list) }}</span>
+                                    Satuan: <span class="badge bg-light text-dark border">{{ implode(' / ', $item->unit_list) }}</span>
                                 </small>
                             </div>
 
                             <div class="border-top pt-2.5 mt-2">
                                 {{-- Stock Indicator with Meter --}}
                                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                    <span class="small text-muted fw-semibold">Sisa Stok Fisik:</span>
+                                    <span class="small text-muted fw-semibold">Sisa Stok:</span>
                                     <span class="fw-bold {{ $item->stock <= 0 ? 'text-danger' : 'text-primary' }} fs-5">
                                         {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">{{ $item->unit ?? 'Unit' }}</small>
                                     </span>
@@ -240,23 +219,15 @@
                                         Ajukan Barang Ini
                                     </a>
                                 @else
-                                    <button type="button"
-                                        class="btn btn-sm btn-warning text-white fw-bold w-100 d-inline-flex justify-content-center align-items-center gap-1.5 shadow-sm btn-pesan-katalog"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalPesanKatalog"
-                                        data-id="{{ $item->id }}"
-                                        data-code="{{ $item->code }}"
-                                        data-name="{{ $item->name }}"
-                                        data-category="{{ $item->category->name ?? '-' }}"
-                                        data-unit="{{ $item->unit ?? 'Buah' }}"
-                                        data-available-units="{{ implode(',', $item->unit_list) }}">
+                                    <a href="{{ route('pengajuan.pengadaan.create') }}?product_id={{ $item->id }}"
+                                        class="btn btn-sm btn-warning text-white fw-bold w-100 d-inline-flex justify-content-center align-items-center gap-1.5 shadow-sm">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                                             <line x1="3" y1="6" x2="21" y2="6"></line>
                                             <path d="M16 10a4 4 0 0 1-8 0"></path>
                                         </svg>
                                         Pesan Barang Ini (Restock)
-                                    </button>
+                                    </a>
                                 @endif
                             </div>
                         </div>
@@ -335,7 +306,7 @@
                                 <div class="card-body p-3">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span class="badge bg-secondary font-monospace" id="modal-product-code" style="font-size: 0.75rem;">-</span>
-                                        <span class="badge bg-danger">Stok Belum Tersedia (0)</span>
+                                        <span class="badge bg-danger">Belum Tersedia (0)</span>
                                     </div>
                                     <h6 class="fw-bold text-dark mb-1" id="modal-product-name">-</h6>
                                     <small class="text-muted d-block">
@@ -369,12 +340,12 @@
                                         </select>
                                     </div>
                                     <span class="d-none" id="modal-product-unit">Buah</span>
-                                    <small class="text-muted" style="font-size: 0.75rem;">Tentukan jumlah dan pilih satuan standar barang yang dibutuhkan.</small>
+                                    <small class="text-muted" style="font-size: 0.75rem;">Tentukan jumlah dan pilih satuan barang yang dibutuhkan.</small>
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold small text-secondary">Keperluan / Catatan Permintaan</label>
-                                    <textarea name="notes" class="form-control form-control-sm" rows="2" placeholder="Contoh: Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini"></textarea>
+                                    <textarea name="notes" class="form-control form-control-sm" rows="2" placeholder="Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini"></textarea>
                                 </div>
                             </div>
 

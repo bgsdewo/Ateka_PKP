@@ -42,7 +42,7 @@
                 @php
                     $currentUser = auth()->user();
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
-                    $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
+                    $isPicDistribusi = $currentUser && ($currentUser->isPicDistribusi() || $currentUser->isDistributor() || $currentUser->isPegawaiGudang());
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
@@ -117,7 +117,7 @@
                             ->with(['user', 'details.product']);
 
                         $totalPendingDistribusi = (clone $readyDistribusiQuery)->count();
-                        $readyItems = (clone $readyDistribusiQuery)->latest('updated_at')->latest('id')->take(3)->get();
+                        $readyItems = (clone $readyDistribusiQuery)->latest('updated_at')->latest('id')->take(5)->get();
 
                         foreach ($readyItems as $ri) {
                             $pemohonName = $ri->user ? ($ri->user->name_with_title ?: $ri->user->name) : 'Pemohon';

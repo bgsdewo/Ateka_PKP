@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- External HDD Enclosure -->
+    <rect x="42" y="38" width="76" height="96" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <!-- Brand / Finish Stripe -->
+    <rect x="46" y="42" width="68" height="34" rx="4" fill="#334155"/>
+    <text x="80" y="64" font-family="Arial" font-size="11" font-weight="bold" fill="#f8fafc" text-anchor="middle">1 TB</text>
+    <!-- LED indicator -->
+    <circle cx="106" cy="120" r="2.5" fill="#38bdf8" filter="url(#softGlow)"/>
+    <!-- Cable Port -->
+    <rect x="70" y="32" width="20" height="7" rx="2" fill="#64748b"/>
+
+  </g>
+</svg>

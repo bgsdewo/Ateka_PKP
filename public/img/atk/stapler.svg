@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Modern Desktop Stapler -->
+    <!-- Base Plate -->
+    <rect x="28" y="104" width="104" height="16" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <!-- Anvil plate -->
+    <rect x="38" y="102" width="16" height="4" rx="1" fill="#cbd5e1"/>
+    <!-- Upper Arm angled slightly -->
+    <polygon points="32,80 126,62 126,104 32,104" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+    <rect x="30" y="74" width="26" height="14" rx="3" fill="#38bdf8"/>
+
+  </g>
+</svg>

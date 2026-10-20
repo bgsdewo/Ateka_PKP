@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     // Kolom yang boleh diisi secara mass assignment
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'kode_barang', 'kd_rincian', 'description'];
 
     /**
      * Relasi antara Category dan Product.

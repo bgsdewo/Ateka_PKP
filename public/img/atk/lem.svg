@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Twist-up Glue Stick Body -->
+    <rect x="58" y="48" width="44" height="74" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <!-- Label -->
+    <rect x="58" y="60" width="44" height="42" fill="#ffffff" stroke="#b45309" stroke-width="1"/>
+    <text x="80" y="85" font-family="Arial" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">GLUE</text>
+    <!-- Cap removed / Glue exposed top -->
+    <rect x="64" y="32" width="32" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <!-- Bottom twist wheel -->
+    <rect x="62" y="122" width="36" height="12" rx="3" fill="#d97706"/>
+
+  </g>
+</svg>

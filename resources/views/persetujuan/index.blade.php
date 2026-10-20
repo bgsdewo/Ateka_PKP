@@ -768,7 +768,7 @@
                                                                         <div class="mb-3">
                                                                             <label class="form-label fw-bold small">Catatan Persetujuan Subbag TU (Opsional):</label>
                                                                             <textarea name="verification_notes" class="form-control" rows="2"
-                                                                                placeholder="{{ $req->is_procurement ? 'Contoh: Disetujui untuk diproses pembelian secara offline oleh Subbag TU.' : 'Contoh: Disetujui untuk diserahkan/didistribusikan dari stok gudang.' }}"></textarea>
+                                                                                placeholder="{{ $req->is_procurement ? 'Disetujui untuk diproses pembelian secara offline oleh Subbag TU.' : 'Disetujui untuk diserahkan/didistribusikan dari stok gudang.' }}"></textarea>
                                                                         </div>
 
                                                                         <div class="alert alert-info py-2 px-3 small mb-0 d-flex align-items-center gap-2 text-start"
@@ -825,7 +825,7 @@
                                                                                 Penolakan (Akan Dilihat oleh Pemohon): <span
                                                                                     class="text-danger">*</span></label>
                                                                             <textarea name="rejection_reason" class="form-control" rows="3" required
-                                                                                placeholder="Contoh: Stok barang saat ini habis atau permohonan melebihi kuota bulanan unit kerja."></textarea>
+                                                                                placeholder="Stok barang saat ini habis atau permohonan melebihi kuota bulanan unit kerja."></textarea>
                                                                         </div>
                                                                     </div>
                                                                     <div class="modal-footer flex-shrink-0 bg-white border-top">

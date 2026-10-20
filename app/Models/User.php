@@ -58,6 +58,14 @@ class User extends Authenticatable
         return (bool) $this->is_distributor;
     }
 
+    /**
+     * Cek apakah user memiliki wewenang mengelola dan mendistribusikan barang
+     */
+    public function canManageDistribution(): bool
+    {
+        return $this->isPicDistribusi() || ($this->isPegawaiGudang() && $this->isDistributor()) || $this->isPegawaiGudang() || $this->isKasubagTU();
+    }
+
     public function isKasubagTU(): bool
     {
         return in_array($this->role, ['kasubag_tu', 'admin']);
@@ -116,6 +124,11 @@ class User extends Authenticatable
      */
     public function canHandleRequest($requestItem): bool
     {
+        // Pegawai Gudang & Kasubag TU berhak menangani seluruh permohonan
+        if ($this->isPegawaiGudang() || $this->isKasubagTU()) {
+            return true;
+        }
+
         if (!$this->isPicDistribusi()) {
             return false;
         }

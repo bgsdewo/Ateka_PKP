@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <rect x="24" y="12" width="112" height="22" rx="11" fill="#1e293b"/>
+    <text x="80" y="27" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#38bdf8" text-anchor="middle">Isi Staples No. 3</text>
+
+    <rect x="36" y="50" width="88" height="52" rx="5" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <rect x="44" y="58" width="72" height="22" rx="3" fill="#ffffff"/>
+    <text x="80" y="74" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">No. 3</text>
+    <rect x="48" y="86" width="64" height="10" rx="1" fill="#cbd5e1" stroke="#64748b" stroke-width="1"/>
+
+    <rect x="20" y="128" width="120" height="20" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.2"/>
+    <text x="80" y="142" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle">Besar / Tebal (24/6)</text>
+
+  </g>
+</svg>

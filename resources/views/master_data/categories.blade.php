@@ -87,6 +87,7 @@
                                 <thead>
                                     <tr>
                                         <th width="5%">No</th>
+                                        <th>Kode Barang</th>
                                         <th>Nama Kategori</th>
                                         <th>Deskripsi</th>
                                         <th width="15%">Tanggal Dibuat</th>
@@ -97,6 +98,9 @@
                                     @foreach ($categories as $category)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <span class="badge bg-primary font-monospace">{{ $category->kode_barang ?: ($category->kd_rincian ?: '-') }}</span>
+                                            </td>
                                             <td>
                                                 <strong>{{ $category->name }}</strong>
                                             </td>
@@ -114,6 +118,7 @@
                                                 <div class="d-flex justify-content-center gap-1 flex-nowrap">
                                                     <button type="button" class="btn btn-info btn-sm btn-detail-kategori"
                                                         data-id="{{ $category->id }}" data-name="{{ e($category->name) }}"
+                                                        data-kode-barang="{{ e($category->kode_barang ?? $category->kd_rincian ?? '') }}"
                                                         data-description="{{ e($category->description) }}"
                                                         data-products-count="{{ $category->products_count }}"
                                                         data-created-at="{{ $category->created_at ? $category->created_at->format('d-m-Y H:i') : '-' }}"
@@ -122,6 +127,7 @@
                                                     </button>
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit-kategori"
                                                         data-id="{{ $category->id }}" data-name="{{ e($category->name) }}"
+                                                        data-kode-barang="{{ e($category->kode_barang ?? $category->kd_rincian ?? '') }}"
                                                         data-description="{{ e($category->description) }}">
                                                         Edit
                                                     </button>
@@ -177,12 +183,21 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Kode Barang BMN
+                                </label>
+                                <input type="text" name="kode_barang" id="kode_barang" class="form-control font-monospace"
+                                    placeholder="1010301001">
+                                <small class="text-muted" style="font-size: 0.74rem;">Standar Kode Barang Persediaan BMN (10 Digit)</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Nama Kategori <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="name" id="name" class="form-control"
-                                    placeholder="Contoh: Besi Siku" required>
+                                    placeholder="Pensil" required>
                             </div>
 
                             <div class="col-md-12 mb-3">
@@ -218,6 +233,7 @@
                 const $title = $('#modalKategoriLabel');
                 const $btnSubmit = $('#btnSubmitKategori');
                 const $inputName = $('#name');
+                const $inputKodeBarang = $('#kode_barang');
                 const $inputDescription = $('#description');
                 const $detailInfo = $('#detailKategoriInfo');
                 const $detailProductsCount = $('#detailProductsCount');
@@ -229,6 +245,7 @@
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $inputName.prop('readonly', false);
+                    $inputKodeBarang.prop('readonly', false).val('');
                     $inputDescription.prop('readonly', false);
                     $detailInfo.addClass('d-none');
                     $detailProductsCount.text('0 Produk');
@@ -256,6 +273,7 @@
                     $form.attr('action', updateUrl);
                     $method.prop('disabled', false).val('PUT');
                     $inputName.val(name);
+                    $inputKodeBarang.val($(this).data('kode-barang') || '');
                     $inputDescription.val(description);
                     $title.text('Edit Kategori Barang');
                     $btnSubmit.text('Simpan Perubahan');
@@ -271,9 +289,11 @@
                     const updatedAt = $(this).data('updated-at');
 
                     $inputName.val(name);
+                    $inputKodeBarang.val($(this).data('kode-barang') || '-');
                     $inputDescription.val(description ? description : '-');
 
                     $inputName.prop('readonly', true);
+                    $inputKodeBarang.prop('readonly', true);
                     $inputDescription.prop('readonly', true);
 
                     $detailProductsCount.text(productsCount + ' Produk');

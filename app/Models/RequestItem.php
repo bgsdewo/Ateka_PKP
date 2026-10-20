@@ -75,6 +75,11 @@ class RequestItem extends Model
      */
     public function scopeForPic($query, User $picUser)
     {
+        // Pegawai Gudang & Kasubag TU mengelola seluruh permohonan distribusi fisik tanpa batasan unit/divisi
+        if ($picUser->isPegawaiGudang() || $picUser->isKasubagTU()) {
+            return $query;
+        }
+
         if ($picUser->isPicTataUsaha()) {
             return $query->where(function ($q) {
                 $q->where('type', 'individu')

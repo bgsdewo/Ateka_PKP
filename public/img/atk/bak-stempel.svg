@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Base box -->
+    <rect x="26" y="52" width="108" height="66" rx="8" fill="#334155" stroke="#1e293b" stroke-width="2"/>
+    <!-- Open Inked Felt Pad (Blue Ink) -->
+    <rect x="34" y="60" width="92" height="50" rx="4" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+    <rect x="38" y="64" width="84" height="42" rx="3" fill="#3b82f6"/>
+    <!-- Stamp Handle resting -->
+    <ellipse cx="80" cy="85" rx="18" ry="8" fill="#1e40af" opacity="0.6"/>
+    <rect x="42" y="38" width="76" height="14" rx="4" fill="#64748b" stroke="#475569" stroke-width="1.5"/>
+
+  </g>
+</svg>

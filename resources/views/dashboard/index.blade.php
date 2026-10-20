@@ -131,13 +131,38 @@
                                     Cetak Laporan Mutasi
                                 </a>
                             @else
-                                <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-white fw-bold btn-sm shadow-sm">
+                                <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
                                     + Buat Pengajuan ATK Baru
                                 </a>
-                                <a href="{{ route('katalog-atk') }}" class="btn btn-outline-primary btn-sm">
+                                <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-primary text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                    </svg>
+                                    Permintaan Pengadaan
+                                </a>
+                                <a href="{{ route('katalog-atk') }}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
                                     Katalog &amp; Ketersediaan Stok
                                 </a>
-                                <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-secondary btn-sm">
+                                <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
                                     Riwayat Pengajuan Saya
                                 </a>
                             @endif
@@ -366,39 +391,62 @@
                                 $firstItemName = $tReq->details->first()->item_name ?? 'Barang ATK';
                                 $summaryItems = $itemCount > 1 ? "{$firstItemName} (+".($itemCount - 1)." barang)" : $firstItemName;
 
-                                // Penentuan state tiap step: 'step-done', 'step-current', 'step-upcoming', 'step-rejected'
-                                // Step 1: Pengajuan Dibuat
-                                $s1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
+                                if ($tReq->is_procurement) {
+                                    // WORKFLOW PENGADAAN BARANG BARU (RESTOCK)
+                                    // Step 1: Usulan Diajukan
+                                    $s1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
 
-                                // Apakah pengadaan sudah dibeli / ditambahkan di Master Data?
-                                $isWaitingProcurement = ($tReq->is_procurement && !$tReq->is_purchased);
+                                    // Step 2: Verifikasi Kasubag TU
+                                    if ($status === 'pending') {
+                                        $s2Class = 'step-current';
+                                    } elseif ($status === 'rejected') {
+                                        $s2Class = 'step-rejected';
+                                    } else {
+                                        $s2Class = 'step-done line-completed';
+                                    }
 
-                                // Step 2: Verifikasi Kasubag TU
-                                if ($status === 'pending') {
-                                    $s2Class = 'step-current';
-                                } elseif ($status === 'rejected') {
-                                    $s2Class = 'step-rejected';
-                                } elseif ($status === 'approved' && $isWaitingProcurement) {
-                                    // Baru disetujui Kasubag TU, belum dibeli / belum ditambahkan di Master Data
-                                    $s2Class = 'step-current';
+                                    // Step 3: Proses Pembelian Supplier
+                                    if ($status === 'approved') {
+                                        $s3Class = $tReq->is_purchased ? 'step-done line-completed' : 'step-current';
+                                    } else {
+                                        $s3Class = 'step-upcoming';
+                                    }
+
+                                    // Step 4: Tersedia di Katalog Persediaan
+                                    if ($status === 'approved' && $tReq->is_purchased) {
+                                        $s4Class = 'step-current';
+                                    } else {
+                                        $s4Class = 'step-upcoming';
+                                    }
                                 } else {
-                                    $s2Class = 'step-done line-completed';
-                                }
+                                    // WORKFLOW PERMINTAAN STOK GUDANG (DISTRIBUSI)
+                                    // Step 1: Pengajuan Dibuat
+                                    $s1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
 
-                                // Step 3: Diproses Gudang / Pengadaan
-                                if ($status === 'approved') {
-                                    $s3Class = $isWaitingProcurement ? 'step-upcoming' : 'step-current';
-                                } elseif ($status === 'distributed') {
-                                    $s3Class = 'step-done line-completed';
-                                } else {
-                                    $s3Class = 'step-upcoming';
-                                }
+                                    // Step 2: Verifikasi Kasubag TU
+                                    if ($status === 'pending') {
+                                        $s2Class = 'step-current';
+                                    } elseif ($status === 'rejected') {
+                                        $s2Class = 'step-rejected';
+                                    } else {
+                                        $s2Class = 'step-done line-completed';
+                                    }
 
-                                // Step 4: Selesai Diserahterimakan
-                                if ($status === 'distributed') {
-                                    $s4Class = 'step-current';
-                                } else {
-                                    $s4Class = 'step-upcoming';
+                                    // Step 3: Diproses Gudang
+                                    if ($status === 'approved') {
+                                        $s3Class = 'step-current';
+                                    } elseif ($status === 'distributed') {
+                                        $s3Class = 'step-done line-completed';
+                                    } else {
+                                        $s3Class = 'step-upcoming';
+                                    }
+
+                                    // Step 4: Selesai Diserahterimakan
+                                    if ($status === 'distributed') {
+                                        $s4Class = 'step-current';
+                                    } else {
+                                        $s4Class = 'step-upcoming';
+                                    }
                                 }
                             @endphp
 
@@ -413,36 +461,53 @@
                                         
 
 
-                                        <!-- Tombol Cetak Bukti Serah Terima Resmi -->
-                                        @if(in_array($tReq->status, ['approved', 'distributed']))
-                                            <a href="{{ route('distribusi.bukti', $tReq->id) }}" target="_blank"
-                                                class="btn btn-xs btn-outline-success py-0.5 px-2 small fw-semibold d-inline-flex align-items-center gap-1"
-                                                title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                                Cetak Bukti
-                                            </a>
-                                        @endif
+                                        @if($tReq->is_procurement)
+                                            {{-- Aksi Khusus Pengadaan Barang --}}
+                                            @if($tReq->is_purchased)
+                                                <a href="{{ route('katalog-atk') }}"
+                                                    class="btn btn-xs btn-success py-1 px-2.5 small fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                                                    title="Barang telah dibeli dan tersedia di katalog. Klik untuk membuat pengajuan permintaan barang ini.">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <circle cx="9" cy="21" r="1"></circle>
+                                                        <circle cx="20" cy="21" r="1"></circle>
+                                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                    </svg>
+                                                    Pesan di Katalog ATK &rarr;
+                                                </a>
+                                            @endif
+                                        @else
+                                            {{-- Aksi Khusus Permintaan Stok Gudang --}}
+                                            <!-- Tombol Cetak Bukti Serah Terima Resmi -->
+                                            @if(in_array($tReq->status, ['approved', 'distributed']))
+                                                <a href="{{ route('distribusi.bukti', $tReq->id) }}" target="_blank"
+                                                    class="btn btn-xs btn-outline-success py-0.5 px-2 small fw-semibold d-inline-flex align-items-center gap-1"
+                                                    title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                    Cetak Bukti
+                                                </a>
+                                            @endif
 
-                                        @if($tReq->status === 'distributed' && !$tReq->signed_proof)
-                                            <a href="{{ route('pengajuan.index') }}"
-                                                class="btn btn-xs btn-warning text-dark py-0.5 px-2 small fw-bold d-inline-flex align-items-center gap-1"
-                                                title="Unggah berkas serah terima bertanda tangan agar pelacakan selesai">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                                </svg>
-                                                Upload Berkas TTD
-                                            </a>
+                                            @if($tReq->status === 'distributed' && !$tReq->signed_proof)
+                                                <a href="{{ route('pengajuan.index') }}"
+                                                    class="btn btn-xs btn-warning text-dark py-0.5 px-2 small fw-bold d-inline-flex align-items-center gap-1"
+                                                    title="Unggah berkas serah terima bertanda tangan agar pelacakan selesai">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                    </svg>
+                                                    Upload Berkas TTD
+                                                </a>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
 
                                 {{-- 4-Step Horizontal Stepper --}}
                                 <div class="atk-stepper-wrapper">
-                                    {{-- STEP 1: Pengajuan Dibuat --}}
+                                    {{-- STEP 1: Pengajuan Dibuat / Usulan Diajukan --}}
                                     <div class="atk-stepper-item {{ $s1Class }}">
                                         <div class="atk-step-circle">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -453,8 +518,12 @@
                                                 <polyline points="10 9 9 9 8 9"></polyline>
                                             </svg>
                                         </div>
-                                        <div class="atk-step-title">Pengajuan Dibuat</div>
-                                        <div class="atk-step-subtitle">({{ $itemCount }} Jenis Barang)</div>
+                                        <div class="atk-step-title">
+                                            {{ $tReq->is_procurement ? 'Usulan Pengadaan' : 'Pengajuan Dibuat' }}
+                                        </div>
+                                        <div class="atk-step-subtitle">
+                                            ({{ $itemCount }} {{ $tReq->is_procurement ? 'Jenis Barang Baru' : 'Jenis Barang' }})
+                                        </div>
                                         <div class="atk-step-time">{{ $tReq->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB</div>
                                     </div>
 
@@ -489,7 +558,7 @@
                                             @elseif($status === 'rejected')
                                                 ({{ \Illuminate\Support\Str::limit($tReq->rejection_reason ?? 'Tidak disetujui', 32) }})
                                             @else
-                                                (Telah Diverifikasi)
+                                                {{ $tReq->is_procurement ? '(Disetujui untuk Dibeli)' : '(Telah Diverifikasi)' }}
                                             @endif
                                         </div>
                                         <div class="atk-step-time">
@@ -501,66 +570,112 @@
                                         </div>
                                     </div>
 
-                                    {{-- STEP 3: Diproses Gudang / Pengadaan --}}
+                                    {{-- STEP 3: Diproses Gudang (Stok) / Pembelian Supplier (Pengadaan) --}}
                                     <div class="atk-stepper-item {{ $s3Class }}">
                                         <div class="atk-step-circle">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="1" y="3" width="15" height="13"></rect>
-                                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                                            </svg>
+                                            @if($tReq->is_procurement)
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="9" cy="21" r="1"></circle>
+                                                    <circle cx="20" cy="21" r="1"></circle>
+                                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                </svg>
+                                            @else
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                                    <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+                                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                                </svg>
+                                            @endif
                                         </div>
                                         <div class="atk-step-title">
-                                            {{ $tReq->is_procurement ? 'Pengadaan Barang' : 'Diproses Gudang' }}
+                                            {{ $tReq->is_procurement ? 'Pembelian Supplier' : 'Diproses Gudang' }}
                                         </div>
                                         <div class="atk-step-subtitle">
-                                            @if($status === 'approved')
-                                                @if($tReq->is_procurement)
-                                                    ({{ $tReq->is_purchased ? 'Tersedia di Katalog' : 'Menunggu Pengadaan' }})
+                                            @if($tReq->is_procurement)
+                                                @if($status === 'approved')
+                                                    {{ $tReq->is_purchased ? '(Telah Dibeli Subbag TU)' : '(Sedang Dibeli Kasubag TU)' }}
                                                 @else
-                                                    (Siap Diserahterimakan)
+                                                    (Menunggu Persetujuan)
                                                 @endif
-                                            @elseif($status === 'distributed')
-                                                (Telah Disiapkan Gudang)
                                             @else
-                                                (Menunggu Antrean)
+                                                @if($status === 'approved')
+                                                    (Siap Diserahterimakan)
+                                                @elseif($status === 'distributed')
+                                                    (Telah Disiapkan Gudang)
+                                                @else
+                                                    (Menunggu Antrean)
+                                                @endif
                                             @endif
                                         </div>
                                         <div class="atk-step-time">
-                                            @if($status === 'distributed' || ($status === 'approved' && !$isWaitingProcurement))
-                                                {{ ($tReq->updated_at ?? $tReq->verified_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                            @if($tReq->is_procurement)
+                                                @if($tReq->is_purchased)
+                                                    {{ ($tReq->updated_at ?? $tReq->verified_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                                @else
+                                                    -
+                                                @endif
                                             @else
-                                                -
+                                                @if($status === 'distributed' || $status === 'approved')
+                                                    {{ ($tReq->updated_at ?? $tReq->verified_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                                @else
+                                                    -
+                                                @endif
                                             @endif
                                         </div>
                                     </div>
 
-                                    {{-- STEP 4: Selesai Diterima --}}
+                                    {{-- STEP 4: Selesai Diterima (Stok) / Tersedia di Katalog (Pengadaan) --}}
                                     <div class="atk-stepper-item {{ $s4Class }}">
                                         <div class="atk-step-circle">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
-                                                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                                            </svg>
+                                            @if($tReq->is_procurement)
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                                </svg>
+                                            @else
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                                                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                                                </svg>
+                                            @endif
                                         </div>
-                                        <div class="atk-step-title">Selesai Diterima</div>
+                                        <div class="atk-step-title">
+                                            {{ $tReq->is_procurement ? 'Tersedia di Katalog' : 'Selesai Diterima' }}
+                                        </div>
                                         <div class="atk-step-subtitle">
-                                            @if($status === 'distributed')
-                                                @if(!$tReq->signed_proof)
-                                                    <span class="text-warning fw-semibold">(Menunggu Berkas TTD)</span>
+                                            @if($tReq->is_procurement)
+                                                @if($tReq->is_purchased)
+                                                    (Stok Masuk &amp; Siap Diminta)
                                                 @else
-                                                    (Penerima: {{ $tReq->receiver_name ?? $user->name }})
+                                                    (Menunggu Barang Tiba)
                                                 @endif
                                             @else
-                                                (Bukti Serah Terima)
+                                                @if($status === 'distributed')
+                                                    @if(!$tReq->signed_proof)
+                                                        <span class="text-warning fw-semibold">(Menunggu Berkas TTD)</span>
+                                                    @else
+                                                        (Penerima: {{ $tReq->receiver_name ?? $user->name }})
+                                                    @endif
+                                                @else
+                                                    (Bukti Serah Terima)
+                                                @endif
                                             @endif
                                         </div>
                                         <div class="atk-step-time">
-                                            @if($status === 'distributed' && $tReq->distributed_at)
-                                                {{ $tReq->distributed_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                            @if($tReq->is_procurement)
+                                                @if($tReq->is_purchased)
+                                                    {{ ($tReq->updated_at ?? $tReq->verified_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                                @else
+                                                    -
+                                                @endif
                                             @else
-                                                -
+                                                @if($status === 'distributed' && $tReq->distributed_at)
+                                                    {{ $tReq->distributed_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
+                                                @else
+                                                    -
+                                                @endif
                                             @endif
                                         </div>
                                     </div>
@@ -570,6 +685,18 @@
                     </div>
                 </div>
             @endif
+
+                            <script>
+                    function switchTrackedRequest(reqId) {
+                        document.querySelectorAll('.tracked-request-panel').forEach(function(panel) {
+                            panel.classList.add('d-none');
+                        });
+                        const target = document.getElementById('tracked-panel-' + reqId);
+                        if (target) {
+                            target.classList.remove('d-none');
+                        }
+                    }
+                </script>
 
             {{-- Smart Consolidated Notification Hub --}}
             @if(isset($recentProcurementNotifications) && $recentProcurementNotifications->isNotEmpty())
@@ -801,10 +928,10 @@
                             <div class="table-responsive table-responsive-no-scroll">
                                 <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100" style="table-layout: fixed;">
                                     <colgroup>
-                                        <col style="width: 18%;">
+                                        <col style="width: 16%;">
                                         <col style="width: 8%;">
                                         <col style="width: 12%;">
-                                        <col style="width: 36%;">
+                                        <col style="width: 38%;">
                                         <col style="width: 14%;">
                                         <col style="width: 12%;">
                                     </colgroup>
@@ -832,10 +959,10 @@
                                                     <div class="text-dark fw-semibold" style="font-size: 0.74rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
                                                     <div class="text-muted" style="font-size: 0.68rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
                                                 </td>
-                                                <td>
-                                                    <ul class="mb-0 ps-3" style="font-size: 0.75rem; word-break: break-word;">
+                                                <td style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;">
+                                                    <ul class="mb-0 ps-3" style="font-size: 0.75rem; word-break: break-word; white-space: normal;">
                                                         @foreach ($req->details as $d)
-                                                            <li class="mb-1">
+                                                            <li class="mb-1" style="word-break: break-word;">
                                                                 <strong>{{ $d->item_name }}</strong>
                                                                 @if (in_array($req->status, ['approved', 'distributed']))
                                                                     <span class="badge bg-success-subtle text-success border px-1 py-0.2" style="font-size: 0.65rem;">Disetujui: {{ $d->effective_quantity }} {{ $d->item_unit }}</span>
@@ -844,12 +971,12 @@
                                                                 @endif
 
                                                                 @if ($d->specification)
-                                                                    <div class="text-muted fst-italic" style="font-size: 0.7rem; line-height: 1.25;">Spesifikasi: {{ $d->specification }}</div>
+                                                                    <div class="text-muted fst-italic" style="font-size: 0.7rem; line-height: 1.25; word-break: break-word;">Spesifikasi: {{ $d->specification }}</div>
                                                                 @endif
 
                                                                 @if ($d->verification_note)
-                                                                    <div class="text-primary fw-semibold fst-italic" style="font-size: 0.7rem; line-height: 1.25;">
-                                                                        Catatan TU: "{{ $d->verification_note }}"
+                                                                    <div class="mt-0.5 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.69rem; line-height: 1.3; word-break: break-word; white-space: normal;">
+                                                                        <span class="fw-bold">Catatan TU:</span> "{{ $d->verification_note }}"
                                                                     </div>
                                                                 @endif
                                                             </li>
@@ -857,12 +984,20 @@
                                                     </ul>
 
                                                     @if ($req->verification_notes && (!isset($d) || $req->verification_notes !== $d->verification_note))
-                                                        <div class="mt-0.5 pt-0.5 border-top text-primary fst-italic" style="font-size: 0.7rem;">
-                                                            <strong>Catatan TU:</strong> {{ $req->verification_notes }}
+                                                        <div class="mt-1.5 p-1.5 rounded-2 bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.69rem; line-height: 1.35; word-break: break-word; white-space: normal;">
+                                                            <strong class="d-inline-flex align-items-center gap-1">
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                </svg>
+                                                                Catatan TU:
+                                                            </strong>
+                                                            <div class="mt-0.5" style="word-break: break-word;">{{ $req->verification_notes }}</div>
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td style="white-space: nowrap; vertical-align: middle;">
                                                     @php
                                                         $shortStatus = match ($req->status) {
                                                             'pending' => $req->is_procurement ? 'Pending Pengadaan' : 'Pending TU',

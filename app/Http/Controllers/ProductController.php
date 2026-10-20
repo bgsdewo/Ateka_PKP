@@ -11,6 +11,8 @@ use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -177,18 +179,13 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
         }
 
-        // Cek apakah barang dengan kode atau nama yang sama sudah ada di master data (misal dari standar LIST ATK bersaldo 0)
-        $existingProduct = Product::where('code', trim((string) $request->code))
-            ->orWhereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
+        // Cek apakah barang dengan nama yang sama sudah ada di master data
+        $existingProduct = Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
             ->first();
-
-        $codeRule = $existingProduct
-            ? ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($existingProduct->id)]
-            : ['required', 'string', 'max:255', 'unique:products,code'];
 
         $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
-            'code' => $codeRule,
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -198,6 +195,7 @@ class ProductController extends Controller
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
             'category_id.exists' => 'Kategori barang tidak valid.',
@@ -212,22 +210,37 @@ class ProductController extends Controller
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
             'transaction_date.date' => 'Format tanggal faktur tidak valid.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPEG, PNG, JPG, atau WEBP.',
+            'image.max' => 'Ukuran gambar tidak boleh melebihi 2 MB.',
         ]);
 
         DB::beginTransaction();
         try {
             $addedQty = (int) $request->stock;
 
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = 'product_' . Str::slug($request->code ?: 'item') . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $stored = $file->storeAs('products', $filename, 'public');
+                $imagePath = 'storage/' . $stored;
+            }
+
             if ($existingProduct) {
                 $newTotalStock = $addedQty > 0 ? ((int) $existingProduct->stock + $addedQty) : (int) $existingProduct->stock;
-                $existingProduct->update([
+                $updateData = [
                     'category_id' => $request->category_id ?: $existingProduct->category_id,
                     'unit' => $request->unit ?: $existingProduct->unit,
                     'stock' => $newTotalStock,
                     'minimum_stock' => $request->minimum_stock ?? $existingProduct->minimum_stock ?? 0,
                     'purchase_price' => (float) $request->purchase_price > 0 ? $request->purchase_price : $existingProduct->purchase_price,
                     'description' => $request->description ?: $existingProduct->description,
-                ]);
+                ];
+                if ($imagePath) {
+                    $updateData['image'] = $imagePath;
+                }
+                $existingProduct->update($updateData);
                 $product = $existingProduct;
             } else {
                 // 1. Simpan data produk baru
@@ -240,6 +253,7 @@ class ProductController extends Controller
                     'minimum_stock' => $request->minimum_stock ?? 0,
                     'purchase_price' => $request->purchase_price,
                     'description' => $request->description,
+                    'image' => $imagePath,
                 ]);
             }
 
@@ -296,7 +310,7 @@ class ProductController extends Controller
 
         $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($daftar_barang->id)],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'unit' => ['required', 'string', 'max:255'],
             'stock' => ['required', 'integer', 'min:0'],
@@ -306,6 +320,7 @@ class ProductController extends Controller
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
             'category_id.exists' => 'Kategori barang tidak valid.',
@@ -320,12 +335,14 @@ class ProductController extends Controller
             'purchase_price.numeric' => 'Harga beli harus berupa angka.',
             'purchase_price.min' => 'Harga beli tidak boleh kurang dari 0.',
             'transaction_date.date' => 'Format tanggal faktur tidak valid.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPEG, PNG, JPG, atau WEBP.',
+            'image.max' => 'Ukuran gambar tidak boleh melebihi 2 MB.',
         ]);
 
         DB::beginTransaction();
         try {
-            // 1. Perbarui data master barang
-            $daftar_barang->update([
+            $updateData = [
                 'category_id'    => $request->category_id,
                 'code'           => $request->code,
                 'name'           => $request->name,
@@ -334,7 +351,24 @@ class ProductController extends Controller
                 'minimum_stock'  => $request->minimum_stock ?? ($daftar_barang->minimum_stock ?? 0),
                 'purchase_price' => $request->purchase_price,
                 'description'    => $request->description,
-            ]);
+            ];
+
+            if ($request->hasFile('image')) {
+                // Hapus foto lama jika tersimpan di disk public storage
+                if ($daftar_barang->image && str_starts_with($daftar_barang->image, 'storage/products/')) {
+                    $oldRelative = str_replace('storage/', '', $daftar_barang->image);
+                    if (Storage::disk('public')->exists($oldRelative)) {
+                        Storage::disk('public')->delete($oldRelative);
+                    }
+                }
+                $file = $request->file('image');
+                $filename = 'product_' . Str::slug($request->code ?: 'item') . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $stored = $file->storeAs('products', $filename, 'public');
+                $updateData['image'] = 'storage/' . $stored;
+            }
+
+            // 1. Perbarui data master barang
+            $daftar_barang->update($updateData);
 
             // 2. Sinkronisasi real-time ke riwayat Barang Masuk (StockTransaction)
             $masukTx = StockTransaction::where('product_id', $daftar_barang->id)

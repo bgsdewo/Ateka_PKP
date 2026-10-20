@@ -26,6 +26,8 @@ class CategoryController extends Controller
         }
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'kode_barang' => ['nullable', 'string', 'max:50'],
+            'kd_rincian' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
         ], [
             'name.required' => 'Nama kategori wajib diisi.',
@@ -33,8 +35,12 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
+        $kodeBarang = $request->kode_barang ?? $request->kd_rincian;
+
         Category::create([
             'name' => $request->name,
+            'kode_barang' => $kodeBarang,
+            'kd_rincian' => $request->kd_rincian ?? $kodeBarang,
             'description' => $request->description,
         ]);
 
@@ -47,6 +53,8 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($kategori_barang->id)],
+            'kode_barang' => ['nullable', 'string', 'max:50'],
+            'kd_rincian' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
         ], [
             'name.required' => 'Nama kategori wajib diisi.',
@@ -54,8 +62,12 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
+        $kodeBarang = $request->kode_barang ?? $request->kd_rincian ?? $kategori_barang->kode_barang;
+
         $kategori_barang->update([
             'name' => $request->name,
+            'kode_barang' => $kodeBarang,
+            'kd_rincian' => $request->kd_rincian ?? $kategori_barang->kd_rincian,
             'description' => $request->description,
         ]);
 

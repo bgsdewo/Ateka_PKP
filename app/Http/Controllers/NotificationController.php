@@ -21,7 +21,7 @@ class NotificationController extends Controller
         }
 
         $isKasubagTU = $user->isKasubagTU();
-        $isPicDistribusi = $user->isPicDistribusi();
+        $isPicDistribusi = $user->isPicDistribusi() || $user->isDistributor() || $user->isPegawaiGudang();
 
         $notifications = collect();
         $stats = [

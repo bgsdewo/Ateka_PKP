@@ -147,6 +147,11 @@
                                 </svg>
                             </i>
                             <span class="item-name">Distribusi Barang</span>
+                            @if ($readyDistribusiCount > 0)
+                                <span class="badge rounded-pill bg-warning text-dark ms-auto fw-bold" style="font-size: 0.68rem; padding: 0.25em 0.6em;">
+                                    {{ $readyDistribusiCount }}
+                                </span>
+                            @endif
                         </a>
                     </li>
                 @endif
@@ -221,30 +226,30 @@
 
                         <ul class="sub-nav collapse {{ $pengajuanActive ? 'show' : '' }}" id="pengajuan-menu" data-bs-parent="#sidebar-menu">
                             <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('katalog-atk') ? 'active' : '' }}" href="{{ route('katalog-atk') }}" title="Katalog Persediaan">
+                                    <i class="sidenav-mini-icon">K</i>
+                                    <span class="item-name">Katalog Persediaan</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.pengadaan.create') }}" title="Permintaan Pengadaan">
+                                    <i class="sidenav-mini-icon">P</i>
+                                    <span class="item-name">Permintaan Pengadaan</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Barang">
+                                    <i class="sidenav-mini-icon">+</i>
+                                    <span class="item-name">Buat Pengajuan Barang</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('pengajuan.index') ? 'active' : '' }}" href="{{ route('pengajuan.index') }}" title="Riwayat Pengajuan">
                                     <i class="sidenav-mini-icon">R</i>
                                     <span class="item-name">Riwayat Pengajuan</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Baru">
-                                    <i class="sidenav-mini-icon">+</i>
-                                    <span class="item-name">Buat Pengajuan Baru</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.pengadaan.create') }}" title="Permintaan Pengadaan (Beli Baru)">
-                                    <i class="sidenav-mini-icon">P</i>
-                                    <span class="item-name">Permintaan Pengadaan (Beli)</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('katalog-atk') ? 'active' : '' }}" href="{{ route('katalog-atk') }}" title="Katalog & Ketersediaan">
-                                    <i class="sidenav-mini-icon">K</i>
-                                    <span class="item-name">Katalog & Ketersediaan</span>
                                 </a>
                             </li>
                         </ul>

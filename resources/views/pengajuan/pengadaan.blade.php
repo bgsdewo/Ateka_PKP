@@ -21,120 +21,11 @@
 
 @push('styles')
     <style>
-        /* Custom Dropdown Satuan Pengadaan */
         .procure-row {
-            position: relative;
-            overflow: visible !important;
+            transition: border-color 0.15s ease-in-out;
         }
-        .procure-row.dropdown-active {
-            z-index: 1050;
-        }
-        .custom-unit-dropdown {
-            position: relative;
-        }
-        .custom-unit-dropdown.is-open {
-            z-index: 1060;
-        }
-        .custom-unit-trigger {
-            height: 38px;
-            cursor: pointer;
-            user-select: none;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 0.375rem 0.75rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-        .custom-unit-trigger:hover {
-            border-color: #94a3b8;
-        }
-        .custom-unit-dropdown.is-open .custom-unit-trigger {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
-        }
-        .custom-unit-chevron {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-        }
-        .custom-unit-dropdown.is-open .custom-unit-chevron {
-            transform: rotate(180deg);
-            color: #2563eb !important;
-        }
-        .custom-unit-menu {
-            display: none;
-            position: absolute;
-            top: calc(100% + 5px) !important;
-            left: 0;
-            right: 0;
-            bottom: auto !important; /* Pastikan selalu terbuka ke bawah, tidak pernah ke atas */
-            z-index: 1070;
-            min-width: 140px;
-            max-height: 195px; /* Kompak & tidak kepanjangan */
-            overflow-y: auto;
-            overscroll-behavior: contain;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 6px;
-            margin: 0;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-        }
-        .custom-unit-dropdown.is-open .custom-unit-menu {
-            display: block;
-            animation: customDropdownSlideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes customDropdownSlideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .custom-unit-item {
-            padding: 7px 12px;
-            border-radius: 8px;
-            margin-bottom: 2px;
-            cursor: pointer;
-            font-size: 0.86rem;
-            color: #334155;
-            font-weight: 500;
-            transition: background-color 0.12s ease, color 0.12s ease;
-            user-select: none;
-        }
-        .custom-unit-item:last-child {
-            margin-bottom: 0;
-        }
-        .custom-unit-item:hover {
-            background-color: #f1f5f9;
-            color: #0f172a;
-        }
-        .custom-unit-item.active {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            font-weight: 600;
-        }
-        .custom-unit-item .check-icon {
-            display: none;
-            flex-shrink: 0;
-        }
-        .custom-unit-item.active .check-icon {
-            display: inline-block;
-        }
-        /* Scrollbar minimalis & elegan */
-        .custom-unit-menu::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-unit-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-unit-menu::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .custom-unit-menu::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        .procure-row:hover {
+            border-color: #cbd5e1 !important;
         }
     </style>
 @endpush
@@ -147,29 +38,9 @@
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="card-title mb-0 fw-bold">Form Permintaan Pembelian Barang ke Subbag TU</h5>
-                            <small class="text-muted">Gunakan form ini jika barang yang Anda butuhkan stoknya belum ada di gudang. Kasubag TU akan memproses pembelian ke supplier atas permintaan ini.</small>
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        {{-- Petunjuk Alur Pengadaan --}}
-                        <div class="alert alert-info border-0 shadow-sm mb-4 d-flex align-items-start gap-3 p-3">
-                            <div class="badge bg-primary rounded-circle p-2 mt-1">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold text-primary mb-1">Alur Pembelian Berdasarkan Permintaan Pegawai/Subdit:</h6>
-                                <p class="mb-0 small text-dark" style="line-height: 1.5;">
-                                    1. Anda mengajukan daftar barang yang dibutuhkan beserta spesifikasinya.<br>
-                                    2. Subbag TU merekapitulasi usulan dan Kasubag TU melakukan <strong>pembelian langsung ke supplier/toko</strong>.<br>
-                                    3. Setelah barang dibeli dan tiba, barang akan diserahterimakan kepada Anda melalui PIC Distribusi.
-                                </p>
-                            </div>
-                        </div>
-
                         @if ($errors->any())
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <strong>Mohon perbaiki isian form:</strong>
@@ -195,7 +66,6 @@
                                             Individu (Staf / Pegawai)
                                         </option>
                                     </select>
-                                    <small class="text-muted">Permohonan pengadaan diajukan atas nama pegawai pemohon.</small>
                                 </div>
 
                                 <div class="col-md-6">
@@ -211,8 +81,7 @@
                                         Keperluan / Alasan Pengadaan Barang <span class="text-danger">*</span>
                                     </label>
                                     <textarea name="notes" class="form-control" rows="2" required
-                                        placeholder="Contoh: Kebutuhan perlengkapan rapat koordinasi nasional, map dokumen akreditasi, stok belum tersedia di gudang...">{{ old('notes') }}</textarea>
-                                    <small class="text-muted">Jelaskan keperluan penggunaan barang ini agar Kasubag TU dapat memverifikasi pengadaan.</small>
+                                        placeholder="Kebutuhan perlengkapan rapat koordinasi nasional, map dokumen akreditasi, stok belum tersedia di gudang...">{{ old('notes') }}</textarea>
                                 </div>
                             </div>
 
@@ -221,16 +90,8 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <h5 class="mb-0 fw-bold">Daftar Barang yang Diminta untuk Dibeli ke Supplier</h5>
-                                    <small class="text-muted">Tuliskan nama barang, perkiraan spesifikasi / merk, dan jumlah yang dibutuhkan</small>
                                 </div>
                             </div>
-
-                            {{-- Datalist produk yang pernah ada sebagai rekomendasi autocomplete --}}
-                            <datalist id="existingProductList">
-                                @foreach ($existingProducts as $p)
-                                    <option value="{{ $p->name }}" data-unit="{{ $p->unit }}" data-available-units="{{ implode(',', $p->unit_list) }}" data-category-id="{{ $p->category_id }}" data-category="{{ $p->category->name ?? 'ATK' }}" data-code="{{ $p->code }}" data-id="{{ $p->id }}">{{ $p->code }} - {{ $p->category->name ?? 'ATK' }}</option>
-                                @endforeach
-                            </datalist>
 
                             @php
                                 $unitOptions = [
@@ -267,15 +128,27 @@
                                         }
                                     }
                                 }
+
+                                $productsJsonData = $existingProducts->map(function($p) {
+                                    return [
+                                        'id' => $p->id,
+                                        'name' => $p->name,
+                                        'code' => $p->code ?? '',
+                                        'category_id' => (string) $p->category_id,
+                                        'category_name' => $p->category->name ?? 'ATK',
+                                        'unit' => $p->unit ?: 'Buah',
+                                        'available_units' => implode(',', $p->unit_list ?? [$p->unit ?: 'Buah']),
+                                    ];
+                                });
                             @endphp
 
                             <div id="procure-rows">
                                 <div class="procure-row p-3 mb-3 rounded-3 border bg-light shadow-xs">
-                                    {{-- Baris Bantu Pilih Cepat dari Standar LIST ATK --}}
+                                    {{-- Baris Filter Kategori & Nama Barang Dropdown --}}
                                     <div class="row g-2 mb-2 pb-2 border-bottom border-secondary-subtle">
                                         <div class="col-md-4 col-12">
-                                            <label class="form-label small text-secondary fw-semibold mb-1">
-                                                Filter Kategori LIST ATK (Opsional)
+                                            <label class="form-label small text-secondary fw-bold mb-1">
+                                                Filter Kategori LIST ATK
                                             </label>
                                             <select class="form-select form-select-sm procure-cat-filter bg-white">
                                                 <option value="">-- Semua Kategori ({{ isset($categories) ? $categories->count() : 0 }} Kategori) --</option>
@@ -287,85 +160,61 @@
                                             </select>
                                         </div>
                                         <div class="col-md-8 col-12">
-                                            <label class="form-label small text-secondary fw-semibold mb-1 d-flex justify-content-between">
-                                                <span>Pilih Cepat dari Standar LIST ATK (Otomatis Isi Nama & Satuan)</span>
-                                                <span class="badge bg-primary-subtle text-primary procure-count-badge" style="font-size: 0.7rem;">{{ $existingProducts->count() }} barang standar</span>
+                                            <label class="form-label small text-secondary fw-bold mb-1 d-flex justify-content-between align-items-center">
+                                                <span>Nama Barang yang Diminta <span class="text-danger">*</span></span>
+                                                <span class="badge bg-primary-subtle text-primary procure-count-badge" style="font-size: 0.72rem;">{{ $existingProducts->count() }} barang</span>
                                             </label>
-                                            <select class="form-select form-select-sm procure-template-select bg-white">
-                                                <option value="">-- Pilih Barang dari Standar LIST ATK atau Ketik Manual di Bawah --</option>
-                                                @foreach ($existingProducts as $p)
-                                                    <option value="{{ $p->id }}"
-                                                        data-name="{{ $p->name }}"
-                                                        data-code="{{ $p->code }}"
-                                                        data-category-id="{{ $p->category_id }}"
-                                                        data-category-name="{{ $p->category->name ?? 'ATK' }}"
-                                                        data-unit="{{ $p->unit ?: 'Buah' }}"
-                                                        data-available-units="{{ implode(',', $p->unit_list) }}">
-                                                        [{{ $p->category->name ?? 'ATK' }}] {{ $p->name }} (Satuan: {{ implode('/', $p->unit_list) }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="item-name-wrapper">
+                                                <select name="item_name[]" class="form-select form-select-sm item-name-select bg-white" required>
+                                                    <option value="">-- Pilih Barang yang Diminta ({{ $existingProducts->count() }} Barang) --</option>
+                                                    @foreach ($existingProducts as $p)
+                                                        <option value="{{ $p->name }}"
+                                                            data-id="{{ $p->id }}"
+                                                            data-name="{{ $p->name }}"
+                                                            data-code="{{ $p->code }}"
+                                                            data-category-id="{{ $p->category_id }}"
+                                                            data-category-name="{{ $p->category->name ?? 'ATK' }}"
+                                                            data-unit="{{ $p->unit ?: 'Buah' }}"
+                                                            data-available-units="{{ implode(',', $p->unit_list) }}">
+                                                            [{{ $p->code ?: '-' }} - {{ $p->category->name ?? 'ATK' }}] {{ $p->name }} (Satuan: {{ implode('/', $p->unit_list) }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <input type="hidden" name="product_id[]" class="item-product-id" value="">
                                         </div>
                                     </div>
 
-                                    <div class="row g-2 align-items-start">
-                                        <div class="col-md-5 col-12">
-                                            <label class="form-label fw-bold small">Nama Barang yang Diminta <span class="text-danger">*</span></label>
-                                            <input type="text" name="item_name[]" class="form-control item-name-input" 
-                                                list="existingProductList" 
-                                                placeholder="Ketik nama barang atau pilih dari LIST ATK di atas..." required autocomplete="off">
-                                            <input type="hidden" name="product_id[]" class="item-product-id">
-                                        </div>
-
+                                    <div class="row g-2 align-items-end">
                                         <div class="col-md-2 col-6">
-                                            <label class="form-label fw-bold small">Jumlah <span class="text-danger">*</span></label>
-                                            <input type="number" name="quantity[]" class="form-control text-center fw-bold" 
+                                            <label class="form-label fw-bold small mb-1">Jumlah <span class="text-danger">*</span></label>
+                                            <input type="number" name="quantity[]" class="form-control form-control-sm text-center fw-bold" 
                                                 min="1" value="1" required>
                                         </div>
 
-                                        <div class="col-md-2 col-6">
-                                            <label class="form-label fw-bold small">Satuan</label>
-                                            <div class="custom-unit-dropdown position-relative">
-                                                <button type="button" class="form-control custom-unit-trigger d-flex justify-content-between align-items-center bg-white text-dark text-start" aria-expanded="false">
-                                                    <span class="custom-unit-label fw-semibold">Buah</span>
-                                                    <svg class="custom-unit-chevron text-secondary" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                                    </svg>
-                                                </button>
-
-                                                <div class="custom-unit-menu shadow-lg bg-white">
-                                                    @foreach ($unitOptions as $val => $label)
-                                                        <div class="custom-unit-item d-flex align-items-center justify-content-between {{ $val === 'Buah' ? 'active' : '' }}" data-value="{{ $val }}">
-                                                            <div class="d-flex align-items-center gap-1">
-                                                                <span class="unit-text">{{ $label }}</span>
-                                                                <span class="badge bg-primary-subtle text-primary unit-recommended-badge d-none" style="font-size: 0.62rem;">Standar</span>
-                                                            </div>
-                                                            <svg class="check-icon text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                                            </svg>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-
-                                                <input type="hidden" name="custom_unit[]" class="item-unit-input" value="Buah">
-                                            </div>
-                                            <div class="recommended-units-pills mt-1 d-none"></div>
+                                        <div class="col-md-3 col-6">
+                                            <label class="form-label fw-bold small mb-1">Satuan <span class="text-danger">*</span></label>
+                                            <select name="custom_unit[]" class="form-select form-select-sm item-unit-select bg-white" required>
+                                                @foreach ($unitOptions as $val => $label)
+                                                    <option value="{{ $val }}" {{ $val === 'Buah' ? 'selected' : '' }}>{{ $label }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
-                                        <div class="col-md-3 col-12">
-                                            <div class="d-flex align-items-end gap-2">
-                                                <div class="flex-grow-1">
-                                                    <label class="form-label fw-bold small">Spesifikasi / Merk (Opsional)</label>
-                                                    <input type="text" name="specification[]" class="form-control item-spec-input" 
-                                                        placeholder="Misal: Warna Biru / Joyko">
-                                                </div>
-                                                <button type="button" class="btn btn-outline-danger btn-sm remove-procure-row" title="Hapus baris ini" style="height: 38px;">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                        <div class="col-md-6 col-10">
+                                            <label class="form-label fw-bold small mb-1">Spesifikasi / Merk</label>
+                                            <input type="text" name="specification[]" class="form-control form-control-sm item-spec-input bg-white" 
+                                                placeholder="Misal: Warna Biru / Joyko">
+                                        </div>
+
+                                        <div class="col-md-1 col-2">
+                                            <label class="form-label d-none d-md-block small text-muted mb-1">&nbsp;</label>
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center remove-procure-row" title="Hapus baris ini" style="height: 31px;">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -377,7 +226,7 @@
                                         <line x1="12" y1="5" x2="12" y2="19"></line>
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
                                     </svg>
-                                    + Tambah Barang Pengadaan Lain
+                                    Tambah Barang Pengadaan Lain
                                 </button>
                             </div>
 
@@ -407,266 +256,97 @@
                 const container = document.getElementById('procure-rows');
                 const addBtn = document.getElementById('btn-add-procure-row');
 
-                // Map product options for auto-filling unit and hidden id
-                const productOptions = {};
-                const masterTemplateItems = [];
-                document.querySelectorAll('#existingProductList option').forEach(opt => {
-                    const itemObj = {
-                        name: opt.value,
-                        unit: opt.getAttribute('data-unit') || 'Buah',
-                        availableUnits: opt.getAttribute('data-available-units') || (opt.getAttribute('data-unit') || 'Buah'),
-                        categoryId: opt.getAttribute('data-category-id') || '',
-                        categoryName: opt.getAttribute('data-category') || 'ATK',
-                        code: opt.getAttribute('data-code') || '',
-                        id: opt.getAttribute('data-id') || ''
-                    };
-                    productOptions[opt.value.toLowerCase()] = itemObj;
-                    masterTemplateItems.push(itemObj);
-                });
+                const masterProducts = @json($productsJsonData);
+                const standardUnitsList = ['Buah', 'Dus', 'Rim', 'Pak', 'Kotak', 'Doz', 'Set', 'Roll', 'Slop', 'Pak/Slop', 'Buku', 'Tube', 'Box', 'Botol', 'Lusin', 'Lembar', 'Batang', 'Bungkus', 'Pcs', 'Unit', 'Meter'];
 
-                function closeAllDropdowns() {
-                    document.querySelectorAll('.custom-unit-dropdown.is-open').forEach(dd => {
-                        dd.classList.remove('is-open');
-                        dd.querySelector('.custom-unit-trigger')?.setAttribute('aria-expanded', 'false');
-                    });
-                    document.querySelectorAll('.procure-row.dropdown-active').forEach(r => {
-                        r.classList.remove('dropdown-active');
-                    });
-                }
-
-                function setRowUnit(row, targetUnit) {
-                    const dropdown = row.querySelector('.custom-unit-dropdown');
-                    if (!dropdown) return;
-                    const hiddenInput = dropdown.querySelector('.item-unit-input');
-                    const labelElem = dropdown.querySelector('.custom-unit-label');
-                    const menu = dropdown.querySelector('.custom-unit-menu');
-                    if (!hiddenInput || !labelElem || !menu) return;
-
-                    const target = (targetUnit || 'Buah').trim().toLowerCase();
-                    let matchedItem = null;
-
-                    menu.querySelectorAll('.custom-unit-item').forEach(item => {
-                        const val = (item.getAttribute('data-value') || '').toLowerCase();
-                        const txt = (item.querySelector('.unit-text')?.textContent || '').toLowerCase();
-                        if (val === target || txt === target || (target === 'dus' && val === 'dos') || (target === 'dos' && val === 'dus')) {
-                            matchedItem = item;
-                        }
-                    });
-
-                    if (!matchedItem) {
-                        matchedItem = document.createElement('div');
-                        matchedItem.className = 'custom-unit-item d-flex align-items-center justify-content-between';
-                        matchedItem.setAttribute('data-value', targetUnit);
-                        matchedItem.innerHTML = `
-                            <div class="d-flex align-items-center gap-1">
-                                <span class="unit-text">${targetUnit}</span>
-                                <span class="badge bg-primary-subtle text-primary unit-recommended-badge d-none" style="font-size: 0.62rem;">Standar</span>
-                            </div>
-                            <svg class="check-icon text-primary" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        `;
-                        menu.appendChild(matchedItem);
-                        bindItemClick(matchedItem, dropdown, row);
-                    }
-
-                    menu.querySelectorAll('.custom-unit-item').forEach(it => it.classList.remove('active'));
-                    matchedItem.classList.add('active');
-
-                    const finalVal = matchedItem.getAttribute('data-value');
-                    const finalLabel = matchedItem.querySelector('.unit-text').textContent;
-
-                    hiddenInput.value = finalVal;
-                    labelElem.textContent = finalLabel;
-
-                    const pillsContainer = row.querySelector('.recommended-units-pills');
-                    if (pillsContainer) {
-                        pillsContainer.querySelectorAll('.btn-unit-pill').forEach(btn => {
-                            if ((btn.getAttribute('data-unit') || '').toLowerCase() === finalVal.toLowerCase()) {
-                                btn.classList.remove('btn-outline-secondary', 'bg-white');
-                                btn.classList.add('btn-primary', 'text-white');
-                            } else {
-                                btn.classList.remove('btn-primary', 'text-white');
-                                btn.classList.add('btn-outline-secondary', 'bg-white');
-                            }
-                        });
-                    }
-                }
-
-                function updateRecommendedUnits(row, availableUnitsStr) {
-                    const dropdown = row.querySelector('.custom-unit-dropdown');
-                    const pillsContainer = row.querySelector('.recommended-units-pills');
-                    if (!dropdown) return;
-                    const menu = dropdown.querySelector('.custom-unit-menu');
+                function setRowUnitSelect(unitSelect, availableUnitsStr, defaultUnit) {
+                    if (!unitSelect) return;
                     const units = (availableUnitsStr || '').split(',').map(u => u.trim()).filter(Boolean);
-                    const unitsLower = units.map(u => u.toLowerCase());
+                    
+                    unitSelect.innerHTML = '';
+                    const added = new Set();
 
-                    menu.querySelectorAll('.custom-unit-item').forEach(item => {
-                        const val = (item.getAttribute('data-value') || '').toLowerCase();
-                        const badge = item.querySelector('.unit-recommended-badge');
-                        if (badge) {
-                            if (unitsLower.includes(val) || (val === 'dus' && unitsLower.includes('dos'))) {
-                                badge.classList.remove('d-none');
-                            } else {
-                                badge.classList.add('d-none');
+                    units.forEach(u => {
+                        added.add(u.toLowerCase());
+                        const opt = document.createElement('option');
+                        opt.value = u;
+                        opt.textContent = `${u} (Standar)`;
+                        if (u.toLowerCase() === (defaultUnit || '').toLowerCase()) {
+                            opt.selected = true;
+                        }
+                        unitSelect.appendChild(opt);
+                    });
+
+                    standardUnitsList.forEach(u => {
+                        if (!added.has(u.toLowerCase())) {
+                            const opt = document.createElement('option');
+                            opt.value = u;
+                            opt.textContent = u;
+                            if (!units.length && u.toLowerCase() === (defaultUnit || 'buah').toLowerCase()) {
+                                opt.selected = true;
                             }
+                            unitSelect.appendChild(opt);
                         }
                     });
-
-                    if (pillsContainer) {
-                        if (units.length > 1) {
-                            pillsContainer.classList.remove('d-none');
-                            pillsContainer.innerHTML = '<small class="text-muted d-block mb-1" style="font-size: 0.68rem;">Pilih cepat satuan standar:</small><div class="d-flex flex-wrap gap-1">' +
-                                units.map(u => `<button type="button" class="btn btn-xs btn-outline-secondary bg-white py-0 px-2 btn-unit-pill" data-unit="${u}" style="font-size: 0.72rem; border-radius: 6px;">${u}</button>`).join('') +
-                                '</div>';
-                            pillsContainer.querySelectorAll('.btn-unit-pill').forEach(btn => {
-                                btn.addEventListener('click', function() {
-                                    setRowUnit(row, this.getAttribute('data-unit'));
-                                });
-                            });
-                        } else {
-                            pillsContainer.classList.add('d-none');
-                            pillsContainer.innerHTML = '';
-                        }
-                    }
                 }
 
-                function bindItemClick(item, dropdown, row) {
-                    item.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const val = this.getAttribute('data-value');
-                        setRowUnit(row, val);
-                        dropdown.classList.remove('is-open');
-                        dropdown.querySelector('.custom-unit-trigger')?.setAttribute('aria-expanded', 'false');
-                        row.classList.remove('dropdown-active');
-                    });
-                }
-
-                function attachDropdownEvents(row) {
-                    const dropdown = row.querySelector('.custom-unit-dropdown');
-                    if (!dropdown) return;
-                    const trigger = dropdown.querySelector('.custom-unit-trigger');
-                    const menu = dropdown.querySelector('.custom-unit-menu');
-
-                    if (trigger) {
-                        trigger.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            const isOpen = dropdown.classList.contains('is-open');
-                            closeAllDropdowns();
-                            if (!isOpen) {
-                                dropdown.classList.add('is-open');
-                                trigger.setAttribute('aria-expanded', 'true');
-                                row.classList.add('dropdown-active');
-                            }
-                        });
-                    }
-
-                    menu.querySelectorAll('.custom-unit-item').forEach(item => {
-                        bindItemClick(item, dropdown, row);
-                    });
-                }
-
-                function filterTemplateOptions(row) {
+                function populateItemSelect(row, selectedProductId = null) {
                     const catFilter = row.querySelector('.procure-cat-filter');
-                    const tplSelect = row.querySelector('.procure-template-select');
+                    const nameSelect = row.querySelector('.item-name-select');
                     const badge = row.querySelector('.procure-count-badge');
-                    if (!tplSelect) return;
+                    if (!nameSelect) return;
 
                     const catVal = catFilter ? catFilter.value : '';
-                    const filtered = masterTemplateItems.filter(it => !catVal || it.categoryId === catVal);
+                    const filtered = masterProducts.filter(p => !catVal || String(p.category_id) === String(catVal));
 
-                    tplSelect.innerHTML = `<option value="">-- Pilih Barang dari Standar LIST ATK (${filtered.length} Barang) --</option>`;
-                    filtered.forEach(it => {
-                        const opt = document.createElement('option');
-                        opt.value = it.id;
-                        opt.setAttribute('data-name', it.name);
-                        opt.setAttribute('data-code', it.code);
-                        opt.setAttribute('data-category-id', it.categoryId);
-                        opt.setAttribute('data-category-name', it.categoryName);
-                        opt.setAttribute('data-unit', it.unit);
-                        opt.setAttribute('data-available-units', it.availableUnits);
-                        const uText = it.availableUnits.split(',').join('/');
-                        opt.textContent = `[${it.categoryName}] ${it.name} (Satuan: ${uText})`;
-                        tplSelect.appendChild(opt);
+                    let html = `<option value="">-- Pilih Barang yang Diminta (${filtered.length} Barang) --</option>`;
+
+                    filtered.forEach(p => {
+                        const uText = p.available_units.split(',').join('/');
+                        const isSel = (selectedProductId !== null && String(p.id) === String(selectedProductId)) ? 'selected' : '';
+                        const codePrefix = p.code ? `[${p.code} - ${p.category_name}]` : `[${p.category_name}]`;
+                        html += `<option value="${p.name}" data-id="${p.id}" data-unit="${p.unit}" data-available-units="${p.available_units}" data-code="${p.code}" data-category-name="${p.category_name}" ${isSel}>${codePrefix} ${p.name} (Satuan: ${uText})</option>`;
                     });
 
+                    nameSelect.innerHTML = html;
                     if (badge) {
-                        badge.textContent = filtered.length + ' barang standar';
+                        badge.textContent = `${filtered.length} barang`;
                     }
                 }
 
                 function attachRowEvents(row) {
-                    const nameInput = row.querySelector('.item-name-input');
+                    const catFilter = row.querySelector('.procure-cat-filter');
+                    const nameSelect = row.querySelector('.item-name-select');
                     const idInput = row.querySelector('.item-product-id');
+                    const unitSelect = row.querySelector('.item-unit-select');
                     const specInput = row.querySelector('.item-spec-input');
                     const removeBtn = row.querySelector('.remove-procure-row');
-                    const catFilter = row.querySelector('.procure-cat-filter');
-                    const tplSelect = row.querySelector('.procure-template-select');
-
-                    attachDropdownEvents(row);
 
                     if (catFilter) {
                         catFilter.addEventListener('change', function() {
-                            filterTemplateOptions(row);
+                            populateItemSelect(row);
+                            if (nameSelect) nameSelect.value = '';
+                            if (idInput) idInput.value = '';
+                            setRowUnitSelect(unitSelect, '', 'Buah');
                         });
                     }
 
-                    if (tplSelect) {
-                        tplSelect.addEventListener('change', function() {
-                            const opt = this.options[this.selectedIndex];
-                            if (this.value && opt) {
-                                const pName = opt.getAttribute('data-name') || '';
-                                const pUnit = opt.getAttribute('data-unit') || 'Buah';
-                                const pAvail = opt.getAttribute('data-available-units') || pUnit;
-                                const pCat = opt.getAttribute('data-category-name') || '';
-                                const pCode = opt.getAttribute('data-code') || '';
+                    if (nameSelect) {
+                        nameSelect.addEventListener('change', function() {
+                            const selectedVal = this.value;
+                            if (selectedVal) {
+                                const opt = this.options[this.selectedIndex];
+                                if (opt) {
+                                    const pId = opt.getAttribute('data-id') || '';
+                                    const pUnit = opt.getAttribute('data-unit') || 'Buah';
+                                    const pAvail = opt.getAttribute('data-available-units') || pUnit;
 
-                                if (nameInput) nameInput.value = pName;
-                                if (idInput) idInput.value = this.value;
-                                if (specInput) {
-                                    specInput.value = pCode ? `Kategori: ${pCat} (${pCode})` : `Kategori: ${pCat}`;
-                                }
-                                updateRecommendedUnits(row, pAvail);
-                                setRowUnit(row, pUnit);
-                            } else {
-                                if (nameInput) nameInput.value = '';
-                                if (idInput) idInput.value = '';
-                                if (specInput && specInput.value.startsWith('Kategori:')) {
-                                    specInput.value = '';
-                                }
-                                updateRecommendedUnits(row, '');
-                                setRowUnit(row, 'Buah');
-                            }
-                        });
-                    }
-
-                    if (nameInput) {
-                        nameInput.addEventListener('input', function() {
-                            const val = this.value.trim().toLowerCase();
-                            if (productOptions[val]) {
-                                const matched = productOptions[val];
-                                updateRecommendedUnits(row, matched.availableUnits);
-                                if (matched.unit) {
-                                    setRowUnit(row, matched.unit);
-                                }
-                                if (idInput) {
-                                    idInput.value = matched.id;
-                                }
-                                if (specInput && (!specInput.value || specInput.value.startsWith('Kategori:'))) {
-                                    specInput.value = matched.code
-                                        ? `Kategori: ${matched.categoryName} (${matched.code})`
-                                        : `Kategori: ${matched.categoryName}`;
-                                }
-                                if (tplSelect && tplSelect.value !== matched.id) {
-                                    const hasOpt = Array.from(tplSelect.options).some(o => o.value === matched.id);
-                                    if (hasOpt) tplSelect.value = matched.id;
+                                    if (idInput) idInput.value = pId;
+                                    setRowUnitSelect(unitSelect, pAvail, pUnit);
                                 }
                             } else {
                                 if (idInput) idInput.value = '';
-                                if (tplSelect) tplSelect.value = '';
-                                if (specInput && specInput.value.startsWith('Kategori:')) {
-                                    specInput.value = '';
-                                }
+                                setRowUnitSelect(unitSelect, '', 'Buah');
                             }
                         });
                     }
@@ -676,51 +356,60 @@
                             const rows = container.querySelectorAll('.procure-row');
                             if (rows.length > 1) {
                                 row.remove();
-                                closeAllDropdowns();
                             } else {
                                 if (catFilter) catFilter.value = '';
-                                filterTemplateOptions(row);
-                                row.querySelectorAll('input:not(.item-unit-input)').forEach(input => {
+                                populateItemSelect(row);
+                                row.querySelectorAll('input').forEach(input => {
                                     if (input.type === 'number') {
                                         input.value = '1';
                                     } else {
                                         input.value = '';
                                     }
                                 });
-                                updateRecommendedUnits(row, '');
-                                setRowUnit(row, 'Buah');
-                                closeAllDropdowns();
+                                if (nameSelect) nameSelect.value = '';
+                                setRowUnitSelect(unitSelect, '', 'Buah');
                             }
                         });
                     }
                 }
 
-                // Global click and escape key handlers for closing dropdowns
-                document.addEventListener('click', function(e) {
-                    if (!e.target.closest('.custom-unit-dropdown')) {
-                        closeAllDropdowns();
-                    }
-                });
-
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        closeAllDropdowns();
-                    }
-                });
-
                 // Attach to initial row
                 container.querySelectorAll('.procure-row').forEach(attachRowEvents);
 
+                // Auto-fill barang jika diarahkan dari Katalog ATK (Pesan Barang Restock)
+                const urlParams = new URLSearchParams(window.location.search);
+                const requestedProductId = urlParams.get('product_id');
+                if (requestedProductId) {
+                    const firstRow = container.querySelector('.procure-row');
+                    if (firstRow) {
+                        const targetProd = masterProducts.find(p => String(p.id) === String(requestedProductId));
+                        if (targetProd) {
+                            const catFilter = firstRow.querySelector('.procure-cat-filter');
+                            if (catFilter) {
+                                catFilter.value = targetProd.category_id;
+                            }
+                            populateItemSelect(firstRow, targetProd.id);
+                            const nameSelect = firstRow.querySelector('.item-name-select');
+                            if (nameSelect) {
+                                nameSelect.value = targetProd.name;
+                                nameSelect.dispatchEvent(new Event('change'));
+                            }
+                        }
+                    }
+                }
+
                 // Add row handler
                 addBtn.addEventListener('click', function() {
-                    closeAllDropdowns();
                     const firstRow = container.querySelector('.procure-row');
                     const newRow = firstRow.cloneNode(true);
 
                     const catFilter = newRow.querySelector('.procure-cat-filter');
                     if (catFilter) catFilter.value = '';
 
-                    newRow.querySelectorAll('input:not(.item-unit-input)').forEach(input => {
+                    const nameSelect = newRow.querySelector('.item-name-select');
+                    if (nameSelect) nameSelect.value = '';
+
+                    newRow.querySelectorAll('input').forEach(input => {
                         if (input.type === 'number') {
                             input.value = '1';
                         } else {
@@ -728,19 +417,12 @@
                         }
                     });
 
-                    newRow.classList.remove('dropdown-active');
-                    const newDropdown = newRow.querySelector('.custom-unit-dropdown');
-                    if (newDropdown) {
-                        newDropdown.classList.remove('is-open');
-                        newDropdown.querySelector('.custom-unit-trigger')?.setAttribute('aria-expanded', 'false');
-                    }
-
                     container.appendChild(newRow);
-                    filterTemplateOptions(newRow);
-                    updateRecommendedUnits(newRow, '');
-                    setRowUnit(newRow, 'Buah');
+                    populateItemSelect(newRow);
+                    const newUnitSelect = newRow.querySelector('.item-unit-select');
+                    setRowUnitSelect(newUnitSelect, '', 'Buah');
                     attachRowEvents(newRow);
-                    newRow.querySelector('.item-name-input').focus();
+                    if (nameSelect) nameSelect.focus();
                 });
             });
         </script>

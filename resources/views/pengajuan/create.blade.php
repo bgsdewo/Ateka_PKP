@@ -109,7 +109,7 @@
                                         Keperluan / Catatan Permintaan (Opsional)
                                     </label>
                                     <textarea name="notes" class="form-control" rows="2"
-                                        placeholder="Contoh: Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini">{{ old('notes') }}</textarea>
+                                        placeholder="Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini">{{ old('notes') }}</textarea>
                                 </div>
                             </div>
 
@@ -208,7 +208,7 @@
                                                         data-unit="{{ $pUnit }}"
                                                         data-available-units="{{ $unitListStr }}"
                                                         {{ $isSelected ? 'selected' : '' }}>
-                                                        [{{ $catName }}] {{ $product->name }} — (Stock: {{ $product->stock }})
+                                                        [{{ $product->code }} - {{ $catName }}] {{ $product->name }} — (Stok: {{ $product->stock }} {{ $pUnit }})
                                                     </option>
                                                 @endforeach
                                             </select>

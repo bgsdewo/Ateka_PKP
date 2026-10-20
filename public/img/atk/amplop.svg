@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Brown Kraft / White Paper Envelope -->
+    <rect x="24" y="44" width="112" height="72" rx="4" fill="#fcd34d" stroke="#d97706" stroke-width="2"/>
+    <polygon points="24,44 80,86 136,44" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+    <line x1="24" y1="116" x2="65" y2="76" stroke="#d97706" stroke-width="1.8"/>
+    <line x1="136" y1="116" x2="95" y2="76" stroke="#d97706" stroke-width="1.8"/>
+    <!-- Stamp -->
+    <rect x="110" y="52" width="18" height="22" rx="1" fill="#ef4444" stroke="#b91c1c" stroke-width="1"/>
+    <circle cx="119" cy="63" r="4" fill="#fef2f2"/>
+    <!-- String / Clasp tie detail -->
+    <circle cx="80" cy="88" r="4.5" fill="#b45309"/>
+    <circle cx="80" cy="88" r="1.5" fill="#fef3c7"/>
+
+  </g>
+</svg>

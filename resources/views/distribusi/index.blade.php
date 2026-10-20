@@ -619,7 +619,7 @@
                                                                 Catatan Penyerahan (Opsional)
                                                             </label>
                                                             <textarea name="distribution_notes" class="form-control" rows="2"
-                                                                placeholder="Contoh: Barang diserahkan lengkap dalam kondisi baik.">{{ $req->distribution_notes }}</textarea>
+                                                                placeholder="Barang diserahkan lengkap dalam kondisi baik.">{{ $req->distribution_notes }}</textarea>
                                                         </div>
                                                     </div>
 

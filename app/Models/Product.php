@@ -18,7 +18,106 @@ class Product extends Model
         'minimum_stock',
         'purchase_price',
         'description',
+        'image',
     ];
+
+    public function getImageUrlAttribute(): string
+    {
+        if (!empty($this->image) && file_exists(public_path($this->image))) {
+            return $this->image;
+        }
+
+        $slug = $this->default_image_slug;
+        $path = 'img/atk/' . $slug . '.svg';
+        if (file_exists(public_path($path))) {
+            return $path;
+        }
+
+        return 'img/atk/general.svg';
+    }
+
+    public function getDefaultImageSlugAttribute(): string
+    {
+        $catName = strtolower($this->category->name ?? '');
+        $itemName = strtolower($this->name ?? '');
+
+        // 1. Specific Isi Staples vs Stapler
+        if (str_contains($catName, 'isi staples') || str_contains($itemName, 'isi staples') || str_contains($itemName, 'isi stapler')) {
+            return 'isi-staples';
+        }
+
+        $map = [
+            'amplop' => 'amplop',
+            'bak stempel' => 'bak-stempel',
+            'baterai' => 'baterai',
+            'binder clip' => 'binder-clip',
+            'book stand' => 'book-stand',
+            'box file' => 'box-file',
+            'buku' => 'buku',
+            'business file' => 'business-file',
+            'clear holder' => 'clear-holder',
+            'converter / usb hub' => 'converter-usb-hub',
+            'cutter' => 'cutter',
+            'double tape' => 'double-tape',
+            'elevated tray' => 'elevated-tray',
+            'flashdisk' => 'flashdisk',
+            'gunting' => 'gunting',
+            'hardisk eksternal' => 'hardisk-eksternal',
+            'isi staples' => 'isi-staples',
+            'kalkulator' => 'kalkulator',
+            'kertas' => 'kertas',
+            'keyboard' => 'keyboard',
+            'label sticker' => 'label-sticker',
+            'lakban' => 'lakban',
+            'laser pointer' => 'laser-pointer',
+            'lem' => 'lem',
+            'map' => 'map',
+            'mouse wireless' => 'mouse-wireless',
+            'ordner' => 'ordner',
+            'paper clip' => 'paper-clip',
+            'pembolong kertas' => 'pembolong-kertas',
+            'penggaris' => 'penggaris',
+            'penghapus' => 'penghapus',
+            'pensil' => 'pensil',
+            'pita' => 'pita',
+            'post it' => 'post-it',
+            'pulpen' => 'pulpen',
+            'rautan pensil' => 'rautan-pensil',
+            'recorder' => 'recorder',
+            'ring o-bin' => 'ring-o-bin',
+            'selotip' => 'selotip',
+            'sheet protector' => 'sheet-protector',
+            'spidol' => 'spidol',
+            'stabilo' => 'stabilo',
+            'stapler' => 'stapler',
+            'tape cutter' => 'tape-cutter',
+            'tape dispenser' => 'tape-dispenser',
+            'tinta brother' => 'tinta-brother',
+            'tinta canon' => 'tinta-canon',
+            'tinta epson' => 'tinta-epson',
+            'tinta hp' => 'tinta-hp',
+            'tinta pulpen' => 'tinta-pulpen',
+            'tipe ex' => 'tipe-ex',
+            'toner printer' => 'toner-printer',
+            'transparant sheet' => 'transparant-sheet',
+            'usb' => 'usb',
+            'v-tech desk organizer' => 'v-tech-desk-organizer',
+            'v-tech round pencil cup' => 'v-tech-round-pencil-cup',
+        ];
+
+        foreach ($map as $key => $slug) {
+            if (str_contains($catName, $key) || str_contains($itemName, $key)) {
+                return $slug;
+            }
+        }
+
+        return 'general';
+    }
+
+    public function getSizeSpecAttribute(): ?array
+    {
+        return null;
+    }
 
     public function getUnitListAttribute(): array
     {

@@ -275,7 +275,7 @@
                                         <th width="4%">No</th>
                                         <th>No. Faktur</th>
                                         <th>Tgl Faktur</th>
-                                        <th>Kode</th>
+                                        <th>Kode Rincian</th>
                                         <th>Nama Barang</th>
                                         <th>Kategori</th>
                                         <th>Uraian / Supplier</th>
@@ -308,12 +308,16 @@
                                                 <span class="badge bg-primary">{{ $product->code }}</span>
                                             </td>
                                             <td>
-                                                <strong>{{ $product->name }}</strong>
-                                                @if ($product->description)
-                                                    <br>
-                                                    <small
-                                                        class="text-muted">{{ Str::limit($product->description, 50) }}</small>
-                                                @endif
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 36px; height: 36px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
+                                                    <div>
+                                                        <strong>{{ $product->name }}</strong>
+                                                        @if ($product->description)
+                                                            <br>
+                                                            <small class="text-muted">{{ Str::limit($product->description, 50) }}</small>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td>{{ $product->category->name ?? '-' }}</td>
                                             <td>{{ $uraian ?: '-' }}</td>
@@ -363,7 +367,8 @@
                                                         data-no-faktur="{{ e($noFaktur ?? '') }}"
                                                         data-transaction-date="{{ $product->initial_transaction_date ?? '' }}"
                                                         data-uraian="{{ e($uraian ?? '') }}"
-                                                        data-description="{{ e($product->description) }}">
+                                                        data-description="{{ e($product->description) }}"
+                                                        data-image="{{ asset($product->image_url) }}">
                                                         Edit
                                                     </button>
                                                     @if (!auth()->user()->isPegawaiGudang())
@@ -395,7 +400,7 @@
     <div class="modal fade" id="modalBarang" tabindex="-1" aria-labelledby="modalBarangLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <form id="formBarang" method="POST">
+                <form id="formBarang" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="_method" id="formMethod" value="" disabled>
                     <input type="hidden" name="request_detail_id" id="request_detail_id" value="">
@@ -459,28 +464,29 @@
                                 <select name="category_id" id="category_id" class="form-select" required>
                                     <option value="">Pilih Kategori</option>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" data-kode-barang="{{ $category->kode_barang }}" data-rincian="{{ $category->kd_rincian }}">{{ $category->name }} ({{ $category->kode_barang ?: $category->kd_rincian }})</option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Kode Barang <span class="text-danger">*</span></label>
-                                <input type="text" name="code" id="code" class="form-control"
-                                    placeholder="Contoh: ATK-0573" required>
+                                <label class="form-label">Kode Rincian <span class="text-danger">*</span></label>
+                                <input type="text" name="code" id="code" class="form-control font-monospace"
+                                    placeholder="10.01.1" required>
+                                <small class="text-muted" style="font-size: 0.74rem;">Kode rincian standar BMN turunan kategori</small>
                             </div>
 
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Nama Barang <span class="text-danger">*</span></label>
                                 <input type="text" name="name" id="name" class="form-control"
-                                    placeholder="Contoh: Pulpen" required>
+                                    placeholder="Pulpen" required>
                             </div>
 
                             <!-- Tambahan No. Faktur, Tgl Faktur & Uraian agar sinkron dengan Barang Masuk -->
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">No. Faktur / Bukti Awal</label>
                                 <input type="text" name="no_faktur" id="no_faktur" class="form-control"
-                                    placeholder="Contoh: 121/FK">
+                                    placeholder="121/FK">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -491,7 +497,7 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Uraian / Nama Supplier</label>
                                 <input type="text" name="uraian" id="uraian" class="form-control"
-                                    placeholder="Contoh: CV. Milia Pertama">
+                                    placeholder="CV. Milia Pertama">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -540,6 +546,22 @@
                                 <label class="form-label">Deskripsi</label>
                                 <textarea name="description" id="description" class="form-control" rows="3"
                                     placeholder="Tulis deskripsi singkat barang"></textarea>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-secondary">Foto Produk Barang (Opsional)</label>
+                                <div class="p-3 rounded-3 border bg-light d-flex align-items-center gap-3">
+                                    <div id="productImagePreviewContainer" class="rounded-3 border bg-white d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 72px; height: 72px;">
+                                        <img id="productImagePreview" src="" alt="Preview" class="d-none" style="width: 100%; height: 100%; object-fit: contain;">
+                                        <span id="productImagePlaceholder" class="text-muted small text-center px-1" style="font-size: 0.7rem;">Tanpa Foto</span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <input type="file" name="image" id="product_image_input" class="form-control form-control-sm bg-white" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="previewProductImage(this)">
+                                        <div class="small text-muted mt-1.5" style="font-size: 0.74rem;">
+                                            Format didukung: <strong>JPG, JPEG, PNG, WEBP</strong>. Ukuran ideal: <strong>600 &times; 600 px</strong> (Maks. 2 MB).
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -617,6 +639,13 @@
                 const $quickSelect = $('#quick_existing_product');
                 const $requestDetailId = $('#request_detail_id');
 
+                $categoryId.on('change', function() {
+                    const rincian = $(this).find('option:selected').data('rincian');
+                    if (rincian && (!$code.val() || $code.val().startsWith('ATK-') || $method.val() !== 'PUT')) {
+                        $code.val(rincian);
+                    }
+                });
+
                 function resetModalBarang() {
                     $form[0].reset();
                     $form.attr('action', storeUrl);
@@ -641,7 +670,29 @@
                     $detailUpdatedAt.text('-');
                     $title.text('Form Barang');
                     $btnSubmit.removeClass('d-none').text('Simpan Barang');
+                    $('#product_image_input').val('');
+                    $('#productImagePreview').attr('src', '').addClass('d-none');
+                    $('#productImagePlaceholder').removeClass('d-none');
                 }
+
+                window.previewProductImage = function(input) {
+                    if (input.files && input.files[0]) {
+                        const file = input.files[0];
+                        if (file.size > 2 * 1024 * 1024) {
+                            alert('Ukuran file foto terlalu besar! Maksimal ukuran file adalah 2 MB.');
+                            input.value = '';
+                            $('#productImagePreview').attr('src', '').addClass('d-none');
+                            $('#productImagePlaceholder').removeClass('d-none');
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            $('#productImagePreview').attr('src', e.target.result).removeClass('d-none');
+                            $('#productImagePlaceholder').addClass('d-none');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
 
                 // Event listener untuk tombol + Isi Stok dari Banner Usulan Pengadaan
                 $(document).on('click', '.btn-fulfill-procurement', function() {
@@ -743,6 +794,15 @@
                     $stock.val($(this).data('stock'));
                     $purchasePrice.val($(this).data('purchase-price'));
                     $description.val($(this).data('description'));
+
+                    const existingImg = $(this).data('image');
+                    if (existingImg) {
+                        $('#productImagePreview').attr('src', existingImg).removeClass('d-none');
+                        $('#productImagePlaceholder').addClass('d-none');
+                    } else {
+                        $('#productImagePreview').attr('src', '').addClass('d-none');
+                        $('#productImagePlaceholder').removeClass('d-none');
+                    }
 
                     $title.text('Edit / Isi Stok Barang');
                     $btnSubmit.text('Simpan Perubahan');

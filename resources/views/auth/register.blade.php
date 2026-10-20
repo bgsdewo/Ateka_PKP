@@ -31,20 +31,24 @@
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .auth-content {
+            width: 100%;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem 1rem;
+            padding: 1.25rem 1rem;
         }
 
         @keyframes authCardEnter {
             from {
                 opacity: 0;
-                transform: translateY(22px) scale(0.98);
+                transform: translateY(16px) scale(0.985);
             }
             to {
                 opacity: 1;
@@ -53,18 +57,18 @@
         }
 
         .auth-card {
-            border-radius: 1.25rem;
+            border-radius: 1rem;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
-            animation: authCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+            animation: authCardEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .form-control, .form-select {
-            border-radius: 0.65rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.925rem;
+            border-radius: 0.55rem;
+            padding: 0.52rem 0.8rem;
+            font-size: 0.875rem;
             border: 1.5px solid #e2e8f0;
             background-color: #f8fafc;
             color: #0f172a;
@@ -74,28 +78,28 @@
         .form-control:focus, .form-select:focus {
             background-color: #ffffff;
             border-color: #0284c7;
-            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
             outline: none;
         }
 
         .form-label {
             font-weight: 700;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             letter-spacing: 0.04em;
             color: #0a213e;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.25rem;
         }
 
         .btn-primary {
-            border-radius: 0.65rem !important;
-            padding: 0.85rem 1.25rem !important;
+            border-radius: 0.55rem !important;
+            padding: 0.58rem 1rem !important;
             font-weight: 700 !important;
-            font-size: 0.95rem;
-            letter-spacing: 0.02em;
+            font-size: 0.9rem;
+            letter-spacing: 0.01em;
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
             border: none !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.32);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -103,7 +107,7 @@
         .btn-primary:focus-visible {
             background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.38);
         }
 
         .btn-primary:active {
@@ -111,61 +115,17 @@
         }
 
         .brand-logo-img {
-            max-height: 84px;
+            max-height: 48px;
             width: auto;
             object-fit: contain;
         }
 
-        .role-radio-card {
-            border: 1.5px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 1rem;
+        .cursor-pointer {
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            background-color: #f8fafc;
-            height: 100%;
-        }
-
-        .role-radio-card:hover {
-            border-color: #0284c7;
-            background-color: #f0f9ff;
-        }
-
-        .role-radio-card.active {
-            border-color: #0284c7;
-            background-color: #f0f9ff;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);
-        }
-
-        .role-radio-card input[type="radio"] {
-            accent-color: #0284c7;
-        }
-
-        .badge-role {
-            font-size: 0.68rem;
-            font-weight: 700;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            letter-spacing: 0.03em;
-        }
-
-        .badge-dept {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.35rem 0.75rem;
-            background: rgba(2, 132, 199, 0.08);
-            color: #0284c7;
-            border: 1px solid rgba(2, 132, 199, 0.2);
-            border-radius: 9999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .btn-primary, .role-radio-card, .form-control {
+            .btn-primary, .form-control {
                 transition: none !important;
                 transform: none !important;
             }
@@ -174,74 +134,69 @@
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="wrapper w-100">
         <section class="auth-content">
-            <div class="container">
+            <div class="container px-3">
                 <div class="row justify-content-center">
-                    <div class="col-lg-8 col-md-10">
+                    <div class="col-12 col-sm-10 col-md-9 col-lg-7 col-xl-6" style="max-width: 580px;">
                         <div class="card auth-card mb-0">
-                            <div class="card-body p-4 p-md-5">
+                            <div class="card-body p-3.5 p-sm-4">
                                 <!-- Logo & Header -->
-                                <div class="text-center mb-4">
-                                    <div class="mb-3">
-                                        <span class="badge-dept">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                            </svg>
-                                            Kementerian Perumahan & Kawasan Permukiman RI
-                                        </span>
-                                    </div>
-                                    <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}"
-                                        class="brand-logo-img mb-3" alt="Logo Kementerian PKP RI">
-                                    <h3 class="fw-bold text-dark mb-1" style="color: #0a213e !important; letter-spacing: -0.02em;">Pendaftaran Akun Baru</h3>
-                                    <p class="text-muted small mb-0">Sistem Pencatatan Persediaan & Pengajuan Alat Tulis Kantor (ATK)</p>
+                                <div class="text-center mb-3">
+                                    <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}"
+                                        class="brand-logo-img mb-2" alt="Logo Kementerian PKP RI" width="48" height="48">
+                                    <h4 class="fw-bold text-dark mb-0.5" style="color: #0a213e !important; letter-spacing: -0.02em; font-size: 1.25rem;">
+                                        Pendaftaran Akun Baru
+                                    </h4>
+                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                                        Sistem Pencatatan Persediaan &amp; Pengajuan ATK
+                                    </p>
                                 </div>
 
                                 <!-- Alert Notifikasi Sesi & Kesalahan -->
                                 @if (session('error'))
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
                                         <div class="d-flex align-items-center">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <line x1="12" y1="8" x2="12" y2="12"></line>
                                                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                             </svg>
                                             <div>{{ session('error') }}</div>
                                         </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
                                     </div>
                                 @endif
 
                                 @if (session('info'))
-                                    <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-info alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
                                         <div class="d-flex align-items-center">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
                                                 <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12" y2="12"></line>
                                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                             </svg>
                                             <div>{{ session('info') }}</div>
                                         </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
                                     </div>
                                 @endif
 
                                 @if (session('success'))
-                                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-success alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
                                         <div class="d-flex align-items-center">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
                                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                             </svg>
                                             <div>{{ session('success') }}</div>
                                         </div>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
                                     </div>
                                 @endif
 
                                 @if ($errors->any())
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
                                         <div class="d-flex align-items-center mb-1">
                                             <strong class="me-2">Mohon perbaiki data berikut:</strong>
                                         </div>
@@ -250,7 +205,7 @@
                                                 <li>{{ $error }}</li>
                                             @endforeach
                                         </ul>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
                                     </div>
                                 @endif
 
@@ -258,114 +213,80 @@
                                 <form action="{{ route('register.store') }}" method="POST">
                                     @csrf
 
-                                    <div class="row g-3">
+                                    <div class="row g-2">
                                         <!-- Nama Lengkap -->
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
                                                     Nama Lengkap <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" name="name" class="form-control"
-                                                    value="{{ old('name') }}" placeholder="Contoh: Budi Prasetyo" required autofocus autocomplete="name">
+                                                    value="{{ old('name') }}" placeholder="Budi Prasetyo" required autofocus autocomplete="name">
                                             </div>
                                         </div>
 
                                         <!-- Email Dinas / Pribadi -->
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
                                                     Alamat Email <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="email" name="email" class="form-control"
-                                                    value="{{ old('email') }}" placeholder="nama@perumahan.go.id" required autocomplete="email">
+                                                    value="{{ old('email') }}" placeholder="nama@pkp.go.id" required autocomplete="email">
                                             </div>
                                         </div>
 
-                                        <!-- Nomor Induk Pegawai (NIP) -->
+                                        <!-- Nomor Induk Pegawai -->
                                         <div class="col-md-6 col-12">
-                                            <div class="form-group mb-2">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
-                                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
+                                                    NIP <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" name="nip" id="nip" class="form-control font-monospace"
-                                                    value="{{ old('nip') }}" placeholder="Contoh: 19950510 202012 1 002" required>
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-primary" aria-hidden="true">
-                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                                    </svg>
-                                                    Identitas dinas & verifikasi <strong>lupa password</strong>.
-                                                </small>
+                                                    value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required>
                                             </div>
                                         </div>
 
-                                        <!-- Gelar Akademik / Kehormatan (Opsional) -->
+                                        <!-- Gelar Akademik -->
                                         <div class="col-md-6 col-12">
-                                            <div class="form-group mb-2">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
-                                                    Gelar Akademik / Titel <span class="text-muted fw-normal">(Opsional)</span>
+                                                    Gelar Akademik
                                                 </label>
                                                 <input type="text" name="title" id="title" class="form-control"
-                                                    value="{{ old('title', old('gelar')) }}" placeholder="Contoh: S.T. / M.Si. / S.Kom. atau Ir.">
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
-                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1 text-success" aria-hidden="true">
-                                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-                                                    </svg>
-                                                    Gelar otomatis disematkan pada <strong>dokumen rekapitulasi</strong> resmi.
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <!-- Peran Akun (Pegawai) -->
-                                        <div class="col-12">
-                                            <label class="form-label text-uppercase mb-2">
-                                                Peran Akun (Role)
-                                            </label>
-                                            <div class="row g-3">
-                                                <div class="col-12">
-                                                    <label class="role-radio-card d-block active" for="role_pegawai">
-                                                        <div class="d-flex align-items-start gap-2">
-                                                            <input type="radio" id="role_pegawai" name="role" value="pegawai" class="mt-1" checked required>
-                                                            <div>
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <strong class="text-dark">Pegawai</strong>
-                                                                </div>
-                                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem; line-height: 1.4;">
-                                                                    Untuk staf / pegawai perorangan yang mengajukan kebutuhan ATK harian operasional.
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2 text-muted small d-flex align-items-center gap-2">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary flex-shrink-0" aria-hidden="true">
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                                </svg>
-                                                <span class="fst-italic" style="font-size: 0.78rem;">
-                                                    Akun struktural <strong>Kasubag TU</strong> dan <strong>PIC Distribusi</strong> ditambahkan langsung oleh Kasubag TU melalui <strong>Manajemen Pengguna</strong>.
-                                                </span>
+                                                    value="{{ old('title', old('gelar')) }}" placeholder="S.T. / M.Si. / S.Kom.">
                                             </div>
                                         </div>
 
                                         <!-- Jabatan Khusus Pegawai -->
-                                        <div class="col-12" id="pegawai-position-container">
-                                            <div class="form-group mb-2">
+                                        <div class="col-md-6 col-12" id="pegawai-position-container">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
-                                                    Jabatan / Posisi Kerja <span class="text-muted fw-normal">(Opsional)</span>
+                                                    Jabatan
                                                 </label>
                                                 <input type="text" name="position" id="position" class="form-control"
-                                                    value="{{ old('position') }}" placeholder="Contoh: Staf Keuangan / Analis Kebijakan / Bagian Umum">
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">Isi dengan posisi jabatan dinas Anda.</small>
+                                                    value="{{ old('position') }}" placeholder="Staf Keuangan / Analis Kebijakan">
+                                            </div>
+                                        </div>
+
+                                        <!-- Peran Akun (Kompak) -->
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-1.5">
+                                                <label class="form-label text-uppercase">
+                                                    Peran Akun <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="d-flex align-items-center gap-2 px-2.5 py-1.5 border rounded-2 bg-light" style="min-height: 38px;">
+                                                    <input type="radio" id="role_pegawai" name="role" value="pegawai" class="form-check-input mt-0" checked required>
+                                                    <label for="role_pegawai" class="small fw-semibold text-dark mb-0 cursor-pointer" style="font-size: 0.8rem;">
+                                                        Pegawai (Pemohon ATK)
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
 
                                         <!-- Password -->
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
                                                     Password <span class="text-danger">*</span>
                                                 </label>
@@ -375,8 +296,8 @@
                                         </div>
 
                                         <!-- Konfirmasi Password -->
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
                                                     Ulangi Password <span class="text-danger">*</span>
                                                 </label>
@@ -386,15 +307,15 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-grid mt-4 mb-3">
+                                    <div class="d-grid mt-3 mb-2">
                                         <button type="submit" class="btn btn-primary btn-block">
                                             Daftarkan Akun
                                         </button>
                                     </div>
 
-                                    <div class="text-center pt-2">
-                                        <span class="text-muted small">Sudah memiliki akun terdaftar?</span>
-                                        <a href="{{ route('login') }}" class="fw-bold ms-1" style="color: #0284c7; text-decoration: none;">
+                                    <div class="text-center pt-1">
+                                        <span class="text-muted small" style="font-size: 0.8rem;">Sudah memiliki akun terdaftar?</span>
+                                        <a href="{{ route('login') }}" class="fw-bold ms-1" style="color: #0284c7; text-decoration: none; font-size: 0.8rem;">
                                             Masuk di Sini
                                         </a>
                                     </div>

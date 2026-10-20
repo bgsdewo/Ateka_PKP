@@ -239,7 +239,7 @@
                                     Nama Pengguna <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" name="name" id="name" class="form-control"
-                                    placeholder="Contoh: Utami M" required>
+                                    placeholder="Utami M" required>
                             </div>
 
                             <div class="col-md-6">
@@ -247,7 +247,7 @@
                                     Gelar Akademik / Titel <span class="text-muted font-normal">(Opsional)</span>
                                 </label>
                                 <input type="text" name="title" id="userTitle" class="form-control"
-                                    placeholder="Contoh: S.T. / M.Si. / S.Kom.">
+                                    placeholder="S.T. / M.Si. / S.Kom.">
                             </div>
 
                             <div class="col-md-6">
@@ -255,7 +255,7 @@
                                     Nomor Induk Pegawai (NIP) <span class="text-danger" id="nipRequiredAsterisk">*</span> <span class="text-muted font-normal d-none" id="nipOptionalLabel">(Opsional)</span>
                                 </label>
                                 <input type="text" name="nip" id="nip" class="form-control"
-                                    placeholder="Contoh: 19950510 202012 1 002" required>
+                                    placeholder="19950510 202012 1 002" required>
                                 <small class="text-muted" id="nipHelpText" style="font-size: 0.75rem;">
                                     Wajib diisi untuk identitas dinas & verifikasi keamanan lupa password.
                                 </small>
@@ -266,7 +266,7 @@
                                     Email <span class="text-danger">*</span>
                                 </label>
                                 <input type="email" name="email" id="email" class="form-control"
-                                    placeholder="email@perumahan.go.id" required>
+                                    placeholder="nama@pkp.go.id" required>
                             </div>
 
                             <div class="col-md-6">
@@ -301,7 +301,7 @@
                                     Jabatan / Posisi Kerja <span class="text-muted font-normal">(Opsional)</span>
                                 </label>
                                 <input type="text" name="position" id="position" class="form-control"
-                                    placeholder="Contoh: PIC Distribusi Subdirektorat SDK / Staf Keuangan">
+                                    placeholder="PIC Distribusi Subdirektorat SDK / Staf Keuangan">
                                 <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih unit penugasan PIC, atau dapat disesuaikan.</small>
                             </div>
 

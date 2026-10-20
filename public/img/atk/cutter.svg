@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="16" fill="url(#bgGrad)"/>
+  <g filter="url(#cardShadow)">
+
+    <!-- Cutter Handle (Rotated/Angled) -->
+    <g transform="rotate(-35 80 80)">
+      <!-- Handle -->
+      <rect x="40" y="70" width="76" height="20" rx="5" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+      <rect x="60" y="74" width="22" height="12" rx="3" fill="#1e293b"/>
+      <!-- Slide button ridged -->
+      <line x1="68" y1="76" x2="68" y2="84" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="74" y1="76" x2="74" y2="84" stroke="#ffffff" stroke-width="1.5"/>
+      <!-- Metallic Blade extended -->
+      <polygon points="116,73 134,73 124,87 116,87" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+      <!-- Blade segment lines -->
+      <line x1="122" y1="73" x2="119" y2="87" stroke="#94a3b8" stroke-width="1"/>
+    </g>
+
+  </g>
+</svg>
