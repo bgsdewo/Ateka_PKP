@@ -7,14 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Master Data Persediaan</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Daftar Barang ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Kelola master barang, stok minimum, satuan, dan standardisasi katalog persediaan kantor.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -22,6 +15,147 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+<style>
+    .pengadaan-pagination {
+        width: 100% !important;
+    }
+    .pengadaan-pagination nav {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+    .pengadaan-pagination nav > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 1rem !important;
+    }
+    .pengadaan-pagination p {
+        margin-bottom: 0 !important;
+        font-size: 0.82rem !important;
+        color: #64748b !important;
+    }
+    .pengadaan-pagination .pagination {
+        margin-bottom: 0 !important;
+        margin-left: auto !important;
+        gap: 3px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    .pengadaan-pagination .page-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 28px !important;
+        height: 28px !important;
+        padding: 0 0.4rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        border-radius: 5px !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+        text-decoration: none !important;
+        background: #ffffff !important;
+        transition: all 0.15s ease !important;
+    }
+    .pengadaan-pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25) !important;
+    }
+    .pengadaan-pagination .page-link:hover:not(.active) {
+        background: #f1f5f9 !important;
+        color: #0284c7 !important;
+        border-color: #cbd5e1 !important;
+    }
+    .pengadaan-pagination .page-item.disabled .page-link {
+        opacity: 0.45 !important;
+        background: #f8fafc !important;
+        color: #94a3b8 !important;
+    }
+
+    /* Styling Pagination DataTables Master Data Barang ATK */
+    #datatable_paginate,
+    .dataTables_paginate {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+    }
+    #datatable_paginate .pagination,
+    .dataTables_paginate .pagination {
+        margin-bottom: 0 !important;
+        margin-left: auto !important;
+        gap: 3px !important;
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+    #datatable_paginate .page-item,
+    .dataTables_paginate .page-item {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+    }
+    #datatable_paginate .page-link,
+    .dataTables_paginate .page-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 28px !important;
+        height: 28px !important;
+        padding: 0 0.45rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        border-radius: 5px !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+        text-decoration: none !important;
+        background: #ffffff !important;
+        transition: all 0.15s ease !important;
+        line-height: 1 !important;
+        box-shadow: none !important;
+    }
+    #datatable_paginate .page-item.previous .page-link,
+    #datatable_paginate .page-item.next .page-link,
+    .dataTables_paginate .page-item.previous .page-link,
+    .dataTables_paginate .page-item.next .page-link {
+        padding: 0 0.65rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        min-width: unset !important;
+    }
+    #datatable_paginate .page-link:hover:not(.active),
+    .dataTables_paginate .page-link:hover:not(.active) {
+        background: #f1f5f9 !important;
+        color: #0284c7 !important;
+        border-color: #cbd5e1 !important;
+    }
+    #datatable_paginate .page-item.active .page-link,
+    .dataTables_paginate .page-item.active .page-link {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25) !important;
+    }
+    #datatable_paginate .page-item.disabled .page-link,
+    .dataTables_paginate .page-item.disabled .page-link {
+        opacity: 0.45 !important;
+        background: #f8fafc !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
+</style>
+@endpush
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
@@ -58,7 +192,6 @@
                             </span>
                             <div>
                                 <h6 class="card-title mb-0 fw-bold text-dark">Filter Data Barang ATK</h6>
-                                <small class="text-secondary" style="font-size: 0.76rem;">Saring master barang berdasarkan kategori, ketersediaan stok, atau riwayat faktur pengadaan</small>
                             </div>
                         </div>
                         @if ($month || $year || $startDate || $endDate || !empty($categoryId) || !empty($stockStatus))
@@ -149,16 +282,8 @@
                                 </div>
                             </div>
 
-                            {{-- Baris Bawah: Info & Tombol Aksi --}}
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2.5 mt-2.5 border-top">
-                                <div class="d-flex align-items-center gap-1.5 text-muted small" style="font-size: 0.76rem;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary flex-shrink-0">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                    </svg>
-                                    <span>Pilih kriteria filter lalu klik <strong>Terapkan Filter</strong> untuk menyaring data barang.</span>
-                                </div>
+                            {{-- Baris Bawah: Tombol Aksi --}}
+                            <div class="d-flex justify-content-end align-items-center flex-wrap gap-2 pt-2.5 mt-2.5 border-top">
                                 <div class="d-flex align-items-center gap-2 ms-auto">
                                     @if ($month || $year || $startDate || $endDate || !empty($categoryId) || !empty($stockStatus))
                                         <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.8rem;">
@@ -184,26 +309,28 @@
         </div>
 
         @if(isset($unfulfilledProcurements) && $unfulfilledProcurements->isNotEmpty())
-            <div class="row mb-4">
+            <div class="row mb-4" id="pengadaan-section">
                 <div class="col-sm-12">
-                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #f59e0b !important;">
-                        <div class="card-body p-3.5">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2.5">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <span class="badge bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h6 class="mb-0 fw-bold text-dark">Permintaan Pengadaan Menunggu Penambahan Barang / Stok di Master Data ({{ $unfulfilledProcurements->count() }} Item)</h6>
-                                        <small class="text-secondary">Klik tombol <strong>"+ Tambahkan / Isi Stok"</strong> di bawah ketika barang sudah dibeli agar status di akun Pegawai / PIC otomatis berubah menjadi <strong>Tersedia</strong> disertai notifikasi.</small>
-                                    </div>
+                    <div class="card border-0 shadow-sm" style="border: 1px solid rgba(245, 158, 11, 0.25) !important; border-top: 3.5px solid #f59e0b !important;">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <span class="badge bg-warning-subtle text-warning p-2 rounded-3 d-flex align-items-center justify-content-center">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">Permintaan Pengadaan Menunggu Penambahan Barang</h6>
                                 </div>
                             </div>
-                            <div class="row g-2">
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fw-bold shadow-xs" style="font-size: 0.75rem;">
+                                {{ method_exists($unfulfilledProcurements, 'total') ? $unfulfilledProcurements->total() : $unfulfilledProcurements->count() }} Item Menunggu
+                            </span>
+                        </div>
+                        <div class="card-body p-3.5 bg-light-subtle">
+                            <div class="row g-3">
                                 @foreach($unfulfilledProcurements as $upDetail)
                                     @php
                                         $upReq = $upDetail->requestItem;
@@ -215,35 +342,62 @@
                                         $upCatId = $upProd->category_id ?? ($categories->first()->id ?? '');
                                     @endphp
                                     <div class="col-12 col-md-6 col-xl-4">
-                                        <div class="bg-white rounded-3 p-2.5 border shadow-xs d-flex justify-content-between align-items-center gap-2 h-100">
-                                            <div class="min-w-0">
-                                                <div class="d-flex align-items-center gap-1.5 flex-wrap mb-0.5">
-                                                    <span class="badge bg-primary-subtle text-primary border font-monospace" style="font-size: 0.68rem;">{{ $upReq->request_code ?? '-' }}</span>
-                                                    <span class="badge {{ ($upReq->status ?? '') === 'approved' ? 'bg-info text-white' : 'bg-warning text-dark' }}" style="font-size: 0.68rem;">
-                                                        {{ ($upReq->status ?? '') === 'approved' ? 'Disetujui TU' : 'Menunggu Review' }}
-                                                    </span>
-                                                </div>
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.86rem;" title="{{ $upName }}">{{ $upName }}</div>
-                                                <small class="text-muted d-block" style="font-size: 0.74rem;">
-                                                    Pemohon: <strong>{{ $upReq->user->name ?? 'Pegawai' }}</strong> &bull; Butuh: <strong class="text-success">{{ $upQty }} {{ $upUnit }}</strong>
-                                                </small>
+                                        <div class="card border border-light-subtle shadow-xs h-100 bg-white rounded-3 p-3 transition-all overflow-hidden">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-1.5 mb-2">
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace text-truncate px-2 py-0.5" style="font-size: 0.68rem; max-width: 58%;" title="{{ $upReq->request_code ?? '-' }}">
+                                                    {{ $upReq->request_code ?? '-' }}
+                                                </span>
+                                                <span class="badge {{ ($upReq->status ?? '') === 'approved' ? 'bg-info-subtle text-info border border-info-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle' }} px-2 py-0.5 fw-semibold flex-shrink-0" style="font-size: 0.68rem;">
+                                                    {{ ($upReq->status ?? '') === 'approved' ? 'Disetujui TU' : 'Menunggu Review' }}
+                                                </span>
                                             </div>
-                                            <button type="button"
-                                                class="btn btn-sm btn-success text-white fw-bold flex-shrink-0 btn-fulfill-procurement shadow-sm"
-                                                style="font-size: 0.75rem;"
-                                                data-detail-id="{{ $upDetail->id }}"
-                                                data-product-id="{{ $upProd->id ?? '' }}"
-                                                data-category-id="{{ $upCatId }}"
-                                                data-code="{{ $upCode }}"
-                                                data-name="{{ $upName }}"
-                                                data-unit="{{ $upUnit }}"
-                                                data-qty="{{ $upQty }}"
-                                                data-price="{{ $upProd->purchase_price ?? 0 }}">
-                                                + Isi Stok
-                                            </button>
+                                            <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $upName }}" style="font-size: 0.88rem;">
+                                                {{ $upName }}
+                                            </h6>
+                                            <div class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                                                Pemohon: <span class="text-dark fw-semibold">{{ $upReq->user->name ?? 'Pegawai' }}</span> &bull; 
+                                                Kebutuhan: <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">{{ $upQty }} {{ $upUnit }}</span>
+                                            </div>
+                                            <div class="mt-auto pt-2 border-top d-flex justify-content-end">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-success text-white fw-bold d-inline-flex align-items-center gap-1.5 btn-fulfill-procurement shadow-sm px-3 py-1.5"
+                                                    style="font-size: 0.76rem;"
+                                                    data-detail-id="{{ $upDetail->id }}"
+                                                    data-product-id="{{ $upProd->id ?? '' }}"
+                                                    data-category-id="{{ $upCatId }}"
+                                                    data-code="{{ $upCode }}"
+                                                    data-name="{{ $upName }}"
+                                                    data-unit="{{ $upUnit }}"
+                                                    data-qty="{{ $upQty }}"
+                                                    data-price="{{ $upProd->purchase_price ?? 0 }}">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    </svg>
+                                                    <span>Isi Stok</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
+                            </div>
+
+                            {{-- Pagination Pengadaan (3 item per halaman) --}}
+                            <div class="pt-3 mt-3 border-top">
+                                @if ($unfulfilledProcurements->hasPages())
+                                    <div class="pengadaan-pagination w-100">
+                                        {{ $unfulfilledProcurements->links() }}
+                                    </div>
+                                @else
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small" style="font-size: 0.78rem;">
+                                            Showing <span class="fw-semibold">1</span> to <span class="fw-semibold">{{ $unfulfilledProcurements->count() }}</span> of <span class="fw-semibold">{{ method_exists($unfulfilledProcurements, 'total') ? $unfulfilledProcurements->total() : $unfulfilledProcurements->count() }}</span> results
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-white text-secondary border px-2.5 py-1.5" style="font-size: 0.74rem;">Halaman 1 dari 1</span>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -256,10 +410,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div class="header-title">
-                            <h4 class="card-title mb-1">Master Data Barang</h4>
-                            <p class="mb-0 text-secondary">
-                                Kelola data barang seperti kode barang, kategori, satuan, stok, faktur, dan perolehan barang.
-                            </p>
+                            <h4 class="card-title mb-0">Master Data Barang</h4>
                         </div>
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             @if ($startDate && $endDate)
@@ -279,33 +430,29 @@
                                     Filter: <strong>{{ $month ? \Carbon\Carbon::createFromDate(2026, (int)$month, 1)->translatedFormat('F') : '' }} {{ $year ?? '' }}</strong>
                                 </span>
                             @endif
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                                Total: <strong>{{ number_format($totalProducts) }} Barang</strong>
-                            </span>
                             <button type="button" class="btn btn-primary btn-sm btn-create-barang">
                                 + Tambah / Isi Stok Barang
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="datatable" class="table table-striped table-hover word-wrap"
-                                data-toggle="data-table">
+                    <div class="card-body px-2 px-md-3 py-3">
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
+                            data-toggle="data-table">
                                 <thead>
                                     <tr>
-                                        <th width="4%">No</th>
-                                        <th>No. Faktur</th>
-                                        <th>Tgl Faktur</th>
-                                        <th>Kode Rincian</th>
-                                        <th>Nama Barang</th>
-                                        <th>Kategori</th>
-                                        <th>Uraian / Supplier</th>
-                                        <th>Satuan</th>
-                                        <th>Stok</th>
-                                        <th>Harga Perolehan</th>
-                                        <th>Total Nilai Saldo</th>
-                                        <th>Status</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th width="3%" class="text-center no-sort" data-orderable="false">No</th>
+                                        <th width="7%" class="text-nowrap">No. Faktur</th>
+                                        <th width="7%" class="text-nowrap">Tgl Faktur</th>
+                                        <th width="7%" class="text-nowrap">Kode Rincian</th>
+                                        <th width="17%">Nama Barang</th>
+                                        <th width="7%">Kategori</th>
+                                        <th width="8%">Uraian / Supplier</th>
+                                        <th width="4%" class="text-center">Satuan</th>
+                                        <th width="4%" class="text-center">Stok</th>
+                                        <th width="8%" class="text-nowrap text-end">Harga Perolehan</th>
+                                        <th width="8%" class="text-nowrap text-end">Total Nilai Saldo</th>
+                                        <th width="8%" class="text-center text-nowrap">Status</th>
+                                        <th width="12%" class="text-center text-nowrap no-sort" data-orderable="false">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -318,45 +465,45 @@
                                             $uraian = $product->initial_uraian;
                                         @endphp
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="text-nowrap">
                                                 <span class="badge bg-secondary">{{ $noFaktur ?: '-' }}</span>
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 {{ $tglFaktur }}
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 <span class="badge bg-primary">{{ $product->code }}</span>
                                             </td>
                                             <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 36px; height: 36px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
-                                                    <div>
-                                                        <strong>{{ $product->name }}</strong>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 28px; height: 28px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
+                                                    <div style="min-width: 0;">
+                                                        <strong class="d-block" style="font-size: 0.78rem; line-height: 1.25;">{{ $product->name }}</strong>
                                                         @if ($product->description)
-                                                            <br>
-                                                            <small class="text-muted">{{ Str::limit($product->description, 50) }}</small>
+                                                            <small class="text-muted d-block text-truncate" style="font-size: 0.68rem; max-width: 170px;">{{ $product->description }}</small>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>{{ $product->category->name ?? '-' }}</td>
                                             <td>{{ $uraian ?: '-' }}</td>
-                                            <td>{{ $product->unit }}</td>
-                                            <td>{{ number_format($product->stock) }}</td>
-                                            <td>Rp {{ number_format($hargaBeli, 0, ',', '.') }}</td>
-                                            <td><strong class="text-success">Rp
+                                            <td class="text-center">{{ $product->unit }}</td>
+                                            <td class="text-center fw-semibold">{{ number_format($product->stock) }}</td>
+                                            <td class="text-nowrap text-end" style="font-size: 0.74rem;">Rp {{ number_format($hargaBeli, 0, ',', '.') }}</td>
+                                            <td class="text-nowrap text-end" style="font-size: 0.74rem;"><strong class="text-success">Rp
                                                     {{ number_format($totalNilai, 0, ',', '.') }}</strong></td>
-                                            <td>
+                                            <td class="text-nowrap text-center">
                                                 @if ($product->stock <= 0)
-                                                    <span class="badge bg-dark">Stok Belum Tersedia</span>
+                                                    <span class="badge bg-dark" style="font-size: 0.65rem; padding: 0.22rem 0.45rem;">Stok Belum Tersedia</span>
                                                 @else
-                                                    <span class="badge bg-success">Tersedia</span>
+                                                    <span class="badge bg-success" style="font-size: 0.65rem; padding: 0.22rem 0.45rem;">Tersedia</span>
                                                 @endif
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center text-nowrap">
                                                 <div class="d-flex justify-content-center gap-1 flex-nowrap">
-                                                    <button type="button" class="btn btn-info btn-sm btn-detail-barang"
+                                                    <button type="button" class="btn btn-info btn-sm btn-detail-barang px-1.5 py-0.5"
+                                                        style="font-size: 0.68rem; line-height: 1.2;"
                                                         data-id="{{ $product->id }}"
                                                         data-category-id="{{ $product->category_id }}"
                                                         data-category-name="{{ e($product->category->name ?? '-') }}"
@@ -376,7 +523,8 @@
                                                         data-updated-at="{{ $product->updated_at ? $product->updated_at->format('d-m-Y H:i') : '-' }}">
                                                         Detail
                                                     </button>
-                                                    <button type="button" class="btn btn-warning btn-sm btn-edit-barang"
+                                                    <button type="button" class="btn btn-warning btn-sm btn-edit-barang px-1.5 py-0.5"
+                                                        style="font-size: 0.68rem; line-height: 1.2;"
                                                         data-id="{{ $product->id }}"
                                                         data-category-id="{{ $product->category_id }}"
                                                         data-code="{{ e($product->code) }}"
@@ -394,12 +542,13 @@
                                                     </button>
                                                     @if (!auth()->user()->isPegawaiGudang())
                                                         <form
-                                                            action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
+                                                             action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
                                                             method="POST"
                                                             onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                            <button type="submit" class="btn btn-danger btn-sm px-1.5 py-0.5"
+                                                                style="font-size: 0.68rem; line-height: 1.2;">
                                                                 Hapus
                                                             </button>
                                                         </form>
@@ -410,7 +559,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -568,22 +716,6 @@
                                 <textarea name="description" id="description" class="form-control" rows="3"
                                     placeholder="Tulis deskripsi singkat barang"></textarea>
                             </div>
-
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold small text-uppercase text-secondary">Foto Produk Barang (Opsional)</label>
-                                <div class="p-3 rounded-3 border bg-light d-flex align-items-center gap-3">
-                                    <div id="productImagePreviewContainer" class="rounded-3 border bg-white d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 72px; height: 72px;">
-                                        <img id="productImagePreview" src="" alt="Preview" class="d-none" style="width: 100%; height: 100%; object-fit: contain;">
-                                        <span id="productImagePlaceholder" class="text-muted small text-center px-1" style="font-size: 0.7rem;">Tanpa Foto</span>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <input type="file" name="image" id="product_image_input" class="form-control form-control-sm bg-white" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="previewProductImage(this)">
-                                        <div class="small text-muted mt-1.5" style="font-size: 0.74rem;">
-                                            Format didukung: <strong>JPG, JPEG, PNG, WEBP</strong>. Ukuran ideal: <strong>600 &times; 600 px</strong> (Maks. 2 MB).
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -691,29 +823,7 @@
                     $detailUpdatedAt.text('-');
                     $title.text('Form Barang');
                     $btnSubmit.removeClass('d-none').text('Simpan Barang');
-                    $('#product_image_input').val('');
-                    $('#productImagePreview').attr('src', '').addClass('d-none');
-                    $('#productImagePlaceholder').removeClass('d-none');
                 }
-
-                window.previewProductImage = function(input) {
-                    if (input.files && input.files[0]) {
-                        const file = input.files[0];
-                        if (file.size > 2 * 1024 * 1024) {
-                            alert('Ukuran file foto terlalu besar! Maksimal ukuran file adalah 2 MB.');
-                            input.value = '';
-                            $('#productImagePreview').attr('src', '').addClass('d-none');
-                            $('#productImagePlaceholder').removeClass('d-none');
-                            return;
-                        }
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            $('#productImagePreview').attr('src', e.target.result).removeClass('d-none');
-                            $('#productImagePlaceholder').addClass('d-none');
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
 
                 // Event listener untuk tombol + Isi Stok dari Banner Usulan Pengadaan
                 $(document).on('click', '.btn-fulfill-procurement', function() {
@@ -815,15 +925,6 @@
                     $stock.val($(this).data('stock'));
                     $purchasePrice.val($(this).data('purchase-price'));
                     $description.val($(this).data('description'));
-
-                    const existingImg = $(this).data('image');
-                    if (existingImg) {
-                        $('#productImagePreview').attr('src', existingImg).removeClass('d-none');
-                        $('#productImagePlaceholder').addClass('d-none');
-                    } else {
-                        $('#productImagePreview').attr('src', '').addClass('d-none');
-                        $('#productImagePlaceholder').removeClass('d-none');
-                    }
 
                     $title.text('Edit / Isi Stok Barang');
                     $btnSubmit.text('Simpan Perubahan');

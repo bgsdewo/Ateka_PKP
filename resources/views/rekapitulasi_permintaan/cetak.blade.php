@@ -268,7 +268,7 @@
             }
 
             if (!$distributorUser) {
-                if (auth()->check() && auth()->user()->isPegawaiGudang() && auth()->user()->name !== 'tes') {
+                if (auth()->check() && auth()->user()->isPegawaiGudang() && auth()->user()->isDistributor() && auth()->user()->name !== 'tes') {
                     $distributorUser = auth()->user();
                 } else {
                     $distributorUser = \App\Models\User::where('role', 'pegawai_gudang')

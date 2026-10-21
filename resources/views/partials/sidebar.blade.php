@@ -10,7 +10,8 @@
     $pendingApprovalsCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->count() : 0;
     $pendingProcurementCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count() : 0;
     $pendingStockCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
-    $readyDistribusiCount = ($isKasubagTU || $isPegawaiGudang) ? \App\Models\RequestItem::where('status', 'approved')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
+    $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
+    $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::where('status', 'approved')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
 @endphp
 
 <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all">
@@ -135,9 +136,9 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 2. MENU DISTRIBUSI BARANG (Kasubag TU & Pegawai Gudang) -->
+                <!-- 2. MENU DISTRIBUSI BARANG (Pegawai Gudang) -->
                 <!-- ======================================================== -->
-                @if ($isKasubagTU || $isPegawaiGudang)
+                @if ($isPegawaiGudang)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
@@ -201,7 +202,7 @@
                 <!-- ======================================================== -->
                 <!-- 4. MENU PENGAJUAN ATK (Pegawai & PIC) -->
                 <!-- ======================================================== -->
-                @if ($isRequester || $isKasubagTU)
+                @if ($isRequester && !$isKasubagTU)
                     @php
                         $pengajuanActive = request()->routeIs('pengajuan.*') || request()->routeIs('katalog-atk');
                     @endphp

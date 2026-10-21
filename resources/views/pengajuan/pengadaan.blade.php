@@ -150,38 +150,106 @@
                                             <label class="form-label small text-secondary fw-bold mb-1">
                                                 Filter Kategori LIST ATK
                                             </label>
-                                            <select class="form-select form-select-sm procure-cat-filter bg-white">
-                                                <option value="">-- Semua Kategori ({{ isset($categories) ? $categories->count() : 0 }} Kategori) --</option>
-                                                @if (isset($categories))
-                                                    @foreach ($categories as $cat)
-                                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
+                                            <div class="category-combobox-wrapper position-relative">
+                                                <div class="input-group flex-nowrap" style="height: 38px;">
+                                                    <input type="text" 
+                                                           class="form-control form-control-sm category-search-input bg-white text-truncate" 
+                                                           placeholder="Saring kategori..." 
+                                                           autocomplete="off"
+                                                           style="height: 38px; font-size: 0.85rem;">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-clear-category d-none px-2 d-flex align-items-center justify-content-center" title="Hapus filter kategori" style="height: 38px;">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split btn-toggle-category-menu px-2 d-flex align-items-center justify-content-center" title="Buka daftar pilihan kategori" style="height: 38px;">
+                                                        <span class="visually-hidden">Toggle</span>
+                                                    </button>
+                                                </div>
+
+                                                {{-- Hidden input keeping selected category ID --}}
+                                                <input type="hidden" class="procure-cat-filter" value="">
+
+                                                {{-- Floating dropdown menu --}}
+                                                <div class="category-dropdown-menu shadow-lg rounded-3 border bg-white position-absolute start-0 w-100 mt-1 d-none" 
+                                                     style="z-index: 1060; max-height: 220px; min-width: 240px; overflow-y: auto;">
+                                                    <div class="p-1 category-items-list">
+                                                        <div class="category-item-option py-1.5 px-2 rounded-2 small d-flex justify-content-between align-items-center active" 
+                                                             data-id="" data-name="-- Semua Kategori ({{ isset($categories) ? $categories->count() : 0 }} Kategori) --">
+                                                            <span>-- Semua Kategori ({{ isset($categories) ? $categories->count() : 0 }} Kategori) --</span>
+                                                            <span class="badge bg-light text-secondary border" style="font-size: 0.65rem;">{{ $existingProducts->count() }} item</span>
+                                                        </div>
+                                                        @if (isset($categories))
+                                                            @foreach ($categories as $cat)
+                                                                @php
+                                                                    $catCount = $existingProducts->where('category_id', $cat->id)->count();
+                                                                @endphp
+                                                                <div class="category-item-option py-1.5 px-2 rounded-2 small d-flex justify-content-between align-items-center" 
+                                                                     data-id="{{ $cat->id }}" data-name="{{ $cat->name }}">
+                                                                    <span>{{ $cat->name }}</span>
+                                                                    <span class="badge bg-light text-secondary border" style="font-size: 0.65rem;">{{ $catCount }} item</span>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                        <div class="no-category-found p-2 text-center text-muted small d-none">
+                                                            Kategori tidak ditemukan
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-8 col-12">
                                             <label class="form-label small text-secondary fw-bold mb-1 d-flex justify-content-between align-items-center">
                                                 <span>Nama Barang yang Diminta <span class="text-danger">*</span></span>
-                                                <span class="badge bg-primary-subtle text-primary procure-count-badge" style="font-size: 0.72rem;">{{ $existingProducts->count() }} barang</span>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle procure-count-badge" style="font-size: 0.68rem;">{{ $existingProducts->count() }} barang</span>
                                             </label>
-                                            <div class="item-name-wrapper">
-                                                <select name="item_name[]" class="form-select form-select-sm item-name-select bg-white" required>
-                                                    <option value="">-- Pilih Barang yang Diminta ({{ $existingProducts->count() }} Barang) --</option>
-                                                    @foreach ($existingProducts as $p)
-                                                        <option value="{{ $p->name }}"
-                                                            data-id="{{ $p->id }}"
-                                                            data-name="{{ $p->name }}"
-                                                            data-code="{{ $p->code }}"
-                                                            data-category-id="{{ $p->category_id }}"
-                                                            data-category-name="{{ $p->category->name ?? 'ATK' }}"
-                                                            data-unit="{{ $p->unit ?: 'Buah' }}"
-                                                            data-available-units="{{ implode(',', $p->unit_list) }}">
-                                                            [{{ $p->code ?: '-' }} - {{ $p->category->name ?? 'ATK' }}] {{ $p->name }} (Satuan: {{ implode('/', $p->unit_list) }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                            <div class="product-select-dropdown-wrapper dropdown">
+                                                {{-- Tombol Dropdown yang tampil persis seperti select --}}
+                                                <button type="button" 
+                                                        class="form-select form-select-sm product-select-trigger-btn dropdown-toggle w-100" 
+                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-auto-close="outside"
+                                                        aria-expanded="false">
+                                                    <span class="product-btn-text text-truncate me-2">-- Pilih Barang yang Diminta ({{ $existingProducts->count() }} Barang) --</span>
+                                                    <span class="product-select-arrow">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                    </span>
+                                                </button>
+
+                                                {{-- Hidden inputs keeping selected item name & product ID for submission --}}
+                                                <input type="hidden" name="item_name[]" class="item-name-input" required value="">
+                                                <input type="hidden" name="product_id[]" class="item-product-id" value="">
+
+                                                {{-- Dropdown menu dengan Quick Search di atas & List Barang Ber-scrollbar --}}
+                                                <div class="dropdown-menu product-select-menu shadow-lg border rounded-3 mt-1">
+                                                    <div class="p-2 border-bottom bg-light">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text bg-white border-end-0 text-muted px-2">
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                                            </span>
+                                                            <input type="text" 
+                                                                   class="form-control border-start-0 product-quick-search" 
+                                                                   placeholder="Cari nama / kode barang..." 
+                                                                   autocomplete="off" 
+                                                                   style="font-size: 0.82rem;">
+                                                            <button type="button" class="btn btn-outline-secondary btn-clear-quick-search d-none px-2" title="Hapus pencarian">
+                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="product-scroll-list p-1">
+                                                        {{-- Rendered dynamically via JS --}}
+                                                    </div>
+                                                    <div class="no-product-found p-3 text-center text-muted small d-none">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-1 text-secondary opacity-50">
+                                                            <circle cx="11" cy="11" r="8"></circle>
+                                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                                        </svg>
+                                                        <div>Barang tidak ditemukan</div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <input type="hidden" name="product_id[]" class="item-product-id" value="">
                                         </div>
                                     </div>
 
@@ -290,66 +358,301 @@
                     });
                 }
 
-                function populateItemSelect(row, selectedProductId = null) {
-                    const catFilter = row.querySelector('.procure-cat-filter');
-                    const nameSelect = row.querySelector('.item-name-select');
-                    const badge = row.querySelector('.procure-count-badge');
-                    if (!nameSelect) return;
-
-                    const catVal = catFilter ? catFilter.value : '';
-                    const filtered = masterProducts.filter(p => !catVal || String(p.category_id) === String(catVal));
-
-                    let html = `<option value="">-- Pilih Barang yang Diminta (${filtered.length} Barang) --</option>`;
-
-                    filtered.forEach(p => {
-                        const uText = p.available_units.split(',').join('/');
-                        const isSel = (selectedProductId !== null && String(p.id) === String(selectedProductId)) ? 'selected' : '';
-                        const codePrefix = p.code ? `[${p.code} - ${p.category_name}]` : `[${p.category_name}]`;
-                        html += `<option value="${p.name}" data-id="${p.id}" data-unit="${p.unit}" data-available-units="${p.available_units}" data-code="${p.code}" data-category-name="${p.category_name}" ${isSel}>${codePrefix} ${p.name} (Satuan: ${uText})</option>`;
-                    });
-
-                    nameSelect.innerHTML = html;
-                    if (badge) {
-                        badge.textContent = `${filtered.length} barang`;
-                    }
-                }
-
                 function attachRowEvents(row) {
+                    // 1. Elemen Kategori Combobox
                     const catFilter = row.querySelector('.procure-cat-filter');
-                    const nameSelect = row.querySelector('.item-name-select');
-                    const idInput = row.querySelector('.item-product-id');
+                    const catInput = row.querySelector('.category-search-input');
+                    const catClearBtn = row.querySelector('.btn-clear-category');
+                    const catToggleBtn = row.querySelector('.btn-toggle-category-menu');
+                    const catMenu = row.querySelector('.category-dropdown-menu');
+                    const catOptions = row.querySelectorAll('.category-item-option');
+                    const catNoFound = row.querySelector('.no-category-found');
+
+                    // 2. Elemen Produk Dropdown dengan Quick Search & Scrollbar
+                    const nameInputHidden = row.querySelector('.item-name-input');
+                    const prodIdHidden = row.querySelector('.item-product-id');
+                    const prodTriggerBtn = row.querySelector('.product-select-trigger-btn');
+                    const prodBtnText = row.querySelector('.product-btn-text');
+                    const prodQuickSearch = row.querySelector('.product-quick-search');
+                    const prodClearQuickSearch = row.querySelector('.btn-clear-quick-search');
+                    const prodMenu = row.querySelector('.product-select-menu');
+                    const prodList = row.querySelector('.product-scroll-list');
+                    const prodNoFound = row.querySelector('.no-product-found');
+                    const badge = row.querySelector('.procure-count-badge');
+
                     const unitSelect = row.querySelector('.item-unit-select');
                     const specInput = row.querySelector('.item-spec-input');
                     const removeBtn = row.querySelector('.remove-procure-row');
 
-                    if (catFilter) {
-                        catFilter.addEventListener('change', function() {
-                            populateItemSelect(row);
-                            if (nameSelect) nameSelect.value = '';
-                            if (idInput) idInput.value = '';
-                            setRowUnitSelect(unitSelect, '', 'Buah');
+                    // Render daftar produk dalam dropdown
+                    function renderProducts(query = '') {
+                        if (!prodList) return;
+                        const catVal = catFilter ? catFilter.value : '';
+                        const q = (query || '').trim().toLowerCase();
+                        const currentName = nameInputHidden ? nameInputHidden.value : '';
+
+                        const matched = masterProducts.filter(p => {
+                            const matchCat = !catVal || String(p.category_id) === String(catVal);
+                            const searchText = (p.code + ' ' + p.category_name + ' ' + p.name).toLowerCase();
+                            const matchQ = !q || searchText.includes(q);
+                            return matchCat && matchQ;
+                        });
+
+                        if (badge) {
+                            badge.textContent = `${matched.length} barang`;
+                        }
+
+                        prodList.innerHTML = '';
+                        if (matched.length === 0) {
+                            if (prodNoFound) prodNoFound.classList.remove('d-none');
+                            return;
+                        }
+
+                        if (prodNoFound) prodNoFound.classList.add('d-none');
+
+                        matched.forEach(p => {
+                            const itemDiv = document.createElement('div');
+                            const isActive = (p.name === currentName);
+                            itemDiv.className = `product-select-option py-2 px-2.5 rounded-2 d-flex flex-column gap-1 ${isActive ? 'active' : ''}`;
+                            itemDiv.dataset.id = p.id;
+                            itemDiv.dataset.name = p.name;
+
+                            const uText = p.available_units.split(',').join('/');
+                            itemDiv.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <span class="product-item-title fw-semibold text-dark text-truncate" style="font-size: 0.85rem;" title="${p.name}">${p.name}</span>
+                                    <span class="badge bg-light text-secondary border flex-shrink-0" style="font-size: 0.68rem;">Satuan: ${uText}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small text-muted" style="font-size: 0.74rem;">
+                                    <span class="badge bg-light text-secondary border font-monospace">[${p.code || '-'}]</span>
+                                    <span class="text-truncate">${p.category_name}</span>
+                                </div>
+                            `;
+
+                            itemDiv.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                selectProduct(p);
+                            });
+
+                            prodList.appendChild(itemDiv);
                         });
                     }
 
-                    if (nameSelect) {
-                        nameSelect.addEventListener('change', function() {
-                            const selectedVal = this.value;
-                            if (selectedVal) {
-                                const opt = this.options[this.selectedIndex];
-                                if (opt) {
-                                    const pId = opt.getAttribute('data-id') || '';
-                                    const pUnit = opt.getAttribute('data-unit') || 'Buah';
-                                    const pAvail = opt.getAttribute('data-available-units') || pUnit;
+                    // Fungsi Memilih Produk
+                    function selectProduct(p) {
+                        if (p) {
+                            if (nameInputHidden) nameInputHidden.value = p.name;
+                            if (prodIdHidden) prodIdHidden.value = p.id;
+                            if (prodBtnText) {
+                                prodBtnText.textContent = `[${p.code ? p.code + ' - ' : ''}${p.category_name}] ${p.name}`;
+                                prodBtnText.title = p.name;
+                            }
+                            setRowUnitSelect(unitSelect, p.available_units, p.unit);
+                        } else {
+                            if (nameInputHidden) nameInputHidden.value = '';
+                            if (prodIdHidden) prodIdHidden.value = '';
+                            const catVal = catFilter ? catFilter.value : '';
+                            const matchedCount = masterProducts.filter(item => !catVal || String(item.category_id) === String(catVal)).length;
+                            if (prodBtnText) {
+                                prodBtnText.textContent = `-- Pilih Barang yang Diminta (${matchedCount} Barang) --`;
+                                prodBtnText.title = '';
+                            }
+                            setRowUnitSelect(unitSelect, '', 'Buah');
+                        }
 
-                                    if (idInput) idInput.value = pId;
-                                    setRowUnitSelect(unitSelect, pAvail, pUnit);
-                                }
-                            } else {
-                                if (idInput) idInput.value = '';
-                                setRowUnitSelect(unitSelect, '', 'Buah');
+                        // Tutup Dropdown
+                        if (prodTriggerBtn && window.bootstrap && bootstrap.Dropdown) {
+                            const bsDrop = bootstrap.Dropdown.getInstance(prodTriggerBtn) || new bootstrap.Dropdown(prodTriggerBtn);
+                            bsDrop.hide();
+                        }
+
+                        if (nameInputHidden) {
+                            nameInputHidden.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+
+                    row._selectProduct = selectProduct;
+
+                    // Event Listeners pada Quick Search & Trigger Dropdown
+                    if (prodTriggerBtn) {
+                        prodTriggerBtn.addEventListener('shown.bs.dropdown', function() {
+                            renderProducts(prodQuickSearch ? prodQuickSearch.value : '');
+                            if (prodQuickSearch) {
+                                setTimeout(() => prodQuickSearch.focus(), 50);
                             }
                         });
                     }
+
+                    if (prodQuickSearch) {
+                        prodQuickSearch.addEventListener('input', function() {
+                            const val = this.value;
+                            if (prodClearQuickSearch) {
+                                if (val) prodClearQuickSearch.classList.remove('d-none');
+                                else prodClearQuickSearch.classList.add('d-none');
+                            }
+                            renderProducts(val);
+                        });
+
+                        prodQuickSearch.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const firstOption = prodList.querySelector('.product-select-option');
+                                if (firstOption) {
+                                    const pId = firstOption.dataset.id;
+                                    const p = masterProducts.find(item => String(item.id) === String(pId));
+                                    if (p) selectProduct(p);
+                                }
+                            } else if (e.key === 'Escape') {
+                                if (prodTriggerBtn && window.bootstrap && bootstrap.Dropdown) {
+                                    const bsDrop = bootstrap.Dropdown.getInstance(prodTriggerBtn) || new bootstrap.Dropdown(prodTriggerBtn);
+                                    bsDrop.hide();
+                                }
+                            }
+                        });
+                    }
+
+                    if (prodClearQuickSearch) {
+                        prodClearQuickSearch.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (prodQuickSearch) {
+                                prodQuickSearch.value = '';
+                                prodQuickSearch.focus();
+                            }
+                            this.classList.add('d-none');
+                            renderProducts('');
+                        });
+                    }
+
+                    // Fungsi Memilih Kategori
+                    function selectCategory(catId, catName) {
+                        if (catFilter) catFilter.value = catId;
+                        if (catInput) {
+                            catInput.value = catId ? catName : '';
+                        }
+                        if (catClearBtn) {
+                            if (catId) {
+                                catClearBtn.classList.remove('d-none');
+                            } else {
+                                catClearBtn.classList.add('d-none');
+                            }
+                        }
+                        catOptions.forEach(opt => {
+                            if (opt.getAttribute('data-id') === catId) {
+                                opt.classList.add('active');
+                            } else {
+                                opt.classList.remove('active');
+                            }
+                        });
+                        if (catMenu) catMenu.classList.add('d-none');
+                        catOptions.forEach(opt => opt.classList.remove('d-none'));
+                        if (catNoFound) catNoFound.classList.add('d-none');
+
+                        // Re-render list barang sesuai kategori
+                        renderProducts('');
+
+                        // Reset pilihan barang jika kategori berubah
+                        const currentProdId = prodIdHidden ? prodIdHidden.value : '';
+                        if (currentProdId && catId) {
+                            const currentP = masterProducts.find(p => String(p.id) === String(currentProdId));
+                            if (currentP && String(currentP.category_id) !== String(catId)) {
+                                selectProduct(null);
+                            }
+                        }
+                    }
+
+                    // Expose selectCategory on row element
+                    row._selectCategory = selectCategory;
+
+                    if (catInput) {
+                        catInput.addEventListener('focus', function() {
+                            document.querySelectorAll('.category-dropdown-menu').forEach(m => {
+                                if (m !== catMenu) m.classList.add('d-none');
+                            });
+                            document.querySelectorAll('.product-dropdown-menu').forEach(m => m.classList.add('d-none'));
+                            if (catMenu) catMenu.classList.remove('d-none');
+                        });
+
+                        catInput.addEventListener('input', function() {
+                            const query = this.value.trim().toLowerCase();
+                            if (catMenu) catMenu.classList.remove('d-none');
+
+                            let visibleCount = 0;
+                            catOptions.forEach(opt => {
+                                const optName = (opt.getAttribute('data-name') || '').toLowerCase();
+                                const optId = opt.getAttribute('data-id');
+                                if (!optId && query === '') {
+                                    opt.classList.remove('d-none');
+                                    visibleCount++;
+                                } else if (optId && optName.includes(query)) {
+                                    opt.classList.remove('d-none');
+                                    visibleCount++;
+                                } else if (!optId) {
+                                    opt.classList.add('d-none');
+                                } else {
+                                    opt.classList.add('d-none');
+                                }
+                            });
+
+                            if (catNoFound) {
+                                if (visibleCount === 0) {
+                                    catNoFound.classList.remove('d-none');
+                                } else {
+                                    catNoFound.classList.add('d-none');
+                                }
+                            }
+
+                            if (this.value) {
+                                if (catClearBtn) catClearBtn.classList.remove('d-none');
+                            } else {
+                                selectCategory('', '');
+                                if (catMenu) catMenu.classList.remove('d-none');
+                            }
+                        });
+
+                        catInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const firstVisible = Array.from(catOptions).find(opt => !opt.classList.contains('d-none') && opt.getAttribute('data-id') !== '');
+                                if (firstVisible) {
+                                    selectCategory(firstVisible.getAttribute('data-id'), firstVisible.getAttribute('data-name'));
+                                }
+                            } else if (e.key === 'Escape') {
+                                if (catMenu) catMenu.classList.add('d-none');
+                            }
+                        });
+                    }
+
+                    if (catToggleBtn) {
+                        catToggleBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (catMenu) {
+                                const isClosed = catMenu.classList.contains('d-none');
+                                document.querySelectorAll('.category-dropdown-menu').forEach(m => m.classList.add('d-none'));
+                                document.querySelectorAll('.product-dropdown-menu').forEach(m => m.classList.add('d-none'));
+                                if (isClosed) {
+                                    catMenu.classList.remove('d-none');
+                                    if (catInput) catInput.focus();
+                                }
+                            }
+                        });
+                    }
+
+                    if (catClearBtn) {
+                        catClearBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            selectCategory('', '');
+                            if (catInput) catInput.focus();
+                        });
+                    }
+
+                    catOptions.forEach(opt => {
+                        opt.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const id = this.getAttribute('data-id') || '';
+                            const name = this.getAttribute('data-name') || '';
+                            selectCategory(id, name);
+                        });
+                    });
 
                     if (removeBtn) {
                         removeBtn.addEventListener('click', function() {
@@ -357,21 +660,29 @@
                             if (rows.length > 1) {
                                 row.remove();
                             } else {
-                                if (catFilter) catFilter.value = '';
-                                populateItemSelect(row);
+                                selectCategory('', '');
+                                selectProduct(null);
                                 row.querySelectorAll('input').forEach(input => {
                                     if (input.type === 'number') {
                                         input.value = '1';
-                                    } else {
+                                    } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id')) {
                                         input.value = '';
                                     }
                                 });
-                                if (nameSelect) nameSelect.value = '';
-                                setRowUnitSelect(unitSelect, '', 'Buah');
                             }
                         });
                     }
+
+                    // Render awal produk pada row
+                    renderProducts('');
                 }
+
+                // Global click listener untuk menutup menu combobox kategori saat klik di luar
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.category-combobox-wrapper')) {
+                        document.querySelectorAll('.category-dropdown-menu').forEach(m => m.classList.add('d-none'));
+                    }
+                });
 
                 // Attach to initial row
                 container.querySelectorAll('.procure-row').forEach(attachRowEvents);
@@ -384,15 +695,11 @@
                     if (firstRow) {
                         const targetProd = masterProducts.find(p => String(p.id) === String(requestedProductId));
                         if (targetProd) {
-                            const catFilter = firstRow.querySelector('.procure-cat-filter');
-                            if (catFilter) {
-                                catFilter.value = targetProd.category_id;
+                            if (typeof firstRow._selectCategory === 'function') {
+                                firstRow._selectCategory(targetProd.category_id, targetProd.category_name);
                             }
-                            populateItemSelect(firstRow, targetProd.id);
-                            const nameSelect = firstRow.querySelector('.item-name-select');
-                            if (nameSelect) {
-                                nameSelect.value = targetProd.name;
-                                nameSelect.dispatchEvent(new Event('change'));
+                            if (typeof firstRow._selectProduct === 'function') {
+                                firstRow._selectProduct(targetProd);
                             }
                         }
                     }
@@ -403,26 +710,52 @@
                     const firstRow = container.querySelector('.procure-row');
                     const newRow = firstRow.cloneNode(true);
 
-                    const catFilter = newRow.querySelector('.procure-cat-filter');
-                    if (catFilter) catFilter.value = '';
+                    // Reset combobox kategori in new row
+                    const catHidden = newRow.querySelector('.procure-cat-filter');
+                    if (catHidden) catHidden.value = '';
+                    const catInput = newRow.querySelector('.category-search-input');
+                    if (catInput) catInput.value = '';
+                    const catClearBtn = newRow.querySelector('.btn-clear-category');
+                    if (catClearBtn) catClearBtn.classList.add('d-none');
+                    const catMenu = newRow.querySelector('.category-dropdown-menu');
+                    if (catMenu) catMenu.classList.add('d-none');
 
-                    const nameSelect = newRow.querySelector('.item-name-select');
-                    if (nameSelect) nameSelect.value = '';
+                    newRow.querySelectorAll('.category-item-option').forEach(opt => {
+                        opt.classList.remove('d-none');
+                        if (opt.getAttribute('data-id') === '') {
+                            opt.classList.add('active');
+                        } else {
+                            opt.classList.remove('active');
+                        }
+                    });
+
+                    // Reset dropdown produk in new row
+                    const nameInputHidden = newRow.querySelector('.item-name-input');
+                    if (nameInputHidden) nameInputHidden.value = '';
+                    const prodIdHidden = newRow.querySelector('.item-product-id');
+                    if (prodIdHidden) prodIdHidden.value = '';
+                    const prodBtnText = newRow.querySelector('.product-btn-text');
+                    if (prodBtnText) {
+                        prodBtnText.textContent = `-- Pilih Barang yang Diminta (${masterProducts.length} Barang) --`;
+                        prodBtnText.title = '';
+                    }
+                    const prodQuickSearch = newRow.querySelector('.product-quick-search');
+                    if (prodQuickSearch) prodQuickSearch.value = '';
+                    const prodClearQuickSearch = newRow.querySelector('.btn-clear-quick-search');
+                    if (prodClearQuickSearch) prodClearQuickSearch.classList.add('d-none');
 
                     newRow.querySelectorAll('input').forEach(input => {
                         if (input.type === 'number') {
                             input.value = '1';
-                        } else {
+                        } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id')) {
                             input.value = '';
                         }
                     });
 
                     container.appendChild(newRow);
-                    populateItemSelect(newRow);
                     const newUnitSelect = newRow.querySelector('.item-unit-select');
                     setRowUnitSelect(newUnitSelect, '', 'Buah');
                     attachRowEvents(newRow);
-                    if (nameSelect) nameSelect.focus();
                 });
             });
         </script>

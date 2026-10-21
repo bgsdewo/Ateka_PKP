@@ -7,14 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Klasifikasi Persediaan</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Kategori Barang ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Kelola master kategori untuk pengelompokan produk dan klasifikasi persediaan ATK kantor.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -70,20 +63,15 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div class="header-title">
-                            <h4 class="card-title mb-1">Master Data Kategori Barang</h4>
-                            <p class="mb-0 text-secondary">
-                                Kelola pengelompokan barang seperti Buku Tulis, Kertas, Pensil, Pulpen, Spidol dan
-                                kategori lainnya.
-                            </p>
+                            <h4 class="card-title mb-0">Master Data Kategori Barang</h4>
                         </div>
                         <button type="button" class="btn btn-primary btn-sm btn-create-kategori">
                             Tambah Kategori
                         </button>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="datatable" class="table table-striped table-hover word-wrap"
-                                data-toggle="data-table">
+                        <table id="datatable" class="table table-striped table-hover word-wrap"
+                            data-toggle="data-table">
                                 <thead>
                                     <tr>
                                         <th width="5%">No</th>
@@ -147,7 +135,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
                     </div>
                 </div>
             </div>

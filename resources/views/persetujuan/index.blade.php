@@ -5,10 +5,6 @@
         <div class="container-fluid iq-container">
             <div class="row align-items-center">
                 <div class="col-12">
-                    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                        <span class="badge-dot badge-dot-primary"></span>
-                        <span>Kementerian PKP RI &bull; Approval Kasubag TU</span>
-                    </div>
                     <h1 class="text-white fw-bold mb-1">
                         @if (($category ?? 'pengadaan') === 'persediaan')
                             Verifikasi Permintaan Stok (Persediaan)
@@ -16,13 +12,6 @@
                             Verifikasi Pengadaan (Beli Baru)
                         @endif
                     </h1>
-                    <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                        @if (($category ?? 'pengadaan') === 'persediaan')
-                            Wewenang Kasubag TU untuk meninjau dan menyetujui permintaan barang dari stok persediaan gudang sebelum diserahkan oleh PIC Distribusi.
-                        @else
-                            Wewenang Kasubag TU untuk meninjau dan menyetujui usulan permintaan ATK pengadaan beli baru sebelum diproses pembelian offline.
-                        @endif
-                    </p>
                 </div>
             </div>
         </div>
@@ -192,10 +181,8 @@
                             <div>
                                 @if (($category ?? 'pengadaan') === 'persediaan')
                                     <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
-                                    <small class="text-secondary">Periksa permohonan permintaan barang dari stok persediaan yang sudah tersedia sebelum diserahkan/didistribusikan oleh PIC Distribusi</small>
                                 @else
                                     <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
-                                    <small class="text-secondary">Periksa kebutuhan barang baru dan kuantitas permintaan sebelum memberikan persetujuan untuk diproses pembelian offline oleh Kasubag TU</small>
                                 @endif
                             </div>
                         </div>
@@ -336,18 +323,25 @@
                             </div>
                         </form>
                     </div>
-                    <div class="card-body p-4" id="table-container">
+                    <div class="card-body p-2.5 p-md-3" id="table-container">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle">
+                            <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100">
+                                <colgroup>
+                                    <col style="width: 3%;">
+                                    <col style="width: 21%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 27%;">
+                                    <col style="width: 13%;">
+                                    <col style="width: 16%;">
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th width="4%">No</th>
+                                        <th>No</th>
                                         <th>Kode & Tipe</th>
                                         <th>Pemohon / Unit Kerja</th>
-                                        <th>Rincian Barang & Kuantitas Permintaan</th>
-                                        <th>Catatan Pemohon</th>
+                                        <th>Rincian Barang & Keperluan</th>
                                         <th>Status</th>
-                                        <th width="16%" class="text-end">Aksi Kasubag TU</th>
+                                        <th class="text-end">Aksi Kasubag TU</th>
                                     </tr>
                                 </thead>
                                 <tbody id="persetujuan-table-body">
@@ -417,36 +411,42 @@
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}
                                             </td>
                                             <td>
-                                                <strong
-                                                    class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                <span
-                                                    class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }} text-capitalize">
-                                                    {{ $req->type }}
-                                                </span>
-                                                @if ($req->is_procurement)
-                                                    <br><span class="badge bg-warning text-dark mt-1" style="font-size: 0.72rem;">
-                                                        Pengadaan (Beli Baru)
+                                                <div class="font-monospace fw-bold text-primary" style="font-size: 0.72rem; letter-spacing: -0.02em;">{{ $req->request_code }}</div>
+                                                <div class="d-flex align-items-center gap-1 flex-wrap mt-0.5">
+                                                    <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }} text-capitalize" style="font-size: 0.66rem; padding: 0.15rem 0.4rem;">
+                                                        {{ $req->type }}
                                                     </span>
-                                                @endif
-                                                <br>
-                                                <small
-                                                    class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
+                                                    @if ($req->is_procurement)
+                                                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">
+                                                            Pengadaan (Beli Baru)
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-muted mt-0.5" style="font-size: 0.68rem;">
+                                                    {{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB
+                                                </div>
                                             </td>
-                                            <td>
-                                                <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
-                                                <small class="text-muted">{{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}</small>
+                                            <td style="word-break: break-word;">
+                                                <div class="fw-bold text-dark" style="font-size: 0.76rem; line-height: 1.25;">
+                                                    {{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}
+                                                </div>
+                                                <div class="text-muted" style="font-size: 0.68rem; line-height: 1.2;">
+                                                    {{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}
+                                                </div>
                                                 @if(!empty($req->user->nip))
-                                                    <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
+                                                    <span class="badge bg-light text-secondary border mt-0.5" style="font-size: 0.65rem; padding: 0.12rem 0.35rem;">
+                                                        NIP: {{ $req->user->nip }}
+                                                    </span>
                                                 @endif
 
                                                 {{-- Tombol Lihat History Pengadaan Pemohon --}}
                                                 @if (($category ?? 'pengadaan') !== 'persediaan')
-                                                    <div class="mt-2 d-flex align-items-center gap-1 flex-wrap">
-                                                        <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
-                                                            style="font-size: 0.72rem;"
+                                                    <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
+                                                        <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
+                                                            style="font-size: 0.66rem; line-height: 1.1;"
                                                             data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
                                                             title="Lihat riwayat akun pemohon untuk pengawasan kebutuhan ATK">
-                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <circle cx="12" cy="12" r="10"></circle>
                                                                 <polyline points="12 6 12 12 16 14"></polyline>
                                                             </svg>
@@ -455,9 +455,9 @@
 
                                                         @if ($hasRepeatedItemsSameMonth)
                                                             <span class="badge bg-danger-subtle text-danger border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
-                                                                style="font-size: 0.68rem;"
+                                                                style="font-size: 0.64rem; line-height: 1.1;"
                                                                 title="Peringatan: Pemohon ini pernah mengajukan barang yang sama di bulan ini!">
-                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-danger">
+                                                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-danger">
                                                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                                                                     <line x1="12" y1="9" x2="12" y2="13"></line>
                                                                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -466,7 +466,7 @@
                                                             </span>
                                                         @elseif ($hasRepeatedItems)
                                                             <span class="badge bg-warning-subtle text-dark border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
-                                                                style="font-size: 0.68rem;"
+                                                                style="font-size: 0.64rem; line-height: 1.1;"
                                                                 title="Pemohon pernah mengajukan barang ini pada periode bulan sebelumnya">
                                                                 Pernah Minta Serupa (Bulan Lalu)
                                                             </span>
@@ -474,8 +474,8 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <ul class="ps-3 mb-0 small">
+                                            <td style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;">
+                                                <ul class="mb-0 ps-3" style="font-size: 0.74rem; word-break: break-word; white-space: normal;">
                                                     @foreach ($req->details as $detail)
                                                         @php
                                                              $currentStock = $detail->product->stock ?? 0;
@@ -485,37 +485,36 @@
                                                              $totalPastApproved = collect($pastMatches)->whereIn('status', ['approved', 'distributed'])->sum('quantity');
                                                              $lastPastMatch = collect($pastMatches)->sortByDesc('date')->first();
                                                         @endphp
-                                                        <li class="mb-1">
-                                                            <strong>{{ $detail->item_name }}</strong>:
-                                                            <span class="badge bg-light text-dark border">Diminta: {{ $detail->quantity }} {{ $detail->item_unit }}</span>
+                                                        <li class="mb-1" style="word-break: break-word;">
+                                                            <span class="fw-bold text-dark">{{ $detail->item_name }}</span>:
+                                                            <span class="badge bg-light text-dark border px-1.5 py-0.5" style="font-size: 0.65rem;">Diminta: {{ $detail->quantity }} {{ $detail->item_unit }}</span>
                                                             @if (in_array($req->status, ['approved', 'distributed']))
-                                                                <span class="badge bg-success-subtle text-success border ms-1">
+                                                                <span class="badge bg-success-subtle text-success border px-1.5 py-0.5 ms-0.5" style="font-size: 0.65rem;">
                                                                     Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}
                                                                 </span>
                                                             @endif
                                                             @if ($req->status === 'pending')
                                                                 @if ($detail->product)
-                                                                    <span
-                                                                        class="badge {{ $isSufficient ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} ms-1"
-                                                                        style="font-size: 0.72rem;">
-                                                                        (Sisa Stok Gudang: {{ $currentStock }} {{ $detail->item_unit }})
+                                                                    <span class="badge {{ $isSufficient ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} border px-1.5 py-0.5 ms-0.5"
+                                                                        style="font-size: 0.65rem;">
+                                                                        (Sisa Stok: {{ $currentStock }} {{ $detail->item_unit }})
                                                                     </span>
                                                                 @else
-                                                                    <span class="badge bg-warning-subtle text-dark border ms-1" style="font-size: 0.72rem;">
-                                                                        (Item Baru - Belum Ada di Gudang)
+                                                                    <span class="badge bg-warning-subtle text-dark border px-1.5 py-0.5 ms-0.5" style="font-size: 0.65rem;">
+                                                                        (Item Baru)
                                                                     </span>
                                                                 @endif
                                                             @endif
 
                                                             @if (($category ?? 'pengadaan') !== 'persediaan' && !empty($pastMatches))
-                                                                <div class="mt-1">
-                                                                    <span class="badge bg-warning-subtle text-dark border py-0.5 px-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;"
+                                                                <div class="mt-0.5">
+                                                                    <span class="badge bg-warning-subtle text-dark border py-0.5 px-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.64rem;"
                                                                         title="Riwayat: Pemohon pernah mengajukan barang ini sebelumnya">
-                                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
+                                                                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning">
                                                                             <circle cx="12" cy="12" r="10"></circle>
                                                                             <polyline points="12 6 12 12 16 14"></polyline>
                                                                         </svg>
-                                                                        Pernah Diajukan: {{ count($pastMatches) }}x (Disetujui: {{ $totalPastApproved }} {{ $detail->item_unit }})
+                                                                        Pernah: {{ count($pastMatches) }}x (Disetujui: {{ $totalPastApproved }} {{ $detail->item_unit }})
                                                                         @if ($lastPastMatch)
                                                                             &bull; Terakhir: {{ \Carbon\Carbon::parse($lastPastMatch['date'])->format('d/m/Y') }}
                                                                         @endif
@@ -524,78 +523,104 @@
                                                             @endif
 
                                                             @if ($detail->specification)
-                                                                <div class="text-muted fst-italic" style="font-size: 0.72rem;">
+                                                                <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">
                                                                     Spesifikasi: {{ $detail->specification }}
                                                                 </div>
                                                             @endif
                                                             @if ($detail->verification_note)
-                                                                <div class="text-muted fst-italic" style="font-size: 0.72rem;">
-                                                                    Catatan: {{ $detail->verification_note }}
+                                                                <div class="mt-0.5 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.68rem; line-height: 1.25;">
+                                                                    <span class="fw-bold">Catatan TU:</span> "{{ $detail->verification_note }}"
                                                                 </div>
                                                             @endif
                                                         </li>
                                                     @endforeach
                                                 </ul>
-                                            </td>
-                                            <td>
-                                                @if ($req->notes)
-                                                    <div class="small text-dark mb-1">
-                                                        <strong>Pemohon:</strong> {{ $req->notes }}
-                                                    </div>
-                                                @endif
+
                                                 @if ($req->verification_notes)
-                                                    <div class="small text-primary">
-                                                        <strong>TU:</strong> {{ $req->verification_notes }}
+                                                    <div class="mt-1 ps-3" style="font-size: 0.68rem; line-height: 1.35; word-break: break-word; white-space: normal;">
+                                                        <div class="p-1 rounded bg-primary-subtle text-primary border border-primary-subtle">
+                                                            <strong class="d-inline-flex align-items-center gap-1">
+                                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                                                Catatan TU:
+                                                            </strong>
+                                                            <span class="ms-1">{{ $req->verification_notes }}</span>
+                                                        </div>
                                                     </div>
                                                 @endif
-                                                @if (!$req->notes && !$req->verification_notes)
-                                                    <small class="text-secondary">-</small>
+
+                                                @if ($req->notes)
+                                                    <div class="text-muted ps-3 mt-1" style="font-size: 0.7rem; line-height: 1.3; word-break: break-word;">
+                                                        <span class="text-secondary fw-semibold">Keperluan:</span> {{ $req->notes }}
+                                                    </div>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td style="vertical-align: middle;">
                                                 @if ($req->status == 'pending')
-                                                    <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
+                                                    <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.68rem;">Menunggu Verifikasi</span>
                                                 @elseif($req->status == 'approved')
-                                                    <span class="badge bg-success">Disetujui Kasubag TU</span>
+                                                    <span class="badge bg-success px-1.5 py-0.5" style="font-size: 0.68rem;">Disetujui TU</span>
                                                     @if ($req->purchase_invoice)
-                                                        <br><span class="badge bg-primary-subtle text-primary border mt-1" style="font-size: 0.72rem;" title="Pengadaan via Faktur">
-                                                            Dibeli: {{ $req->purchase_invoice }}
-                                                        </span>
+                                                        <div class="mt-0.5">
+                                                            <span class="badge bg-primary-subtle text-primary border px-1.5 py-0.5" style="font-size: 0.65rem;" title="Pengadaan via Faktur">
+                                                                Faktur: {{ $req->purchase_invoice }}
+                                                            </span>
+                                                        </div>
                                                     @endif
                                                     @if ($req->is_procurement)
-                                                        <br><small class="text-muted">Akan diproses pembelian offline TU</small>
+                                                        <div class="text-muted mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">Proses pembelian offline TU</div>
                                                     @else
-                                                        <br><small class="text-success fw-semibold">Siap diserahkan oleh PIC Distribusi</small>
+                                                        <div class="text-success fw-semibold mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">Siap diserahkan PIC</div>
                                                     @endif
                                                 @elseif($req->status == 'distributed')
-                                                    <span class="badge bg-primary">Selesai Didistribusikan</span>
+                                                    <span class="badge bg-primary px-1.5 py-0.5" style="font-size: 0.68rem;">Selesai</span>
                                                     @if ($req->purchase_invoice)
-                                                        <br><span class="badge bg-info-subtle text-dark border mt-1" style="font-size: 0.72rem;">
-                                                            Faktur: {{ $req->purchase_invoice }}
-                                                        </span>
+                                                        <div class="mt-0.5">
+                                                            <span class="badge bg-info-subtle text-dark border px-1.5 py-0.5" style="font-size: 0.65rem;">
+                                                                Faktur: {{ $req->purchase_invoice }}
+                                                            </span>
+                                                        </div>
                                                     @endif
                                                 @else
-                                                    <span class="badge bg-danger"
-                                                        title="{{ $req->rejection_reason }}">Ditolak</span>
+                                                    <span class="badge bg-danger px-1.5 py-0.5" style="font-size: 0.68rem;" title="{{ $req->rejection_reason }}">Ditolak</span>
                                                     @if ($req->rejection_reason)
-                                                        <br><small
-                                                            class="text-danger">"{{ $req->rejection_reason }}"</small>
+                                                        <div class="text-danger mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">"{{ $req->rejection_reason }}"</div>
                                                     @endif
                                                 @endif
                                             </td>
-                                            <td class="text-end">
+                                            <td class="text-end" style="vertical-align: middle; white-space: nowrap;">
                                                 @if ($req->status == 'pending')
-                                                    <div class="d-flex justify-content-end gap-1.5 flex-nowrap">
+                                                    <div class="d-flex justify-content-end gap-1 flex-nowrap">
                                                         <!-- Tombol Setujui (Kasubag TU) -->
                                                         <button type="button"
-                                                            class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
+                                                            class="btn btn-success btn-sm d-inline-flex align-items-center gap-1 px-2 py-1 shadow-sm"
+                                                            style="font-size: 0.72rem;"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#approveModal{{ $req->id }}"
                                                             title="Setujui Permintaan Barang">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24"
+                                                            <svg width="12" height="12" viewBox="0 0 24 24"
                                                                 fill="none" stroke="currentColor" stroke-width="2">
                                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                                             </svg>
+                                                            Setujui
+                                                        </button>
+
+                                                        <!-- Tombol Tolak -->
+                                                        <button type="button"
+                                                            class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                            style="font-size: 0.72rem;"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#rejectModal{{ $req->id }}"
+                                                            title="Tolak Usulan Permintaan">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24"
+                                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                                <line x1="18" y1="6" x2="6"
+                                                                    y2="18"></line>
+                                                                <line x1="6" y1="6" x2="18"
+                                                                    y2="18"></line>
+                                                            </svg>
+                                                            Tolak
+                                                        </button>
+                                                    </div>
                                                             Setujui
                                                         </button>
 
@@ -839,21 +864,21 @@
                                                         </div>
                                                     </div>
                                                 @else
-                                                    <div class="d-flex justify-content-end align-items-center gap-1">
-                                                        <span class="badge bg-light text-secondary border px-2 py-1 small">
-                                                            Selesai Ditinjau
-                                                        </span>
+                                                    <div class="d-flex justify-content-end align-items-center">
                                                         <button type="button"
-                                                            class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
+                                                            class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 px-2.5 py-1"
+                                                            style="font-size: 0.72rem;"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#detailModal{{ $req->id }}"
                                                             title="Lihat Rincian Pengajuan">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <circle cx="12" cy="12" r="10"></circle>
                                                                 <line x1="12" y1="16" x2="12" y2="12"></line>
                                                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                                             </svg>
                                                             Detail
+                                                        </button>
+                                                    </div>
                                                         </button>
                                                     </div>
 
@@ -1339,7 +1364,7 @@
                                         </tr>
                                     @empty
                                         <tr id="table-initial-empty-row">
-                                            <td colspan="7" class="text-center text-muted py-5">
+                                            <td colspan="6" class="text-center text-muted py-5">
                                                 Tidak ada pengajuan permohonan ATK yang sesuai kriteria.
                                             </td>
                                         </tr>
@@ -1431,7 +1456,7 @@
                             emptyRow = document.createElement('tr');
                             emptyRow.id = 'no-local-match-row';
                             emptyRow.innerHTML = `
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="6" class="text-center text-muted py-4">
                             <div class="d-inline-flex align-items-center gap-2">
                                 <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
                                 <span>Mencari "<strong>${escapeHtml(keyword)}</strong>"...</span>

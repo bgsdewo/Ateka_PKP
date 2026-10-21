@@ -229,7 +229,7 @@ if (typeof Scrollbar !== typeof null) {
 if ($.fn.DataTable) {
   if ($('[data-toggle="data-table"]').length) {
     const table = $('[data-toggle="data-table"]').DataTable({
-      "dom": '<"row align-items-center"<"col-md-6" l><"col-md-6" f>><"table-responsive border-bottom my-3" rt><"row align-items-center" <"col-md-6" i><"col-md-6" p>><"clear">',
+      "dom": '<"d-flex justify-content-between align-items-center flex-wrap gap-2.5 mb-3"<"dataTables-length-box" l><"dataTables-search-box ms-auto" f>><"table-responsive border-bottom my-3" rt><"d-flex justify-content-between align-items-center flex-wrap gap-2 pt-3 mt-1 border-top"<"col-auto" i><"col-auto ms-auto" p>><"clear">',
     });
   }
 }

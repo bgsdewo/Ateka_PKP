@@ -29,17 +29,78 @@
         <div class="container-fluid iq-container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
-                        <div>
-                            <h1 class="text-white fw-bold mb-1">Selamat Datang, {{ $user->name }}</h1>
+                    <div class="d-flex flex-column justify-content-center text-white">
+                        <h1 class="text-white fw-bold mb-2.5">Selamat Datang, {{ $user->name }}</h1>
+
+                        {{-- 4 Fitur Aksi Cepat Role-Based tepat di bawah Selamat Datang --}}
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
                             @if ($isKasubagTU)
-                                <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                    Wewenang tertinggi untuk menyetujui/menolak pengajuan ATK, mengelola pengadaan, distribusi barang, serta mengesahkan laporan mutasi persediaan.
-                                </p>
+                                <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                        <polyline points="9 11 12 14 22 4"></polyline>
+                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                    </svg>
+                                    Review Pengajuan ({{ $pendingRequestsCount }} Pending)
+                                </a>
+                                <a href="{{ route('rekapitulasi-permintaan.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Rekapitulasi Permintaan
+                                </a>
+                                <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    + Pengadaan (Barang Masuk)
+                                </a>
+                                <a href="{{ route('reports.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Laporan &amp; Pengesahan
+                                </a>
                             @elseif ($isPegawaiGudang)
-                                <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                    Pemeriksaan stok persediaan fisik, distribusi barang, pemantauan transaksi barang masuk & penerima barang keluar, serta pencetakan laporan resmi mutasi ATK.
-                                </p>
+                                @if (auth()->user()->isDistributor())
+                                    <a href="{{ route('distribusi.index', ['status' => 'ready']) }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                        </svg>
+                                        Distribusi ATK ({{ $readyDistribusiCount }} Siap Serah)
+                                    </a>
+                                @endif
+                                <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
+                                    Cek Stok Barang
+                                </a>
+                                <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Cek Barang Masuk
+                                </a>
+                                <a href="{{ route('barang-keluar') }}" class="btn btn-danger text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Cek Barang Keluar
+                                </a>
+                                <a href="{{ route('reports.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Cetak Laporan Mutasi
+                                </a>
+                            @else
+                                <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Buat Pengajuan ATK Baru
+                                </a>
+                                <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                    </svg>
+                                    Permintaan Pengadaan
+                                </a>
+                                <a href="{{ route('katalog-atk') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Katalog ATK
+                                </a>
+                                <a href="{{ route('pengajuan.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    Riwayat Pengajuan
+                                </a>
                             @endif
                         </div>
                     </div>
@@ -66,111 +127,7 @@
             </div>
         @endif
 
-        <!-- ======================================================== -->
-        <!-- BANNER AKSI CEPAT ROLE-BASED -->
-        <!-- ======================================================== -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow-sm border-0 bg-white">
-                    <div class="card-body p-3.5 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle fw-bold d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 52px; height: 52px; font-size: 1.35rem; background: var(--brand-gradient); box-shadow: 0 4px 14px -2px rgba(15, 76, 129, 0.35) !important;">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                            </div>
-                            <div>
-                                <h5 class="mb-0 fw-bold text-dark">{{ $user->name }}</h5>
-                                <small class="text-muted">{{ $user->position ?? 'Pegawai' }} <span class="text-muted mx-1">&vert;</span> <strong class="text-primary">{{ $roleTitle }}</strong></small>
-                            </div>
-                        </div>
 
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            @if ($isKasubagTU)
-                                <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn btn-warning text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="9 11 12 14 22 4"></polyline>
-                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                                    </svg>
-                                    Review Pengajuan ({{ $pendingRequestsCount }} Pending)
-                                </a>
-                                <a href="{{ route('distribusi.index', ['status' => 'ready']) }}" class="btn btn-outline-warning text-dark fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    Distribusi ATK ({{ $readyDistribusiCount }} Siap Serah)
-                                </a>
-                                <a href="{{ route('rekapitulasi-permintaan.index') }}" class="btn btn-outline-primary btn-sm fw-bold shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    Rekapitulasi Permintaan
-                                </a>
-                                <a href="{{ route('barang-masuk') }}" class="btn btn-success btn-sm text-white shadow-sm">
-                                    + Pengadaan (Barang Masuk)
-                                </a>
-                                <a href="{{ route('reports.index') }}" class="btn btn-light border btn-sm">
-                                    Laporan &amp; Pengesahan
-                                </a>
-                            @elseif ($isPegawaiGudang)
-                                <a href="{{ route('distribusi.index', ['status' => 'ready']) }}" class="btn btn-warning text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                    </svg>
-                                    Distribusi ATK ({{ $readyDistribusiCount }} Siap Serah)
-                                </a>
-                                <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-primary text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                    Cek Stok Barang
-                                </a>
-                                <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white btn-sm shadow-sm">
-                                    Cek Barang Masuk
-                                </a>
-                                <a href="{{ route('barang-keluar') }}" class="btn btn-outline-danger btn-sm">
-                                    Cek Barang Keluar
-                                </a>
-                                <a href="{{ route('reports.index') }}" class="btn btn-outline-primary btn-sm">
-                                    Cetak Laporan Mutasi
-                                </a>
-                            @else
-                                <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                    + Buat Pengajuan ATK Baru
-                                </a>
-                                <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-primary text-white fw-bold btn-sm shadow-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                    </svg>
-                                    Permintaan Pengadaan
-                                </a>
-                                <a href="{{ route('katalog-atk') }}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                    Katalog &amp; Ketersediaan Stok
-                                </a>
-                                <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
-                                    </svg>
-                                    Riwayat Pengajuan Saya
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- ======================================================== -->
         <!-- FILTER PERIODE BULANAN DASHBOARD -->
@@ -925,33 +882,33 @@
                             </a>
                         </div>
                         <div class="card-body p-2.5 p-md-3">
-                            <div class="table-responsive table-responsive-no-scroll">
-                                <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100" style="table-layout: fixed;">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100">
                                     <colgroup>
-                                        <col style="width: 16%;">
-                                        <col style="width: 8%;">
-                                        <col style="width: 12%;">
-                                        <col style="width: 38%;">
-                                        <col style="width: 14%;">
-                                        <col style="width: 12%;">
+                                        <col style="width: 22%; min-width: 195px;">
+                                        <col style="width: 9%; min-width: 85px;">
+                                        <col style="width: 12%; min-width: 105px;">
+                                        <col style="width: 33%;">
+                                        <col style="width: 12%; min-width: 105px;">
+                                        <col style="width: 12%; min-width: 95px;">
                                     </colgroup>
                                     <thead>
                                         <tr>
-                                            <th>Kode</th>
-                                            <th>Tipe</th>
-                                            <th>Tanggal</th>
+                                            <th style="min-width: 195px;">Kode</th>
+                                            <th style="min-width: 85px;">Tipe</th>
+                                            <th style="min-width: 105px;">Tanggal</th>
                                             <th>Barang</th>
-                                            <th>Status</th>
-                                            <th class="text-end">Aksi</th>
+                                            <th style="min-width: 105px;">Status</th>
+                                            <th class="text-end" style="min-width: 95px;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse ($userRequests as $req)
                                             <tr>
-                                                <td>
-                                                    <div class="font-monospace fw-bold text-primary" style="font-size: 0.76rem; letter-spacing: -0.02em;">{{ $req->request_code }}</div>
+                                                <td style="white-space: nowrap;">
+                                                    <div class="font-monospace fw-bold text-primary" style="font-size: 0.78rem; letter-spacing: -0.01em;">{{ $req->request_code }}</div>
                                                     @if ($req->is_procurement)
-                                                        <span class="badge bg-warning-subtle text-dark border px-1 py-0.5 mt-0.5" style="font-size: 0.62rem;">Pengadaan</span>
+                                                        <span class="badge bg-warning-subtle text-dark border px-1.5 py-0.5 mt-0.5" style="font-size: 0.65rem;">Pengadaan</span>
                                                     @endif
                                                 </td>
                                                 <td><span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }}" style="font-size: 0.68rem; padding: 0.2rem 0.45rem;">{{ ucfirst($req->type) }}</span></td>
@@ -963,19 +920,23 @@
                                                     <ul class="mb-0 ps-3" style="font-size: 0.75rem; word-break: break-word; white-space: normal;">
                                                         @foreach ($req->details as $d)
                                                             <li class="mb-1" style="word-break: break-word;">
-                                                                <strong>{{ $d->item_name }}</strong>
-                                                                @if (in_array($req->status, ['approved', 'distributed']))
-                                                                    <span class="badge bg-success-subtle text-success border px-1 py-0.2" style="font-size: 0.65rem;">Disetujui: {{ $d->effective_quantity }} {{ $d->item_unit }}</span>
-                                                                @else
-                                                                    <span class="text-secondary" style="font-size: 0.7rem;">({{ $d->quantity }} {{ $d->item_unit }})</span>
-                                                                @endif
+                                                                <div class="fw-bold text-dark" style="line-height: 1.3;">{{ $d->item_name }}</div>
+                                                                <div class="mt-0.5">
+                                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                                        <span class="badge bg-success-subtle text-success border px-1.5 py-0.5" style="font-size: 0.64rem;">
+                                                                            Disetujui: {{ $d->effective_quantity }} {{ $d->item_unit }}
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="text-secondary small" style="font-size: 0.68rem;">({{ $d->quantity }} {{ $d->item_unit }})</span>
+                                                                    @endif
+                                                                </div>
 
                                                                 @if ($d->specification)
-                                                                    <div class="text-muted fst-italic" style="font-size: 0.7rem; line-height: 1.25; word-break: break-word;">Spesifikasi: {{ $d->specification }}</div>
+                                                                    <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">Spesifikasi: {{ $d->specification }}</div>
                                                                 @endif
 
                                                                 @if ($d->verification_note)
-                                                                    <div class="mt-0.5 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.69rem; line-height: 1.3; word-break: break-word; white-space: normal;">
+                                                                    <div class="mt-1 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.68rem; line-height: 1.3;">
                                                                         <span class="fw-bold">Catatan TU:</span> "{{ $d->verification_note }}"
                                                                     </div>
                                                                 @endif
@@ -984,20 +945,28 @@
                                                     </ul>
 
                                                     @if ($req->verification_notes && (!isset($d) || $req->verification_notes !== $d->verification_note))
-                                                        <div class="mt-1.5 p-1.5 rounded-2 bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.69rem; line-height: 1.35; word-break: break-word; white-space: normal;">
-                                                            <strong class="d-inline-flex align-items-center gap-1">
-                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                                                </svg>
-                                                                Catatan TU:
-                                                            </strong>
-                                                            <div class="mt-0.5" style="word-break: break-word;">{{ $req->verification_notes }}</div>
+                                                        <div class="mt-1.5 ps-3" style="font-size: 0.68rem; line-height: 1.35; word-break: break-word; white-space: normal;">
+                                                            <div class="p-1.5 rounded-2 bg-primary-subtle text-primary border border-primary-subtle">
+                                                                <strong class="d-inline-flex align-items-center gap-1">
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                    </svg>
+                                                                    Catatan TU:
+                                                                </strong>
+                                                                <div class="mt-0.5" style="word-break: break-word;">{{ $req->verification_notes }}</div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if ($req->notes)
+                                                        <div class="text-muted ps-3 mt-1" style="font-size: 0.7rem; line-height: 1.3;">
+                                                            <span class="text-secondary fw-semibold">Keperluan:</span> {{ $req->notes }}
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td style="white-space: nowrap; vertical-align: middle;">
+                                                <td style="vertical-align: middle;">
                                                     @php
                                                         $shortStatus = match ($req->status) {
                                                             'pending' => $req->is_procurement ? 'Pending Pengadaan' : 'Pending TU',
@@ -1007,21 +976,32 @@
                                                             default => ucfirst($req->status),
                                                         };
                                                     @endphp
-                                                    <span class="badge {{ $req->status_badge }}" style="font-size: 0.68rem; padding: 0.22rem 0.45rem;" title="{{ $req->status_label }}">
+                                                    <span class="badge {{ $req->status_badge }} px-1.5 py-0.5 text-nowrap" style="font-size: 0.68rem;" title="{{ $req->status_label }}">
                                                         {{ $shortStatus }}
                                                     </span>
                                                     @if ($req->is_procurement && $req->purchase_invoice)
                                                         <div class="mt-0.5">
-                                                            <span class="badge bg-primary-subtle text-primary border text-truncate d-inline-block" style="font-size: 0.64rem; padding: 0.18rem 0.4rem; max-width: 110px;" title="Faktur: {{ $req->purchase_invoice }}">
+                                                            <span class="badge bg-primary-subtle text-primary border text-truncate d-inline-block px-1.5 py-0.2" style="font-size: 0.64rem; max-width: 110px;" title="Faktur: {{ $req->purchase_invoice }}">
                                                                 Faktur: {{ $req->purchase_invoice }}
                                                             </span>
                                                         </div>
                                                     @endif
                                                     @if ($req->is_procurement && $req->is_purchased)
                                                         <div class="mt-0.5">
-                                                            <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none" style="font-size: 0.64rem; padding: 0.18rem 0.4rem;">
+                                                            <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none px-1.5 py-0.2" style="font-size: 0.64rem;">
                                                                 Katalog &rarr;
                                                             </a>
+                                                        </div>
+                                                    @endif
+                                                    @if($req->status == 'distributed' && $req->receiver_name)
+                                                        <div class="text-muted mt-1" style="font-size: 0.68rem; line-height: 1.25;">
+                                                            <span class="text-secondary d-block" style="font-size: 0.64rem;">Penerima:</span>
+                                                            <strong class="text-dark d-block text-wrap" style="word-break: break-word;">{{ $req->receiver_name }}</strong>
+                                                        </div>
+                                                    @elseif($req->status == 'rejected' && $req->rejection_reason)
+                                                        <div class="text-danger mt-1" style="font-size: 0.68rem; line-height: 1.25;">
+                                                            <span class="d-block" style="font-size: 0.64rem;">Alasan:</span>
+                                                            <span class="d-block text-wrap" style="word-break: break-word;">"{{ $req->rejection_reason }}"</span>
                                                         </div>
                                                     @endif
                                                 </td>

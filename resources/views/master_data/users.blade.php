@@ -7,14 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Administrasi Akun &amp; Hak Akses</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Manajemen Pengguna &amp; Peran</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Kelola hak akses akun pengguna untuk seluruh hierarki peran instansi: Kasubag TU, PIC Distribusi, Pegawai Gudang, dan Pegawai.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -58,9 +51,6 @@
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div class="header-title">
                             <h4 class="card-title mb-0 fw-bold">Master Data Akun Pengguna</h4>
-                            <small class="text-secondary">
-                                Daftar seluruh pengguna terdaftar dengan peran wewenangnya dalam aplikasi
-                            </small>
                         </div>
                         <button type="button" class="btn btn-primary btn-sm btn-create-user"
                             data-bs-toggle="modal" data-bs-target="#modalUser">
@@ -68,9 +58,8 @@
                         </button>
                     </div>
                     <div class="card-body p-4">
-                        <div class="table-responsive">
-                            <table id="datatable" class="table table-striped table-hover align-middle word-wrap"
-                                data-toggle="data-table">
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap"
+                            data-toggle="data-table">
                                 <thead>
                                     <tr>
                                         <th width="4%">No</th>
@@ -92,7 +81,7 @@
                                             };
                                             $roleLabel = match ($user->role) {
                                                 'kasubag_tu', 'admin' => 'Kasubag TU (Approver)',
-                                                'pic_distribusi' => 'PIC Distribusi (Gudang)',
+                                                'pic_distribusi' => 'PIC Subdirektorat (Pemohon)',
                                                 'pegawai_gudang' => 'Pegawai Gudang',
                                                 default => 'Pegawai (Individu)',
                                             };
@@ -177,7 +166,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -275,7 +263,7 @@
                                 </label>
                                 <select name="role" id="role" class="form-select" required>
                                     <option value="kasubag_tu">Kasubag TU (Approver / Pimpinan)</option>
-                                    <option value="pic_distribusi">PIC Distribusi (Pengelola / Gudang)</option>
+                                    <option value="pic_distribusi">PIC Subdirektorat (Pemohon Kolektif)</option>
                                     <option value="pegawai_gudang">Pegawai Gudang</option>
                                     <option value="pegawai" selected>Pegawai</option>
                                 </select>

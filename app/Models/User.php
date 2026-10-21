@@ -63,7 +63,7 @@ class User extends Authenticatable
      */
     public function canManageDistribution(): bool
     {
-        return $this->isPicDistribusi() || ($this->isPegawaiGudang() && $this->isDistributor()) || $this->isPegawaiGudang() || $this->isKasubagTU();
+        return $this->isKasubagTU() || ($this->isPegawaiGudang() && $this->isDistributor());
     }
 
     public function isKasubagTU(): bool
@@ -124,8 +124,8 @@ class User extends Authenticatable
      */
     public function canHandleRequest($requestItem): bool
     {
-        // Pegawai Gudang & Kasubag TU berhak menangani seluruh permohonan
-        if ($this->isPegawaiGudang() || $this->isKasubagTU()) {
+        // Kasubag TU & Pegawai Gudang yang ditugaskan sebagai distributor berhak menangani permohonan
+        if ($this->isKasubagTU() || ($this->isPegawaiGudang() && $this->isDistributor())) {
             return true;
         }
 
@@ -202,7 +202,7 @@ class User extends Authenticatable
     {
         return match ($this->role) {
             'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
-            'pic_distribusi' => 'PIC Distribusi (Pengelola / Gudang)',
+            'pic_distribusi' => 'PIC Unit / Subdirektorat',
             'pegawai_gudang' => 'Pegawai Gudang',
             'pegawai' => 'Pegawai',
             default => 'Pegawai',

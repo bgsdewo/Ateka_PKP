@@ -15,6 +15,13 @@ class RequestDetail extends Model
         'quantity',
         'approved_quantity',
         'verification_note',
+        'is_fulfilled',
+        'fulfilled_at',
+    ];
+
+    protected $casts = [
+        'is_fulfilled' => 'boolean',
+        'fulfilled_at' => 'datetime',
     ];
 
     public function product()

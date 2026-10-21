@@ -26,14 +26,7 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Pelaporan &amp; Pengesahan Mutasi</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Laporan Persediaan Barang</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Pantau pergerakan transaksi keluar-masuk barang, ringkasan mutasi, dan ekspor dokumen resmi berstandar instansi.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -179,35 +172,78 @@
             box-shadow: 0 2px 6px rgba(58, 87, 232, 0.12);
         }
 
-        /* Modern Data Table */
+        /* Modern Data Table - Fit 100% tanpa horizontal scroll & tanpa potong kata */
         .custom-report-table {
             width: 100% !important;
+            max-width: 100% !important;
             margin-bottom: 0;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: auto;
+            border-collapse: collapse !important;
+            table-layout: auto !important;
         }
 
-        .custom-report-table thead th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 2px solid #cbd5e1;
-            padding: 12px 8px;
-            vertical-align: middle;
-            white-space: nowrap;
+        .custom-report-table thead th,
+        table.dataTable.custom-report-table > thead > tr > th:not(.sorting_disabled),
+        table.dataTable.custom-report-table > thead > tr > th.sorting,
+        table.dataTable.custom-report-table > thead > tr > th.sorting_asc,
+        table.dataTable.custom-report-table > thead > tr > th.sorting_desc {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.01em !important;
+            border-top: 1px solid #e2e8f0 !important;
+            border-bottom: 2px solid #cbd5e1 !important;
+            padding: 8px 4px !important;
+            vertical-align: middle !important;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            line-height: 1.25 !important;
+        }
+
+        table.dataTable.custom-report-table > thead > tr > th::before,
+        table.dataTable.custom-report-table > thead > tr > th::after {
+            display: none !important;
         }
 
         .custom-report-table tbody td {
-            padding: 11px 8px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
-            color: #334155;
-            font-size: 0.835rem;
+            padding: 7px 4px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            color: #334155 !important;
+            font-size: 0.72rem !important;
+            line-height: 1.35 !important;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+        }
+
+        .custom-report-table tbody td.col-nowrap {
+            white-space: nowrap !important;
+        }
+
+        .custom-report-table tfoot th {
+            padding: 8px 4px !important;
+            font-size: 0.72rem !important;
+            white-space: nowrap !important;
+            vertical-align: middle !important;
+        }
+
+        .custom-report-table .badge {
+            font-size: 0.64rem !important;
+            padding: 0.22em 0.45em !important;
+            white-space: nowrap !important;
+            word-break: normal !important;
+            line-height: 1.2 !important;
+        }
+
+        .custom-report-table .badge-wrap {
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            display: inline-block;
+            max-width: 100%;
         }
 
         .custom-report-table tbody tr:hover {
@@ -216,15 +252,16 @@
 
         /* Kolom spesifik agar fit responsif */
         .col-nama-barang {
-            max-width: 160px;
-            word-break: break-word;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            min-width: 95px;
         }
 
         .col-catatan-teks {
-            max-width: 140px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+            min-width: 85px;
         }
 
         /* Hide default DataTables buttons container because we use custom header buttons */
@@ -387,7 +424,6 @@
                             </div>
                             <div>
                                 <h5 class="card-title mb-0 fw-bold">Filter & Saring Laporan Persediaan</h5>
-                                <small class="text-secondary">Saring data berdasarkan periode bulan, tahun, jenis mutasi, atau kategori pemohon</small>
                             </div>
                         </div>
                     </div>
@@ -533,7 +569,7 @@
                                                 <line x1="8" y1="2" x2="8" y2="6"></line>
                                                 <line x1="3" y1="10" x2="21" y2="10"></line>
                                             </svg>
-                                            <span>{{ (request('start_date') || request('end_date')) ? 'Tutup Filter Tanggal Spesifik' : '+ Rentang Tanggal Spesifik (Opsional)' }}</span>
+                                            <span>{{ (request('start_date') || request('end_date')) ? 'Tutup Filter Tanggal Spesifik' : '+ Rentang Tanggal Spesifik' }}</span>
                                         </a>
                                     </div>
 
@@ -592,8 +628,6 @@
                                         {{ number_format($totalTransactions) }} Data Ditemukan
                                     </span>
                                 </div>
-                                <small class="text-secondary">Daftar mutasi persediaan barang masuk dan keluar di
-                                    gudang</small>
                             </div>
                         </div>
 
@@ -644,7 +678,7 @@
                         </div>
                     </div>
 
-                    <div class="card-body p-4">
+                    <div class="card-body p-3">
                         {{-- Notifikasi Filter Aktif --}}
                         @if (request('type') || request('recipient_type') || request('month') || request('year') || request('start_date') || request('end_date'))
                             <div
@@ -709,23 +743,23 @@
                             </div>
                         @endif
 
-                        <table id="laporanTable" class="table custom-report-table word-wrap">
+                        <table id="laporanTable" class="table custom-report-table w-100">
                                 <thead>
                                     <tr class="text-center">
                                         <th width="3%">No</th>
-                                        <th width="7%">Tanggal Faktur</th>
-                                        <th width="7%">Kode Barang</th>
-                                        <th width="8%">Kategori</th>
-                                        <th width="11%">Nama Barang</th>
-                                        <th width="10%">Uraian</th>
-                                        <th width="7%">Jenis</th>
-                                        <th width="6%">Stok Awal</th>
-                                        <th width="7%">Stok Dipinjam</th>
-                                        <th width="6%">Stok Sisa</th>
+                                        <th width="7%">Tgl Faktur</th>
+                                        <th width="6%">Kode Barang</th>
+                                        <th width="7%">Kategori</th>
+                                        <th width="13%">Nama Barang</th>
+                                        <th width="8%">Uraian</th>
+                                        <th width="6%">Jenis</th>
+                                        <th width="5%">Stok Awal</th>
+                                        <th width="5%">Stok Dipinjam</th>
+                                        <th width="5%">Stok Sisa</th>
                                         <th width="8%">Harga Satuan</th>
                                         <th width="9%">Nilai Saldo / Total</th>
-                                        <th width="9%">Nama Penerima</th>
-                                        <th width="9%">Catatan</th>
+                                        <th width="8%">Nama Penerima</th>
+                                        <th width="10%">Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -751,23 +785,23 @@
                                         @endphp
                                         <tr>
                                             {{-- 1. No --}}
-                                            <td class="text-center text-muted fw-semibold">
+                                            <td class="text-center text-muted fw-semibold col-nowrap">
                                                 {{ $loop->iteration }}
                                             </td>
                                             {{-- 2. Tanggal Faktur --}}
-                                            <td class="text-center text-nowrap fw-semibold text-dark">
+                                            <td class="text-center fw-semibold text-dark col-nowrap">
                                                 {{ $transaction->transaction_date ? \Carbon\Carbon::parse($transaction->transaction_date)->format('d-m-Y') : '-' }}
                                             </td>
                                             {{-- 3. Kode Barang --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center col-nowrap">
                                                 <span
-                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-1">
+                                                    class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-1.5 py-1">
                                                     {{ $transaction->product->code ?? '-' }}
                                                 </span>
                                             </td>
                                             {{-- 4. Kategori --}}
-                                            <td class="text-center text-nowrap">
-                                                <span class="badge bg-light text-secondary border px-2 py-1 rounded-pill">
+                                            <td class="text-center">
+                                                <span class="badge badge-wrap bg-light text-secondary border px-1.5 py-1 rounded-pill">
                                                     {{ $transaction->product->category->name ?? '-' }}
                                                 </span>
                                             </td>
@@ -777,7 +811,7 @@
                                                     class="fw-bold text-dark">{{ $transaction->product->name ?? '-' }}</span>
                                             </td>
                                             {{-- 6. Uraian --}}
-                                            <td class="col-uraian text-break">
+                                            <td class="col-uraian">
                                                 @if ($transaction->type === 'masuk')
                                                     <span class="text-dark small fw-medium">{{ $transaction->uraian ?? '-' }}</span>
                                                 @else
@@ -785,77 +819,65 @@
                                                 @endif
                                             </td>
                                             {{-- 7. Jenis --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center col-nowrap">
                                                 @if ($transaction->type === 'masuk')
                                                     <span
-                                                        class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 fw-semibold d-inline-flex align-items-center gap-1">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24"
-                                                            fill="none" stroke="currentColor" stroke-width="2.5">
-                                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                                            <line x1="12" y1="15" x2="12"
-                                                                y2="3"></line>
-                                                        </svg>
+                                                        class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 fw-semibold">
                                                         Masuk
                                                     </span>
                                                 @else
                                                     <span
-                                                        class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fw-semibold d-inline-flex align-items-center gap-1">
-                                                        <svg width="11" height="11" viewBox="0 0 24 24"
-                                                            fill="none" stroke="currentColor" stroke-width="2.5">
-                                                            <polyline points="17 14 12 9 7 14"></polyline>
-                                                            <line x1="12" y1="9" x2="12"
-                                                                y2="21"></line>
-                                                        </svg>
+                                                        class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 fw-semibold">
                                                         Keluar
                                                     </span>
-                                                    <div class="mt-1">
-                                                        <span class="badge {{ $transaction->is_subdit ? 'bg-info text-white' : 'bg-secondary text-white' }}" style="font-size: 0.65rem; padding: 2px 6px;">
+                                                    <div class="mt-0.5">
+                                                        <span class="badge {{ $transaction->is_subdit ? 'bg-info text-white' : 'bg-secondary text-white' }}" style="font-size: 0.58rem; padding: 1px 5px;">
                                                             {{ $transaction->is_subdit ? 'Subdit' : 'Individu' }}
                                                         </span>
                                                     </div>
                                                 @endif
                                             </td>
                                             {{-- 8. Jumlah Stok Awal --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center col-nowrap">
                                                 @if ($stockAwal > 0)
                                                     <span
                                                         class="fw-semibold {{ $transaction->type === 'masuk' ? 'text-success' : 'text-dark' }}">{{ number_format($stockAwal) }}</span>
-                                                    <span class="text-muted small ms-1">Pcs</span>
+                                                    <span class="text-muted small">Pcs</span>
                                                 @elseif ($stockAwal === 0)
                                                     <span class="fw-semibold text-muted">0</span>
-                                                    <span class="text-muted small ms-1">Pcs</span>
+                                                    <span class="text-muted small">Pcs</span>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             {{-- 9. Jumlah Stok Dipinjam (Barang Keluar) --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center col-nowrap">
                                                 @if ($stockDipinjam > 0)
                                                     <span
                                                         class="fw-bold text-danger">{{ number_format($stockDipinjam) }}</span>
-                                                    <span class="text-muted small ms-1">Pcs</span>
+                                                    <span class="text-muted small">Pcs</span>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             {{-- 10. Jumlah Stok Sisa --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center col-nowrap">
                                                 <span
                                                     class="fw-semibold {{ $stockSisa < 5 ? 'text-danger' : 'text-success' }}">{{ number_format($stockSisa) }}</span>
-                                                <span class="text-muted small ms-1">Pcs</span>
+                                                <span class="text-muted small">Pcs</span>
                                             </td>
                                             {{-- 11. Harga Satuan --}}
-                                            <td class="text-end font-monospace text-secondary text-nowrap"
+                                            <td class="text-end font-monospace text-secondary col-nowrap"
                                                 data-order="{{ $harga }}">
                                                 {{ $formattedHarga }}
                                             </td>
                                             {{-- 12. Nilai Saldo / Total --}}
-                                            <td class="text-end font-monospace fw-bold text-dark text-nowrap"
+                                            <td class="text-end font-monospace fw-bold text-dark col-nowrap"
                                                 data-order="{{ $nilaiSaldo }}">
                                                 {{ $formattedTotal }}
                                             </td>
                                             {{-- 13. Nama Penerima --}}
-                                            <td class="text-center text-nowrap">
+                                            <td class="text-center">
                                                 @if ($transaction->type === 'keluar')
                                                     <span class="text-dark small fw-semibold">{{ $transaction->recipient_name }}</span>
                                                 @else
@@ -955,6 +977,7 @@
                 });
 
                 var dataTableInstance = $('#laporanTable').DataTable({
+                    autoWidth: false,
                     pageLength: 25,
                     lengthMenu: [
                         [25, 50, 100, -1],

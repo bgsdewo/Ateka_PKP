@@ -7,14 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Subbag Tata Usaha</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Rekapitulasi Permintaan ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Rekapitulasi seluruh usulan permohonan ATK dari Pegawai &amp; Subdirektorat serta pencetakan rekapitulasi kebutuhan kantor.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -129,8 +122,7 @@
             <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.35rem 1.75rem !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h4 class="card-title mb-1 fw-bold text-dark">Rekapitulasi Kebutuhan &amp; Permintaan ATK</h4>
-                        <small class="text-secondary">Periode: <strong>{{ $periodLabel }}</strong> &bull; Rekapitulasi seluruh usulan permohonan ATK</small>
+                        <h4 class="card-title mb-0 fw-bold text-dark">Rekapitulasi Kebutuhan &amp; Permintaan ATK</h4>
                     </div>
                 </div>
             </div>
@@ -223,19 +215,25 @@
                 </form>
             </div>
 
-            <div class="card-body p-4">
+            <div class="card-body p-2.5 p-md-3">
                 <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle">
-                            <thead class="table-light">
+                        <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100">
+                            <colgroup>
+                                <col style="width: 3%;">
+                                <col style="width: 21%;">
+                                <col style="width: 20%;">
+                                <col style="width: 26%;">
+                                <col style="width: 13%;">
+                                <col style="width: 17%;">
+                            </colgroup>
+                            <thead>
                                 <tr>
-                                    <th width="4%">No</th>
+                                    <th>No</th>
                                     <th>Kode & Tanggal</th>
                                     <th>Pemohon & Unit Kerja</th>
-                                    <th>Tipe</th>
-                                    <th>Rincian Barang (Diminta & Disetujui)</th>
-                                    <th>Catatan Pemohon & Verifikasi</th>
+                                    <th>Rincian Barang & Keperluan</th>
                                     <th>Status</th>
-                                    <th width="10%" class="text-end">Aksi</th>
+                                    <th class="text-end">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -243,101 +241,118 @@
                                     <tr>
                                         <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $idx + 1 }}</td>
                                         <td>
-                                            <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                            <small class="text-muted">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</small>
+                                            <div class="font-monospace fw-bold text-primary" style="font-size: 0.72rem; letter-spacing: -0.02em;">{{ $req->request_code }}</div>
+                                            <div class="d-flex align-items-center gap-1 flex-wrap mt-0.5">
+                                                <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary text-white' }}" style="font-size: 0.66rem; padding: 0.15rem 0.4rem;">
+                                                    {{ ucfirst($req->type) }}
+                                                </span>
+                                                @if ($req->is_procurement)
+                                                    <span class="badge bg-warning text-dark" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">
+                                                        Pengadaan (Beli TU)
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="text-muted mt-0.5" style="font-size: 0.68rem;">
+                                                {{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB
+                                            </div>
                                         </td>
-                                        <td>
-                                            <strong class="text-dark">{{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}</strong><br>
-                                            <small class="text-muted">{{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}</small>
+                                        <td style="word-break: break-word;">
+                                            <div class="fw-bold text-dark" style="font-size: 0.76rem; line-height: 1.25;">
+                                                {{ $req->user->name_with_title ?? ($req->user->name ?? '-') }}
+                                            </div>
+                                            <div class="text-muted" style="font-size: 0.68rem; line-height: 1.2;">
+                                                {{ $req->user->position ?? ($req->user->subdit_name ?? '-') }}
+                                            </div>
                                             @if(!empty($req->user->nip))
-                                                <br><span class="badge bg-light text-secondary border mt-1" style="font-size: 0.72rem;">NIP: {{ $req->user->nip }}</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary text-white' }}">
-                                                {{ ucfirst($req->type) }}
-                                            </span>
-                                            @if ($req->is_procurement)
-                                                <br><span class="badge bg-warning text-dark mt-1" style="font-size:0.7rem;">
-                                                    Pengadaan (Beli TU)
+                                                <span class="badge bg-light text-secondary border mt-0.5" style="font-size: 0.65rem; padding: 0.12rem 0.35rem;">
+                                                    NIP: {{ $req->user->nip }}
                                                 </span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <ul class="ps-3 mb-0 small">
+                                        <td style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;">
+                                            <ul class="mb-0 ps-3" style="font-size: 0.74rem; word-break: break-word; white-space: normal;">
                                                 @foreach ($req->details as $det)
-                                                    <li class="mb-1">
-                                                        <strong>{{ $det->item_name }}</strong>:
-                                                        <span class="badge bg-light text-dark border">Diminta: {{ $det->quantity }} {{ $det->item_unit }}</span>
+                                                    <li class="mb-1" style="word-break: break-word;">
+                                                        <span class="fw-bold text-dark">{{ $det->item_name }}</span>:
+                                                        <span class="badge bg-light text-dark border px-1.5 py-0.5" style="font-size: 0.65rem;">Diminta: {{ $det->quantity }} {{ $det->item_unit }}</span>
                                                         @if (in_array($req->status, ['approved', 'distributed']))
-                                                            <span class="badge bg-success-subtle text-success border ms-1">
+                                                            <span class="badge bg-success-subtle text-success border px-1.5 py-0.5 ms-0.5" style="font-size: 0.65rem;">
                                                                 Disetujui: {{ $det->effective_quantity }} {{ $det->item_unit }}
                                                             </span>
                                                         @endif
                                                         @if ($det->specification)
-                                                            <div class="text-muted fst-italic" style="font-size: 0.72rem;">
+                                                            <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">
                                                                 Spesifikasi: {{ $det->specification }}
                                                             </div>
                                                         @endif
                                                         @if ($det->verification_note)
-                                                            <div class="text-muted fst-italic" style="font-size: 0.72rem;">
-                                                                Catatan: {{ $det->verification_note }}
+                                                            <div class="mt-0.5 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.68rem; line-height: 1.25;">
+                                                                <span class="fw-bold">Catatan TU:</span> "{{ $det->verification_note }}"
                                                             </div>
                                                         @endif
                                                     </li>
                                                 @endforeach
                                             </ul>
-                                        </td>
-                                        <td>
-                                            @if ($req->notes)
-                                                <div class="small text-dark mb-1">
-                                                    <strong>Pemohon:</strong> {{ $req->notes }}
-                                                </div>
-                                            @endif
+
                                             @if ($req->verification_notes)
-                                                <div class="small text-primary">
-                                                    <strong>TU:</strong> {{ $req->verification_notes }}
+                                                <div class="mt-1 ps-3" style="font-size: 0.68rem; line-height: 1.35; word-break: break-word; white-space: normal;">
+                                                    <div class="p-1 rounded bg-primary-subtle text-primary border border-primary-subtle">
+                                                        <strong class="d-inline-flex align-items-center gap-1">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                                            Catatan TU:
+                                                        </strong>
+                                                        <span class="ms-1">{{ $req->verification_notes }}</span>
+                                                    </div>
                                                 </div>
                                             @endif
-                                            @if (!$req->notes && !$req->verification_notes)
-                                                <span class="text-muted small">-</span>
+
+                                            @if ($req->notes)
+                                                <div class="text-muted ps-3 mt-1" style="font-size: 0.7rem; line-height: 1.3; word-break: break-word;">
+                                                    <span class="text-secondary fw-semibold">Keperluan:</span> {{ $req->notes }}
+                                                </div>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td style="vertical-align: middle;">
                                             @if ($req->status === 'pending')
-                                                <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
+                                                <span class="badge bg-warning text-dark px-1.5 py-0.5" style="font-size: 0.68rem;">Menunggu Verifikasi</span>
                                             @elseif ($req->status === 'approved')
-                                                <span class="badge bg-success text-white">Disetujui TU</span>
+                                                <span class="badge bg-success text-white px-1.5 py-0.5" style="font-size: 0.68rem;">Disetujui TU</span>
                                                 @if ($req->purchase_invoice)
-                                                    <br><span class="badge bg-primary-subtle text-primary border mt-1" style="font-size: 0.72rem;" title="Pengadaan Faktur TU">
-                                                        Dibeli: {{ $req->purchase_invoice }}
-                                                    </span>
+                                                    <div class="mt-0.5">
+                                                        <span class="badge bg-primary-subtle text-primary border px-1.5 py-0.5" style="font-size: 0.65rem;" title="Pengadaan Faktur TU">
+                                                            Dibeli: {{ $req->purchase_invoice }}
+                                                        </span>
+                                                    </div>
                                                 @endif
                                             @elseif ($req->status === 'distributed')
-                                                <span class="badge bg-primary text-white">Selesai Didistribusikan</span>
+                                                <span class="badge bg-primary text-white px-1.5 py-0.5" style="font-size: 0.68rem;">Selesai</span>
                                                 @if ($req->purchase_invoice)
-                                                    <br><span class="badge bg-info-subtle text-dark border mt-1" style="font-size: 0.72rem;">
-                                                        Faktur: {{ $req->purchase_invoice }}
-                                                    </span>
+                                                    <div class="mt-0.5">
+                                                        <span class="badge bg-info-subtle text-dark border px-1.5 py-0.5" style="font-size: 0.65rem;">
+                                                            Faktur: {{ $req->purchase_invoice }}
+                                                        </span>
+                                                    </div>
                                                 @endif
                                             @else
-                                                <span class="badge bg-danger text-white">Ditolak</span>
+                                                <span class="badge bg-danger text-white px-1.5 py-0.5" style="font-size: 0.68rem;">Ditolak</span>
                                             @endif
                                         </td>
-                                        <td class="text-end">
+                                        <td class="text-end" style="vertical-align: middle; white-space: nowrap;">
                                             <div class="d-inline-flex gap-1">
                                                 <a href="{{ route('rekapitulasi-permintaan.cetak', ['request_id' => $req->id]) }}" 
                                                    target="_blank" 
-                                                   class="btn btn-sm btn-primary fw-bold d-inline-flex align-items-center gap-1 shadow-sm"
+                                                   class="btn btn-sm btn-primary fw-bold d-inline-flex align-items-center gap-1 shadow-sm px-2 py-1"
+                                                   style="font-size: 0.72rem;"
                                                    title="Cetak Form Rekapan Permintaan {{ $req->request_code }}">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
                                                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                                                         <rect x="6" y="14" width="12" height="8"></rect>
                                                     </svg>
                                                     Cetak
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                <button type="button" class="btn btn-sm btn-outline-info px-2 py-1"
+                                                        style="font-size: 0.72rem;"
                                                         data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}"
                                                         title="Lihat Rincian Usulan">
                                                     Detail
@@ -441,7 +456,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted py-5">
+                                        <td colspan="6" class="text-center text-muted py-5">
                                             Tidak ada data usulan permintaan pada filter periode ini.
                                         </td>
                                     </tr>

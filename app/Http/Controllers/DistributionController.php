@@ -130,7 +130,7 @@ class DistributionController extends Controller
             ->first()
             ?? auth()->user();
 
-        $gudangUsers = \App\Models\User::whereIn('role', ['pegawai_gudang', 'pic_distribusi'])
+        $gudangUsers = \App\Models\User::where('role', 'pegawai_gudang')
             ->orderByDesc('is_distributor')
             ->orderBy('name')
             ->get();
@@ -160,8 +160,11 @@ class DistributionController extends Controller
      */
     public function confirmHandover(Request $request, $id)
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh Kasubag TU dan Pegawai Gudang.');
+        $authUser = auth()->user();
+        $isAuthorizedDistributor = $authUser && ($authUser->isKasubagTU() || ($authUser->isPegawaiGudang() && $authUser->isDistributor()));
+
+        if (!$isAuthorizedDistributor) {
+            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubag TU.');
         }
 
         $requestItem = RequestItem::with(['user', 'details.product'])
@@ -221,8 +224,11 @@ class DistributionController extends Controller
      */
     public function uploadProof(Request $request, $id)
     {
-        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Aksi ini hanya dapat dilakukan oleh Kasubag TU dan Pegawai Gudang.');
+        $authUser = auth()->user();
+        $isAuthorizedDistributor = $authUser && ($authUser->isKasubagTU() || ($authUser->isPegawaiGudang() && $authUser->isDistributor()));
+
+        if (!$isAuthorizedDistributor) {
+            return redirect()->route('dashboard')->with('error', 'Aksi upload foto bukti penyerahan hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubag TU.');
         }
 
         $requestItem = RequestItem::where(function ($q) {
