@@ -79,6 +79,81 @@
         background: #f8fafc !important;
         color: #94a3b8 !important;
     }
+
+    /* Styling Pagination DataTables Master Data Barang ATK */
+    #datatable_paginate,
+    .dataTables_paginate {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+    }
+    #datatable_paginate .pagination,
+    .dataTables_paginate .pagination {
+        margin-bottom: 0 !important;
+        margin-left: auto !important;
+        gap: 3px !important;
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+    #datatable_paginate .page-item,
+    .dataTables_paginate .page-item {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+    }
+    #datatable_paginate .page-link,
+    .dataTables_paginate .page-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 28px !important;
+        height: 28px !important;
+        padding: 0 0.45rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        border-radius: 5px !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+        text-decoration: none !important;
+        background: #ffffff !important;
+        transition: all 0.15s ease !important;
+        line-height: 1 !important;
+        box-shadow: none !important;
+    }
+    #datatable_paginate .page-item.previous .page-link,
+    #datatable_paginate .page-item.next .page-link,
+    .dataTables_paginate .page-item.previous .page-link,
+    .dataTables_paginate .page-item.next .page-link {
+        padding: 0 0.65rem !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        min-width: unset !important;
+    }
+    #datatable_paginate .page-link:hover:not(.active),
+    .dataTables_paginate .page-link:hover:not(.active) {
+        background: #f1f5f9 !important;
+        color: #0284c7 !important;
+        border-color: #cbd5e1 !important;
+    }
+    #datatable_paginate .page-item.active .page-link,
+    .dataTables_paginate .page-item.active .page-link {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25) !important;
+    }
+    #datatable_paginate .page-item.disabled .page-link,
+    .dataTables_paginate .page-item.disabled .page-link {
+        opacity: 0.45 !important;
+        background: #f8fafc !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
+    }
 </style>
 @endpush
 
@@ -360,24 +435,24 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table id="datatable" class="table table-striped table-hover word-wrap"
+                    <div class="card-body px-2 px-md-3 py-3">
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
                             data-toggle="data-table">
                                 <thead>
                                     <tr>
-                                        <th width="4%">No</th>
-                                        <th>No. Faktur</th>
-                                        <th>Tgl Faktur</th>
-                                        <th>Kode Rincian</th>
-                                        <th>Nama Barang</th>
-                                        <th>Kategori</th>
-                                        <th>Uraian / Supplier</th>
-                                        <th>Satuan</th>
-                                        <th>Stok</th>
-                                        <th>Harga Perolehan</th>
-                                        <th>Total Nilai Saldo</th>
-                                        <th>Status</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th width="3%" class="text-center no-sort" data-orderable="false">No</th>
+                                        <th width="7%" class="text-nowrap">No. Faktur</th>
+                                        <th width="7%" class="text-nowrap">Tgl Faktur</th>
+                                        <th width="7%" class="text-nowrap">Kode Rincian</th>
+                                        <th width="17%">Nama Barang</th>
+                                        <th width="7%">Kategori</th>
+                                        <th width="8%">Uraian / Supplier</th>
+                                        <th width="4%" class="text-center">Satuan</th>
+                                        <th width="4%" class="text-center">Stok</th>
+                                        <th width="8%" class="text-nowrap text-end">Harga Perolehan</th>
+                                        <th width="8%" class="text-nowrap text-end">Total Nilai Saldo</th>
+                                        <th width="8%" class="text-center text-nowrap">Status</th>
+                                        <th width="12%" class="text-center text-nowrap no-sort" data-orderable="false">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -390,45 +465,45 @@
                                             $uraian = $product->initial_uraian;
                                         @endphp
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="text-nowrap">
                                                 <span class="badge bg-secondary">{{ $noFaktur ?: '-' }}</span>
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 {{ $tglFaktur }}
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 <span class="badge bg-primary">{{ $product->code }}</span>
                                             </td>
                                             <td>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 36px; height: 36px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
-                                                    <div>
-                                                        <strong>{{ $product->name }}</strong>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 28px; height: 28px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
+                                                    <div style="min-width: 0;">
+                                                        <strong class="d-block" style="font-size: 0.78rem; line-height: 1.25;">{{ $product->name }}</strong>
                                                         @if ($product->description)
-                                                            <br>
-                                                            <small class="text-muted">{{ Str::limit($product->description, 50) }}</small>
+                                                            <small class="text-muted d-block text-truncate" style="font-size: 0.68rem; max-width: 170px;">{{ $product->description }}</small>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>{{ $product->category->name ?? '-' }}</td>
                                             <td>{{ $uraian ?: '-' }}</td>
-                                            <td>{{ $product->unit }}</td>
-                                            <td>{{ number_format($product->stock) }}</td>
-                                            <td>Rp {{ number_format($hargaBeli, 0, ',', '.') }}</td>
-                                            <td><strong class="text-success">Rp
+                                            <td class="text-center">{{ $product->unit }}</td>
+                                            <td class="text-center fw-semibold">{{ number_format($product->stock) }}</td>
+                                            <td class="text-nowrap text-end" style="font-size: 0.74rem;">Rp {{ number_format($hargaBeli, 0, ',', '.') }}</td>
+                                            <td class="text-nowrap text-end" style="font-size: 0.74rem;"><strong class="text-success">Rp
                                                     {{ number_format($totalNilai, 0, ',', '.') }}</strong></td>
-                                            <td>
+                                            <td class="text-nowrap text-center">
                                                 @if ($product->stock <= 0)
-                                                    <span class="badge bg-dark">Stok Belum Tersedia</span>
+                                                    <span class="badge bg-dark" style="font-size: 0.65rem; padding: 0.22rem 0.45rem;">Stok Belum Tersedia</span>
                                                 @else
-                                                    <span class="badge bg-success">Tersedia</span>
+                                                    <span class="badge bg-success" style="font-size: 0.65rem; padding: 0.22rem 0.45rem;">Tersedia</span>
                                                 @endif
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center text-nowrap">
                                                 <div class="d-flex justify-content-center gap-1 flex-nowrap">
-                                                    <button type="button" class="btn btn-info btn-sm btn-detail-barang"
+                                                    <button type="button" class="btn btn-info btn-sm btn-detail-barang px-1.5 py-0.5"
+                                                        style="font-size: 0.68rem; line-height: 1.2;"
                                                         data-id="{{ $product->id }}"
                                                         data-category-id="{{ $product->category_id }}"
                                                         data-category-name="{{ e($product->category->name ?? '-') }}"
@@ -448,7 +523,8 @@
                                                         data-updated-at="{{ $product->updated_at ? $product->updated_at->format('d-m-Y H:i') : '-' }}">
                                                         Detail
                                                     </button>
-                                                    <button type="button" class="btn btn-warning btn-sm btn-edit-barang"
+                                                    <button type="button" class="btn btn-warning btn-sm btn-edit-barang px-1.5 py-0.5"
+                                                        style="font-size: 0.68rem; line-height: 1.2;"
                                                         data-id="{{ $product->id }}"
                                                         data-category-id="{{ $product->category_id }}"
                                                         data-code="{{ e($product->code) }}"
@@ -466,12 +542,13 @@
                                                     </button>
                                                     @if (!auth()->user()->isPegawaiGudang())
                                                         <form
-                                                            action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
+                                                             action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
                                                             method="POST"
                                                             onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                            <button type="submit" class="btn btn-danger btn-sm px-1.5 py-0.5"
+                                                                style="font-size: 0.68rem; line-height: 1.2;">
                                                                 Hapus
                                                             </button>
                                                         </form>

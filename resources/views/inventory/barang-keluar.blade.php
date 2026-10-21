@@ -171,18 +171,18 @@
 
                     <!-- TABEL DATA -->
                     <div class="card-body">
-                        <table id="datatable" class="table table-striped table-hover word-wrap"
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
                             data-toggle="data-table">
                                 <thead>
                                     <tr>
-                                        <th width="5%">No</th>
-                                        <th>Tanggal</th>
-                                        <th>Barang</th>
-                                        <th>Uraian / Penerima</th>
-                                        <th>Kondisi</th>
-                                        <th>Keluar</th>
-                                        <th>Stok Sisa</th>
-                                        <th>Status</th>
+                                        <th width="4%">No</th>
+                                        <th width="10%">Tanggal</th>
+                                        <th width="22%">Barang</th>
+                                        <th width="28%">Uraian / Penerima</th>
+                                        <th width="8%">Kondisi</th>
+                                        <th width="8%" class="text-center">Keluar</th>
+                                        <th width="8%" class="text-center">Stok Sisa</th>
+                                        <th width="12%" class="text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>

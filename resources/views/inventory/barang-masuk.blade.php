@@ -171,19 +171,19 @@
 
                     <!-- TABEL DATA -->
                     <div class="card-body">
-                        <table id="datatable" class="table table-striped table-hover word-wrap"
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
                             data-toggle="data-table">
                                 <thead>
                                     <tr>
-                                        <th width="5%">No</th>
-                                        <th>No. Faktur</th>
-                                        <th>Tgl Faktur</th>
-                                        <th>Barang</th>
-                                        <th>Uraian / Supplier</th>
-                                        <th>Kondisi</th>
-                                        <th>Harga Satuan</th>
-                                        <th>Masuk</th>
-                                        <th>Stok Sisa</th>
+                                        <th width="4%">No</th>
+                                        <th width="13%">No. Faktur</th>
+                                        <th width="10%">Tgl Faktur</th>
+                                        <th width="22%">Barang</th>
+                                        <th width="20%">Uraian / Supplier</th>
+                                        <th width="8%">Kondisi</th>
+                                        <th width="11%" class="text-end">Harga Satuan</th>
+                                        <th width="6%" class="text-center">Masuk</th>
+                                        <th width="6%" class="text-center">Stok Sisa</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -218,7 +218,7 @@
                                             <td class="text-end">{{ $hargaPerolehan }}</td>
 
                                             <!-- Jumlah Masuk -->
-                                            <td>
+                                            <td class="text-center">
                                                 <span class="text-success fw-bold">
                                                     {{ number_format($transaction->quantity) }}
                                                 </span>
@@ -234,7 +234,7 @@
                                             </td>
 
                                             <!-- Stok Sisa -->
-                                            <td>
+                                            <td class="text-center">
                                                 <strong>
                                                     {{ number_format($stockAfter) }}
                                                 </strong>

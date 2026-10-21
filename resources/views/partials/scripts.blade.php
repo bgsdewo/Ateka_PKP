@@ -14,6 +14,10 @@
     if (typeof $ !== 'undefined' && typeof $.fn.dataTable !== 'undefined') {
         $.fn.dataTable.ext.errMode = 'none';
         $.extend(true, $.fn.dataTable.defaults, {
+            autoWidth: false,
+            columnDefs: [
+                { targets: 'no-sort', orderable: false }
+            ],
             language: {
                 emptyTable: "Tidak ada data yang tersedia pada tabel ini",
                 info: "Menampilkan <strong>_START_</strong> sampai <strong>_END_</strong> dari <strong>_TOTAL_</strong> entri",

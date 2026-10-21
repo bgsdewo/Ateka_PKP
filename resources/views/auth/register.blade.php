@@ -57,6 +57,8 @@
         }
 
         .auth-card {
+            width: 100% !important;
+            padding: 0 !important;
             border-radius: 1rem;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);

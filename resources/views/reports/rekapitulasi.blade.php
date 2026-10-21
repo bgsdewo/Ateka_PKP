@@ -349,16 +349,16 @@
 
                     <div class="card-body p-4">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0 w-100">
                                 <thead>
                                     <tr class="text-secondary text-uppercase small" style="background-color: #f8fafc; font-size: 0.75rem; letter-spacing: 0.04em;">
-                                        <th width="4%" class="text-center py-3">No</th>
-                                        <th class="py-3">Kategori ATK</th>
-                                        <th class="text-center py-3">Jumlah Item</th>
-                                        <th class="text-center py-3 text-success">Barang Masuk</th>
-                                        <th class="text-center py-3 text-danger">Barang Keluar</th>
-                                        <th class="text-center py-3">Sisa Stok Fisik</th>
-                                        <th class="text-end py-3 pe-3">Nilai Saldo (Rp)</th>
+                                        <th width="5%" class="text-center py-3">No</th>
+                                        <th width="29%" class="py-3">Kategori ATK</th>
+                                        <th width="13%" class="text-center py-3">Jumlah Item</th>
+                                        <th width="13%" class="text-center py-3 text-success">Barang Masuk</th>
+                                        <th width="13%" class="text-center py-3 text-danger">Barang Keluar</th>
+                                        <th width="13%" class="text-center py-3">Sisa Stok Fisik</th>
+                                        <th width="14%" class="text-end py-3 pe-3">Nilai Saldo (Rp)</th>
                                     </tr>
                                 </thead>
                                 <tbody>

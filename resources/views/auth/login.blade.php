@@ -103,6 +103,8 @@
         }
 
         .auth-card {
+            width: 100% !important;
+            padding: 0 !important;
             border-radius: 1.25rem;
             box-shadow: 0 25px 50px -12px rgba(6, 18, 36, 0.50), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
             background: rgba(255, 255, 255, 0.98);
@@ -197,9 +199,9 @@
         <section class="login-content">
             <div class="container">
                 <div class="row justify-content-center align-items-center">
-                    <div class="col-11 col-sm-9 col-md-6 col-lg-4" style="max-width: 430px;">
+                    <div class="col-12" style="width: 100%; max-width: 440px;">
                         <div class="card auth-card mb-0">
-                            <div class="card-body" style="padding: 2.75rem 2.25rem !important;">
+                            <div class="card-body" style="padding: 2.5rem 2.25rem !important;">
                                 <!-- Logo & Identity -->
                                 <div class="text-center mb-4">
                                     <div class="mb-3">
