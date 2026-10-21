@@ -65,14 +65,7 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-info"></span>
-                                <span>Kementerian PKP RI &bull; Administrasi Arsip &amp; Dokumen</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Rekapitulasi Mutasi &amp; Arsip Dokumen</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Pengelolaan arsip persediaan, rekap data pergerakan barang masuk/keluar, dan penyusunan berita acara resmi kantor.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -177,7 +170,6 @@
                             </div>
                             <div>
                                 <h5 class="card-title mb-0 fw-bold">Parameter Penyaringan &amp; Rekapitulasi</h5>
-                                <small class="text-secondary">Saring data mutasi arsip persediaan per bulan, tahun, jenis transaksi, atau penerima</small>
                             </div>
                         </div>
                     </div>
@@ -351,12 +343,8 @@
                             </div>
                             <div>
                                 <h5 class="card-title mb-0 fw-bold">Rekapitulasi Mutasi per Kategori Barang ATK</h5>
-                                <small class="text-secondary">Rangkuman mutasi barang masuk, barang keluar, dan akumulasi nilai persediaan untuk arsip</small>
                             </div>
                         </div>
-                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1.5 small fw-semibold">
-                            {{ method_exists($categoriesRekap, 'total') ? $categoriesRekap->total() : $categoriesRekap->count() }} Kategori Terdaftar
-                        </span>
                     </div>
 
                     <div class="card-body p-4">

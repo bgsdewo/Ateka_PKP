@@ -20,15 +20,6 @@
                 </svg>
             </i>
         </div>
-        <div class="input-group search-input d-none d-md-flex">
-            <span class="input-group-text">
-                <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="11.7669" cy="11.7666" r="8.98856" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M18.0186 18.4851L21.5426 22" stroke="currentColor" stroke-width="1.5"></path>
-                </svg>
-            </span>
-            <input type="search" id="navbar-search" class="form-control" placeholder="Cari data persediaan atau transaksi..." aria-label="Cari data persediaan atau transaksi">
-        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">
             <span class="navbar-toggler-icon">
                 <span class="mt-2 navbar-toggler-bar bar1"></span>
@@ -42,7 +33,8 @@
                 @php
                     $currentUser = auth()->user();
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
-                    $isPicDistribusi = $currentUser && ($currentUser->isPicDistribusi() || $currentUser->isDistributor() || $currentUser->isPegawaiGudang());
+                    $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
+                    $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
@@ -104,16 +96,15 @@
                         }
                     }
 
-                    // Khusus PIC Distribusi: Ringkasan & Antrean Serah Terima Barang
+                    // Khusus Petugas Distribusi Gudang: Ringkasan & Antrean Serah Terima Barang
                     $pendingDistributions = collect();
                     $totalPendingDistribusi = 0;
 
-                    if ($isPicDistribusi) {
+                    if ($isDistributorGudang) {
                         $readyDistribusiQuery = \App\Models\RequestItem::where('status', 'approved')
                             ->where(function ($q) {
                                 $q->where('is_procurement', false)->orWhereNull('is_procurement');
                             })
-                            ->forPic($currentUser)
                             ->with(['user', 'details.product']);
 
                         $totalPendingDistribusi = (clone $readyDistribusiQuery)->count();
@@ -140,7 +131,7 @@
 
                     $navBadgeCount = $isKasubagTU 
                         ? ($unreadNotifCount + $totalPendingVerifikasi) 
-                        : ($isPicDistribusi 
+                        : ($isDistributorGudang 
                             ? ($unreadNotifCount + $totalPendingDistribusi) 
                             : $unreadNotifCount);
 
@@ -170,7 +161,7 @@
                                 <small class="text-white-50" id="nav-notif-subtitle">
                                     @if($isKasubagTU && $totalPendingVerifikasi > 0)
                                         {{ $totalPendingVerifikasi }} menunggu verifikasi
-                                    @elseif($isPicDistribusi && $totalPendingDistribusi > 0)
+                                    @elseif($isDistributorGudang && $totalPendingDistribusi > 0)
                                         {{ $totalPendingDistribusi }} siap diserahkan
                                     @else
                                         {{ $unreadNotifCount }} belum dibaca
@@ -212,8 +203,8 @@
                             </div>
                         @endif
 
-                        {{-- Card Ringkasan Khusus PIC Distribusi --}}
-                        @if($isPicDistribusi && $totalPendingDistribusi > 0)
+                        {{-- Card Ringkasan Khusus Petugas Distribusi Gudang --}}
+                        @if($isDistributorGudang && $totalPendingDistribusi > 0)
                             <div class="p-2.5 m-2.5 mb-1 rounded-3 border" style="background: #fffbeb; border-color: #fef3c7 !important;">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <span class="small fw-bold text-dark d-flex align-items-center gap-1" style="font-size: 0.76rem;">
@@ -362,7 +353,7 @@
                                 <a href="{{ route('persetujuan.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.76rem;">
                                     Menu Verifikasi &rarr;
                                 </a>
-                            @elseif($isPicDistribusi)
+                            @elseif($isDistributorGudang)
                                 <a href="{{ route('distribusi.index') }}" class="btn btn-link btn-sm text-primary p-0 small fw-bold text-decoration-none" style="font-size: 0.76rem;">
                                     Menu Distribusi &rarr;
                                 </a>

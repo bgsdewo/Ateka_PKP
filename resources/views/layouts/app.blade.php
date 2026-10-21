@@ -357,40 +357,6 @@
 
     @include('partials.scripts')
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('navbar-search');
-
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const keyword = e.target.value.toLowerCase();
-
-                    // 1. JIKA HALAMAN MENGGUNAKAN PLUGIN DATATABLES (Kategori & Daftar Barang)
-                    if (typeof $.fn.dataTable !== 'undefined' && $.fn.DataTable.isDataTable('table')) {
-                        $('table').DataTable().search(keyword).draw();
-                    }
-
-                    // 2. JIKA HALAMAN MENGGUNAKAN TABEL HTML BIASA (Transaksi Masuk & Keluar)
-                    else {
-                        const rows = document.querySelectorAll('table tbody tr');
-
-                        rows.forEach(function(row) {
-                            // Lewati baris jika itu pesan kosong dari datatables
-                            if (row.classList.contains('dataTables_empty')) return;
-
-                            const text = row.innerText.toLowerCase();
-                            if (text.includes(keyword)) {
-                                row.style.display = ''; // Tampilkan
-                            } else {
-                                row.style.display = 'none'; // Sembunyikan
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    </script>
-
     @stack('scripts')
 </body>
 

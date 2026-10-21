@@ -83,10 +83,13 @@
         }
 
         @media print {
+            html,
             body {
                 background: #fff !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
             }
 
             .no-print-bar {
@@ -96,16 +99,24 @@
             .sheet-page {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 10mm 15mm !important;
+                padding: 0 !important;
                 width: 100% !important;
-                min-height: 297mm !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-width: 100% !important;
                 page-break-after: always !important;
                 break-after: page !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
 
             .sheet-page:last-child {
                 page-break-after: auto !important;
                 break-after: auto !important;
+            }
+
+            .sheet-page img {
+                max-height: 480px !important;
             }
 
             .sheet-badge {
@@ -121,7 +132,7 @@
 
             @page {
                 size: A4 portrait;
-                margin: 8mm;
+                margin: 12mm 15mm 12mm 15mm;
             }
         }
     </style>
@@ -180,7 +191,7 @@
         }
 
         if (!$distributorUser) {
-            if (auth()->check() && auth()->user()->isPegawaiGudang() && auth()->user()->name !== 'tes') {
+            if (auth()->check() && auth()->user()->isPegawaiGudang() && auth()->user()->isDistributor() && auth()->user()->name !== 'tes') {
                 $distributorUser = auth()->user();
             } else {
                 $distributorUser = \App\Models\User::where('role', 'pegawai_gudang')

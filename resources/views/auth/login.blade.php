@@ -27,23 +27,32 @@
 
     <!-- Penyesuaian UI/UX: Official Kementerian PKP RI Palette & Modern GovTech Styling -->
     <style>
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background: linear-gradient(135deg, #061224 0%, #0a213e 40%, #0c3d69 75%, #075985 100%);
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
             font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
             position: relative;
             overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* Ambient Living Glow */
+        /* Ambient Living Glow (Fixed agar tidak menambah tinggi halaman / sisa ruang kosong) */
         body::before {
             content: '';
-            position: absolute;
-            width: 550px;
-            height: 550px;
-            right: -100px;
-            top: -150px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.28) 0%, rgba(14, 165, 233, 0.12) 40%, transparent 70%);
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            right: -80px;
+            top: -120px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.24) 0%, rgba(14, 165, 233, 0.08) 40%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
@@ -51,23 +60,33 @@
 
         body::after {
             content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            left: -120px;
-            bottom: -150px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.20) 0%, transparent 65%);
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            left: -80px;
+            bottom: -100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, transparent 65%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
         }
 
+        .wrapper {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .login-content {
+            width: 100%;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem 1rem;
+            padding: 1.5rem 1rem;
+            box-sizing: border-box;
             position: relative;
             z-index: 1;
         }
@@ -75,7 +94,7 @@
         @keyframes authCardEnter {
             from {
                 opacity: 0;
-                transform: translateY(22px) scale(0.98);
+                transform: translateY(16px) scale(0.98);
             }
             to {
                 opacity: 1;
@@ -89,15 +108,14 @@
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border: none;
-            animation: authCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: authCardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-
         .form-control {
             border-radius: 0.65rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.92rem;
+            padding: 0.72rem 1rem;
+            font-size: 0.9rem;
             border: 1.5px solid #e2e8f0;
             background-color: #f8fafc;
             color: #0f172a;
@@ -113,7 +131,7 @@
 
         .btn-primary {
             border-radius: 0.65rem !important;
-            padding: 0.78rem 1rem !important;
+            padding: 0.75rem 1rem !important;
             font-weight: 700 !important;
             letter-spacing: -0.01em;
             background: linear-gradient(135deg, #0b345b 0%, #174e84 45%, #0284c7 100%) !important;
@@ -134,7 +152,7 @@
         }
 
         .brand-logo-img {
-            max-height: 85px;
+            max-height: 72px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.03));
@@ -179,19 +197,19 @@
         <section class="login-content">
             <div class="container">
                 <div class="row justify-content-center align-items-center">
-                    <div class="col-md-7 col-lg-5">
+                    <div class="col-11 col-sm-9 col-md-6 col-lg-4" style="max-width: 430px;">
                         <div class="card auth-card mb-0">
-                            <div class="card-body p-4 p-sm-5">
+                            <div class="card-body" style="padding: 2.75rem 2.25rem !important;">
                                 <!-- Logo & Identity -->
                                 <div class="text-center mb-4">
                                     <div class="mb-3">
                                         <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}"
-                                            class="brand-logo-img" alt="Logo Kementerian PKP" width="64" height="64">
+                                            class="brand-logo-img" alt="Logo Kementerian PKP" style="max-height: 78px; width: auto;">
                                     </div>
-                                    <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.025em;">
+                                    <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.025em; font-size: 1.55rem;">
                                         Inventori ATK
                                     </h3>
-                                    <p class="text-muted small mb-0">
+                                    <p class="text-muted small mb-0" style="font-size: 0.82rem; line-height: 1.45;">
                                         Sistem Pencatatan &amp; Pengelolaan Stok Barang Kantor
                                     </p>
                                 </div>
@@ -233,27 +251,29 @@
                                 <form action="{{ route('login.process') }}" method="POST">
                                     @csrf
                                     <div class="form-group mb-3">
-                                        <label for="email" class="form-label small fw-bold text-dark text-uppercase" style="letter-spacing: 0.04em;">
+                                        <label for="email" class="form-label small fw-bold text-dark text-uppercase mb-1.5" style="font-size: 0.74rem; letter-spacing: 0.04em;">
                                             Alamat Email
                                         </label>
                                         <div class="input-group">
                                             <input type="email" id="email" name="email" class="form-control"
-                                                value="{{ old('email') }}" placeholder="nama@perumahan.go.id" required autocomplete="email">
+                                                value="{{ old('email') }}" placeholder="nama@perumahan.go.id" required autocomplete="email"
+                                                style="padding: 0.78rem 1rem; border-radius: 0.65rem; font-size: 0.92rem;">
                                         </div>
                                     </div>
 
                                     <div class="form-group mb-4">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="password" class="form-label small fw-bold text-dark text-uppercase mb-0" style="letter-spacing: 0.04em;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                            <label for="password" class="form-label small fw-bold text-dark text-uppercase mb-0" style="font-size: 0.74rem; letter-spacing: 0.04em;">
                                                 Password
                                             </label>
-                                            <a href="{{ route('password.forgot') }}" class="small fw-semibold text-primary" style="text-decoration: none;">
+                                            <a href="{{ route('password.forgot') }}" class="small fw-semibold text-primary" style="font-size: 0.78rem; text-decoration: none;">
                                                 Lupa Password?
                                             </a>
                                         </div>
                                         <div class="input-group">
                                             <input type="password" id="password" name="password" class="form-control"
-                                                placeholder="Masukkan password Anda" required autocomplete="current-password">
+                                                placeholder="Masukkan password Anda" required autocomplete="current-password"
+                                                style="padding: 0.78rem 1rem; border-top-left-radius: 0.65rem; border-bottom-left-radius: 0.65rem; font-size: 0.92rem;">
                                             <button type="button" class="password-toggle-btn border border-start-0 rounded-end bg-light" id="togglePasswordBtn" aria-label="Tampilkan atau sembunyikan password">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="togglePasswordIcon">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -263,37 +283,17 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-grid mb-3">
-                                        <button type="submit" class="btn btn-primary btn-block shadow-sm">
+                                    <div class="d-grid mb-3 pt-1">
+                                        <button type="submit" class="btn btn-primary btn-block shadow-sm" style="padding: 0.82rem 1rem !important; border-radius: 0.65rem !important; font-size: 0.95rem;">
                                             Masuk ke Sistem
                                         </button>
                                     </div>
 
                                     <div class="text-center pt-2 mb-3">
-                                        <span class="text-muted small">Belum memiliki akun?</span>
-                                        <a href="{{ route('register') }}" class="fw-bold ms-1 text-primary text-decoration-none">
+                                        <span class="text-muted small" style="font-size: 0.84rem;">Belum memiliki akun?</span>
+                                        <a href="{{ route('register') }}" class="fw-bold ms-1 text-primary text-decoration-none" style="font-size: 0.84rem;">
                                             Daftar Akun Baru
                                         </a>
-                                    </div>
-
-                                    <!-- Bantuan Demo Akun Kasubag TU -->
-                                    <div class="card border rounded-3 bg-light shadow-none mb-3">
-                                        <div class="card-body p-2.5 text-start">
-                                            <div class="d-flex justify-content-between align-items-center mb-1.5">
-                                                <small class="fw-bold text-dark" style="font-size: 0.76rem;">Akun Uji Coba Cepat:</small>
-                                                <small class="text-muted" style="font-size: 0.7rem;">Klik untuk isi instan</small>
-                                            </div>
-                                            <div class="d-flex flex-wrap gap-1.5">
-                                                <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-pill quick-fill d-inline-flex align-items-center gap-1" 
-                                                    style="font-size: 0.74rem;" data-email="utami@gmail.com">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                        <circle cx="12" cy="7" r="4"></circle>
-                                                    </svg>
-                                                    Kasubag TU (Approver)
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <p class="text-center text-muted small mb-0" style="font-size: 0.75rem;">
@@ -332,19 +332,6 @@
                     }
                 });
             }
-
-            // Quick Fill Button
-            document.querySelectorAll('.quick-fill').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const email = this.getAttribute('data-email');
-                    const emailInput = document.querySelector('input[name="email"]');
-                    const passInput = document.querySelector('input[name="password"]');
-                    if (emailInput && passInput) {
-                        emailInput.value = email;
-                        passInput.value = 'password123';
-                    }
-                });
-            });
 
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted) {

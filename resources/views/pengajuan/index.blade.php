@@ -169,76 +169,86 @@
                             <h4 class="card-title mb-0 fw-bold">Daftar Riwayat Permintaan Anda</h4>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-success btn-sm fw-bold d-inline-flex align-items-center gap-1 shadow-sm" title="Ajukan kebutuhan barang yang belum ada di gudang agar dibeli oleh Subbag TU">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-success btn-sm fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" title="Ajukan kebutuhan barang yang belum ada di gudang agar dibeli oleh Subbag TU">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                                     <line x1="3" y1="6" x2="21" y2="6"></line>
                                     <path d="M16 10a4 4 0 0 1-8 0"></path>
                                 </svg>
-                                + Permintaan Pengadaan
+                                Permintaan Pengadaan
                             </a>
-                            <a href="{{ route('pengajuan.create') }}" class="btn btn-primary btn-sm fw-semibold shadow-sm" title="Pengajuan dari stok gudang">
-                                + Buat Pengajuan Barang
+                            <a href="{{ route('pengajuan.create') }}" class="btn btn-primary btn-sm fw-semibold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" title="Pengajuan dari stok gudang">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Buat Pengajuan Barang
                             </a>
                         </div>
                     </div>
-                    <div class="card-body p-3 p-md-4">
+                    <div class="card-body p-2.5 p-md-3">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle mb-0">
-                                <thead class="table-light">
+                            <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100">
+                                <colgroup>
+                                    <col style="width: 22%; min-width: 195px;">
+                                    <col style="width: 9%; min-width: 85px;">
+                                    <col style="width: 12%; min-width: 105px;">
+                                    <col style="width: 33%;">
+                                    <col style="width: 12%; min-width: 105px;">
+                                    <col style="width: 12%; min-width: 95px;">
+                                </colgroup>
+                                <thead>
                                     <tr>
-                                        <th class="text-center" style="width: 50px;">No</th>
-                                        <th style="min-width: 170px;">Kode Pengajuan</th>
-                                        <th style="min-width: 130px;">Tipe & Tanggal</th>
-                                        <th style="min-width: 260px;">Barang yang Diminta</th>
-                                        <th style="min-width: 160px;">Keperluan</th>
-                                        <th style="min-width: 140px;">Status</th>
-                                        <th class="text-end" style="min-width: 125px;">Aksi</th>
+                                        <th style="min-width: 195px;">Kode</th>
+                                        <th style="min-width: 85px;">Tipe</th>
+                                        <th style="min-width: 105px;">Tanggal</th>
+                                        <th>Barang</th>
+                                        <th style="min-width: 105px;">Status</th>
+                                        <th class="text-end" style="min-width: 95px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($requests as $index => $req)
+                                    @forelse($requests as $req)
                                         <tr>
-                                            <td class="text-center text-muted fw-semibold" style="font-size: 0.85rem;">{{ $index + 1 }}</td>
-                                            <td>
-                                                <div class="font-monospace fw-bold text-primary" style="font-size: 0.85rem;">{{ $req->request_code }}</div>
+                                            <td style="white-space: nowrap;">
+                                                <div class="font-monospace fw-bold text-primary" style="font-size: 0.78rem; letter-spacing: -0.01em;">{{ $req->request_code }}</div>
                                                 @if ($req->is_procurement)
-                                                    <span class="badge bg-warning-subtle text-dark border px-2 py-0.5 mt-1" style="font-size: 0.72rem;">
+                                                    <span class="badge bg-warning-subtle text-dark border px-1.5 py-0.5 mt-0.5" style="font-size: 0.65rem;">
                                                         Pengadaan (Beli TU)
                                                     </span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($req->type === 'subdit')
-                                                    <span class="badge bg-info-subtle text-info border px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
-                                                        Kolektif
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-secondary-subtle text-secondary border px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
-                                                        Individu
-                                                    </span>
-                                                @endif
-                                                <div class="text-dark fw-semibold mt-1" style="font-size: 0.8rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
+                                                <span class="badge {{ $req->type === 'subdit' ? 'bg-info text-white' : 'bg-secondary' }}" style="font-size: 0.68rem; padding: 0.2rem 0.45rem;">
+                                                    {{ ucfirst($req->type) }}
+                                                </span>
                                             </td>
                                             <td>
-                                                <ul class="ps-3 mb-0" style="font-size: 0.82rem;">
+                                                <div class="text-dark fw-semibold" style="font-size: 0.74rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('d/m/Y') }}</div>
+                                                <div class="text-muted" style="font-size: 0.68rem;">{{ $req->created_at->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
+                                            </td>
+                                            <td style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;">
+                                                <ul class="mb-0 ps-3" style="font-size: 0.75rem; word-break: break-word; white-space: normal;">
                                                     @foreach ($req->details as $detail)
-                                                        <li class="mb-1">
-                                                            <strong>{{ $detail->item_name }}</strong>
-                                                            @if (in_array($req->status, ['approved', 'distributed']))
-                                                                <span class="badge bg-success-subtle text-success border px-1.5 py-0.5 ms-1" style="font-size: 0.72rem;">Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}</span>
-                                                            @else
-                                                                <span class="text-secondary small ms-1">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
-                                                            @endif
+                                                        <li class="mb-1" style="word-break: break-word;">
+                                                            <div class="fw-bold text-dark" style="line-height: 1.3;">{{ $detail->item_name }}</div>
+                                                            <div class="mt-0.5">
+                                                                @if (in_array($req->status, ['approved', 'distributed']))
+                                                                    <span class="badge bg-success-subtle text-success border px-1.5 py-0.5" style="font-size: 0.64rem;">
+                                                                        Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}
+                                                                    </span>
+                                                                @else
+                                                                    <span class="text-secondary small" style="font-size: 0.68rem;">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
+                                                                @endif
+                                                            </div>
 
                                                             @if ($detail->specification)
-                                                                <div class="text-muted fst-italic small">Spesifikasi: {{ $detail->specification }}</div>
+                                                                <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">Spesifikasi: {{ $detail->specification }}</div>
                                                             @endif
 
                                                             @if ($detail->verification_note)
-                                                                <div class="text-primary fw-semibold fst-italic small">
-                                                                    Catatan TU: "{{ $detail->verification_note }}"
+                                                                <div class="mt-1 p-1 rounded bg-light-subtle text-primary border-start border-2 border-primary ps-1.5" style="font-size: 0.68rem; line-height: 1.3;">
+                                                                    <span class="fw-bold">Catatan TU:</span> "{{ $detail->verification_note }}"
                                                                 </div>
                                                             @endif
                                                         </li>
@@ -246,15 +256,28 @@
                                                 </ul>
 
                                                 @if ($req->verification_notes && (!isset($detail) || $req->verification_notes !== $detail->verification_note))
-                                                    <div class="mt-1 pt-1 border-top text-primary fst-italic small">
-                                                        <strong>Catatan TU:</strong> {{ $req->verification_notes }}
+                                                    <div class="mt-1.5 ps-3" style="font-size: 0.68rem; line-height: 1.35; word-break: break-word; white-space: normal;">
+                                                        <div class="p-1.5 rounded-2 bg-primary-subtle text-primary border border-primary-subtle">
+                                                            <strong class="d-inline-flex align-items-center gap-1">
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                </svg>
+                                                                Catatan TU:
+                                                            </strong>
+                                                            <div class="mt-0.5" style="word-break: break-word;">{{ $req->verification_notes }}</div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                                @if ($req->notes)
+                                                    <div class="text-muted ps-3 mt-1" style="font-size: 0.7rem; line-height: 1.3;">
+                                                        <span class="text-secondary fw-semibold">Keperluan:</span> {{ $req->notes }}
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div class="text-secondary" style="font-size: 0.82rem; line-height: 1.4;">{{ $req->notes ?: '-' }}</div>
-                                            </td>
-                                            <td>
+                                            <td style="vertical-align: middle;">
                                                 @php
                                                     $shortStatus = match ($req->status) {
                                                         'pending' => $req->is_procurement ? 'Pending Pengadaan' : 'Pending TU',
@@ -264,35 +287,41 @@
                                                         default => ucfirst($req->status),
                                                     };
                                                 @endphp
-                                                <span class="badge {{ $req->status_badge }} px-2 py-1" style="font-size: 0.75rem;" title="{{ $req->status_label }}">
+                                                <span class="badge {{ $req->status_badge }}" style="font-size: 0.68rem; padding: 0.22rem 0.45rem; white-space: nowrap;" title="{{ $req->status_label }}">
                                                     {{ $shortStatus }}
                                                 </span>
                                                 @if ($req->is_procurement && $req->purchase_invoice)
-                                                    <div class="mt-1">
-                                                        <span class="badge bg-primary-subtle text-primary border text-truncate d-inline-block px-2 py-0.5" style="font-size: 0.72rem; max-width: 130px;" title="Faktur: {{ $req->purchase_invoice }}">
+                                                    <div class="mt-0.5">
+                                                        <span class="badge bg-primary-subtle text-primary border text-truncate d-inline-block px-1.5 py-0.2" style="font-size: 0.64rem; max-width: 110px;" title="Faktur: {{ $req->purchase_invoice }}">
                                                             Faktur: {{ $req->purchase_invoice }}
                                                         </span>
                                                     </div>
                                                 @endif
                                                 @if ($req->is_procurement && $req->is_purchased)
-                                                    <div class="mt-1">
-                                                        <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none px-2 py-0.5" style="font-size: 0.72rem;">
+                                                    <div class="mt-0.5">
+                                                        <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none px-1.5 py-0.2" style="font-size: 0.64rem;">
                                                             Katalog &rarr;
                                                         </a>
                                                     </div>
                                                 @endif
                                                 @if($req->status == 'distributed' && $req->receiver_name)
-                                                    <div class="text-muted mt-1 small">Penerima: {{ $req->receiver_name }}</div>
+                                                    <div class="text-muted mt-1" style="font-size: 0.68rem; line-height: 1.25;">
+                                                        <span class="text-secondary d-block" style="font-size: 0.64rem;">Penerima:</span>
+                                                        <strong class="text-dark d-block text-wrap" style="word-break: break-word;">{{ $req->receiver_name }}</strong>
+                                                    </div>
                                                 @elseif($req->status == 'rejected' && $req->rejection_reason)
-                                                    <div class="text-danger mt-1 small">Alasan: "{{ $req->rejection_reason }}"</div>
+                                                    <div class="text-danger mt-1" style="font-size: 0.68rem; line-height: 1.25;">
+                                                        <span class="d-block" style="font-size: 0.64rem;">Alasan:</span>
+                                                        <span class="d-block text-wrap" style="word-break: break-word;">"{{ $req->rejection_reason }}"</span>
+                                                    </div>
                                                 @endif
                                             </td>
                                             <td class="text-end">
-                                                <div class="d-flex flex-column gap-1.5 align-items-stretch" style="min-width: 105px; margin-left: auto;">
+                                                <div class="d-flex justify-content-end gap-1 flex-wrap">
                                                     <!-- Tombol Detail Modal -->
-                                                    <button type="button" class="btn btn-sm btn-outline-info py-1 px-2 fw-semibold w-100"
+                                                    <button type="button" class="btn btn-xs btn-outline-primary py-0.5 px-2 fw-semibold"
                                                         data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}"
-                                                        style="font-size: 0.78rem; border-radius: 6px;"
+                                                        style="font-size: 0.72rem; border-radius: 6px;"
                                                         title="Lihat rincian lengkap permintaan">
                                                         Detail
                                                     </button>
@@ -300,26 +329,26 @@
                                                     <!-- Tombol Cetak Dokumen Bukti Serah Terima ATK Resmi -->
                                                     @if (in_array($req->status, ['approved', 'distributed']))
                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                            class="btn btn-sm btn-outline-success py-1 px-2 fw-semibold w-100 text-nowrap"
-                                                            style="font-size: 0.78rem; border-radius: 6px;"
+                                                            class="btn btn-xs btn-outline-secondary py-0.5 px-1.5 fw-semibold"
+                                                            style="font-size: 0.72rem; border-radius: 6px;"
                                                             title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
                                                             Cetak Bukti
                                                         </a>
 
                                                         <!-- Tombol Unggah / Status Berkas Dokumen -->
                                                         @if ($req->signed_proof)
-                                                            <button type="button" class="btn btn-sm btn-success text-white py-1 px-2 fw-semibold w-100 text-nowrap"
+                                                            <button type="button" class="btn btn-xs btn-success text-white py-0.5 px-1.5 fw-semibold"
                                                                 data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}"
-                                                                style="font-size: 0.78rem; border-radius: 6px;"
+                                                                style="font-size: 0.72rem; border-radius: 6px;"
                                                                 title="Berkas telah diunggah. Klik untuk melihat atau ganti berkas.">
-                                                                Upload Berkas &check;
+                                                                Upload &check;
                                                             </button>
                                                         @else
-                                                            <button type="button" class="btn btn-sm btn-warning text-dark py-1 px-2 fw-semibold w-100 text-nowrap"
+                                                            <button type="button" class="btn btn-xs btn-warning text-dark py-0.5 px-1.5 fw-semibold"
                                                                 data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}"
-                                                                style="font-size: 0.78rem; border-radius: 6px;"
+                                                                style="font-size: 0.72rem; border-radius: 6px;"
                                                                 title="Unggah berkas dokumen serah terima">
-                                                                Upload Berkas
+                                                                Upload
                                                             </button>
                                                         @endif
                                                     @endif
@@ -578,7 +607,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-5">
+                                            <td colspan="6" class="text-center text-muted py-5">
                                                 Belum ada riwayat pengajuan permintaan barang. Silakan buat pengajuan baru.
                                             </td>
                                         </tr>

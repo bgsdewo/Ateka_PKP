@@ -21,7 +21,7 @@ class NotificationController extends Controller
         }
 
         $isKasubagTU = $user->isKasubagTU();
-        $isPicDistribusi = $user->isPicDistribusi() || $user->isDistributor() || $user->isPegawaiGudang();
+        $isDistributorGudang = $user->isPegawaiGudang() && $user->isDistributor();
 
         $notifications = collect();
         $stats = [
@@ -146,13 +146,12 @@ class NotificationController extends Controller
 
             $unreadCount = $totalPending + $user->unreadNotificationsCount;
 
-        } elseif ($isPicDistribusi) {
-            // Antrean Distribusi Fisik Barang untuk PIC Distribusi
+        } elseif ($isDistributorGudang) {
+            // Antrean Distribusi Fisik Barang untuk Petugas Gudang (Distributor)
             $readyDistribusiQuery = RequestItem::where('status', 'approved')
                 ->where(function ($q) {
                     $q->where('is_procurement', false)->orWhereNull('is_procurement');
                 })
-                ->forPic($user)
                 ->with(['user', 'details.product']);
 
             $readyItems = (clone $readyDistribusiQuery)->latest('updated_at')->latest('id')->get();

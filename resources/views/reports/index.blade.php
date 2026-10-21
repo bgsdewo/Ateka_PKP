@@ -26,14 +26,7 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-primary"></span>
-                                <span>Kementerian PKP RI &bull; Pelaporan &amp; Pengesahan Mutasi</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Laporan Persediaan Barang</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Pantau pergerakan transaksi keluar-masuk barang, ringkasan mutasi, dan ekspor dokumen resmi berstandar instansi.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -387,7 +380,6 @@
                             </div>
                             <div>
                                 <h5 class="card-title mb-0 fw-bold">Filter & Saring Laporan Persediaan</h5>
-                                <small class="text-secondary">Saring data berdasarkan periode bulan, tahun, jenis mutasi, atau kategori pemohon</small>
                             </div>
                         </div>
                     </div>
@@ -533,7 +525,7 @@
                                                 <line x1="8" y1="2" x2="8" y2="6"></line>
                                                 <line x1="3" y1="10" x2="21" y2="10"></line>
                                             </svg>
-                                            <span>{{ (request('start_date') || request('end_date')) ? 'Tutup Filter Tanggal Spesifik' : '+ Rentang Tanggal Spesifik (Opsional)' }}</span>
+                                            <span>{{ (request('start_date') || request('end_date')) ? 'Tutup Filter Tanggal Spesifik' : '+ Rentang Tanggal Spesifik' }}</span>
                                         </a>
                                     </div>
 
@@ -592,8 +584,6 @@
                                         {{ number_format($totalTransactions) }} Data Ditemukan
                                     </span>
                                 </div>
-                                <small class="text-secondary">Daftar mutasi persediaan barang masuk dan keluar di
-                                    gudang</small>
                             </div>
                         </div>
 

@@ -31,6 +31,69 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
         }
+
+        /* Styling Pagination Katalog */
+        .katalog-pagination-links {
+            width: 100% !important;
+        }
+        .katalog-pagination-links nav {
+            width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+        .katalog-pagination-links nav > div:last-child {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .katalog-pagination-links p {
+            margin-bottom: 0 !important;
+            font-size: 0.82rem !important;
+            color: #64748b !important;
+        }
+        .katalog-pagination-links .pagination {
+            margin-bottom: 0 !important;
+            margin-left: auto !important;
+            gap: 2px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .katalog-pagination-links .page-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 28px !important;
+            height: 28px !important;
+            padding: 0 0.38rem !important;
+            font-size: 0.76rem !important;
+            font-weight: 600 !important;
+            border-radius: 5px !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+            text-decoration: none !important;
+            background: #ffffff !important;
+            transition: all 0.15s ease !important;
+        }
+        .katalog-pagination-links .page-item.active .page-link {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+            color: #ffffff !important;
+            border-color: #0284c7 !important;
+            box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25) !important;
+        }
+        .katalog-pagination-links .page-link:hover:not(.active) {
+            background: #f1f5f9 !important;
+            color: #0284c7 !important;
+            border-color: #cbd5e1 !important;
+        }
+        .katalog-pagination-links .page-item.disabled .page-link {
+            opacity: 0.45 !important;
+            background: #f8fafc !important;
+            color: #94a3b8 !important;
+        }
     </style>
     <div class="container-fluid content-inner mt-n5 py-0">
         {{-- Flash Notification Alerts --}}
@@ -88,7 +151,7 @@
                             </div>
 
                             <div class="col-12 col-md-6 col-lg-3">
-                                <select name="category_id" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan kategori ATK">
+                                <select name="category_id" class="form-select select-scrollable" onchange="this.form.submit()" aria-label="Filter berdasarkan kategori ATK">
                                     <option value="">-- Semua Kategori ({{ $categories->count() }}) --</option>
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ $categoryId == $cat->id ? 'selected' : '' }}>
@@ -99,7 +162,7 @@
                             </div>
 
                             <div class="col-12 col-md-6 col-lg-2">
-                                <select name="stock_status" class="form-select" onchange="this.form.submit()" aria-label="Filter berdasarkan status ketersediaan stok ATK">
+                                <select name="stock_status" class="form-select select-scrollable" onchange="this.form.submit()" aria-label="Filter berdasarkan status ketersediaan stok ATK">
                                     <option value="">-- Semua Status Stok --</option>
                                     <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>Tersedia di Gudang</option>
                                     <option value="empty" {{ ($stockStatus ?? '') === 'empty' ? 'selected' : '' }}>Stok Belum Tersedia (Bisa Dipesan)</option>
@@ -251,11 +314,8 @@
         <div class="mt-4" id="katalog-pagination-container">
             @if ($products->hasPages())
                 <div class="card shadow-sm border-0">
-                    <div class="card-body py-2.5 px-3.5 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div class="small text-muted">
-                            Menampilkan <strong>{{ $products->firstItem() ?? 0 }}</strong> &ndash; <strong>{{ $products->lastItem() ?? 0 }}</strong> dari total <strong>{{ $products->total() }}</strong> barang ATK
-                        </div>
-                        <div class="katalog-pagination-links">
+                    <div class="card-body py-2.5 px-3.5">
+                        <div class="katalog-pagination-links w-100">
                             {{ $products->onEachSide(1)->links() }}
                         </div>
                     </div>

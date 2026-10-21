@@ -147,16 +147,18 @@ class ProductController extends Controller
 
         $totalProducts = $products->count();
 
-        // Ambil usulan pengadaan yang disetujui / pending dan belum dibeli / ditambahkan stoknya di master data
+        // Ambil usulan pengadaan yang disetujui / pending dan belum dibeli / ditambahkan stoknya di master data (3 item per halaman)
         $unfulfilledProcurements = RequestDetail::whereHas('requestItem', function ($q) {
             $q->where('is_procurement', true)
-              ->whereIn('status', ['pending', 'approved'])
-              ->whereNull('purchase_invoice')
-              ->whereNull('purchase_date');
+              ->whereIn('status', ['pending', 'approved']);
         })
+        ->where('is_fulfilled', false)
         ->with(['requestItem.user', 'product.category'])
         ->latest('id')
-        ->get();
+        ->paginate(3, ['*'], 'pengadaan_page')
+        ->withQueryString();
+
+        $unfulfilledProcurements->fragment('pengadaan-section');
 
         return view('master_data.products', compact(
             'products',
@@ -623,9 +625,9 @@ class ProductController extends Controller
         } else {
             $openDetails = RequestDetail::whereHas('requestItem', function ($q) {
                 $q->where('is_procurement', true)
-                  ->whereIn('status', ['pending', 'approved'])
-                  ->whereNull('purchase_invoice');
+                  ->whereIn('status', ['pending', 'approved']);
             })
+            ->where('is_fulfilled', false)
             ->where(function ($subQ) use ($product) {
                 $subQ->whereNull('product_id')
                      ->orWhere('product_id', $product->id);
@@ -643,21 +645,42 @@ class ProductController extends Controller
         $notifiedNames = [];
         $notifiedUserIds = [];
         foreach ($fulfilledReqDetails as $det) {
-            $det->update(['product_id' => $product->id]);
+            $det->update([
+                'product_id'   => $product->id,
+                'is_fulfilled' => true,
+                'fulfilled_at' => now(),
+            ]);
+
             $reqItem = $det->requestItem;
             if ($reqItem) {
-                $reqItem->update([
-                    'purchase_invoice'   => $noFaktur ?: ($reqItem->purchase_invoice ?: '-'),
-                    'purchase_date'      => $transactionDate ?: ($reqItem->purchase_date ?: now()),
-                    'purchase_price'     => ($product->purchase_price ?? 0) * ($det->approved_quantity ?: $det->quantity),
-                    'purchase_notes'     => $uraian ?: ($reqItem->purchase_notes ?: 'Barang telah ditambahkan di Master Data dan stok tersedia'),
-                    'verification_notes' => $reqItem->verification_notes ?: 'Barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.',
+                $itemTotalCost = ($product->purchase_price ?? 0) * ($det->approved_quantity ?: $det->quantity);
+                $newTotalPrice = ((float) $reqItem->purchase_price) + $itemTotalCost;
+
+                // Cek apakah SELURUH item dalam pengadaan ini telah diisi stoknya
+                $hasUnfulfilled = $reqItem->details()->where('is_fulfilled', false)->exists();
+
+                $updateData = [
+                    'purchase_price'     => $newTotalPrice,
                     'status'             => 'approved',
                     'verified_at'        => $reqItem->verified_at ?: now(),
                     'verified_by'        => $reqItem->verified_by ?: (Auth::id() ?? 1),
-                ]);
+                ];
 
-                if ($reqItem->user && !in_array($reqItem->user_id, $notifiedUserIds)) {
+                if (!$hasUnfulfilled) {
+                    // Semua item di tiket pengadaan ini sudah lengkap dibeli & diisi stoknya
+                    $updateData['purchase_invoice']   = $noFaktur ?: ($reqItem->purchase_invoice ?: '-');
+                    $updateData['purchase_date']      = $transactionDate ?: ($reqItem->purchase_date ?: now());
+                    $updateData['purchase_notes']     = $uraian ?: ($reqItem->purchase_notes ?: 'Seluruh barang telah ditambahkan di Master Data');
+                    $updateData['verification_notes'] = $reqItem->verification_notes ?: 'Seluruh barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.';
+                } else {
+                    if ($noFaktur && !$reqItem->purchase_notes) {
+                        $updateData['purchase_notes'] = 'Sebagian barang telah ditambahkan (' . $product->name . ')';
+                    }
+                }
+
+                $reqItem->update($updateData);
+
+                if ($reqItem->user) {
                     UserNotification::sendProcurementNotification($reqItem, $product, $noFaktur);
                     $notifiedNames[] = $reqItem->user->name_with_title ?: $reqItem->user->name;
                     $notifiedUserIds[] = $reqItem->user_id;

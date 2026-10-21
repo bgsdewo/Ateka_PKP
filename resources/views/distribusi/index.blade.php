@@ -7,19 +7,7 @@
                 <div class="col-md-12">
                     <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
                         <div>
-                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-2" style="background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
-                                <span class="badge-dot badge-dot-warning"></span>
-                                <span>Kementerian PKP RI &bull; Pengelolaan Gudang &bull; Distribusi Barang</span>
-                            </div>
                             <h1 class="text-white fw-bold mb-1">Koordinasi &amp; Distribusi Barang ATK</h1>
-                            <p class="text-white mb-0" style="opacity: 0.92; max-width: 820px;">
-                                Kelola pengelompokan data permintaan dari berbagai Subdirektorat, penyerahan fisik barang, dan cetak bukti tanda terima resmi.
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm">
-                                {{ auth()->user()->position ?? 'Petugas Gudang' }}
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -29,6 +17,11 @@
 @endsection
 
 @section('content')
+    @php
+        $user = auth()->user();
+        $isKasubagTU = $user && $user->isKasubagTU();
+        $canDistribute = $isKasubagTU || ($user && $user->isPegawaiGudang() && $user->isDistributor());
+    @endphp
     <div class="container-fluid content-inner mt-n5 py-0">
         {{-- Flash Messages --}}
         @if (session('success'))
@@ -40,7 +33,7 @@
                     <span>{{ session('success') }}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    @if (session('print_id'))
+                    @if (session('print_id') && $isKasubagTU)
                         <a href="{{ route('distribusi.bukti', session('print_id')) }}" target="_blank"
                             class="btn btn-sm btn-dark text-white d-inline-flex align-items-center gap-1 shadow-sm fw-bold">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,14 +212,22 @@
                                                                         </td>
                                                                         <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
                                                                         <td class="text-end text-nowrap">
-                                                                            <a href="{{ route('distribusi.bukti', $subItem->id) }}" target="_blank"
-                                                                                class="btn btn-xs btn-outline-secondary py-1 px-2">
-                                                                                Cetak Tanda Terima
-                                                                            </a>
-                                                                            <button type="button" class="btn btn-xs btn-success py-1 px-2"
-                                                                                data-bs-toggle="modal" data-bs-target="#handoverModal{{ $subItem->id }}">
-                                                                                Serahkan
-                                                                            </button>
+                                                                            @if ($isKasubagTU)
+                                                                                <a href="{{ route('distribusi.bukti', $subItem->id) }}" target="_blank"
+                                                                                    class="btn btn-xs btn-outline-secondary py-1 px-2">
+                                                                                    Cetak Tanda Terima
+                                                                                </a>
+                                                                            @endif
+                                                                            @if ($canDistribute)
+                                                                                <button type="button" class="btn btn-xs btn-success py-1 px-2"
+                                                                                    data-bs-toggle="modal" data-bs-target="#handoverModal{{ $subItem->id }}">
+                                                                                    Serahkan
+                                                                                </button>
+                                                                            @else
+                                                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-0.5" style="font-size: 0.68rem;">
+                                                                                    Siap Diserahkan
+                                                                                </span>
+                                                                            @endif
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
@@ -252,21 +253,15 @@
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div>
                             <h4 class="card-title mb-0 fw-bold">Daftar Penyerahan Barang ke Pemohon</h4>
-                            <small class="text-muted">Data permintaan barang yang telah disetujui Kasubag TU dan siap diserahkan oleh PIC Gudang</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2" id="distribution-total-badge">
-                            <span class="badge bg-primary rounded-pill px-3 py-1.5">
-                                {{ $requests->total() }} Permintaan Ditampilkan
-                            </span>
                         </div>
                     </div>
 
                     {{-- Filter Bar Status, Tipe, Periode Bulan & Tahun, serta Pencarian --}}
-                    <div class="p-3 bg-light border-bottom">
-                        <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET" class="row g-2 align-items-center">
+                    <div class="px-4 py-3 bg-light border-bottom">
+                        <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET" class="d-flex align-items-center flex-wrap gap-2.5">
                             {{-- Filter Status --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <div style="min-width: 150px;">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
                                     <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
                                     <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
                                     <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
@@ -274,8 +269,8 @@
                             </div>
 
                             {{-- Filter Tipe --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <div style="min-width: 150px;">
+                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
                                     <option value="">Semua Tipe</option>
                                     <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
                                     <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
@@ -283,13 +278,13 @@
                             </div>
 
                             {{-- Filter Periode Bulan --}}
-                            <div class="col-12 col-sm-6 col-md-3">
-                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <div style="min-width: 185px;">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
                                     <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                                     @php
                                         $allMonths = [
                                             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
-                                            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                             7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
                                         ];
                                     @endphp
                                     @foreach ($allMonths as $num => $name)
@@ -301,8 +296,8 @@
                             </div>
 
                             {{-- Filter Periode Tahun --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <div style="min-width: 135px;">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
                                     <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
                                         <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
@@ -313,31 +308,36 @@
                             </div>
 
                             {{-- Input Pencarian --}}
-                            <div class="col-12 col-sm-6 col-md-2">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" id="distribusi-search" name="search" class="form-control" placeholder="Cari..."
-                                        value="{{ $search ?? '' }}" autocomplete="off">
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}" title="Hapus pencarian">
+                            <div class="flex-grow-1" style="min-width: 220px; max-width: 360px;">
+                                <div class="input-group input-group-sm" style="height: 38px;">
+                                    <input type="text" id="distribusi-search" name="search" class="form-control" placeholder="Cari tiket / pemohon / barang..."
+                                        value="{{ $search ?? '' }}" autocomplete="off" style="font-size: 0.84rem; border-color: #cbd5e1;">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}; border-color: #cbd5e1;" title="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </button>
-                                    <button class="btn btn-primary d-inline-flex align-items-center" id="btn-distribusi-search" type="submit" title="Cari">
+                                    <button class="btn btn-primary d-inline-flex align-items-center px-3 shadow-sm" id="btn-distribusi-search" type="submit" title="Cari">
                                         <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
                                         <svg id="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
+                                        <span class="ms-1 fw-semibold d-none d-sm-inline">Cari</span>
                                     </button>
                                 </div>
                             </div>
 
                             {{-- Reset Button --}}
-                            <div class="col-12 col-sm-6 col-md-1 text-md-end" id="distribusi-reset-container">
+                            <div id="distribusi-reset-container">
                                 @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
-                                    <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary w-100" title="Reset Filter">
-                                        Reset
+                                    <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 px-3 shadow-none" style="height: 38px; border-color: #cbd5e1; white-space: nowrap;" title="Reset Filter">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="1 4 1 10 7 10"></polyline>
+                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                        </svg>
+                                        <span>Reset</span>
                                     </a>
                                 @endif
                             </div>
@@ -434,7 +434,7 @@
                                                                 </svg>
                                                                 Lihat Bukti Foto
                                                             </button>
-                                                        @else
+                                                        @elseif ($canDistribute)
                                                             <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
                                                                 style="font-size: 0.72rem;"
                                                                 data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}"
@@ -466,27 +466,35 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="d-flex justify-content-end gap-1 flex-wrap">
-                                                    <!-- Tombol Cetak Tanda Terima / Surat Jalan -->
-                                                    <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                        class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
-                                                        title="Cetak Bukti Penyerahan Barang">
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                                            <rect x="6" y="14" width="12" height="8"></rect>
-                                                        </svg>
-                                                        Cetak Bukti
-                                                    </a>
+                                                    @if ($isKasubagTU)
+                                                        <!-- Tombol Cetak Tanda Terima / Surat Jalan (Hanya Kasubag TU) -->
+                                                        <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
+                                                            class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                                                            title="Cetak Bukti Penyerahan Barang">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                                                <rect x="6" y="14" width="12" height="8"></rect>
+                                                            </svg>
+                                                            Cetak Bukti
+                                                        </a>
+                                                    @endif
 
                                                     @if ($req->status === 'approved')
-                                                        <!-- Tombol Serahkan Barang (Buka Modal Handover) -->
-                                                        <button type="button" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1"
-                                                            data-bs-toggle="modal" data-bs-target="#handoverModal{{ $req->id }}">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                                            </svg>
-                                                            Serahkan
-                                                        </button>
+                                                        @if ($canDistribute)
+                                                            <!-- Tombol Serahkan Barang (Buka Modal Handover) -->
+                                                            <button type="button" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1"
+                                                                data-bs-toggle="modal" data-bs-target="#handoverModal{{ $req->id }}">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                                </svg>
+                                                                Serahkan
+                                                            </button>
+                                                        @else
+                                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small">
+                                                                Siap Diserahkan
+                                                            </span>
+                                                        @endif
                                                     @else
                                                         <span class="badge bg-light text-secondary border px-2 py-1 small">
                                                             Selesai
@@ -521,7 +529,7 @@
                         <div id="distribusi-modals-wrapper">
                             @foreach ($requests as $req)
                                 {{-- 1. Modal Konfirmasi Penyerahan Barang --}}
-                                @if ($req->status === 'approved')
+                                @if ($req->status === 'approved' && $canDistribute)
                                     <div class="modal fade" id="handoverModal{{ $req->id }}" tabindex="-1" aria-labelledby="handoverModalLabel{{ $req->id }}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
                                             <form action="{{ route('distribusi.handover', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
@@ -688,49 +696,51 @@
                                 @endif
 
                                 {{-- 3. Modal Upload / Perbarui Foto Bukti --}}
-                                <div class="modal fade" id="uploadModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
-                                        <form action="{{ route('distribusi.uploadProof', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
-                                            @csrf
-                                            <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
-                                                <div class="modal-header bg-info text-white px-4 py-3 border-0">
-                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                                                        </svg>
-                                                        Upload Foto Bukti Penyerahan
-                                                    </h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body p-4">
-                                                    <div class="alert alert-light border mb-3">
-                                                        <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                        <small class="text-muted">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
+                                @if ($canDistribute)
+                                    <div class="modal fade" id="uploadModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+                                            <form action="{{ route('distribusi.uploadProof', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
+                                                @csrf
+                                                <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
+                                                    <div class="modal-header bg-info text-white px-4 py-3 border-0">
+                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                                            </svg>
+                                                            Upload Foto Bukti Penyerahan
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold text-dark small text-uppercase mb-1">
-                                                            Pilih File Foto Bukti <span class="text-danger">*</span>
-                                                        </label>
-                                                        <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" required
-                                                            onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')">
-                                                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                            Format yang didukung: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
-                                                        </small>
-                                                        <div id="proofReuploadPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
-                                                            <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                    <div class="modal-body p-4">
+                                                        <div class="alert alert-light border mb-3">
+                                                            <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
+                                                            <small class="text-muted">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                                Pilih File Foto Bukti <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" required
+                                                                onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')">
+                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                                Format yang didukung: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
+                                                            </small>
+                                                            <div id="proofReuploadPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
+                                                                <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
+                                                        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-info text-white fw-bold px-4 shadow-sm">Simpan Foto Bukti</button>
+                                                    </div>
                                                 </div>
-                                                <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
-                                                    <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" class="btn btn-info text-white fw-bold px-4 shadow-sm">Simpan Foto Bukti</button>
-                                                </div>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             @endforeach
                         </div>
                     </div>
