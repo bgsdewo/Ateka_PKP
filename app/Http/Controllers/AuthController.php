@@ -60,7 +60,7 @@ class AuthController extends Controller
             'title' => ['nullable', 'string', 'max:50'],
             'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'nip' => ['required', 'string', 'max:50'],
+            'nip' => ['required', 'string', 'max:50', 'unique:users,nip'],
             'role' => ['nullable', 'string', 'in:pegawai'],
             'position' => ['nullable', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
@@ -70,6 +70,7 @@ class AuthController extends Controller
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Alamat email ini sudah terdaftar. Silakan masuk (login) dengan akun tersebut atau gunakan email dinas lain.',
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi untuk keamanan akun.',
+            'nip.unique' => 'Nomor Induk Pegawai (NIP) ini sudah terdaftar dalam sistem.',
             'role.in' => 'Pilihan role pendaftaran hanya untuk Pegawai.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
@@ -107,24 +108,31 @@ class AuthController extends Controller
     {
         $request->validate([
             'nip' => ['required', 'string'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ], [
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi.',
+            'email.required' => 'Alamat email dinas terdaftar wajib diisi.',
+            'email.email' => 'Format email dinas tidak valid.',
             'password.required' => 'Password baru wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
         ]);
 
         $cleanInputNip = preg_replace('/[^a-zA-Z0-9]/', '', $request->nip);
+        $inputEmail = strtolower(trim($request->email));
 
-        // Cari akun berdasarkan NIP (langsung atau tanpa spasi/simbol)
-        $user = \App\Models\User::where('nip', $request->nip)
-            ->orWhereRaw("REPLACE(REPLACE(nip, ' ', ''), '-', '') = ?", [$cleanInputNip])
+        // Cari akun yang cocok dengan kombinasi Email dan NIP secara bersamaan
+        $user = \App\Models\User::whereRaw('LOWER(email) = ?', [$inputEmail])
+            ->where(function ($q) use ($request, $cleanInputNip) {
+                $q->where('nip', $request->nip)
+                  ->orWhereRaw("REPLACE(REPLACE(nip, ' ', ''), '-', '') = ?", [$cleanInputNip]);
+            })
             ->first();
 
-        // Fallback pencarian fleksibel jika format di DB berbeda
+        // Fallback pencarian fleksibel jika format spasi/simbol NIP di DB berbeda
         if (!$user) {
-            $user = \App\Models\User::all()->first(function ($u) use ($cleanInputNip, $request) {
+            $user = \App\Models\User::whereRaw('LOWER(email) = ?', [$inputEmail])->get()->first(function ($u) use ($cleanInputNip, $request) {
                 if (empty($u->nip)) {
                     return false;
                 }
@@ -134,8 +142,14 @@ class AuthController extends Controller
         }
 
         if (!$user) {
-            return back()->withInput($request->only('nip'))
-                ->with('error', 'Nomor Induk Pegawai (NIP) tidak terdaftar pada sistem inventori.');
+            return back()->withInput($request->only('nip', 'email'))
+                ->with('error', 'Kombinasi NIP dan Email dinas tidak sesuai dengan data pengguna manapun.');
+        }
+
+        // KEAMANAN TINGKAT TINGGI: Akun Administrator / Kasubag TU dilarang reset mandiri melalui formulir publik
+        if ($user->isKasubagTU() || $user->isAdmin()) {
+            return back()->withInput($request->only('nip', 'email'))
+                ->with('error', 'Demi perlindungan keamanan sistem instansi, akun Administrator / Kasubag TU tidak dapat direset melalui formulir publik. Silakan hubungi admin server internal.');
         }
 
         $user->password = \Illuminate\Support\Facades\Hash::make($request->password);

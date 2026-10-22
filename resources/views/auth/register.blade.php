@@ -243,7 +243,7 @@
                                         <div class="col-md-6 col-12">
                                             <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
-                                                    NIP <span class="text-danger">*</span>
+                                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" name="nip" id="nip" class="form-control font-monospace"
                                                     value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required>

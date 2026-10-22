@@ -275,8 +275,9 @@ class RequestController extends Controller
         }
 
         $file = $request->file('signed_proof');
-        $ext = $file->getClientOriginalExtension();
-        $filename = 'signed_' . $requestItem->request_code . '_' . time() . '.' . $ext;
+        $ext = strtolower($file->getClientOriginalExtension());
+        $ext = in_array($ext, ['pdf', 'jpeg', 'png', 'jpg', 'webp']) ? $ext : 'pdf';
+        $filename = 'signed_' . $requestItem->request_code . '_' . Str::random(16) . '.' . $ext;
         $path = $file->storeAs('signed_proofs', $filename, 'public');
 
         $requestItem->update([

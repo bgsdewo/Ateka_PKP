@@ -217,6 +217,18 @@ class RequestRecapController extends Controller
         // 1. JIKA CETAK PER TIKET (DARI KOLOM AKSI):
         if ($requestId) {
             $singleReq = RequestItem::with(['user', 'details.product.category', 'distributor', 'verifier', 'signedBy'])->findOrFail($requestId);
+
+            // Validasi hak akses kepemilikan dokumen (Mencegah IDOR)
+            if ($user->isPegawai()) {
+                if ($singleReq->user_id !== $user->id) {
+                    abort(403, 'Akses ditolak: Anda hanya berhak mencetak dokumen pengajuan milik Anda sendiri.');
+                }
+            } elseif ($user->isPicDistribusi()) {
+                if ($singleReq->user_id !== $user->id && !$user->canHandleRequest($singleReq)) {
+                    abort(403, 'Akses ditolak: Dokumen pengajuan ini berada di luar unit kerja Anda.');
+                }
+            }
+
             $requestItem = $singleReq;
             $reqUser = $singleReq->user;
 
@@ -279,6 +291,10 @@ class RequestRecapController extends Controller
         }
 
         // 2. JIKA CETAK MULTI-TIKET (FILTER PERIODE / FALLBACK)
+        if ($user->isPegawai()) {
+            abort(403, 'Akses ditolak: Pegawai tidak memiliki wewenang untuk mencetak rekapitulasi massal seluruh instansi.');
+        }
+
         $statusFilter = $request->get('status');
         $typeFilter = $request->get('type');
         $monthInput = $request->get('month');
@@ -290,7 +306,18 @@ class RequestRecapController extends Controller
         $selectedMonth = ($isAllMonths || $monthInput === null || $monthInput === '') ? null : (int) $monthInput;
         $selectedYear = ($yearInput === 'all' || $yearInput === null || $yearInput === '') ? null : (int) $yearInput;
 
-        $query = RequestItem::with(['user', 'verifier', 'details.product.category'])
+        $queryBuilder = RequestItem::with(['user', 'verifier', 'details.product.category']);
+
+        if ($user->isPicDistribusi()) {
+            $queryBuilder->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere(function ($sub) use ($user) {
+                      $sub->forPic($user);
+                  });
+            });
+        }
+
+        $query = $queryBuilder
             ->when($typeFilter, fn($q) => $q->where('type', $typeFilter))
             ->when($statusFilter && $statusFilter !== 'all', fn($q) => $q->where('status', $statusFilter))
             ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))

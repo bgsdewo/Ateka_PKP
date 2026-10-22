@@ -49,6 +49,10 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $kategori_barang)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($kategori_barang->id)],
             'kode_barang' => ['nullable', 'string', 'max:50'],
@@ -74,6 +78,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $kategori_barang)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
+        }
+
         if ($kategori_barang->products()->exists()) {
             return redirect()
                 ->route('master-data.kategori-barang.index')

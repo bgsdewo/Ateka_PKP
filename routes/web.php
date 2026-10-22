@@ -27,6 +27,7 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('/login', [AuthController::class, 'authenticate'])
+        ->middleware('throttle:5,1')
         ->name('login.process');
 
     // ==========================================
@@ -36,15 +37,17 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('/register', [AuthController::class, 'storeRegister'])
+        ->middleware('throttle:5,1')
         ->name('register.store');
 
     // ==========================================
-    // ROUTE LUPA PASSWORD DENGAN NIP
+    // ROUTE LUPA PASSWORD DENGAN NIP & EMAIL
     // ==========================================
     Route::get('/lupa-password', [AuthController::class, 'showForgotPassword'])
         ->name('password.forgot');
 
     Route::post('/lupa-password', [AuthController::class, 'resetPasswordWithNip'])
+        ->middleware('throttle:3,1')
         ->name('password.reset.nip');
 });
 
@@ -69,62 +72,74 @@ Route::middleware('auth')->group(function () {
 
     // Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {
-        Route::resource('/kategori-barang', CategoryController::class);
-        Route::resource('/daftar-barang', ProductController::class);
-        Route::resource('/manajemen-pengguna', UserManagementController::class);
+        Route::resource('/kategori-barang', CategoryController::class)
+            ->middleware('role:kasubag_tu');
+
+        Route::resource('/daftar-barang', ProductController::class)
+            ->middleware('role:kasubag_tu,pegawai_gudang');
+
+        Route::resource('/manajemen-pengguna', UserManagementController::class)
+            ->middleware('role:kasubag_tu');
     });
 
     // Operasional Gudang
-    Route::get('/barang-masuk', [BarangMasukController::class, 'index'])
-        ->name('barang-masuk');
+    Route::middleware('role:kasubag_tu,pegawai_gudang')->group(function () {
+        Route::get('/barang-masuk', [BarangMasukController::class, 'index'])
+            ->name('barang-masuk');
 
-    Route::get('/barang-keluar', [BarangKeluarController::class, 'index'])
-        ->name('barang-keluar');
+        Route::get('/barang-keluar', [BarangKeluarController::class, 'index'])
+            ->name('barang-keluar');
 
-    Route::post('/persediaan-barang/transaksi', [InventoryController::class, 'storeTransaction'])
-        ->name('inventory.transaction.store');
+        Route::post('/persediaan-barang/transaksi', [InventoryController::class, 'storeTransaction'])
+            ->name('inventory.transaction.store');
+    });
 
     // ==========================================
     // 1. ROUTE VERIFIKASI & PERSETUJUAN - KASUBAG TU
     // ==========================================
-    Route::get('/persetujuan', [ApprovalController::class, 'index'])
-        ->name('persetujuan.index');
+    Route::middleware('role:kasubag_tu')->group(function () {
+        Route::get('/persetujuan', [ApprovalController::class, 'index'])
+            ->name('persetujuan.index');
 
-    Route::get('/verifikasi', [ApprovalController::class, 'index'])
-        ->name('verifikasi.index');
+        Route::get('/verifikasi', [ApprovalController::class, 'index'])
+            ->name('verifikasi.index');
 
-    Route::put('/persetujuan/{id}', [ApprovalController::class, 'updateStatus'])
-        ->name('persetujuan.update');
+        Route::put('/persetujuan/{id}', [ApprovalController::class, 'updateStatus'])
+            ->name('persetujuan.update');
 
-    Route::put('/verifikasi/{id}', [ApprovalController::class, 'updateStatus'])
-        ->name('verifikasi.update');
+        Route::put('/verifikasi/{id}', [ApprovalController::class, 'updateStatus'])
+            ->name('verifikasi.update');
 
-    Route::post('/persetujuan/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
-        ->name('persetujuan.procure');
+        Route::post('/persetujuan/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
+            ->name('persetujuan.procure');
 
-    Route::post('/verifikasi/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
-        ->name('verifikasi.procure');
+        Route::post('/verifikasi/{id}/procure', [ApprovalController::class, 'procureAndApprove'])
+            ->name('verifikasi.procure');
+
+        // Rekapitulasi Permintaan Subbag TU
+        Route::get('/rekapitulasi-permintaan', [RequestRecapController::class, 'index'])
+            ->name('rekapitulasi-permintaan.index');
+    });
 
     // ==========================================
-    // 1B. ROUTE REKAPITULASI PERMINTAAN - SUBBAG TU
+    // 1B. CETAK DOKUMEN REKAPITULASI (OTORISASI KONTROL DI CONTROLLER)
     // ==========================================
-    Route::get('/rekapitulasi-permintaan', [RequestRecapController::class, 'index'])
-        ->name('rekapitulasi-permintaan.index');
-
     Route::get('/rekapitulasi-permintaan/cetak/{id?}', [RequestRecapController::class, 'printRecap'])
         ->name('rekapitulasi-permintaan.cetak');
 
     // ==========================================
-    // 2. ROUTE KOORDINASI & DISTRIBUSI - PIC DISTRIBUSI
+    // 2. ROUTE KOORDINASI & DISTRIBUSI - PETUGAS DISTRIBUSI / KASUBAG TU
     // ==========================================
-    Route::get('/distribusi', [DistributionController::class, 'index'])
-        ->name('distribusi.index');
+    Route::middleware('role:kasubag_tu,pegawai_gudang')->group(function () {
+        Route::get('/distribusi', [DistributionController::class, 'index'])
+            ->name('distribusi.index');
 
-    Route::post('/distribusi/{id}/handover', [DistributionController::class, 'confirmHandover'])
-        ->name('distribusi.handover');
+        Route::post('/distribusi/{id}/handover', [DistributionController::class, 'confirmHandover'])
+            ->name('distribusi.handover');
 
-    Route::post('/distribusi/{id}/upload-bukti', [DistributionController::class, 'uploadProof'])
-        ->name('distribusi.uploadProof');
+        Route::post('/distribusi/{id}/upload-bukti', [DistributionController::class, 'uploadProof'])
+            ->name('distribusi.uploadProof');
+    });
 
     Route::get('/distribusi/{id}/bukti', [DistributionController::class, 'printBukti'])
         ->name('distribusi.bukti');
@@ -157,16 +172,18 @@ Route::middleware('auth')->group(function () {
         ->name('katalog.pesan');
 
     // ==========================================
-    // 4. ROUTE PELAPORAN & ARSIP - ARSIPARIS / KASUBAG TU
+    // 4. ROUTE PELAPORAN & ARSIP - KASUBAG TU & PEGAWAI GUDANG
     // ==========================================
-    Route::get('/laporan', [ReportController::class, 'index'])
-        ->name('reports.index');
+    Route::middleware('role:kasubag_tu,pegawai_gudang')->group(function () {
+        Route::get('/laporan', [ReportController::class, 'index'])
+            ->name('reports.index');
 
-    Route::get('/laporan/rekapitulasi', [ReportController::class, 'rekapitulasi'])
-        ->name('reports.rekapitulasi');
+        Route::get('/laporan/rekapitulasi', [ReportController::class, 'rekapitulasi'])
+            ->name('reports.rekapitulasi');
 
-    Route::get('/laporan/berita-acara', [ReportController::class, 'beritaAcara'])
-        ->name('reports.berita-acara');
+        Route::get('/laporan/berita-acara', [ReportController::class, 'beritaAcara'])
+            ->name('reports.berita-acara');
+    });
 
     // Profil & Akun
     Route::get('/profil', [ProfileController::class, 'edit'])

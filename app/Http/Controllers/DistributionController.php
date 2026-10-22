@@ -191,7 +191,9 @@ class DistributionController extends Controller
                 Storage::disk('public')->delete($proofPath);
             }
             $file = $request->file('distribution_proof');
-            $filename = 'proof_' . $requestItem->request_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $ext = strtolower($file->getClientOriginalExtension());
+            $ext = in_array($ext, ['jpeg', 'png', 'jpg', 'webp']) ? $ext : 'jpg';
+            $filename = 'proof_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $ext;
             $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
         }
 
@@ -250,7 +252,9 @@ class DistributionController extends Controller
         }
 
         $file = $request->file('distribution_proof');
-        $filename = 'proof_' . $requestItem->request_code . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $ext = strtolower($file->getClientOriginalExtension());
+        $ext = in_array($ext, ['jpeg', 'png', 'jpg', 'webp']) ? $ext : 'jpg';
+        $filename = 'proof_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $ext;
         $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
 
         $requestItem->update([
@@ -274,11 +278,16 @@ class DistributionController extends Controller
             })
             ->findOrFail($id);
 
-        // Jika Pemohon (Pegawai atau PIC): pastikan permohonan miliknya sendiri atau ditangani oleh PIC tersebut
-        if ($currentUser && ($currentUser->isPegawai() || $currentUser->isPicDistribusi())) {
-            if ($requestItem->user_id !== $currentUser->id && !$currentUser->canHandleRequest($requestItem)) {
-                abort(403, 'Anda tidak memiliki hak akses untuk melihat bukti serah terima permintaan ini.');
-            }
+        // Validasi hak akses menyeluruh (Kasubag TU, Petugas Gudang Distributor, Pemohon bersangkutan, atau PIC penanggung jawab)
+        $canAccess = $currentUser && (
+            $currentUser->isKasubagTU()
+            || ($currentUser->isPegawaiGudang() && $currentUser->isDistributor())
+            || ($requestItem->user_id === $currentUser->id)
+            || ($currentUser->isPicDistribusi() && $currentUser->canHandleRequest($requestItem))
+        );
+
+        if (!$canAccess) {
+            abort(403, 'Akses ditolak: Anda tidak memiliki wewenang untuk melihat bukti serah terima permohonan ini.');
         }
 
         // Jika parameter ?view=foto, tampilkan foto dokumentasi
