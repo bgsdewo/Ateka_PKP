@@ -31,17 +31,18 @@
             min-height: 100vh;
             color: #0f172a;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
         .auth-content {
             width: 100%;
-            min-height: 100vh;
+            margin: auto;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 1.25rem 1rem;
+            align-items: center;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
         }
 
         @keyframes authCardEnter {

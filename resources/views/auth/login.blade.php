@@ -72,21 +72,25 @@
         }
 
         .wrapper {
-            min-height: 100vh;
+            flex: 1 0 auto;
             width: 100%;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
 
         .login-content {
             width: 100%;
-            min-height: 100vh;
+            margin: auto;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 1.5rem 1rem;
-            box-sizing: border-box;
+            align-items: center;
             position: relative;
             z-index: 1;
         }
@@ -197,29 +201,29 @@
 
     <div class="wrapper">
         <section class="login-content">
-            <div class="container">
-                <div class="row justify-content-center align-items-center">
-                    <div class="col-12" style="width: 100%; max-width: 440px;">
-                        <div class="card auth-card mb-0">
-                            <div class="card-body" style="padding: 2.5rem 2.25rem !important;">
+            <div class="container my-auto">
+                <div class="row justify-content-center">
+                    <div class="col-12" style="width: 100%; max-width: 420px;">
+                        <div class="card auth-card mb-0 shadow-lg">
+                            <div class="card-body" style="padding: 2rem 1.85rem !important;">
                                 <!-- Logo & Identity -->
-                                <div class="text-center mb-4">
-                                    <div class="mb-3">
+                                <div class="text-center mb-3">
+                                    <div class="mb-2">
                                         <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}"
-                                            class="brand-logo-img" alt="Logo Kementerian PKP" style="max-height: 78px; width: auto;">
+                                            class="brand-logo-img" alt="Logo Kementerian PKP" style="max-height: 60px; width: auto;">
                                     </div>
-                                    <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.025em; font-size: 1.55rem;">
+                                    <h3 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.025em; font-size: 1.35rem;">
                                         Inventori ATK
                                     </h3>
-                                    <p class="text-muted small mb-0" style="font-size: 0.82rem; line-height: 1.45;">
+                                    <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.4;">
                                         Sistem Pencatatan &amp; Pengelolaan Stok Barang Kantor
                                     </p>
                                 </div>
 
                                 <!-- Notifikasi Alert -->
                                 @if (session('success'))
-                                    <div class="alert alert-success alert-dismissible fade show shadow-sm"
-                                        role="alert">
+                                    <div class="alert alert-success alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5"
+                                        role="alert" style="font-size: 0.82rem;">
                                         {{ session('success') }}
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"
                                             aria-label="Close"></button>
@@ -227,8 +231,8 @@
                                 @endif
 
                                 @if (session('error'))
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm"
-                                        role="alert">
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5"
+                                        role="alert" style="font-size: 0.82rem;">
                                         {{ session('error') }}
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"
                                             aria-label="Close"></button>
@@ -236,10 +240,10 @@
                                 @endif
 
                                 @if ($errors->any())
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm"
-                                        role="alert">
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5"
+                                        role="alert" style="font-size: 0.82rem;">
                                         <strong>Terjadi kesalahan:</strong>
-                                        <ul class="mb-0 mt-2 ps-3">
+                                        <ul class="mb-0 mt-1 ps-3">
                                             @foreach ($errors->all() as $error)
                                                 <li>{{ $error }}</li>
                                             @endforeach
@@ -252,30 +256,30 @@
                                 <!-- Form Login -->
                                 <form action="{{ route('login.process') }}" method="POST">
                                     @csrf
-                                    <div class="form-group mb-3">
-                                        <label for="email" class="form-label small fw-bold text-dark text-uppercase mb-1.5" style="font-size: 0.74rem; letter-spacing: 0.04em;">
+                                    <div class="form-group mb-2.5">
+                                        <label for="email" class="form-label small fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">
                                             Alamat Email
                                         </label>
                                         <div class="input-group">
                                             <input type="email" id="email" name="email" class="form-control"
                                                 value="{{ old('email') }}" placeholder="nama@perumahan.go.id" required autocomplete="email"
-                                                style="padding: 0.78rem 1rem; border-radius: 0.65rem; font-size: 0.92rem;">
+                                                style="padding: 0.65rem 0.9rem; border-radius: 0.65rem; font-size: 0.88rem;">
                                         </div>
                                     </div>
 
-                                    <div class="form-group mb-4">
-                                        <div class="d-flex justify-content-between align-items-center mb-1.5">
-                                            <label for="password" class="form-label small fw-bold text-dark text-uppercase mb-0" style="font-size: 0.74rem; letter-spacing: 0.04em;">
+                                    <div class="form-group mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="password" class="form-label small fw-bold text-dark text-uppercase mb-0" style="font-size: 0.72rem; letter-spacing: 0.04em;">
                                                 Password
                                             </label>
-                                            <a href="{{ route('password.forgot') }}" class="small fw-semibold text-primary" style="font-size: 0.78rem; text-decoration: none;">
+                                            <a href="{{ route('password.forgot') }}" class="small fw-semibold text-primary" style="font-size: 0.76rem; text-decoration: none;">
                                                 Lupa Password?
                                             </a>
                                         </div>
                                         <div class="input-group">
                                             <input type="password" id="password" name="password" class="form-control"
                                                 placeholder="Masukkan password Anda" required autocomplete="current-password"
-                                                style="padding: 0.78rem 1rem; border-top-left-radius: 0.65rem; border-bottom-left-radius: 0.65rem; font-size: 0.92rem;">
+                                                style="padding: 0.65rem 0.9rem; border-top-left-radius: 0.65rem; border-bottom-left-radius: 0.65rem; font-size: 0.88rem;">
                                             <button type="button" class="password-toggle-btn border border-start-0 rounded-end bg-light" id="togglePasswordBtn" aria-label="Tampilkan atau sembunyikan password">
                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="togglePasswordIcon">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -285,20 +289,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-grid mb-3 pt-1">
-                                        <button type="submit" class="btn btn-primary btn-block shadow-sm" style="padding: 0.82rem 1rem !important; border-radius: 0.65rem !important; font-size: 0.95rem;">
+                                    <div class="d-grid mb-2.5 pt-1">
+                                        <button type="submit" class="btn btn-primary btn-block shadow-sm" style="padding: 0.72rem 1rem !important; border-radius: 0.65rem !important; font-size: 0.92rem;">
                                             Masuk ke Sistem
                                         </button>
                                     </div>
 
-                                    <div class="text-center pt-2 mb-3">
-                                        <span class="text-muted small" style="font-size: 0.84rem;">Belum memiliki akun?</span>
-                                        <a href="{{ route('register') }}" class="fw-bold ms-1 text-primary text-decoration-none" style="font-size: 0.84rem;">
+                                    <div class="text-center pt-1 mb-2.5">
+                                        <span class="text-muted small" style="font-size: 0.82rem;">Belum memiliki akun?</span>
+                                        <a href="{{ route('register') }}" class="fw-bold ms-1 text-primary text-decoration-none" style="font-size: 0.82rem;">
                                             Daftar Akun Baru
                                         </a>
                                     </div>
 
-                                    <p class="text-center text-muted small mb-0" style="font-size: 0.75rem;">
+                                    <p class="text-center text-muted small mb-0" style="font-size: 0.72rem;">
                                         &copy; 2026 Kementerian PKP RI &bull; All Rights Reserved
                                     </p>
                                 </form>
