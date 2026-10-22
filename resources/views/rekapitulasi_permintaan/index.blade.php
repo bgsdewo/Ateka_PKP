@@ -472,8 +472,8 @@
                             Menampilkan <strong>{{ $requests->firstItem() ?? 0 }}</strong> - <strong>{{ $requests->lastItem() ?? 0 }}</strong> dari <strong>{{ $requests->total() }}</strong> usulan permohonan (10 per halaman)
                         </div>
                         @if ($requests->hasPages())
-                            <div>
-                                {{ $requests->links() }}
+                            <div class="ms-auto d-flex justify-content-end align-items-center">
+                                {{ $requests->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>

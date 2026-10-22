@@ -1363,8 +1363,8 @@
                                 <strong>{{ $requests->total() }}</strong> pengajuan (10 per halaman)
                             </div>
                             @if ($requests->hasPages())
-                                <div>
-                                    {{ $requests->links() }}
+                                <div class="ms-auto d-flex justify-content-end align-items-center">
+                                    {{ $requests->links('pagination::bootstrap-4') }}
                                 </div>
                             @endif
                         </div>

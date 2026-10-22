@@ -529,8 +529,8 @@
                                 <div class="text-muted small">
                                     Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> data penyerahan
                                 </div>
-                                <div>
-                                    {{ $requests->links() }}
+                                <div class="ms-auto d-flex justify-content-end align-items-center">
+                                    {{ $requests->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         @endif
