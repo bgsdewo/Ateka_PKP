@@ -253,11 +253,8 @@
                     <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET">
                         {{-- 1. Card Header: Judul di Kiri, Kotak Pencarian di Kanan --}}
                         <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center gap-2">
+                            <div>
                                 <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">Daftar Penyerahan Barang ke Pemohon</h5>
-                                <span id="distribusi-header-badge" class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 0.74rem;">
-                                    {{ $requests->total() }} Data
-                                </span>
                             </div>
 
                             {{-- Input Pencarian di Sisi Kanan Header --}}
@@ -353,11 +350,6 @@
                                         </a>
                                     @endif
                                 </div>
-                            </div>
-
-                            {{-- Info Counter Data di Kanan --}}
-                            <div id="distribusi-counter-info" class="text-muted small d-none d-md-block" style="font-size: 0.78rem;">
-                                Menampilkan <strong>{{ $requests->total() }}</strong> data penyerahan
                             </div>
                         </div>
                     </form>
@@ -923,18 +915,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentReset = document.getElementById('distribusi-reset-container');
             if (newReset && currentReset) {
                 currentReset.innerHTML = newReset.innerHTML;
-            }
-
-            const newCounter = doc.getElementById('distribusi-counter-info');
-            const currentCounter = document.getElementById('distribusi-counter-info');
-            if (newCounter && currentCounter) {
-                currentCounter.innerHTML = newCounter.innerHTML;
-            }
-
-            const newHeaderBadge = doc.getElementById('distribusi-header-badge');
-            const currentHeaderBadge = document.getElementById('distribusi-header-badge');
-            if (newHeaderBadge && currentHeaderBadge) {
-                currentHeaderBadge.innerHTML = newHeaderBadge.innerHTML;
             }
 
             const newSubditGroups = doc.getElementById('subdit-groups-container');
