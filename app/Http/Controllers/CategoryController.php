@@ -35,12 +35,10 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
-        $kodeBarang = $request->kode_barang ?? $request->kd_rincian;
-
         Category::create([
             'name' => $request->name,
-            'kode_barang' => $kodeBarang,
-            'kd_rincian' => $request->kd_rincian ?? $kodeBarang,
+            'kode_barang' => $request->kode_barang,
+            'kd_rincian' => $request->kd_rincian,
             'description' => $request->description,
         ]);
 
@@ -51,6 +49,10 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $kategori_barang)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($kategori_barang->id)],
             'kode_barang' => ['nullable', 'string', 'max:50'],
@@ -62,12 +64,10 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
-        $kodeBarang = $request->kode_barang ?? $request->kd_rincian ?? $kategori_barang->kode_barang;
-
         $kategori_barang->update([
             'name' => $request->name,
-            'kode_barang' => $kodeBarang,
-            'kd_rincian' => $request->kd_rincian ?? $kategori_barang->kd_rincian,
+            'kode_barang' => $request->kode_barang,
+            'kd_rincian' => $request->kd_rincian,
             'description' => $request->description,
         ]);
 
@@ -78,6 +78,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $kategori_barang)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubag TU.');
+        }
+
         if ($kategori_barang->products()->exists()) {
             return redirect()
                 ->route('master-data.kategori-barang.index')

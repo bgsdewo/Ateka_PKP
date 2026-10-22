@@ -33,12 +33,10 @@ class DaftarBarangPeriodAndInvoiceTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('master-data.daftar-barang.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Filter Periode Daftar Barang');
+        $response->assertSee('Filter Data Barang ATK');
         $response->assertSee('Periode Bulan');
-        $response->assertSee('Periode Tahun');
-        $response->assertSee('Dari Tanggal');
-        $response->assertSee('Sampai Tanggal');
-        $response->assertSee('Terapkan');
+        $response->assertSee('Rentang Tanggal Faktur');
+        $response->assertSee('Terapkan Filter');
         $response->assertSee('No. Faktur');
         $response->assertSee('Tgl Faktur');
         $response->assertSee('Uraian / Supplier');

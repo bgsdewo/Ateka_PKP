@@ -22,13 +22,15 @@ class Lembar2AtkCatalogSeeder extends Seeder
         }
 
         DB::transaction(function () use ($data) {
-            // 1. Sinkronkan seluruh 56 Kategori dari Lembar 2 LIST ATK
+            // 1. Sinkronkan seluruh 56 Kategori dari Sheet 3 / Lembar 2 LIST ATK
             $categoryMap = [];
+            $categoryInfoMap = [];
             $validCategoryNames = [];
 
             foreach ($data['categories'] as $catData) {
                 $cName = trim($catData['name']);
                 $kdBrg = trim($catData['kd_brg'] ?? '');
+                $kdRincian = trim($catData['kd_rincian'] ?? '');
                 $bmnGroup = trim($catData['bmn_group'] ?? '');
 
                 $desc = '';
@@ -40,10 +42,20 @@ class Lembar2AtkCatalogSeeder extends Seeder
 
                 $category = Category::updateOrCreate(
                     ['name' => $cName],
-                    ['description' => $desc]
+                    [
+                        'kode_barang' => $kdBrg ?: null,
+                        'kd_rincian' => $kdRincian ?: null,
+                        'description' => $desc,
+                    ]
                 );
 
                 $categoryMap[$cName] = $category->id;
+                $categoryInfoMap[$cName] = [
+                    'id' => $category->id,
+                    'kd_brg' => $kdBrg,
+                    'kd_rincian' => $kdRincian,
+                    'bmn_group' => $bmnGroup,
+                ];
                 $validCategoryNames[] = $cName;
             }
 
@@ -91,14 +103,17 @@ class Lembar2AtkCatalogSeeder extends Seeder
                 $units = array_values(array_unique(array_filter(array_map('trim', $item['units'] ?? [$primaryUnit]))));
                 $availableUnitsStr = implode(',', $units);
 
-                $kdBrg = trim($item['kd_brg'] ?? '');
+                $catInfo = $categoryInfoMap[$catName] ?? null;
+                $kdBrg = trim($item['kd_brg'] ?? ($catInfo['kd_brg'] ?? ''));
                 if (str_contains($kdBrg, '…')) {
                     $kdBrg = '';
                 }
-                $bmnGroup = trim($item['bmn_group'] ?? '');
+                $bmnGroup = trim($item['bmn_group'] ?? ($catInfo['bmn_group'] ?? ''));
                 if (str_contains($bmnGroup, '…')) {
                     $bmnGroup = '';
                 }
+                $kdRincian = trim($item['kd_rincian'] ?? ($catInfo['kd_rincian'] ?? ''));
+                $code = $kdRincian !== '' ? $kdRincian : sprintf('ATK-%04d', $idx + 1);
                 $note = trim($item['note'] ?? '');
 
                 $descParts = [];
@@ -110,25 +125,32 @@ class Lembar2AtkCatalogSeeder extends Seeder
                 if ($kdBrg !== '') {
                     $descParts[] = 'BMN: ' . $kdBrg . ($bmnGroup ? " ({$bmnGroup})" : '');
                 }
+                if ($kdRincian !== '') {
+                    $descParts[] = 'Kode Rincian: ' . $kdRincian;
+                }
                 if ($note !== '') {
                     $descParts[] = 'Ket: ' . $note;
                 }
                 $description = implode(' | ', $descParts);
 
-                $code = sprintf('ATK-%04d', $idx + 1);
+                $legacyCode = sprintf('ATK-%04d', $idx + 1);
 
-                // Cari apakah barang dengan nama & kategori yang sama atau kode yang sama sudah ada
-                $existing = Product::where('name', $name)
-                    ->where('category_id', $catId)
+                // Cari apakah barang dengan nama & kategori yang sama atau legacy code sudah ada
+                $normName = preg_replace('/\s+/', ' ', $name);
+                $existing = Product::where('category_id', $catId)
+                    ->where(function ($q) use ($name, $normName) {
+                        $q->where('name', $name)->orWhere('name', $normName);
+                    })
                     ->first();
 
                 if (!$existing) {
-                    $existing = Product::where('code', $code)->first();
+                    $existing = Product::where('code', $legacyCode)->first();
                 }
 
                 if ($existing) {
                     $existing->update([
                         'category_id' => $catId,
+                        'code' => $code,
                         'bmn_code' => $kdBrg ?: $existing->bmn_code,
                         'bmn_group' => $bmnGroup ?: $existing->bmn_group,
                         'name' => $name,

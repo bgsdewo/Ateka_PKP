@@ -32,17 +32,18 @@
             min-height: 100vh;
             color: #0f172a;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
         .auth-content {
             width: 100%;
-            min-height: 100vh;
+            margin: auto;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 1.25rem 1rem;
+            align-items: center;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
         }
 
         @keyframes authCardEnter {
@@ -242,7 +243,7 @@
                                         <div class="col-md-6 col-12">
                                             <div class="form-group mb-1.5">
                                                 <label class="form-label text-uppercase">
-                                                    NIP <span class="text-danger">*</span>
+                                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" name="nip" id="nip" class="form-control font-monospace"
                                                     value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required>

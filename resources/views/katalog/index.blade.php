@@ -253,6 +253,9 @@
                                 </h6>
                                 <small class="text-muted d-block mb-1" style="font-size: 0.78rem;">
                                     Kategori: <strong class="text-secondary">{{ $item->category->name ?? '-' }}</strong>
+                                    @if (!empty($item->bmn_code) || !empty($item->category->kode_barang))
+                                        <span class="text-muted font-monospace" style="font-size: 0.72rem;">({{ $item->bmn_code ?: $item->category->kode_barang }})</span>
+                                    @endif
                                 </small>
                                 <small class="text-muted d-block mb-2" style="font-size: 0.74rem;">
                                     Satuan: <span class="badge bg-light text-dark border">{{ implode(' / ', $item->unit_list) }}</span>
@@ -262,9 +265,9 @@
                             <div class="border-top pt-2.5 mt-2">
                                 {{-- Stock Indicator with Meter --}}
                                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                    <span class="small text-muted fw-semibold">Sisa Stok:</span>
+                                    <span class="small text-muted fw-semibold">Stock sisa:</span>
                                     <span class="fw-bold {{ $item->stock <= 0 ? 'text-danger' : 'text-primary' }} fs-5">
-                                        {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">{{ $item->unit ?? 'Unit' }}</small>
+                                        {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">Stock</small>
                                     </span>
                                 </div>
 

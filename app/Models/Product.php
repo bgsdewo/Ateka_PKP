@@ -23,8 +23,13 @@ class Product extends Model
 
     public function getImageUrlAttribute(): string
     {
-        if (!empty($this->image) && file_exists(public_path($this->image))) {
-            return $this->image;
+        if (!empty($this->image)) {
+            if (file_exists(public_path($this->image))) {
+                return $this->image;
+            }
+            if (str_starts_with($this->image, 'storage/') && file_exists(storage_path('app/public/' . str_replace('storage/', '', $this->image)))) {
+                return $this->image;
+            }
         }
 
         $slug = $this->default_image_slug;

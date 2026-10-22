@@ -621,25 +621,6 @@
                                                             Tolak
                                                         </button>
                                                     </div>
-                                                            Setujui
-                                                        </button>
-
-                                                        <!-- Tombol Tolak -->
-                                                        <button type="button"
-                                                            class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#rejectModal{{ $req->id }}"
-                                                            title="Tolak Usulan Permintaan">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24"
-                                                                fill="none" stroke="currentColor" stroke-width="2">
-                                                                <line x1="18" y1="6" x2="6"
-                                                                    y2="18"></line>
-                                                                <line x1="6" y1="6" x2="18"
-                                                                    y2="18"></line>
-                                                            </svg>
-                                                            Tolak
-                                                        </button>
-                                                    </div>
 
                                                     <!-- Modal Konfirmasi Persetujuan Kasubag TU -->
                                                     <div class="modal fade text-start"
@@ -1382,8 +1363,8 @@
                                 <strong>{{ $requests->total() }}</strong> pengajuan (10 per halaman)
                             </div>
                             @if ($requests->hasPages())
-                                <div>
-                                    {{ $requests->links() }}
+                                <div class="ms-auto d-flex justify-content-end align-items-center">
+                                    {{ $requests->links('pagination::bootstrap-4') }}
                                 </div>
                             @endif
                         </div>

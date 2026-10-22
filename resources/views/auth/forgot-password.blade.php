@@ -31,17 +31,18 @@
             min-height: 100vh;
             color: #0f172a;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
         .auth-content {
             width: 100%;
-            min-height: 100vh;
+            margin: auto;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 1.25rem 1rem;
+            align-items: center;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
         }
 
         @keyframes authCardEnter {
@@ -202,6 +203,18 @@
                                             </div>
                                         </div>
 
+                                        <!-- Email Dinas Terdaftar -->
+                                        <div class="col-12">
+                                            <div class="form-group mb-2">
+                                                <label class="form-label text-uppercase">
+                                                    Email Dinas Terdaftar <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="email" name="email" id="email" class="form-control"
+                                                    value="{{ old('email') }}" placeholder="nama.pegawai@pupr.go.id" required autocomplete="email">
+                                                <small class="text-muted" style="font-size: 0.72rem;">Verifikasi memerlukan kecocokan NIP &amp; Email dinas aktif Anda.</small>
+                                            </div>
+                                        </div>
+
                                         <!-- Password Baru -->
                                         <div class="col-12">
                                             <div class="form-group mb-2">
@@ -267,7 +280,7 @@
 
                                     <div class="d-grid mt-3 mb-2">
                                         <button type="submit" class="btn btn-primary btn-block">
-                                            Perbarui Kata Sandi
+                                            Simpan & Perbarui Password
                                         </button>
                                     </div>
 

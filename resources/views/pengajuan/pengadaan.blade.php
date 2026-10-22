@@ -27,6 +27,106 @@
         .procure-row:hover {
             border-color: #cbd5e1 !important;
         }
+
+        /* Unit Select Dropdown Styling */
+        .unit-select-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .unit-select-trigger-btn {
+            text-align: left;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+            background-color: #ffffff;
+            background-image: none !important;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            height: 38px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+        .unit-select-trigger-btn:hover {
+            border-color: #94a3b8;
+        }
+        .unit-select-trigger-btn:focus,
+        .unit-select-trigger-btn.show {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15) !important;
+            outline: none;
+        }
+        .unit-select-trigger-btn::after {
+            display: none !important;
+        }
+        .unit-select-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .unit-select-trigger-btn.show .unit-select-arrow {
+            transform: rotate(180deg);
+            color: #2563eb;
+        }
+        .unit-select-menu {
+            border-color: #cbd5e1 !important;
+            background: #ffffff !important;
+            box-shadow: 0 12px 30px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+            z-index: 1060 !important;
+            border-radius: 8px !important;
+            min-width: 220px !important;
+            width: 100% !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        .unit-scroll-list {
+            max-height: 180px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+        .unit-scroll-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .unit-scroll-list::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+        .unit-scroll-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .unit-scroll-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .unit-select-option {
+            cursor: pointer;
+            transition: all 0.12s ease;
+            border-radius: 6px;
+            padding: 0.35rem 0.65rem;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.83rem;
+            color: #1e293b;
+        }
+        .unit-select-option:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        .unit-select-option.active {
+            background-color: #eff6ff !important;
+            border-color: #bfdbfe !important;
+            color: #1d4ed8 !important;
+            font-weight: 600;
+        }
     </style>
 @endpush
 
@@ -257,27 +357,64 @@
                                         <div class="col-md-2 col-6">
                                             <label class="form-label fw-bold small mb-1">Jumlah <span class="text-danger">*</span></label>
                                             <input type="number" name="quantity[]" class="form-control form-control-sm text-center fw-bold" 
-                                                min="1" value="1" required>
+                                                min="1" value="1" required style="height: 38px;">
                                         </div>
 
                                         <div class="col-md-3 col-6">
                                             <label class="form-label fw-bold small mb-1">Satuan <span class="text-danger">*</span></label>
-                                            <select name="custom_unit[]" class="form-select form-select-sm item-unit-select bg-white" required>
-                                                @foreach ($unitOptions as $val => $label)
-                                                    <option value="{{ $val }}" {{ $val === 'Buah' ? 'selected' : '' }}>{{ $label }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="unit-select-dropdown-wrapper dropdown">
+                                                {{-- Tombol Dropdown Satuan yang serasi dan rapi --}}
+                                                <button type="button" 
+                                                        class="form-select form-select-sm unit-select-trigger-btn dropdown-toggle w-100" 
+                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-auto-close="outside"
+                                                        aria-expanded="false"
+                                                        data-bs-popper-config='{"placement": "bottom-start"}'>
+                                                    <span class="unit-btn-text text-truncate me-2">Buah</span>
+                                                    <span class="unit-select-arrow">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                    </span>
+                                                </button>
+
+                                                {{-- Hidden input untuk menyimpan nilai satuan terpilih saat form disubmit --}}
+                                                <input type="hidden" name="custom_unit[]" class="item-unit-input" value="Buah" required>
+
+                                                {{-- Dropdown menu dengan Quick Search di atas & List Satuan Ber-scrollbar --}}
+                                                <div class="dropdown-menu unit-select-menu shadow-lg border rounded-3 mt-1">
+                                                    <div class="p-2 border-bottom bg-light">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text bg-white border-end-0 text-muted px-2">
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                                            </span>
+                                                            <input type="text" 
+                                                                   class="form-control border-start-0 unit-quick-search" 
+                                                                   placeholder="Cari / ketik satuan..." 
+                                                                   autocomplete="off" 
+                                                                   style="font-size: 0.82rem;">
+                                                            <button type="button" class="btn btn-outline-secondary btn-clear-unit-search d-none px-2" title="Hapus pencarian">
+                                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="unit-scroll-list p-1">
+                                                        {{-- Rendered dynamically via JS --}}
+                                                    </div>
+                                                    <div class="no-unit-found p-2 text-center text-muted small d-none">
+                                                        Satuan tidak ditemukan
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="col-md-6 col-10">
                                             <label class="form-label fw-bold small mb-1">Spesifikasi / Merk</label>
                                             <input type="text" name="specification[]" class="form-control form-control-sm item-spec-input bg-white" 
-                                                placeholder="Misal: Warna Biru / Joyko">
+                                                placeholder="Misal: Warna Biru / Joyko" style="height: 38px;">
                                         </div>
 
                                         <div class="col-md-1 col-2">
                                             <label class="form-label d-none d-md-block small text-muted mb-1">&nbsp;</label>
-                                            <button type="button" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center remove-procure-row" title="Hapus baris ini" style="height: 31px;">
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center remove-procure-row" title="Hapus baris ini" style="height: 38px;">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <polyline points="3 6 5 6 21 6"></polyline>
                                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -325,37 +462,16 @@
                 const addBtn = document.getElementById('btn-add-procure-row');
 
                 const masterProducts = @json($productsJsonData);
-                const standardUnitsList = ['Buah', 'Dus', 'Rim', 'Pak', 'Kotak', 'Doz', 'Set', 'Roll', 'Slop', 'Pak/Slop', 'Buku', 'Tube', 'Box', 'Botol', 'Lusin', 'Lembar', 'Batang', 'Bungkus', 'Pcs', 'Unit', 'Meter'];
+                const unitOptionsData = @json($unitOptions);
 
-                function setRowUnitSelect(unitSelect, availableUnitsStr, defaultUnit) {
-                    if (!unitSelect) return;
-                    const units = (availableUnitsStr || '').split(',').map(u => u.trim()).filter(Boolean);
-                    
-                    unitSelect.innerHTML = '';
-                    const added = new Set();
-
-                    units.forEach(u => {
-                        added.add(u.toLowerCase());
-                        const opt = document.createElement('option');
-                        opt.value = u;
-                        opt.textContent = `${u} (Standar)`;
-                        if (u.toLowerCase() === (defaultUnit || '').toLowerCase()) {
-                            opt.selected = true;
-                        }
-                        unitSelect.appendChild(opt);
-                    });
-
-                    standardUnitsList.forEach(u => {
-                        if (!added.has(u.toLowerCase())) {
-                            const opt = document.createElement('option');
-                            opt.value = u;
-                            opt.textContent = u;
-                            if (!units.length && u.toLowerCase() === (defaultUnit || 'buah').toLowerCase()) {
-                                opt.selected = true;
-                            }
-                            unitSelect.appendChild(opt);
-                        }
-                    });
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
                 }
 
                 function attachRowEvents(row) {
@@ -380,9 +496,237 @@
                     const prodNoFound = row.querySelector('.no-product-found');
                     const badge = row.querySelector('.procure-count-badge');
 
-                    const unitSelect = row.querySelector('.item-unit-select');
+                    // 3. Elemen Satuan Dropdown dengan Quick Search & Scrollbar
+                    const unitInputHidden = row.querySelector('.item-unit-input');
+                    const unitTriggerBtn = row.querySelector('.unit-select-trigger-btn');
+                    const unitBtnText = row.querySelector('.unit-btn-text');
+                    const unitQuickSearch = row.querySelector('.unit-quick-search');
+                    const unitClearSearch = row.querySelector('.btn-clear-unit-search');
+                    const unitMenu = row.querySelector('.unit-select-menu');
+                    const unitList = row.querySelector('.unit-scroll-list');
+                    const unitNoFound = row.querySelector('.no-unit-found');
+
                     const specInput = row.querySelector('.item-spec-input');
                     const removeBtn = row.querySelector('.remove-procure-row');
+
+                    let rowAvailableUnits = [];
+                    let currentUnitValue = unitInputHidden ? unitInputHidden.value : 'Buah';
+
+                    // Render daftar satuan dalam dropdown
+                    function renderUnits(searchQuery = '') {
+                        if (!unitList) return;
+                        const q = (searchQuery || '').trim().toLowerCase();
+                        unitList.innerHTML = '';
+
+                        const added = new Set();
+                        const recommendedList = [];
+                        const generalList = [];
+
+                        // Satuan rekomendasi dari produk terpilih
+                        rowAvailableUnits.forEach(u => {
+                            if (!u) return;
+                            const key = u.toLowerCase();
+                            if (!added.has(key)) {
+                                added.add(key);
+                                const label = unitOptionsData[u] || u;
+                                if (!q || key.includes(q) || label.toLowerCase().includes(q)) {
+                                    recommendedList.push({ value: u, label: label });
+                                }
+                            }
+                        });
+
+                        // Satuan umum standar lainnya
+                        Object.keys(unitOptionsData).forEach(u => {
+                            const key = u.toLowerCase();
+                            if (!added.has(key)) {
+                                added.add(key);
+                                const label = unitOptionsData[u] || u;
+                                if (!q || key.includes(q) || label.toLowerCase().includes(q)) {
+                                    generalList.push({ value: u, label: label });
+                                }
+                            }
+                        });
+
+                        // Bila saat ini bernilai custom yang tidak ada di daftar
+                        if (currentUnitValue && !added.has(currentUnitValue.toLowerCase())) {
+                            added.add(currentUnitValue.toLowerCase());
+                            if (!q || currentUnitValue.toLowerCase().includes(q)) {
+                                generalList.unshift({ value: currentUnitValue, label: currentUnitValue });
+                            }
+                        }
+
+                        const totalVisible = recommendedList.length + generalList.length;
+                        const showCustomAdd = q && !added.has(q);
+
+                        if (totalVisible === 0 && !showCustomAdd) {
+                            if (unitNoFound) unitNoFound.classList.remove('d-none');
+                            return;
+                        }
+                        if (unitNoFound) unitNoFound.classList.add('d-none');
+
+                        // Bagian 1: Satuan Standar Produk
+                        if (recommendedList.length > 0) {
+                            const header = document.createElement('div');
+                            header.className = 'px-2 pt-1 pb-1 text-muted fw-bold d-flex justify-content-between align-items-center';
+                            header.style.fontSize = '0.67rem';
+                            header.style.textTransform = 'uppercase';
+                            header.style.letterSpacing = '0.5px';
+                            header.innerHTML = '<span>Satuan Standar Produk</span><span class="badge bg-primary-subtle text-primary border" style="font-size: 0.62rem;">Standar</span>';
+                            unitList.appendChild(header);
+
+                            recommendedList.forEach(item => {
+                                unitList.appendChild(createUnitOptionItem(item.value, item.label, true));
+                            });
+                        }
+
+                        // Bagian 2: Satuan Umum Lainnya
+                        if (generalList.length > 0) {
+                            if (recommendedList.length > 0) {
+                                const header = document.createElement('div');
+                                header.className = 'px-2 pt-2 pb-1 text-muted fw-bold border-top mt-1';
+                                header.style.fontSize = '0.67rem';
+                                header.style.textTransform = 'uppercase';
+                                header.style.letterSpacing = '0.5px';
+                                header.textContent = 'Pilihan Satuan Lainnya';
+                                unitList.appendChild(header);
+                            }
+
+                            generalList.forEach(item => {
+                                unitList.appendChild(createUnitOptionItem(item.value, item.label, false));
+                            });
+                        }
+
+                        // Opsi bila user mengetik satuan baru khusus
+                        if (showCustomAdd) {
+                            const customDiv = document.createElement('div');
+                            customDiv.className = 'unit-select-option custom-add-option py-1.5 px-2 rounded-2 mt-1 d-flex align-items-center justify-content-between';
+                            customDiv.style.background = '#f0fdf4';
+                            customDiv.style.border = '1px dashed #86efac';
+                            customDiv.innerHTML = `
+                                <span class="text-truncate" style="font-size: 0.82rem; color: #15803d;">
+                                    Gunakan satuan: <strong>${escapeHtml(searchQuery.trim())}</strong>
+                                </span>
+                                <span class="badge bg-success text-white" style="font-size: 0.65rem;">Baru</span>
+                            `;
+                            customDiv.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                selectUnit(searchQuery.trim());
+                            });
+                            unitList.appendChild(customDiv);
+                        }
+                    }
+
+                    function createUnitOptionItem(val, label, isRecommended) {
+                        const div = document.createElement('div');
+                        const isSelected = (val.toLowerCase() === (currentUnitValue || '').toLowerCase());
+                        div.className = `unit-select-option py-1.5 px-2 rounded-2 ${isSelected ? 'active' : ''}`;
+                        div.dataset.value = val;
+
+                        div.innerHTML = `
+                            <div class="d-flex align-items-center gap-1.5 text-truncate">
+                                <span class="unit-option-title ${isSelected ? 'fw-bold text-primary' : ''}">${escapeHtml(label)}</span>
+                            </div>
+                            ${isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+                        `;
+
+                        div.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            selectUnit(val);
+                        });
+
+                        return div;
+                    }
+
+                    function selectUnit(val) {
+                        if (!val) return;
+                        currentUnitValue = val;
+                        if (unitInputHidden) {
+                            unitInputHidden.value = val;
+                            unitInputHidden.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        if (unitBtnText) {
+                            const displayLabel = unitOptionsData[val] || val;
+                            unitBtnText.textContent = displayLabel;
+                            unitBtnText.title = displayLabel;
+                        }
+
+                        if (unitTriggerBtn && window.bootstrap && bootstrap.Dropdown) {
+                            const bsDrop = bootstrap.Dropdown.getInstance(unitTriggerBtn) || new bootstrap.Dropdown(unitTriggerBtn);
+                            bsDrop.hide();
+                        }
+                    }
+
+                    function updateUnitOptions(availableUnitsStr, defaultUnit) {
+                        rowAvailableUnits = (availableUnitsStr || '').split(',').map(u => u.trim()).filter(Boolean);
+                        if (defaultUnit) {
+                            currentUnitValue = defaultUnit;
+                        } else if (rowAvailableUnits.length > 0) {
+                            currentUnitValue = rowAvailableUnits[0];
+                        } else if (!currentUnitValue) {
+                            currentUnitValue = 'Buah';
+                        }
+                        if (unitInputHidden) unitInputHidden.value = currentUnitValue;
+                        if (unitBtnText) {
+                            const displayLabel = unitOptionsData[currentUnitValue] || currentUnitValue;
+                            unitBtnText.textContent = displayLabel;
+                            unitBtnText.title = displayLabel;
+                        }
+                        renderUnits(unitQuickSearch ? unitQuickSearch.value : '');
+                    }
+
+                    row._updateUnitOptions = updateUnitOptions;
+                    row._selectUnit = selectUnit;
+
+                    if (unitTriggerBtn) {
+                        unitTriggerBtn.addEventListener('shown.bs.dropdown', function() {
+                            renderUnits(unitQuickSearch ? unitQuickSearch.value : '');
+                            if (unitQuickSearch) {
+                                setTimeout(() => unitQuickSearch.focus(), 50);
+                            }
+                        });
+                    }
+
+                    if (unitQuickSearch) {
+                        unitQuickSearch.addEventListener('input', function() {
+                            const val = this.value;
+                            if (unitClearSearch) {
+                                if (val) unitClearSearch.classList.remove('d-none');
+                                else unitClearSearch.classList.add('d-none');
+                            }
+                            renderUnits(val);
+                        });
+
+                        unitQuickSearch.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const firstOption = unitList.querySelector('.unit-select-option');
+                                if (firstOption) {
+                                    if (firstOption.classList.contains('custom-add-option')) {
+                                        selectUnit(unitQuickSearch.value.trim());
+                                    } else if (firstOption.dataset.value) {
+                                        selectUnit(firstOption.dataset.value);
+                                    }
+                                }
+                            } else if (e.key === 'Escape') {
+                                if (unitTriggerBtn && window.bootstrap && bootstrap.Dropdown) {
+                                    const bsDrop = bootstrap.Dropdown.getInstance(unitTriggerBtn) || new bootstrap.Dropdown(unitTriggerBtn);
+                                    bsDrop.hide();
+                                }
+                            }
+                        });
+                    }
+
+                    if (unitClearSearch) {
+                        unitClearSearch.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (unitQuickSearch) {
+                                unitQuickSearch.value = '';
+                                unitQuickSearch.focus();
+                            }
+                            this.classList.add('d-none');
+                            renderUnits('');
+                        });
+                    }
 
                     // Render daftar produk dalam dropdown
                     function renderProducts(query = '') {
@@ -447,7 +791,7 @@
                                 prodBtnText.textContent = `[${p.code ? p.code + ' - ' : ''}${p.category_name}] ${p.name}`;
                                 prodBtnText.title = p.name;
                             }
-                            setRowUnitSelect(unitSelect, p.available_units, p.unit);
+                            updateUnitOptions(p.available_units, p.unit);
                         } else {
                             if (nameInputHidden) nameInputHidden.value = '';
                             if (prodIdHidden) prodIdHidden.value = '';
@@ -457,7 +801,7 @@
                                 prodBtnText.textContent = `-- Pilih Barang yang Diminta (${matchedCount} Barang) --`;
                                 prodBtnText.title = '';
                             }
-                            setRowUnitSelect(unitSelect, '', 'Buah');
+                            updateUnitOptions('', 'Buah');
                         }
 
                         // Tutup Dropdown
@@ -665,16 +1009,18 @@
                                 row.querySelectorAll('input').forEach(input => {
                                     if (input.type === 'number') {
                                         input.value = '1';
-                                    } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id')) {
+                                    } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id') && !input.classList.contains('unit-quick-search') && !input.classList.contains('item-unit-input')) {
                                         input.value = '';
                                     }
                                 });
+                                updateUnitOptions('', 'Buah');
                             }
                         });
                     }
 
-                    // Render awal produk pada row
+                    // Render awal pada row
                     renderProducts('');
+                    updateUnitOptions('', currentUnitValue || 'Buah');
                 }
 
                 // Global click listener untuk menutup menu combobox kategori saat klik di luar
@@ -744,17 +1090,27 @@
                     const prodClearQuickSearch = newRow.querySelector('.btn-clear-quick-search');
                     if (prodClearQuickSearch) prodClearQuickSearch.classList.add('d-none');
 
+                    // Reset dropdown satuan in new row
+                    const newUnitInput = newRow.querySelector('.item-unit-input');
+                    if (newUnitInput) newUnitInput.value = 'Buah';
+                    const newUnitBtnText = newRow.querySelector('.unit-btn-text');
+                    if (newUnitBtnText) newUnitBtnText.textContent = 'Buah';
+                    const newUnitSearch = newRow.querySelector('.unit-quick-search');
+                    if (newUnitSearch) newUnitSearch.value = '';
+                    const newUnitClear = newRow.querySelector('.btn-clear-unit-search');
+                    if (newUnitClear) newUnitClear.classList.add('d-none');
+                    const newUnitList = newRow.querySelector('.unit-scroll-list');
+                    if (newUnitList) newUnitList.innerHTML = '';
+
                     newRow.querySelectorAll('input').forEach(input => {
                         if (input.type === 'number') {
                             input.value = '1';
-                        } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id')) {
+                        } else if (!input.classList.contains('category-search-input') && !input.classList.contains('procure-cat-filter') && !input.classList.contains('product-quick-search') && !input.classList.contains('item-name-input') && !input.classList.contains('item-product-id') && !input.classList.contains('unit-quick-search') && !input.classList.contains('item-unit-input')) {
                             input.value = '';
                         }
                     });
 
                     container.appendChild(newRow);
-                    const newUnitSelect = newRow.querySelector('.item-unit-select');
-                    setRowUnitSelect(newUnitSelect, '', 'Buah');
                     attachRowEvents(newRow);
                 });
             });

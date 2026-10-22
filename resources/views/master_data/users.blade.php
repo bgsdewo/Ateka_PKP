@@ -152,11 +152,17 @@
                                                     <form
                                                         action="{{ route('master-data.manajemen-pengguna.destroy', $user->id) }}"
                                                         method="POST"
-                                                        onsubmit="return confirm('Yakin ingin menghapus pengguna {{ $user->name }}?')">
+                                                        class="d-inline form-delete-user">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            {{ auth()->id() == $user->id ? 'disabled' : '' }}>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-delete-user"
+                                                            data-id="{{ $user->id }}"
+                                                            data-name="{{ e($user->name_with_title ?? $user->name) }}"
+                                                            data-email="{{ e($user->email) }}"
+                                                            data-role="{{ e($roleLabel) }}"
+                                                            data-position="{{ e($user->position ?? '-') }}"
+                                                            data-nip="{{ e($user->nip ?? '') }}"
+                                                            {{ auth()->id() == $user->id ? 'disabled title="Akun Anda sendiri tidak dapat dihapus"' : '' }}>
                                                             Hapus
                                                         </button>
                                                     </form>
@@ -349,6 +355,136 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
+                // SweetAlert2 Flash Notifications
+                @if (session('success'))
+                    if (typeof Swal !== 'undefined') {
+                        const successMsg = {!! json_encode(session('success')) !!};
+                        let titleText = 'Berhasil!';
+                        const lowerMsg = successMsg.toLowerCase();
+                        if (lowerMsg.includes('dihapus')) {
+                            titleText = 'Pengguna Dihapus!';
+                        } else if (lowerMsg.includes('diperbarui') || lowerMsg.includes('diperbaharui')) {
+                            titleText = 'Pengguna Diperbarui!';
+                        } else if (lowerMsg.includes('ditambahkan') || lowerMsg.includes('dibuat')) {
+                            titleText = 'Pengguna Ditambahkan!';
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: titleText,
+                            html: `<div class="text-secondary small mt-1">${successMsg}</div>`,
+                            confirmButtonText: 'Tutup',
+                            confirmButtonColor: '#059669',
+                            width: '350px',
+                            padding: '1.25rem',
+                            background: '#ffffff',
+                            customClass: {
+                                popup: 'rounded-4 shadow-lg border-0 p-3',
+                                title: 'fw-bold text-dark fs-5 mb-0',
+                                confirmButton: 'btn btn-success btn-sm px-3 py-1.5 fw-semibold rounded-3'
+                            },
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+                    }
+                @endif
+
+                @if (session('error'))
+                    if (typeof Swal !== 'undefined') {
+                        const errorMsg = {!! json_encode(session('error')) !!};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            html: `<div class="text-secondary small mt-1">${errorMsg}</div>`,
+                            confirmButtonText: 'Tutup',
+                            confirmButtonColor: '#ef4444',
+                            width: '350px',
+                            padding: '1.25rem',
+                            background: '#ffffff',
+                            customClass: {
+                                popup: 'rounded-4 shadow-lg border-0 p-3',
+                                title: 'fw-bold text-dark fs-5 mb-0',
+                                confirmButton: 'btn btn-danger btn-sm px-3 py-1.5 fw-semibold rounded-3'
+                            }
+                        });
+                    }
+                @endif
+
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                }
+
+                // Modern Compact Delete Confirmation matching user design (Shadcn / Tailwind Style)
+                $(document).on('click', '.btn-delete-user', function(e) {
+                    e.preventDefault();
+                    const $btn = $(this);
+                    if ($btn.prop('disabled')) return;
+
+                    const $form = $btn.closest('form');
+                    const userName = $btn.data('name') || 'pengguna ini';
+
+                    const modalHtml = `
+                        <div class="text-center pt-1">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 48px; height: 48px; background-color: #fef2f2;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem; letter-spacing: -0.01em;">Are you sure?</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.5; max-width: 270px; margin: 0 auto;">
+                                Tindakan ini tidak dapat dibatalkan. Seluruh data pengguna <strong>${escapeHtml(userName)}</strong> akan dihapus permanen.
+                            </p>
+                        </div>
+                    `;
+
+                    Swal.fire({
+                        html: modalHtml,
+                        width: '350px',
+                        showCancelButton: true,
+                        confirmButtonText: 'Hapus pengguna',
+                        cancelButtonText: 'Batal',
+                        buttonsStyling: false,
+                        customClass: {
+                            popup: 'custom-delete-popup',
+                            actions: 'custom-delete-actions',
+                            confirmButton: 'custom-delete-confirm-btn',
+                            cancelButton: 'custom-delete-cancel-btn'
+                        },
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                html: `
+                                    <div class="text-center py-2">
+                                        <h6 class="fw-bold text-dark mb-1" style="font-size: 1rem;">Menghapus Pengguna...</h6>
+                                        <p class="text-muted small mb-0">Mohon tunggu sebentar...</p>
+                                    </div>
+                                `,
+                                width: '300px',
+                                padding: '1.25rem',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'custom-delete-popup'
+                                },
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                    $form.submit();
+                                }
+                            });
+                        }
+                    });
+                });
+
                 const storeUrl = "{{ route('master-data.manajemen-pengguna.store') }}";
                 const updateUrlTemplate = "{{ route('master-data.manajemen-pengguna.update', ':id') }}";
 

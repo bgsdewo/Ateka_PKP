@@ -181,6 +181,27 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
         }
 
+        // Auto-detect category & code jika tidak diisi secara manual saat isi stok
+        if (empty($request->category_id) && !empty($request->name)) {
+            $matched = Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim($request->name))])->first();
+            if ($matched) {
+                $request->merge(['category_id' => $matched->category_id]);
+                if (empty($request->code)) {
+                    $request->merge(['code' => $matched->code]);
+                }
+            } else {
+                foreach (Category::all() as $cat) {
+                    if (mb_stripos($request->name, $cat->name) !== false) {
+                        $request->merge(['category_id' => $cat->id]);
+                        if (empty($request->code) && $cat->kd_rincian) {
+                            $request->merge(['code' => $cat->kd_rincian]);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
         // Cek apakah barang dengan nama yang sama sudah ada di master data
         $existingProduct = Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
             ->first();
@@ -240,6 +261,12 @@ class ProductController extends Controller
                     'description' => $request->description ?: $existingProduct->description,
                 ];
                 if ($imagePath) {
+                    if ($existingProduct->image && str_starts_with($existingProduct->image, 'storage/products/')) {
+                        $oldRelative = str_replace('storage/', '', $existingProduct->image);
+                        if (Storage::disk('public')->exists($oldRelative)) {
+                            Storage::disk('public')->delete($oldRelative);
+                        }
+                    }
                     $updateData['image'] = $imagePath;
                 }
                 $existingProduct->update($updateData);
@@ -308,6 +335,14 @@ class ProductController extends Controller
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
             return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
+        }
+
+        // Auto-fill category & code jika tidak dikirimkan saat isi stok barang eksisting
+        if (empty($request->category_id)) {
+            $request->merge(['category_id' => $daftar_barang->category_id]);
+        }
+        if (empty($request->code)) {
+            $request->merge(['code' => $daftar_barang->code]);
         }
 
         $request->validate([

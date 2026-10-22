@@ -115,6 +115,10 @@ class ApprovalController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki wewenang untuk memverifikasi atau menyetujui permohonan ATK.');
+        }
+
         $item = RequestItem::with('details.product', 'user')->findOrFail($id);
 
         if ($item->status !== 'pending') {
@@ -303,6 +307,10 @@ class ApprovalController extends Controller
      */
     public function procureAndApprove(Request $request, $id)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki wewenang untuk melakukan pengadaan barang.');
+        }
+
         $item = RequestItem::with('details.product', 'user')->findOrFail($id);
 
         $request->validate([

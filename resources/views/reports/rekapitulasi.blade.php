@@ -58,6 +58,11 @@
             align-items: center;
             justify-content: center;
         }
+
+        .card-footer .pagination {
+            margin-bottom: 0 !important;
+            gap: 2px !important;
+        }
     </style>
     <div class="iq-navbar-header" style="height: 220px;">
         <div class="container-fluid iq-container">
@@ -433,13 +438,13 @@
                         </div>
                     </div>
                     @if (method_exists($categoriesRekap, 'total') && $categoriesRekap->total() > 0)
-                        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
                             <div class="text-muted small">
                                 Menampilkan <strong>{{ $categoriesRekap->firstItem() ?? 0 }}</strong> - <strong>{{ $categoriesRekap->lastItem() ?? 0 }}</strong> dari <strong>{{ $categoriesRekap->total() }}</strong> kategori ATK (10 kategori per halaman)
                             </div>
                             @if ($categoriesRekap->hasPages())
-                                <div>
-                                    {{ $categoriesRekap->links() }}
+                                <div class="ms-auto d-flex justify-content-end align-items-center">
+                                    {{ $categoriesRekap->links('pagination::bootstrap-4') }}
                                 </div>
                             @endif
                         </div>

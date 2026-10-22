@@ -23,6 +23,10 @@ class UserManagementController extends Controller
 
     public function store(Request $request)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk menambah pengguna.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:50'],
@@ -99,6 +103,16 @@ class UserManagementController extends Controller
 
     public function update(Request $request, User $manajemen_pengguna)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk mengubah data pengguna.');
+        }
+
+        // Mencegah Kasubag TU menurunkan role akunnya sendiri yang dapat menyebabkan terkunci dari sistem
+        if (Auth::id() === $manajemen_pengguna->id && $request->role !== $manajemen_pengguna->role) {
+            return redirect()->back()
+                ->with('error', 'Anda tidak dapat mengubah role akun Anda sendiri untuk mencegah kehilangan hak akses administrasi.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:50'],
@@ -174,6 +188,10 @@ class UserManagementController extends Controller
 
     public function destroy(User $manajemen_pengguna)
     {
+        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
+            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk menghapus pengguna.');
+        }
+
         if (Auth::id() === $manajemen_pengguna->id) {
             return redirect()
                 ->route('master-data.manajemen-pengguna.index')

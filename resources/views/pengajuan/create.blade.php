@@ -374,8 +374,8 @@
                             itemDiv.dataset.name = p.name;
 
                             const stockBadge = p.stock > 0
-                                ? `<span class="badge bg-success-subtle text-success border border-success-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: ${p.stock} ${p.unit}</span>`
-                                : `<span class="badge bg-warning-subtle text-dark border border-warning-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: 0 (Pengadaan TU)</span>`;
+                                ? `<span class="badge bg-success-subtle text-success border border-success-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: ${p.stock} Stock</span>`
+                                : `<span class="badge bg-warning-subtle text-dark border border-warning-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: 0 Stock (Pengadaan TU)</span>`;
 
                             itemDiv.innerHTML = `
                                 <div class="d-flex justify-content-between align-items-start gap-2">
@@ -402,16 +402,16 @@
                         if (p) {
                             if (prodHidden) prodHidden.value = p.id;
                             if (prodBtnText) {
-                                prodBtnText.textContent = `[${p.code ? p.code + ' - ' : ''}${p.category_name}] ${p.name} — (Stok: ${p.stock} ${p.unit})`;
+                                prodBtnText.textContent = `[${p.code ? p.code + ' - ' : ''}${p.category_name}] ${p.name} — (Stok: ${p.stock} Stock)`;
                                 prodBtnText.title = p.name;
                             }
                             if (unitInput) unitInput.value = p.unit;
                             if (qtyInput) qtyInput.removeAttribute('max');
 
                             if (p.stock > 0) {
-                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} ${p.unit}.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubag TU.`;
+                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubag TU.`;
                             } else {
-                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 ${p.unit}).</span> Permintaan ini akan otomatis diproses pengadaan oleh Kasubag TU.`;
+                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini akan otomatis diproses pengadaan oleh Kasubag TU.`;
                             }
                         } else {
                             if (prodHidden) prodHidden.value = '';

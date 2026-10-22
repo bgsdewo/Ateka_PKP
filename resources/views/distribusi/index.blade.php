@@ -250,112 +250,122 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <h4 class="card-title mb-0 fw-bold">Daftar Penyerahan Barang ke Pemohon</h4>
-                        </div>
-                    </div>
-
-                    {{-- Filter Bar Status, Tipe, Periode Bulan & Tahun, serta Pencarian --}}
-                    <div class="px-4 py-3 bg-light border-bottom">
-                        <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET" class="d-flex align-items-center flex-wrap gap-2.5">
-                            {{-- Filter Status --}}
-                            <div style="min-width: 150px;">
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
-                                    <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
-                                    <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
-                                    <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
-                                </select>
+                    <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET">
+                        {{-- 1. Card Header: Judul di Kiri, Kotak Pencarian di Kanan --}}
+                        <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">Daftar Penyerahan Barang ke Pemohon</h5>
                             </div>
 
-                            {{-- Filter Tipe --}}
-                            <div style="min-width: 150px;">
-                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
-                                    <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
-                                    <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
-                                </select>
-                            </div>
-
-                            {{-- Filter Periode Bulan --}}
-                            <div style="min-width: 185px;">
-                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
-                                    <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
-                                    @php
-                                        $allMonths = [
-                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
-                                             7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                                        ];
-                                    @endphp
-                                    @foreach ($allMonths as $num => $name)
-                                        <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
-                                            {{ $name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Filter Periode Tahun --}}
-                            <div style="min-width: 135px;">
-                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem; border-color: #cbd5e1;">
-                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
-                                    @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                                        <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
-                                            Tahun {{ $y }}
-                                        </option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            {{-- Input Pencarian --}}
-                            <div class="flex-grow-1" style="min-width: 220px; max-width: 360px;">
-                                <div class="input-group input-group-sm" style="height: 38px;">
-                                    <input type="text" id="distribusi-search" name="search" class="form-control" placeholder="Cari tiket / pemohon / barang..."
-                                        value="{{ $search ?? '' }}" autocomplete="off" style="font-size: 0.84rem; border-color: #cbd5e1;">
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}; border-color: #cbd5e1;" title="Hapus pencarian">
+                            {{-- Input Pencarian di Sisi Kanan Header --}}
+                            <div style="min-width: 220px; max-width: 320px;" class="flex-grow-1 flex-sm-grow-0">
+                                <div class="input-group input-group-sm" style="height: 32px;">
+                                    <input type="text" id="distribusi-search" name="search" class="form-control form-control-sm" placeholder="Cari tiket / pemohon / barang..."
+                                        value="{{ $search ?? '' }}" autocomplete="off" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1;">
+                                    <button class="btn btn-outline-secondary" type="button" id="btn-clear-search" style="{{ empty($search) ? 'display: none;' : '' }}; height: 32px; border-color: #cbd5e1; padding: 0 0.5rem;" title="Hapus pencarian">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </button>
-                                    <button class="btn btn-primary d-inline-flex align-items-center px-3 shadow-sm" id="btn-distribusi-search" type="submit" title="Cari">
+                                    <button class="btn btn-primary d-inline-flex align-items-center px-2.5 shadow-sm" id="btn-distribusi-search" type="submit" style="height: 32px;" title="Cari">
                                         <span id="search-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
-                                        <svg id="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <svg id="search-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
-                                        <span class="ms-1 fw-semibold d-none d-sm-inline">Cari</span>
+                                        <span class="ms-1 fw-semibold d-none d-sm-inline" style="font-size: 0.8rem;">Cari</span>
                                     </button>
                                 </div>
                             </div>
+                        </div>
 
-                            {{-- Reset Button --}}
-                            <div id="distribusi-reset-container">
-                                @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
-                                    <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 px-3 shadow-none" style="height: 38px; border-color: #cbd5e1; white-space: nowrap;" title="Reset Filter">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="1 4 1 10 7 10"></polyline>
-                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                                        </svg>
-                                        <span>Reset</span>
-                                    </a>
-                                @endif
+                        {{-- 2. Filter Bar: Dropdown Teratur dan Rapi dalam 1 Baris --}}
+                        <div class="px-3 py-2 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <div class="d-flex align-items-center gap-1 text-secondary me-1" style="font-size: 0.78rem; font-weight: 600;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                    </svg>
+                                    <span>Filter:</span>
+                                </div>
+
+                                {{-- Filter Status --}}
+                                <div style="min-width: 125px;">
+                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                                        <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
+                                        <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
+                                    </select>
+                                </div>
+
+                                {{-- Filter Tipe --}}
+                                <div style="min-width: 115px;">
+                                    <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="">Semua Tipe</option>
+                                        <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                        <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
+                                    </select>
+                                </div>
+
+                                {{-- Filter Periode Bulan --}}
+                                <div style="min-width: 130px;">
+                                    <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan</option>
+                                        @php
+                                            $allMonths = [
+                                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                                                 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                            ];
+                                        @endphp
+                                        @foreach ($allMonths as $num => $name)
+                                            <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Filter Periode Tahun --}}
+                                <div style="min-width: 105px;">
+                                    <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                                        @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                            <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
+                                                Tahun {{ $y }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Reset Button --}}
+                                <div id="distribusi-reset-container">
+                                    @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
+                                        <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-2.5 shadow-none" style="height: 32px; font-size: 0.8rem; border-color: #fca5a5; white-space: nowrap;" title="Reset Filter">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="1 4 1 10 7 10"></polyline>
+                                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                            </svg>
+                                            <span>Reset Filter</span>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
 
-                    <div class="card-body p-4" id="table-container">
+                    <div class="card-body p-3" id="table-container">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th width="4%">No</th>
-                                        <th>Kode Pengajuan</th>
+                                        <th style="white-space: nowrap;">Kode Pengajuan</th>
                                         <th>Tipe & Pemohon</th>
                                         <th>Daftar Barang & Qty</th>
-                                        <th>Status Distribusi</th>
-                                        <th>Waktu / Penerima</th>
-                                        <th width="15%" class="text-end">Aksi PIC</th>
+                                        <th style="white-space: nowrap;">Status Distribusi</th>
+                                        <th style="white-space: nowrap; min-width: 170px;">Waktu / Penerima</th>
+                                        <th style="white-space: nowrap; min-width: 100px;" class="text-end">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="distribusi-table-body">
@@ -424,7 +434,7 @@
                                                     <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
                                                         @if ($req->distribution_proof)
                                                             <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
-                                                                style="font-size: 0.72rem;"
+                                                                style="font-size: 0.72rem; white-space: nowrap; line-height: 1.3;"
                                                                 data-bs-toggle="modal" data-bs-target="#photoModal{{ $req->id }}"
                                                                 title="Lihat foto bukti serah terima">
                                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -432,11 +442,11 @@
                                                                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                                                     <polyline points="21 15 16 10 5 21"></polyline>
                                                                 </svg>
-                                                                Lihat Bukti Foto
+                                                                <span>Lihat Bukti Foto</span>
                                                             </button>
                                                         @elseif ($canDistribute)
                                                             <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
-                                                                style="font-size: 0.72rem;"
+                                                                style="font-size: 0.72rem; white-space: nowrap; line-height: 1.3;"
                                                                 data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}"
                                                                 title="Upload foto bukti dokumentasi serah terima">
                                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -444,19 +454,19 @@
                                                                     <polyline points="17 8 12 3 7 8"></polyline>
                                                                     <line x1="12" y1="3" x2="12" y2="15"></line>
                                                                 </svg>
-                                                                + Upload Bukti Foto
+                                                                <span>+ Upload Bukti Foto</span>
                                                             </button>
                                                         @endif
                                                         @if ($req->signed_proof)
                                                             <a href="{{ $req->signed_proof_url }}" target="_blank" download class="btn btn-xs btn-success text-white rounded-pill px-2 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
-                                                                style="font-size: 0.72rem;"
+                                                                style="font-size: 0.72rem; white-space: nowrap; line-height: 1.3;"
                                                                 title="Download Berkas Serah Terima yang diunggah PIC / Pemohon">
                                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                                     <polyline points="7 10 12 15 17 10"></polyline>
                                                                     <line x1="12" y1="15" x2="12" y2="3"></line>
                                                                 </svg>
-                                                                Download Berkas
+                                                                <span>Download Berkas</span>
                                                             </a>
                                                         @endif
                                                     </div>
@@ -519,8 +529,8 @@
                                 <div class="text-muted small">
                                     Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> data penyerahan
                                 </div>
-                                <div>
-                                    {{ $requests->links() }}
+                                <div class="ms-auto d-flex justify-content-end align-items-center">
+                                    {{ $requests->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         @endif
@@ -531,13 +541,13 @@
                                 {{-- 1. Modal Konfirmasi Penyerahan Barang --}}
                                 @if ($req->status === 'approved' && $canDistribute)
                                     <div class="modal fade" id="handoverModal{{ $req->id }}" tabindex="-1" aria-labelledby="handoverModalLabel{{ $req->id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
                                             <form action="{{ route('distribusi.handover', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
                                                 @csrf
                                                 <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
-                                                    <div class="modal-header bg-success text-white px-4 py-3 border-0">
-                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" id="handoverModalLabel{{ $req->id }}" style="font-size: 1.05rem;">
-                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <div class="modal-header bg-success text-white px-3 py-2.5 border-0">
+                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" id="handoverModalLabel{{ $req->id }}" style="font-size: 0.95rem;">
+                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                                             </svg>
@@ -545,95 +555,92 @@
                                                         </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <div class="modal-body p-4">
+                                                    <div class="modal-body p-3">
                                                         {{-- Alert Info Pengajuan --}}
-                                                        <div class="alert alert-light border rounded-3 mb-3 p-3">
+                                                        <div class="alert alert-light border rounded-2 mb-2.5 p-2.5">
                                                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                                                <strong class="font-monospace text-primary fs-6">{{ $req->request_code }}</strong>
-                                                                <span class="badge {{ $req->type === 'subdit' || ($req->user && $req->user->isPicDistribusi()) ? 'bg-info-subtle text-info border border-info' : 'bg-secondary-subtle text-secondary border border-secondary' }} rounded-pill px-2.5 py-1">
+                                                                <strong class="font-monospace text-primary" style="font-size: 0.85rem;">{{ $req->request_code }}</strong>
+                                                                <span class="badge {{ $req->type === 'subdit' || ($req->user && $req->user->isPicDistribusi()) ? 'bg-info-subtle text-info border border-info' : 'bg-secondary-subtle text-secondary border border-secondary' }} rounded-pill px-2 py-0.5" style="font-size: 0.72rem;">
                                                                     {{ $req->type === 'subdit' || ($req->user && $req->user->isPicDistribusi()) ? 'Subdit' : 'Individu' }}
                                                                 </span>
                                                             </div>
-                                                            <div class="small text-muted">
+                                                            <div class="text-muted" style="font-size: 0.78rem;">
                                                                 Pemohon: <strong class="text-dark">{{ $req->user->name_with_title ?: ($req->user->name ?? '-') }}</strong> 
                                                                 ({{ $req->user->position ?? ($req->type === 'subdit' ? 'Perwakilan Subdirektorat' : 'Pegawai') }})
                                                             </div>
                                                         </div>
 
-                                                        {{-- Petugas Gudang yang Menyerahkan (Otomatis dari Akun Ditunjuk Kasubag TU, Tanpa Dropdown) --}}
+                                                        {{-- Petugas Gudang yang Menyerahkan --}}
                                                         @php
                                                             $assignedDist = $defaultDistributor ?? auth()->user();
                                                         @endphp
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                        <div class="mb-2.5">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                                                 Petugas Gudang yang Menyerahkan
                                                             </label>
-                                                            <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between">
-                                                                <div class="d-flex align-items-center gap-3">
-                                                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; min-width: 38px;">
-                                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <div class="p-2 border rounded-2 bg-light d-flex align-items-center justify-content-between">
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px; min-width: 32px;">
+                                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                                                             <circle cx="12" cy="7" r="4"></circle>
                                                                         </svg>
                                                                     </div>
                                                                     <div>
-                                                                        <strong class="text-dark d-block" style="font-size: 0.92rem;">
+                                                                        <strong class="text-dark d-block" style="font-size: 0.84rem;">
                                                                             {{ $assignedDist->name_with_title ?: $assignedDist->name }}
                                                                         </strong>
-                                                                        <small class="text-muted d-block">{{ $assignedDist->position ?: 'Petugas Distribusi Gudang ATK' }}</small>
+                                                                        <small class="text-muted d-block" style="font-size: 0.72rem;">{{ $assignedDist->position ?: 'Petugas Distribusi Gudang' }}</small>
                                                                     </div>
                                                                 </div>
-                                                                <span class="badge bg-success-subtle text-success border border-success px-2.5 py-1 rounded-pill small fw-semibold">
-                                                                    Petugas Ditunjuk
+                                                                <span class="badge bg-success-subtle text-success border border-success px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
+                                                                    Ditunjuk
                                                                 </span>
                                                             </div>
                                                             <input type="hidden" name="distributed_by" value="{{ $assignedDist->id ?? auth()->id() }}">
-                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                Nama petugas ini otomatis dicatat di Bukti Serah Terima sebagai pihak yang menyerahkan barang.
-                                                            </small>
                                                         </div>
 
                                                         {{-- Nama Penerima Fisik --}}
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                        <div class="mb-2.5">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                                                 Nama Penerima Barang Fisik <span class="text-danger">*</span>
                                                             </label>
-                                                            <input type="text" name="receiver_name" class="form-control"
+                                                            <input type="text" name="receiver_name" class="form-control form-control-sm"
                                                                 value="{{ $req->receiver_name ?? ($req->user->name ?? '') }}" required
-                                                                placeholder="Nama yang mengambil barang fisik">
-                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                Bisa diisi nama pemohon langsung atau perwakilan yang mengambil barang.
+                                                                placeholder="Nama yang mengambil barang fisik" style="font-size: 0.8125rem; min-height: 32px;">
+                                                            <small class="text-muted d-block mt-0.5" style="font-size: 0.72rem;">
+                                                                Bisa nama pemohon langsung atau perwakilan yang mengambil barang.
                                                             </small>
                                                         </div>
 
                                                         {{-- Foto Bukti Penyerahan --}}
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                        <div class="mb-2.5">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                                                 Foto Bukti Penyerahan (Dokumentasi)
                                                             </label>
-                                                            <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp"
-                                                                onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}')">
-                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                Unggah foto serah terima barang (JPG, JPEG, PNG, WEBP, maks 5MB). Opsional namun sangat disarankan.
+                                                            <input type="file" name="distribution_proof" class="form-control form-control-sm" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                                                onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}')" style="font-size: 0.8125rem;">
+                                                            <small class="text-muted d-block mt-0.5" style="font-size: 0.72rem;">
+                                                                Unggah foto serah terima barang (JPG, JPEG, PNG, WEBP, maks 5MB).
                                                             </small>
                                                             <div id="proofPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
-                                                                <img id="proofPreview{{ $req->id }}" src="" alt="Pratinjau Foto Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                                <img id="proofPreview{{ $req->id }}" src="" alt="Pratinjau Foto Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 140px; object-fit: contain;">
                                                             </div>
                                                         </div>
 
                                                         {{-- Catatan Penyerahan --}}
                                                         <div class="mb-0">
-                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                                                 Catatan Penyerahan (Opsional)
                                                             </label>
-                                                            <textarea name="distribution_notes" class="form-control" rows="2"
-                                                                placeholder="Barang diserahkan lengkap dalam kondisi baik.">{{ $req->distribution_notes }}</textarea>
+                                                            <textarea name="distribution_notes" class="form-control form-control-sm" rows="2"
+                                                                placeholder="Barang diserahkan lengkap dalam kondisi baik." style="font-size: 0.8125rem;">{{ $req->distribution_notes }}</textarea>
                                                         </div>
                                                     </div>
 
-                                                    <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
-                                                        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-success fw-bold px-4 shadow-sm">
+                                                    <div class="modal-footer bg-light px-3 py-2 border-top d-flex justify-content-end gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-size: 0.8rem; height: 32px;">Batal</button>
+                                                        <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm" style="font-size: 0.8rem; height: 32px;">
                                                             Simpan &amp; Tandai Diserahkan
                                                         </button>
                                                     </div>
@@ -648,9 +655,9 @@
                                     <div class="modal fade" id="photoModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered modal-lg">
                                             <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
-                                                <div class="modal-header bg-primary text-white px-4 py-3 border-0">
-                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
-                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <div class="modal-header bg-primary text-white px-3 py-2.5 border-0">
+                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 0.95rem;">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                                             <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                                             <polyline points="21 15 16 10 5 21"></polyline>
@@ -659,12 +666,12 @@
                                                     </h5>
                                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                 </div>
-                                                <div class="modal-body p-4 text-center">
-                                                    <div class="p-2 border rounded bg-light mb-3">
+                                                <div class="modal-body p-3 text-center">
+                                                    <div class="p-2 border rounded bg-light mb-2.5">
                                                         <img src="{{ $req->distribution_proof_url }}" alt="Bukti Penyerahan {{ $req->request_code }}"
-                                                            class="img-fluid rounded border shadow-sm w-100" style="max-height: 480px; object-fit: contain;">
+                                                            class="img-fluid rounded border shadow-sm w-100" style="max-height: 380px; object-fit: contain;">
                                                     </div>
-                                                    <div class="alert alert-light border text-start small mb-0">
+                                                    <div class="alert alert-light border text-start small mb-0 p-2.5">
                                                         <div class="row">
                                                             <div class="col-sm-6">
                                                                 <strong>Penerima:</strong> {{ $req->receiver_name ?? ($req->user->name ?? '-') }}<br>
@@ -679,15 +686,15 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-between">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}">
+                                                <div class="modal-footer bg-light px-3 py-2 border-top d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadModal{{ $req->id }}" style="font-size: 0.8rem; height: 32px;">
                                                         Ganti / Perbarui Foto
                                                     </button>
                                                     <div class="d-flex gap-2">
-                                                        <a href="{{ $req->distribution_proof_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <a href="{{ $req->distribution_proof_url }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 0.8rem; height: 32px; display: inline-flex; align-items: center;">
                                                             Buka Ukuran Penuh
                                                         </a>
-                                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="font-size: 0.8rem; height: 32px;">Tutup</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -698,13 +705,13 @@
                                 {{-- 3. Modal Upload / Perbarui Foto Bukti --}}
                                 @if ($canDistribute)
                                     <div class="modal fade" id="uploadModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
                                             <form action="{{ route('distribusi.uploadProof', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
                                                 @csrf
                                                 <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
-                                                    <div class="modal-header bg-info text-white px-4 py-3 border-0">
-                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
-                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <div class="modal-header bg-info text-white px-3 py-2.5 border-0">
+                                                        <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 0.95rem;">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                                 <polyline points="17 8 12 3 7 8"></polyline>
                                                                 <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -713,28 +720,28 @@
                                                         </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
-                                                    <div class="modal-body p-4">
-                                                        <div class="alert alert-light border mb-3">
-                                                            <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>
-                                                            <small class="text-muted">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
+                                                    <div class="modal-body p-3">
+                                                        <div class="alert alert-light border rounded-2 mb-2.5 p-2.5">
+                                                            <strong class="font-monospace text-primary" style="font-size: 0.85rem;">{{ $req->request_code }}</strong><br>
+                                                            <small class="text-muted" style="font-size: 0.78rem;">Penerima: <strong>{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong></small>
                                                         </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">
+                                                        <div class="mb-0">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
                                                                 Pilih File Foto Bukti <span class="text-danger">*</span>
                                                             </label>
-                                                            <input type="file" name="distribution_proof" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" required
-                                                                onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')">
-                                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                                Format yang didukung: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
+                                                            <input type="file" name="distribution_proof" class="form-control form-control-sm" accept="image/jpeg,image/png,image/jpg,image/webp" required
+                                                                onchange="previewProofImage(this, 'proofReuploadPreview{{ $req->id }}', 'proofReuploadPreviewWrap{{ $req->id }}')" style="font-size: 0.8125rem;">
+                                                            <small class="text-muted d-block mt-0.5" style="font-size: 0.72rem;">
+                                                                Format: JPG, JPEG, PNG, WEBP (maksimal 5 MB).
                                                             </small>
                                                             <div id="proofReuploadPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
-                                                                <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 160px; object-fit: contain;">
+                                                                <img id="proofReuploadPreview{{ $req->id }}" src="" alt="Pratinjau Foto" class="img-fluid rounded border shadow-sm" style="max-height: 140px; object-fit: contain;">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-end gap-2">
-                                                        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Batal</button>
-                                                        <button type="submit" class="btn btn-info text-white fw-bold px-4 shadow-sm">Simpan Foto Bukti</button>
+                                                    <div class="modal-footer bg-light px-3 py-2 border-top d-flex justify-content-end gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-size: 0.8rem; height: 32px;">Batal</button>
+                                                        <button type="submit" class="btn btn-sm btn-info text-white fw-bold px-3 shadow-sm" style="font-size: 0.8rem; height: 32px;">Simpan Foto Bukti</button>
                                                     </div>
                                                 </div>
                                             </form>
