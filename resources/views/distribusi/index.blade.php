@@ -250,65 +250,18 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">Daftar Penyerahan Barang ke Pemohon</h5>
-                        </div>
-                    </div>
-
-                    {{-- Filter Bar Status, Tipe, Periode Bulan & Tahun, serta Pencarian --}}
-                    <div class="px-3 py-2 bg-light border-bottom">
-                        <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET" class="d-flex align-items-center flex-wrap gap-2">
-                            {{-- Filter Status --}}
-                            <div style="min-width: 125px;">
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
-                                    <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
-                                    <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
-                                    <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
-                                </select>
+                    <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET">
+                        {{-- 1. Card Header: Judul di Kiri, Kotak Pencarian di Kanan --}}
+                        <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">Daftar Penyerahan Barang ke Pemohon</h5>
+                                <span id="distribusi-header-badge" class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 0.74rem;">
+                                    {{ $requests->total() }} Data
+                                </span>
                             </div>
 
-                            {{-- Filter Tipe --}}
-                            <div style="min-width: 115px;">
-                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
-                                    <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
-                                    <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
-                                </select>
-                            </div>
-
-                            {{-- Filter Periode Bulan --}}
-                            <div style="min-width: 135px;">
-                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
-                                    <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan</option>
-                                    @php
-                                        $allMonths = [
-                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
-                                             7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                                        ];
-                                    @endphp
-                                    @foreach ($allMonths as $num => $name)
-                                        <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
-                                            {{ $name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Filter Periode Tahun --}}
-                            <div style="min-width: 105px;">
-                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
-                                    <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
-                                    @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                                        <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
-                                            Tahun {{ $y }}
-                                        </option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            {{-- Input Pencarian --}}
-                            <div class="flex-grow-1" style="min-width: 180px; max-width: 280px;">
+                            {{-- Input Pencarian di Sisi Kanan Header --}}
+                            <div style="min-width: 220px; max-width: 320px;" class="flex-grow-1 flex-sm-grow-0">
                                 <div class="input-group input-group-sm" style="height: 32px;">
                                     <input type="text" id="distribusi-search" name="search" class="form-control form-control-sm" placeholder="Cari tiket / pemohon / barang..."
                                         value="{{ $search ?? '' }}" autocomplete="off" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1;">
@@ -328,21 +281,86 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
 
-                            {{-- Reset Button --}}
-                            <div id="distribusi-reset-container">
-                                @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
-                                    <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1 px-2.5 shadow-none" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; white-space: nowrap;" title="Reset Filter">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="1 4 1 10 7 10"></polyline>
-                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                                        </svg>
-                                        <span>Reset</span>
-                                    </a>
-                                @endif
+                        {{-- 2. Filter Bar: Dropdown Teratur dan Rapi dalam 1 Baris --}}
+                        <div class="px-3 py-2 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <div class="d-flex align-items-center gap-1 text-secondary me-1" style="font-size: 0.78rem; font-weight: 600;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                    </svg>
+                                    <span>Filter:</span>
+                                </div>
+
+                                {{-- Filter Status --}}
+                                <div style="min-width: 125px;">
+                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ ($filterStatus ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                                        <option value="ready" {{ ($filterStatus ?? '') === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
+                                        <option value="distributed" {{ ($filterStatus ?? '') === 'distributed' ? 'selected' : '' }}>Selesai Diserahkan</option>
+                                    </select>
+                                </div>
+
+                                {{-- Filter Tipe --}}
+                                <div style="min-width: 115px;">
+                                    <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="">Semua Tipe</option>
+                                        <option value="subdit" {{ ($filterType ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                        <option value="individu" {{ ($filterType ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
+                                    </select>
+                                </div>
+
+                                {{-- Filter Periode Bulan --}}
+                                <div style="min-width: 130px;">
+                                    <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan</option>
+                                        @php
+                                            $allMonths = [
+                                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                                                 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                            ];
+                                        @endphp
+                                        @foreach ($allMonths as $num => $name)
+                                            <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && (($selectedMonth ?? null) == $num)) ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Filter Periode Tahun --}}
+                                <div style="min-width: 105px;">
+                                    <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 32px; font-size: 0.8rem; border-color: #cbd5e1; padding-top: 0.2rem; padding-bottom: 0.2rem;">
+                                        <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
+                                        @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                            <option value="{{ $y }}" {{ (($selectedYear ?? null) == $y) ? 'selected' : '' }}>
+                                                Tahun {{ $y }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                {{-- Reset Button --}}
+                                <div id="distribusi-reset-container">
+                                    @if (!empty($filterType) || (($filterStatus ?? 'all') !== 'all') || !empty($search) || !empty($selectedMonth) || !empty($selectedYear) || ($isAllMonths ?? false))
+                                        <a href="{{ route('distribusi.index') }}" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-2.5 shadow-none" style="height: 32px; font-size: 0.8rem; border-color: #fca5a5; white-space: nowrap;" title="Reset Filter">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="1 4 1 10 7 10"></polyline>
+                                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                            </svg>
+                                            <span>Reset Filter</span>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
-                        </form>
-                    </div>
+
+                            {{-- Info Counter Data di Kanan --}}
+                            <div id="distribusi-counter-info" class="text-muted small d-none d-md-block" style="font-size: 0.78rem;">
+                                Menampilkan <strong>{{ $requests->total() }}</strong> data penyerahan
+                            </div>
+                        </div>
+                    </form>
 
                     <div class="card-body p-3" id="table-container">
                         <div class="table-responsive">
@@ -905,6 +923,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentReset = document.getElementById('distribusi-reset-container');
             if (newReset && currentReset) {
                 currentReset.innerHTML = newReset.innerHTML;
+            }
+
+            const newCounter = doc.getElementById('distribusi-counter-info');
+            const currentCounter = document.getElementById('distribusi-counter-info');
+            if (newCounter && currentCounter) {
+                currentCounter.innerHTML = newCounter.innerHTML;
+            }
+
+            const newHeaderBadge = doc.getElementById('distribusi-header-badge');
+            const currentHeaderBadge = document.getElementById('distribusi-header-badge');
+            if (newHeaderBadge && currentHeaderBadge) {
+                currentHeaderBadge.innerHTML = newHeaderBadge.innerHTML;
             }
 
             const newSubditGroups = doc.getElementById('subdit-groups-container');
