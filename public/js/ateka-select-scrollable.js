@@ -150,6 +150,7 @@
 
         // Auto-scroll ke opsi aktif saat menu dropdown dibuka
         btn.addEventListener('shown.bs.dropdown', function () {
+            syncFromSelect();
             const activeItem = menu.querySelector('.ateka-scroll-select-item.active');
             if (activeItem) {
                 activeItem.scrollIntoView({ block: 'nearest' });
@@ -157,20 +158,36 @@
         });
 
         // Sinkronisasi jika select diubah secara programmatic
-        select.addEventListener('change', function () {
+        function syncFromSelect() {
             const currentSelected = select.options[select.selectedIndex];
             if (currentSelected) {
                 labelSpan.textContent = currentSelected.text;
                 btn.setAttribute('title', currentSelected.text.trim());
                 menu.querySelectorAll('.ateka-scroll-select-item').forEach(el => {
-                    if (el.dataset.value === currentSelected.value) {
+                    if (String(el.dataset.value) === String(currentSelected.value)) {
                         el.classList.add('active');
                     } else {
                         el.classList.remove('active');
                     }
                 });
             }
-        });
+            if (select.disabled) {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('disabled');
+                btn.disabled = false;
+            }
+        }
+
+        select._syncAtekaSelect = syncFromSelect;
+        select.addEventListener('change', syncFromSelect);
+        select.addEventListener('input', syncFromSelect);
+
+        if (window.MutationObserver) {
+            const observer = new MutationObserver(syncFromSelect);
+            observer.observe(select, { attributes: true, childList: true, subtree: true });
+        }
     }
 
     function initAllScrollableSelects() {

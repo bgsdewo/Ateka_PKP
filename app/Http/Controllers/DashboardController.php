@@ -228,7 +228,10 @@ class DashboardController extends Controller
             ->where('status', 'approved')
             ->where(function ($q) {
                 $q->whereNotNull('purchase_invoice')
-                  ->orWhereNotNull('purchase_date');
+                  ->orWhereNotNull('purchase_date')
+                  ->orWhereHas('details', function ($dq) {
+                      $dq->where('is_fulfilled', true);
+                  });
             })
             ->count();
 

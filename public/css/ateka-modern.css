@@ -2119,6 +2119,182 @@ body.modal-open .iq-navbar-header {
     font-weight: 700 !important;
 }
 
+/* ==============================================================================
+ * ATEKA UNIT SELECT DROPDOWN (Pilih Satuan Pengadaan Compact & Scrollable)
+ * ============================================================================== */
+.unit-select-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.unit-select-trigger-btn {
+    text-align: left;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+    background-color: #ffffff;
+    background-image: none !important;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+}
+
+.unit-select-trigger-btn:hover {
+    border-color: #94a3b8;
+}
+
+.unit-select-trigger-btn:focus,
+.unit-select-trigger-btn.show {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15) !important;
+    outline: none;
+}
+
+.unit-select-trigger-btn::after {
+    display: none !important;
+}
+
+.unit-select-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.unit-select-trigger-btn.show .unit-select-arrow {
+    transform: rotate(180deg);
+    color: #2563eb;
+}
+
+.unit-select-menu {
+    border-color: #cbd5e1 !important;
+    background: #ffffff !important;
+    box-shadow: 0 12px 30px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+    z-index: 1060 !important;
+    border-radius: 8px !important;
+    min-width: 220px !important;
+    width: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.unit-scroll-list {
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.unit-scroll-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.unit-scroll-list::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 4px;
+}
+
+.unit-scroll-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.unit-scroll-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.unit-select-option {
+    cursor: pointer;
+    transition: all 0.12s ease;
+    border-radius: 6px;
+    padding: 0.35rem 0.65rem;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.83rem;
+    color: #1e293b;
+}
+
+.unit-select-option:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.unit-select-option.active {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    color: #1d4ed8 !important;
+    font-weight: 600;
+}
+
+/* ==============================================================================
+ * ATEKA MODERN DESTRUCTIVE CONFIRMATION MODAL (Clean Tailwind / Shadcn Style)
+ * ============================================================================== */
+.custom-delete-popup {
+    border-radius: 20px !important;
+    padding: 28px 24px 22px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    border: none !important;
+    max-width: 350px !important;
+    width: 90% !important;
+    background: #ffffff !important;
+}
+
+.custom-delete-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin: 20px 0 0 0 !important;
+    gap: 8px !important;
+}
+
+.custom-delete-confirm-btn {
+    width: 100% !important;
+    height: 42px !important;
+    background-color: #e11d48 !important; /* Rose-600 / vibrant crimson */
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s ease !important;
+}
+
+.custom-delete-confirm-btn:hover {
+    background-color: #be123c !important;
+}
+
+.custom-delete-cancel-btn {
+    width: 100% !important;
+    height: 42px !important;
+    background-color: #ffffff !important;
+    color: #374151 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.custom-delete-cancel-btn:hover {
+    background-color: #f9fafb !important;
+    border-color: #d1d5db !important;
+    color: #111827 !important;
+}
+
 /* Override bawaan Hope UI custom.min.css (@media min-width: 1400px .auth-card { padding: 0 6.25rem })
    agar card Login, Register, dan Lupa Password tidak menyempit di layar monitor besar */
 .auth-card {

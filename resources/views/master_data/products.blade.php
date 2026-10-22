@@ -154,6 +154,80 @@
         cursor: not-allowed !important;
         pointer-events: none !important;
     }
+
+    /* Modal Barang Compact & Modern (Tambah, Edit, Isi Stok) */
+    #modalBarang .modal-dialog {
+        max-width: 620px !important;
+        margin: 1.5rem auto !important;
+    }
+    #modalBarang .modal-content {
+        border-radius: 14px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04) !important;
+        overflow: hidden;
+    }
+    #modalBarang .modal-header {
+        padding: 0.75rem 1.15rem !important;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    #modalBarang .modal-title {
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+    #modalBarang .modal-body {
+        padding: 0.9rem 1.15rem !important;
+        max-height: calc(85vh - 105px) !important;
+        overflow-y: auto !important;
+    }
+    #modalBarang .modal-footer {
+        padding: 0.6rem 1.15rem !important;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    #modalBarang .form-label {
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+        margin-bottom: 0.2rem !important;
+    }
+    #modalBarang .form-control,
+    #modalBarang .form-select {
+        font-size: 0.8125rem !important;
+        padding: 0.32rem 0.65rem !important;
+        border-radius: 6px !important;
+        min-height: 33px !important;
+    }
+    #modalBarang .input-group-text {
+        font-size: 0.78rem !important;
+        padding: 0.32rem 0.6rem !important;
+        background-color: #f1f5f9;
+        color: #475569;
+    }
+    #modalBarang .ateka-scroll-select-btn {
+        min-height: 33px !important;
+        padding: 0.32rem 0.65rem !important;
+        font-size: 0.8125rem !important;
+        border-radius: 6px !important;
+    }
+    .product-img-thumbnail-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .product-img-thumbnail-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
 </style>
 @endpush
 
@@ -338,8 +412,37 @@
                                         $upQty = $upDetail->approved_quantity ?: $upDetail->quantity;
                                         $upUnit = $upDetail->custom_unit ?: ($upProd->unit ?? 'Buah');
                                         $upName = $upProd->name ?? ($upDetail->custom_product_name ?: 'Barang Pengadaan');
-                                        $upCode = $upProd->code ?? ('ATK-' . strtoupper(\Illuminate\Support\Str::random(4)));
-                                        $upCatId = $upProd->category_id ?? ($categories->first()->id ?? '');
+
+                                        // Auto-resolve matched product jika belum terhubung
+                                        if (!$upProd && !empty($upName)) {
+                                            $upProd = \App\Models\Product::where('name', $upName)->first()
+                                                ?: \App\Models\Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim($upName))])->first();
+                                        }
+
+                                        $upCode = $upProd->code ?? '';
+                                        $upCatId = $upProd->category_id ?? null;
+
+                                        // Jika kategori belum ketemu, cocokkan nama kategori dengan kata di dalam nama barang
+                                        if (!$upCatId && !empty($upName)) {
+                                            foreach ($categories as $cat) {
+                                                if (mb_stripos($upName, $cat->name) !== false) {
+                                                    $upCatId = $cat->id;
+                                                    if (!$upCode && $cat->kd_rincian) {
+                                                        $upCode = $cat->kd_rincian;
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (!$upCatId) {
+                                            $upCatId = $categories->first()->id ?? '';
+                                        }
+
+                                        if (!$upCode && $upCatId) {
+                                            $matchedCat = $categories->firstWhere('id', $upCatId);
+                                            $upCode = $matchedCat->kd_rincian ?? '10.01.1';
+                                        }
                                     @endphp
                                     <div class="col-12 col-md-6 col-xl-4">
                                         <div class="card border border-light-subtle shadow-xs h-100 bg-white rounded-3 p-3 transition-all overflow-hidden">
@@ -369,7 +472,8 @@
                                                     data-name="{{ $upName }}"
                                                     data-unit="{{ $upUnit }}"
                                                     data-qty="{{ $upQty }}"
-                                                    data-price="{{ $upProd->purchase_price ?? 0 }}">
+                                                    data-price="{{ $upProd->purchase_price ?? 0 }}"
+                                                    data-image="{{ $upProd ? asset($upProd->image_url) : '' }}">
                                                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                         <line x1="12" y1="5" x2="12" y2="19"></line>
                                                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -520,7 +624,8 @@
                                                         data-description="{{ e($product->description) }}"
                                                         data-transaction-count="{{ $product->stock_transactions_count }}"
                                                         data-created-at="{{ $product->created_at ? $product->created_at->format('d-m-Y H:i') : '-' }}"
-                                                        data-updated-at="{{ $product->updated_at ? $product->updated_at->format('d-m-Y H:i') : '-' }}">
+                                                        data-updated-at="{{ $product->updated_at ? $product->updated_at->format('d-m-Y H:i') : '-' }}"
+                                                        data-image="{{ asset($product->image_url) }}">
                                                         Detail
                                                     </button>
                                                     <button type="button" class="btn btn-warning btn-sm btn-edit-barang px-1.5 py-0.5"
@@ -542,13 +647,18 @@
                                                     </button>
                                                     @if (!auth()->user()->isPegawaiGudang())
                                                         <form
-                                                             action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
+                                                            action="{{ route('master-data.daftar-barang.destroy', $product->id) }}"
                                                             method="POST"
-                                                            onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
+                                                            class="d-inline form-delete-product">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger btn-sm px-1.5 py-0.5"
-                                                                style="font-size: 0.68rem; line-height: 1.2;">
+                                                            <button type="button" class="btn btn-danger btn-sm px-1.5 py-0.5 btn-delete-product"
+                                                                style="font-size: 0.68rem; line-height: 1.2;"
+                                                                data-id="{{ $product->id }}"
+                                                                data-name="{{ e($product->name) }}"
+                                                                data-code="{{ e($product->code ?? '') }}"
+                                                                data-stock="{{ $product->stock }}"
+                                                                data-unit="{{ $product->unit ?? 'unit' }}">
                                                                 Hapus
                                                             </button>
                                                         </form>
@@ -567,7 +677,7 @@
 
     {{-- Modal Create / Update / Detail --}}
     <div class="modal fade" id="modalBarang" tabindex="-1" aria-labelledby="modalBarangLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form id="formBarang" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -575,38 +685,38 @@
                     <input type="hidden" name="request_detail_id" id="request_detail_id" value="">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalBarangLabel">Form Barang</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h6 class="modal-title" id="modalBarangLabel">Form Barang</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 0.75rem;"></button>
                     </div>
 
                     <div class="modal-body">
-                        <div id="detailBarangInfo" class="alert alert-info d-none mb-4">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">Status Stok</small>
-                                    <strong id="detailStatusStok">-</strong>
+                        <div id="detailBarangInfo" class="alert alert-info d-none mb-2.5 py-2 px-2.5">
+                            <div class="row g-2 text-center">
+                                <div class="col-3">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Status Stok</small>
+                                    <strong id="detailStatusStok" style="font-size: 0.78rem;">-</strong>
                                 </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">Riwayat Transaksi</small>
-                                    <strong id="detailTransactionCount">0 Transaksi</strong>
+                                <div class="col-3">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Transaksi</small>
+                                    <strong id="detailTransactionCount" style="font-size: 0.78rem;">0</strong>
                                 </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">Tanggal Dibuat</small>
-                                    <strong id="detailCreatedAt">-</strong>
+                                <div class="col-3">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Dibuat</small>
+                                    <strong id="detailCreatedAt" style="font-size: 0.78rem;">-</strong>
                                 </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted d-block">Terakhir Diupdate</small>
-                                    <strong id="detailUpdatedAt">-</strong>
+                                <div class="col-3">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">Diupdate</small>
+                                    <strong id="detailUpdatedAt" style="font-size: 0.78rem;">-</strong>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="quickCatalogRestockBox" class="alert alert-light border border-primary-subtle mb-3 p-3">
-                            <label class="form-label fw-bold small text-primary mb-1">
-                                Pilih Cepat dari Katalog Standar LIST ATK (Opsional — Untuk Isi Stok / Input Faktur Barang yang Sudah Ada)
+                        <div id="quickCatalogRestockBox" class="alert alert-light border border-primary-subtle mb-2.5 p-2 rounded-2">
+                            <label class="form-label fw-bold text-primary mb-1 d-block" style="font-size: 0.74rem;">
+                                Pilih Cepat dari Katalog Standar LIST ATK (Opsional — Untuk Isi Stok / Input Faktur):
                             </label>
-                            <select id="quick_existing_product" class="form-select form-select-sm bg-white">
-                                <option value="">-- Buat Barang Baru Manual atau Pilih Barang Standar di Sini untuk Isi Stok --</option>
+                            <select id="quick_existing_product" class="form-select form-select-sm bg-white" style="font-size: 0.78rem;">
+                                <option value="">-- Buat Barang Baru Manual atau Pilih Standar di Sini --</option>
                                 @foreach ($products as $pItem)
                                     <option value="{{ $pItem->id }}"
                                         data-category-id="{{ $pItem->category_id }}"
@@ -617,20 +727,18 @@
                                         data-price="{{ $pItem->purchase_price ?? 0 }}"
                                         data-faktur="{{ $pItem->initial_no_faktur }}"
                                         data-uraian="{{ $pItem->initial_uraian }}"
-                                        data-desc="{{ $pItem->description }}">
+                                        data-desc="{{ $pItem->description }}"
+                                        data-image="{{ asset($pItem->image_url) }}">
                                         [{{ $pItem->category->name ?? 'ATK' }}] {{ $pItem->code }} - {{ $pItem->name }} (Stok: {{ $pItem->stock }} {{ $pItem->unit }})
                                     </option>
                                 @endforeach
                             </select>
-                            <small class="text-muted d-block mt-1" style="font-size: 0.74rem;">
-                                Jika barang sudah ada di LIST ATK, pilih di atas agar otomatis masuk ke mode pengisian stok &amp; faktur tanpa perlu ketik ulang.
-                            </small>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-2">
+                            <div class="col-md-6">
                                 <label class="form-label">Kategori Barang <span class="text-danger">*</span></label>
-                                <select name="category_id" id="category_id" class="form-select" required>
+                                <select name="category_id" id="category_id" class="form-select form-select-sm" required>
                                     <option value="">Pilih Kategori</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" data-kode-barang="{{ $category->kode_barang }}" data-rincian="{{ $category->kd_rincian }}">{{ $category->name }} ({{ $category->kode_barang ?: $category->kd_rincian }})</option>
@@ -638,40 +746,39 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label class="form-label">Kode Rincian <span class="text-danger">*</span></label>
-                                <input type="text" name="code" id="code" class="form-control font-monospace"
+                                <input type="text" name="code" id="code" class="form-control form-control-sm font-monospace"
                                     placeholder="10.01.1" required>
-                                <small class="text-muted" style="font-size: 0.74rem;">Kode rincian standar BMN turunan kategori</small>
                             </div>
 
-                            <div class="col-md-12 mb-3">
+                            <div class="col-12">
                                 <label class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="name" class="form-control"
-                                    placeholder="Pulpen" required>
+                                <input type="text" name="name" id="name" class="form-control form-control-sm"
+                                    placeholder="Nama Barang ATK" required>
                             </div>
 
-                            <!-- Tambahan No. Faktur, Tgl Faktur & Uraian agar sinkron dengan Barang Masuk -->
-                            <div class="col-md-4 mb-3">
+                            <!-- No. Faktur, Tgl Faktur & Uraian -->
+                            <div class="col-md-4">
                                 <label class="form-label">No. Faktur / Bukti Awal</label>
-                                <input type="text" name="no_faktur" id="no_faktur" class="form-control"
+                                <input type="text" name="no_faktur" id="no_faktur" class="form-control form-control-sm"
                                     placeholder="121/FK">
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Tgl Faktur / Pengadaan</label>
-                                <input type="date" name="transaction_date" id="transaction_date" class="form-control">
+                                <input type="date" name="transaction_date" id="transaction_date" class="form-control form-control-sm">
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Uraian / Nama Supplier</label>
-                                <input type="text" name="uraian" id="uraian" class="form-control"
+                                <input type="text" name="uraian" id="uraian" class="form-control form-control-sm"
                                     placeholder="CV. Milia Pertama">
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Satuan <span class="text-danger">*</span></label>
-                                <select name="unit" id="unit" class="form-select" required>
+                                <select name="unit" id="unit" class="form-select form-select-sm" required>
                                     <option value="">Pilih Satuan</option>
                                     <option value="Buah">Buah</option>
                                     <option value="Dus">Dus</option>
@@ -696,32 +803,58 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Stok Awal <span class="text-danger">*</span></label>
-                                <input type="number" name="stock" id="stock" class="form-control" min="0"
+                                <input type="number" name="stock" id="stock" class="form-control form-control-sm" min="0"
                                     value="0" required>
                             </div>
 
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Harga Beli / Satuan <span class="text-danger">*</span></label>
-                                <div class="input-group">
+                                <div class="input-group input-group-sm">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="number" name="purchase_price" id="purchase_price" class="form-control"
+                                    <input type="number" name="purchase_price" id="purchase_price" class="form-control form-control-sm"
                                         min="0" value="0" required>
                                 </div>
                             </div>
 
-                            <div class="col-md-12 mb-3">
+                            <!-- Upload Foto / Gambar Barang (Katalog Persediaan) -->
+                            <div class="col-12" id="boxProductImage">
+                                <label class="form-label">Foto / Gambar Barang (Katalog Persediaan)</label>
+                                <div class="d-flex align-items-center gap-2.5 p-2 rounded-2 border bg-light-subtle">
+                                    <div class="product-img-thumbnail-box">
+                                        <img id="imagePreview" src="" alt="Preview" class="d-none">
+                                        <div id="imagePlaceholder" class="text-secondary small d-flex flex-column align-items-center justify-content-center text-center p-1">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="text-muted">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                <polyline points="21 15 16 10 5 21"></polyline>
+                                            </svg>
+                                            <span style="font-size: 0.58rem; line-height: 1;" class="text-muted mt-0.5">No Foto</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1" style="min-width: 0;">
+                                        <input type="file" name="image" id="product_image" class="form-control form-control-sm"
+                                            accept="image/jpeg,image/png,image/jpg,image/webp">
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="text-muted text-truncate" style="font-size: 0.7rem;">Format: JPG, PNG, WEBP (Maks. 2MB). Foto akan tampil di Katalog Persediaan.</small>
+                                            <button type="button" id="btnResetImage" class="btn btn-link btn-sm text-danger text-decoration-none p-0 d-none" style="font-size: 0.7rem;">Batal Ubah</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
                                 <label class="form-label">Deskripsi</label>
-                                <textarea name="description" id="description" class="form-control" rows="3"
+                                <textarea name="description" id="description" class="form-control form-control-sm" rows="2"
                                     placeholder="Tulis deskripsi singkat barang"></textarea>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary" id="btnSubmitBarang">Simpan Barang</button>
+                        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-3" id="btnSubmitBarang">Simpan Barang</button>
                     </div>
                 </form>
             </div>
@@ -765,6 +898,85 @@
                     }
                 @endif
 
+                function escapeHtml(str) {
+                    if (!str) return '';
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                }
+
+                // Modern Compact Delete Confirmation matching user design (Shadcn / Tailwind Style)
+                $(document).on('click', '.btn-delete-product', function(e) {
+                    e.preventDefault();
+                    const $btn = $(this);
+                    const $form = $btn.closest('form');
+                    const prodName = $btn.data('name') || 'barang ini';
+                    const prodCode = $btn.data('code') || '';
+                    const prodStock = $btn.data('stock') || 0;
+                    const prodUnit = $btn.data('unit') || 'unit';
+
+                    const modalHtml = `
+                        <div class="text-center pt-1">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 48px; height: 48px; background-color: #fef2f2;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2" style="font-size: 1.15rem; letter-spacing: -0.01em;">Are you sure?</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.5; max-width: 270px; margin: 0 auto;">
+                                Tindakan ini tidak dapat dibatalkan. Barang <strong>${escapeHtml(prodName)}</strong> ${prodCode ? `[${escapeHtml(prodCode)}]` : ''} akan dihapus permanen.
+                            </p>
+                            <div class="small text-muted mt-2" style="font-size: 0.76rem;">
+                                Sisa stok saat ini: <strong>${prodStock} ${escapeHtml(prodUnit)}</strong>
+                            </div>
+                        </div>
+                    `;
+
+                    Swal.fire({
+                        html: modalHtml,
+                        width: '350px',
+                        showCancelButton: true,
+                        confirmButtonText: 'Hapus barang',
+                        cancelButtonText: 'Batal',
+                        buttonsStyling: false,
+                        customClass: {
+                            popup: 'custom-delete-popup',
+                            actions: 'custom-delete-actions',
+                            confirmButton: 'custom-delete-confirm-btn',
+                            cancelButton: 'custom-delete-cancel-btn'
+                        },
+                        focusCancel: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                html: `
+                                    <div class="text-center py-2">
+                                        <h6 class="fw-bold text-dark mb-1" style="font-size: 1rem;">Menghapus Barang...</h6>
+                                        <p class="text-muted small mb-0">Mohon tunggu sebentar...</p>
+                                    </div>
+                                `,
+                                width: '300px',
+                                padding: '1.25rem',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'custom-delete-popup'
+                                },
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                    $form.submit();
+                                }
+                            });
+                        }
+                    });
+                });
+
                 const storeUrl = "{{ route('master-data.daftar-barang.store') }}";
                 const updateUrlTemplate = "{{ route('master-data.daftar-barang.update', ':id') }}";
 
@@ -791,6 +1003,66 @@
                 const $quickBox = $('#quickCatalogRestockBox');
                 const $quickSelect = $('#quick_existing_product');
                 const $requestDetailId = $('#request_detail_id');
+                const $productImage = $('#product_image');
+                const $imagePreview = $('#imagePreview');
+                const $imagePlaceholder = $('#imagePlaceholder');
+                const $btnResetImage = $('#btnResetImage');
+                let currentProductImageUrl = '';
+
+                function setProductImagePreview(url) {
+                    currentProductImageUrl = url || '';
+                    $productImage.val('');
+                    $btnResetImage.addClass('d-none');
+                    if (url) {
+                        $imagePreview.attr('src', url).removeClass('d-none');
+                        $imagePlaceholder.addClass('d-none');
+                    } else {
+                        $imagePreview.attr('src', '').addClass('d-none');
+                        $imagePlaceholder.removeClass('d-none');
+                    }
+                }
+
+                $productImage.on('change', function() {
+                    const file = this.files && this.files[0];
+                    if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Ukuran Gambar Terlalu Besar',
+                                    text: 'Ukuran file gambar maksimal adalah 2MB.',
+                                    confirmButtonColor: '#0284c7'
+                                });
+                            } else {
+                                alert('Ukuran file gambar maksimal adalah 2MB.');
+                            }
+                            $(this).val('');
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            $imagePreview.attr('src', e.target.result).removeClass('d-none');
+                            $imagePlaceholder.addClass('d-none');
+                            if (currentProductImageUrl) {
+                                $btnResetImage.removeClass('d-none');
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                $btnResetImage.on('click', function(e) {
+                    e.preventDefault();
+                    $productImage.val('');
+                    $(this).addClass('d-none');
+                    if (currentProductImageUrl) {
+                        $imagePreview.attr('src', currentProductImageUrl).removeClass('d-none');
+                        $imagePlaceholder.addClass('d-none');
+                    } else {
+                        $imagePreview.attr('src', '').addClass('d-none');
+                        $imagePlaceholder.removeClass('d-none');
+                    }
+                });
 
                 $categoryId.on('change', function() {
                     const rincian = $(this).find('option:selected').data('rincian');
@@ -799,12 +1071,28 @@
                     }
                 });
 
+                function setCategoryValue(val) {
+                    val = val ? String(val) : '';
+                    $categoryId.val(val);
+                    if ($categoryId.length && $categoryId[0]) {
+                        $categoryId[0].dispatchEvent(new Event('change', { bubbles: true }));
+                        $categoryId[0].dispatchEvent(new Event('input', { bubbles: true }));
+                        if (typeof $categoryId[0]._syncAtekaSelect === 'function') {
+                            $categoryId[0]._syncAtekaSelect();
+                        }
+                    }
+                    $categoryId.trigger('change');
+                }
+
                 function resetModalBarang() {
                     $form[0].reset();
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $requestDetailId.val('');
-                    $categoryId.prop('disabled', false).val('');
+                    setCategoryValue('');
+                    setProductImagePreview('');
+                    $productImage.prop('disabled', false);
+                    $categoryId.prop('disabled', false);
                     $code.prop('readonly', false).val('');
                     $name.prop('readonly', false).val('');
                     $noFaktur.prop('readonly', false).val('');
@@ -817,6 +1105,7 @@
                     $detailInfo.addClass('d-none');
                     $quickBox.addClass('d-none');
                     $quickSelect.val('');
+                    $('#boxProductImage').removeClass('d-none');
                     $detailStatusStok.text('-');
                     $detailTransactionCount.text('0 Transaksi');
                     $detailCreatedAt.text('-');
@@ -828,14 +1117,16 @@
                 // Event listener untuk tombol + Isi Stok dari Banner Usulan Pengadaan
                 $(document).on('click', '.btn-fulfill-procurement', function() {
                     resetModalBarang();
-                    const detailId = $(this).data('detail-id') || '';
-                    const productId = $(this).data('product-id') || '';
-                    const catId = $(this).data('category-id') || '';
-                    const code = $(this).data('code') || '';
-                    const name = $(this).data('name') || '';
-                    const unit = $(this).data('unit') || 'Buah';
-                    const qty = parseInt($(this).data('qty')) || 1;
-                    const price = $(this).data('price') || 0;
+                    const $btn = $(this).closest('.btn-fulfill-procurement');
+                    const detailId = $btn.attr('data-detail-id') || $btn.data('detail-id') || '';
+                    const productId = $btn.attr('data-product-id') || $btn.data('product-id') || '';
+                    let catId = String($btn.attr('data-category-id') || $btn.data('category-id') || '');
+                    let code = $btn.attr('data-code') || $btn.data('code') || '';
+                    const name = $btn.attr('data-name') || $btn.data('name') || '';
+                    const unit = $btn.attr('data-unit') || $btn.data('unit') || 'Buah';
+                    const qty = parseInt($btn.attr('data-qty') || $btn.data('qty')) || 1;
+                    const price = $btn.attr('data-price') || $btn.data('price') || 0;
+                    const img = $btn.attr('data-image') || '';
 
                     $requestDetailId.val(detailId);
                     if (productId) {
@@ -847,8 +1138,30 @@
                         $method.prop('disabled', true).val('');
                     }
 
-                    $categoryId.val(catId);
-                    $code.val(code);
+                    // Auto-detect kategori dari nama jika belum ada
+                    if (!catId && name) {
+                        const lowerName = name.toLowerCase();
+                        $categoryId.find('option').each(function() {
+                            const val = $(this).val();
+                            const text = $(this).text().split('(')[0].trim().toLowerCase();
+                            if (val && text && lowerName.includes(text)) {
+                                catId = val;
+                                return false;
+                            }
+                        });
+                    }
+
+                    if (catId) {
+                        setCategoryValue(catId);
+                        if (!code) {
+                            code = $categoryId.find('option:selected').data('rincian') || '';
+                        }
+                    }
+
+                    if (code) {
+                        $code.val(code);
+                    }
+
                     $name.val(name);
                     if ($unit.find('option[value="' + unit + '"]').length === 0 && unit) {
                         $unit.append(new Option(unit, unit, true, true));
@@ -857,10 +1170,29 @@
                     $stock.val(qty);
                     $purchasePrice.val(price);
                     $transactionDate.val(new Date().toISOString().split('T')[0]);
+                    setProductImagePreview('');
+                    $('#boxProductImage').addClass('d-none'); // Form isi stok tidak perlu upload gambar
                     $title.text('Tambahkan / Isi Stok Barang Pengadaan: ' + name);
                     $btnSubmit.text('Simpan Stok & Kirim Notifikasi');
                     $modal.modal('show');
                     setTimeout(() => $stock.focus(), 300);
+                });
+
+                // Auto-detect kategori saat mengetik nama barang secara manual
+                $name.on('input blur', function() {
+                    if (!$categoryId.val()) {
+                        const valName = $(this).val().toLowerCase();
+                        if (valName.length >= 3) {
+                            $categoryId.find('option').each(function() {
+                                const optVal = $(this).val();
+                                const optText = $(this).text().split('(')[0].trim().toLowerCase();
+                                if (optVal && optText && valName.includes(optText)) {
+                                    setCategoryValue(optVal);
+                                    return false;
+                                }
+                            });
+                        }
+                    }
                 });
 
                 // Event listener untuk tombol Tambah Barang
@@ -881,28 +1213,43 @@
                         const updateUrl = updateUrlTemplate.replace(':id', selectedId);
                         $form.attr('action', updateUrl);
                         $method.prop('disabled', false).val('PUT');
-                        $categoryId.val($opt.data('category-id'));
-                        $code.val($opt.data('code'));
-                        $name.val($opt.data('name'));
-                        $unit.val($opt.data('unit'));
-                        $stock.val($opt.data('stock') || 0);
-                        $purchasePrice.val($opt.data('price') || 0);
-                        $noFaktur.val($opt.data('faktur') || '');
-                        $uraian.val($opt.data('uraian') || '');
-                        $description.val($opt.data('desc') || '');
+                        const catId = String($opt.attr('data-category-id') || $opt.data('category-id') || '');
+                        if (catId) {
+                            setCategoryValue(catId);
+                        }
+                        const code = $opt.attr('data-code') || $opt.data('code') || '';
+                        if (code) {
+                            $code.val(code);
+                        }
+                        $name.val($opt.attr('data-name') || $opt.data('name') || '');
+                        const unit = $opt.attr('data-unit') || $opt.data('unit') || 'Buah';
+                        if ($unit.find('option[value="' + unit + '"]').length === 0 && unit) {
+                            $unit.append(new Option(unit, unit, true, true));
+                        }
+                        $unit.val(unit);
+                        $stock.val(1);
+                        $purchasePrice.val($opt.attr('data-price') || $opt.data('price') || 0);
+                        $noFaktur.val($opt.attr('data-faktur') || $opt.data('faktur') || '');
+                        $uraian.val($opt.attr('data-uraian') || $opt.data('uraian') || '');
+                        $description.val($opt.attr('data-desc') || $opt.data('desc') || '');
+                        const img = $opt.attr('data-image') || '';
+                        setProductImagePreview('');
+                        $('#boxProductImage').addClass('d-none');
                         $title.text('Isi Stok / Update Barang Standar ATK');
                         $btnSubmit.text('Simpan Stok & Perubahan');
                         $stock.focus();
                     } else {
                         $form.attr('action', storeUrl);
                         $method.prop('disabled', true).val('');
-                        $categoryId.val('');
+                        setCategoryValue('');
                         $code.val('');
                         $name.val('');
                         $unit.val('Buah');
                         $stock.val(0);
                         $purchasePrice.val(0);
                         $description.val('');
+                        setProductImagePreview('');
+                        $('#boxProductImage').removeClass('d-none');
                         $title.text('Tambah Barang Baru');
                         $btnSubmit.text('Simpan Barang');
                     }
@@ -910,21 +1257,31 @@
 
                 $(document).on('click', '.btn-edit-barang', function() {
                     resetModalBarang();
-                    const id = $(this).data('id');
+                    const $btn = $(this).closest('.btn-edit-barang');
+                    const id = $btn.attr('data-id') || $btn.data('id');
                     const updateUrl = updateUrlTemplate.replace(':id', id);
 
                     $form.attr('action', updateUrl);
                     $method.prop('disabled', false).val('PUT');
-                    $categoryId.val($(this).data('category-id'));
-                    $code.val($(this).data('code'));
-                    $name.val($(this).data('name'));
-                    $noFaktur.val($(this).data('no-faktur') || '');
-                    $transactionDate.val($(this).data('transaction-date') || new Date().toISOString().split('T')[0]);
-                    $uraian.val($(this).data('uraian') || '');
-                    $unit.val($(this).data('unit'));
-                    $stock.val($(this).data('stock'));
-                    $purchasePrice.val($(this).data('purchase-price'));
-                    $description.val($(this).data('description'));
+                    const catId = String($btn.attr('data-category-id') || $btn.data('category-id') || '');
+                    if (catId) {
+                        setCategoryValue(catId);
+                    }
+                    const code = $btn.attr('data-code') || $btn.data('code') || '';
+                    if (code) {
+                        $code.val(code);
+                    }
+                    $name.val($btn.attr('data-name') || $btn.data('name') || '');
+                    $noFaktur.val($btn.attr('data-no-faktur') || $btn.data('no-faktur') || '');
+                    $transactionDate.val($btn.attr('data-transaction-date') || $btn.data('transaction-date') || new Date().toISOString().split('T')[0]);
+                    $uraian.val($btn.attr('data-uraian') || $btn.data('uraian') || '');
+                    $unit.val($btn.attr('data-unit') || $btn.data('unit') || 'Buah');
+                    $stock.val($btn.attr('data-stock') || $btn.data('stock') || 0);
+                    $purchasePrice.val($btn.attr('data-purchase-price') || $btn.data('purchase-price') || 0);
+                    $description.val($btn.attr('data-description') || $btn.data('description') || '');
+                    const img = $btn.attr('data-image') || '';
+                    setProductImagePreview(img);
+                    $('#boxProductImage').removeClass('d-none'); // Di Edit Barang tetap bisa upload foto
 
                     $title.text('Edit / Isi Stok Barang');
                     $btnSubmit.text('Simpan Perubahan');
@@ -946,6 +1303,7 @@
                     const transactionCount = $(this).data('transaction-count');
                     const createdAt = $(this).data('created-at');
                     const updatedAt = $(this).data('updated-at');
+                    const img = $(this).data('image') || $(this).attr('data-image') || '';
 
                     $categoryId.val(categoryId);
                     $code.val(code);
@@ -957,6 +1315,13 @@
                     $stock.val(stock);
                     $purchasePrice.val(purchasePrice);
                     $description.val(description ? description : '-');
+                    if (img) {
+                        setProductImagePreview(img);
+                        $('#boxProductImage').removeClass('d-none');
+                    } else {
+                        $('#boxProductImage').addClass('d-none');
+                    }
+                    $productImage.prop('disabled', true);
 
                     $categoryId.prop('disabled', true);
                     $code.prop('readonly', true);

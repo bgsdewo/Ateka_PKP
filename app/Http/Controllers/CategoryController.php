@@ -35,12 +35,10 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
-        $kodeBarang = $request->kode_barang ?? $request->kd_rincian;
-
         Category::create([
             'name' => $request->name,
-            'kode_barang' => $kodeBarang,
-            'kd_rincian' => $request->kd_rincian ?? $kodeBarang,
+            'kode_barang' => $request->kode_barang,
+            'kd_rincian' => $request->kd_rincian,
             'description' => $request->description,
         ]);
 
@@ -62,12 +60,10 @@ class CategoryController extends Controller
             'name.max' => 'Nama kategori maksimal 255 karakter.',
         ]);
 
-        $kodeBarang = $request->kode_barang ?? $request->kd_rincian ?? $kategori_barang->kode_barang;
-
         $kategori_barang->update([
             'name' => $request->name,
-            'kode_barang' => $kodeBarang,
-            'kd_rincian' => $request->kd_rincian ?? $kategori_barang->kd_rincian,
+            'kode_barang' => $request->kode_barang,
+            'kd_rincian' => $request->kd_rincian,
             'description' => $request->description,
         ]);
 

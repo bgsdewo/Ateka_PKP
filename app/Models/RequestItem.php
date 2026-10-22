@@ -156,7 +156,11 @@ class RequestItem extends Model
         return match ($this->status) {
             'pending' => $this->is_procurement ? 'Menunggu Verifikasi Pengadaan' : 'Menunggu Verifikasi Subbag TU',
             'approved' => $this->is_procurement
-                ? ($this->is_purchased ? 'Disetujui & Telah Dibeli (Tersedia)' : 'Disetujui Kasubag TU')
+                ? ($this->is_purchased || ($this->relationLoaded('details') ? $this->details->where('is_fulfilled', true)->isNotEmpty() : $this->details()->where('is_fulfilled', true)->exists())
+                    ? (($this->relationLoaded('details') ? $this->details->where('is_fulfilled', false)->isEmpty() : $this->details()->where('is_fulfilled', false)->doesntExist())
+                        ? 'Disetujui & Telah Dibeli (Tersedia)'
+                        : 'Disetujui (Sebagian Tersedia di Katalog)')
+                    : 'Disetujui Kasubag TU')
                 : 'Disetujui TU (Siap Diambil)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',
@@ -168,7 +172,9 @@ class RequestItem extends Model
     {
         return match ($this->status) {
             'pending' => 'bg-warning text-dark',
-            'approved' => ($this->is_procurement && !$this->is_purchased) ? 'bg-info text-white' : 'bg-success text-white',
+            'approved' => ($this->is_procurement && !$this->is_purchased && !($this->relationLoaded('details') ? $this->details->where('is_fulfilled', true)->isNotEmpty() : $this->details()->where('is_fulfilled', true)->exists()))
+                ? 'bg-info text-white'
+                : 'bg-success text-white',
             'distributed' => 'bg-primary text-white',
             'rejected' => 'bg-danger text-white',
             default => 'bg-secondary text-white',
