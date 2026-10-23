@@ -233,4 +233,80 @@ class UnifiedDocumentAndSignedProofTest extends TestCase
         $responseAfterUpload->assertStatus(200);
         $responseAfterUpload->assertDontSee('id="tracked-panel-' . $this->requestItem->id . '"', false);
     }
+
+    public function test_pegawai_does_not_see_cetak_bukti_and_upload_buttons(): void
+    {
+        $pegawai = User::firstOrCreate(
+            ['email' => 'pegawai_test_role@perumahan.go.id'],
+            [
+                'name' => 'Staf Pegawai Uji',
+                'role' => 'pegawai',
+                'nip' => '19980101 202101 1 002',
+                'password' => bcrypt('password123'),
+            ]
+        );
+
+        $reqPegawai = RequestItem::create([
+            'request_code' => 'REQ-PEG-TEST-99',
+            'user_id' => $pegawai->id,
+            'type' => 'individu',
+            'status' => 'distributed',
+            'receiver_name' => 'Staf Pegawai Uji',
+            'distributed_at' => now(),
+            'distributed_by' => $this->gudangUser->id,
+            'distribution_notes' => 'Selesai diserahkan',
+        ]);
+
+        $reqPegawai->details()->create([
+            'product_id' => $this->product->id,
+            'item_name' => 'Baterai AA (isi 2)',
+            'item_unit' => 'stock',
+            'quantity' => 2,
+            'approved_quantity' => 2,
+        ]);
+
+        // 1. Pada halaman Pengajuan (/pengajuan), Pegawai hanya melihat Detail dan TIDAK melihat Cetak Bukti & Upload
+        $responsePengajuan = $this->actingAs($pegawai)->get(route('pengajuan.index'));
+        $responsePengajuan->assertStatus(200);
+        $responsePengajuan->assertSee('Detail');
+        $responsePengajuan->assertDontSee('Cetak Bukti');
+        $responsePengajuan->assertDontSee('Upload &check;', false);
+        $responsePengajuan->assertDontSee('Upload Berkas');
+        $responsePengajuan->assertDontSee('uploadTtdModal' . $reqPegawai->id);
+
+        // 2. Pada halaman Dashboard (/dashboard), Pegawai TIDAK melihat tombol Cetak Bukti & Upload Berkas TTD
+        $responseDashboard = $this->actingAs($pegawai)->get(route('dashboard'));
+        $responseDashboard->assertStatus(200);
+        $responseDashboard->assertDontSee('Cetak Bukti');
+        $responseDashboard->assertDontSee('Upload Berkas TTD');
+
+        // 3. Pegawai dilarang mengunggah signed_proof langsung ke endpoint backend
+        $fakePdf = UploadedFile::fake()->create('dokumen_ttd_pegawai.pdf', 200, 'application/pdf');
+        $responseUpload = $this->actingAs($pegawai)->post(
+            route('pengajuan.uploadSignedProof', $reqPegawai->id),
+            ['signed_proof' => $fakePdf]
+        );
+        $responseUpload->assertStatus(403);
+    }
+
+    public function test_pegawai_gudang_distribusi_can_print_and_upload_signed_proof(): void
+    {
+        // Pastikan akun pegawai gudang distributor melihat tombol Cetak Bukti pada daftar distribusi
+        $responseDistribusi = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
+        $responseDistribusi->assertStatus(200);
+        $responseDistribusi->assertSee('Cetak Bukti');
+
+        // Pegawai gudang distributor dapat mengunggah dokumen serah terima bertanda tangan
+        $fakePdf = UploadedFile::fake()->create('dokumen_gudang_ttd.pdf', 350, 'application/pdf');
+        $responseUpload = $this->actingAs($this->gudangUser)->post(
+            route('pengajuan.uploadSignedProof', $this->requestItem->id),
+            ['signed_proof' => $fakePdf]
+        );
+        $responseUpload->assertRedirect();
+        $responseUpload->assertSessionHas('success');
+
+        $this->requestItem->refresh();
+        $this->assertNotNull($this->requestItem->signed_proof);
+        $this->assertEquals($this->gudangUser->id, $this->requestItem->signed_by);
+    }
 }

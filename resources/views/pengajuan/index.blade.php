@@ -326,8 +326,8 @@
                                                         Detail
                                                     </button>
 
-                                                    <!-- Tombol Cetak Dokumen Bukti Serah Terima ATK Resmi -->
-                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                    {{-- Tombol Cetak Dokumen Bukti Serah Terima ATK Resmi (Hanya untuk PIC Distribusi / Non-Pegawai) --}}
+                                                    @if (in_array($req->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
                                                             class="btn btn-xs btn-outline-secondary py-0.5 px-1.5 fw-semibold"
                                                             style="font-size: 0.72rem; border-radius: 6px;"
@@ -454,13 +454,15 @@
                                                                                 <a href="{{ $req->signed_proof_url }}" target="_blank" class="btn btn-sm btn-success text-white">
                                                                                     Lihat Berkas
                                                                                 </a>
-                                                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
-                                                                                    Ganti Berkas
-                                                                                </button>
+                                                                                @if (!auth()->user()->isPegawai())
+                                                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
+                                                                                        Ganti Berkas
+                                                                                    </button>
+                                                                                @endif
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                @elseif (in_array($req->status, ['approved', 'distributed']))
+                                                                @elseif (in_array($req->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                                     <div class="card bg-light border p-2.5 my-2">
                                                                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                                                             <div>
@@ -476,8 +478,8 @@
                                                             </div>
                                                             <div class="modal-footer d-flex justify-content-between flex-wrap gap-2">
                                                                 <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                                                    <!-- Tombol Cetak Bukti Resmi -->
-                                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                                    {{-- Tombol Cetak Bukti Resmi (Hanya untuk PIC Distribusi / Non-Pegawai) --}}
+                                                                    @if (in_array($req->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                                         <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
                                                                             class="btn btn-primary btn-sm text-white d-inline-flex align-items-center gap-1.5 fw-semibold shadow-sm"
                                                                             title="Cetak Dokumen Bukti Serah Terima ATK Resmi">
@@ -490,8 +492,8 @@
                                                                         </a>
                                                                     @endif
 
-                                                                    <!-- Tombol Unggah Berkas Dokumen -->
-                                                                    @if (in_array($req->status, ['approved', 'distributed']))
+                                                                    {{-- Tombol Unggah Berkas Dokumen (Hanya untuk PIC Distribusi / Non-Pegawai) --}}
+                                                                    @if (in_array($req->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                                         <button type="button" class="btn btn-warning btn-sm text-dark fw-bold d-inline-flex align-items-center gap-1"
                                                                             data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#uploadTtdModal{{ $req->id }}">
                                                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -521,7 +523,8 @@
                                                     </div>
                                                 </div>
 
-                                                {{-- Modal Upload Berkas Dokumen --}}
+                                                {{-- Modal Upload Berkas Dokumen (Hanya untuk PIC Distribusi / Non-Pegawai) --}}
+                                                @if (!auth()->user()->isPegawai())
                                                 <div class="modal fade text-start" id="uploadTtdModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content border-0 shadow">
@@ -603,6 +606,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty

@@ -534,7 +534,7 @@
                                                 @else
                                                     {{-- Alur Distribusi Stok --}}
                                                     <span class="badge {{ $tReq->status_badge }}">{{ $tReq->status_label }}</span>
-                                                    @if(in_array($tReq->status, ['approved', 'distributed']))
+                                                    @if(in_array($tReq->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                         <a href="{{ route('distribusi.bukti', $tReq->id) }}" target="_blank"
                                                             class="btn btn-xs btn-outline-success py-0.5 px-2 small fw-semibold d-inline-flex align-items-center gap-1"
                                                             title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
@@ -542,7 +542,7 @@
                                                             Cetak Bukti
                                                         </a>
                                                     @endif
-                                                    @if($tReq->status === 'distributed' && !$tReq->signed_proof)
+                                                    @if($tReq->status === 'distributed' && !$tReq->signed_proof && !auth()->user()->isPegawai())
                                                         <a href="{{ route('pengajuan.index') }}"
                                                             class="btn btn-xs btn-warning text-dark py-0.5 px-2 small fw-bold d-inline-flex align-items-center gap-1"
                                                             title="Unggah berkas serah terima bertanda tangan agar pelacakan selesai">
@@ -706,7 +706,7 @@
                                                         @endif
                                                     @else
                                                         @if($status === 'distributed')
-                                                            @if(!$tReq->signed_proof)
+                                                            @if(!$tReq->signed_proof && !auth()->user()->isPegawai())
                                                                 <span class="text-warning fw-semibold">(Menunggu Berkas TTD)</span>
                                                             @else
                                                                 (Penerima: {{ $tReq->receiver_name ?? $user->name }})
@@ -763,7 +763,7 @@
                                                         </a>
                                                     @endif
                                                 @else
-                                                    @if(in_array($tReq->status, ['approved', 'distributed']))
+                                                    @if(in_array($tReq->status, ['approved', 'distributed']) && !auth()->user()->isPegawai())
                                                         <a href="{{ route('distribusi.bukti', $tReq->id) }}" target="_blank"
                                                             class="btn btn-xs btn-outline-success py-0.5 px-2 small fw-semibold d-inline-flex align-items-center gap-1"
                                                             title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
@@ -773,7 +773,7 @@
                                                             Cetak Bukti
                                                         </a>
                                                     @endif
-                                                    @if($tReq->status === 'distributed' && !$tReq->signed_proof)
+                                                    @if($tReq->status === 'distributed' && !$tReq->signed_proof && !auth()->user()->isPegawai())
                                                         <a href="{{ route('pengajuan.index') }}"
                                                             class="btn btn-xs btn-warning text-dark py-0.5 px-2 small fw-bold d-inline-flex align-items-center gap-1">
                                                             Upload Berkas TTD
@@ -939,7 +939,7 @@
                                                         @endif
                                                     @else
                                                         @if($status === 'distributed')
-                                                            @if(!$tReq->signed_proof)
+                                                            @if(!$tReq->signed_proof && !auth()->user()->isPegawai())
                                                                 <span class="text-warning fw-semibold">(Menunggu Berkas TTD)</span>
                                                             @else
                                                                 (Penerima: {{ $tReq->receiver_name ?? $user->name }})
@@ -1208,7 +1208,7 @@
                                                         <a href="{{ route('pengajuan.index') }}" class="btn btn-xs btn-outline-primary py-0.5 px-2 fw-semibold" style="font-size: 0.72rem; border-radius: 6px;">
                                                             Detail
                                                         </a>
-                                                        @if ($req->status === 'distributed')
+                                                        @if ($req->status === 'distributed' && !auth()->user()->isPegawai())
                                                             <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
                                                                 class="btn btn-xs btn-outline-secondary py-0.5 px-1.5 fw-semibold" style="font-size: 0.72rem; border-radius: 6px;">Cetak Bukti</a>
                                                         @endif

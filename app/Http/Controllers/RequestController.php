@@ -251,11 +251,11 @@ class RequestController extends Controller
 
         $requestItem = RequestItem::findOrFail($id);
 
-        $canUpload = $user->isKasubagTU()
+        $canUpload = ($user->isKasubagTU()
             || $user->isPegawaiGudang()
             || $user->isAdmin()
-            || ($requestItem->user_id === $user->id)
-            || ($user->isPicDistribusi() && $user->canHandleRequest($requestItem));
+            || ($user->isPicDistribusi() && $user->canHandleRequest($requestItem)))
+            && !$user->isPegawai();
 
         if (!$canUpload) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengunggah bukti tanda tangan pada pengajuan ini.');
