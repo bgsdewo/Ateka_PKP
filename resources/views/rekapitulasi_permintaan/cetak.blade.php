@@ -419,40 +419,52 @@
                 Demikian Bukti Serah Terima Barang ini dibuat dengan sebenarnya dalam rangkap untuk dipergunakan sebagai arsip administrasi persediaan ATK kantor.
             </p>
 
-            <!-- KOLOM TANDA TANGAN (3 PIHAK: YANG MENYERAHKAN, YANG MENERIMA, MENGETAHUI KASUBAG TU) -->
-            <div class="row text-center mt-5 justify-content-between" style="font-size: 13px; page-break-inside: avoid;">
-                <div class="col-4">
-                    <p class="mb-1">Yang Menyerahkan,</p>
-                    <p class="text-muted small mb-0">Petugas Distribusi Gudang</p>
-                    <div style="height: 65px;"></div>
-                    <p class="mb-0 fw-bold"><u>{{ $namaDistributor }}</u></p>
-                    <small class="text-muted d-block">{{ $jabatanDistributor }}</small>
-                    @if(!empty($nipDistributor))
-                        <small class="text-muted d-block">NIP. {{ $nipDistributor }}</small>
-                    @endif
-                </div>
+            <!-- KOLOM TANDA TANGAN (BARIS 1: YANG MENYERAHKAN & YANG MENERIMA, BARIS 2: MENGETAHUI & MENYETUJUI) -->
+            <div style="margin-top: 25px; page-break-inside: avoid; font-size: 13px;">
+                <!-- Baris 1: Yang Menyerahkan & Yang Menerima -->
+                <table style="width: 100%; border: none; margin-bottom: 25px; text-align: center;">
+                    <tr>
+                        <td style="width: 45%; border: none; vertical-align: top; text-align: center;">
+                            <p class="mb-1" style="margin-bottom: 4px;">Yang Menyerahkan,</p>
+                            <p class="text-muted small mb-0" style="margin-bottom: 0;">Petugas Distribusi Gudang</p>
+                            <div style="height: 55px;"></div>
+                            <p class="mb-0 fw-bold" style="margin-bottom: 0;"><u>{{ $namaDistributor }}</u></p>
+                            <small class="text-muted d-block">{{ $jabatanDistributor }}</small>
+                            @if(!empty($nipDistributor))
+                                <small class="text-muted d-block">NIP. {{ $nipDistributor }}</small>
+                            @endif
+                        </td>
+                        <td style="width: 10%; border: none;"></td>
+                        <td style="width: 45%; border: none; vertical-align: top; text-align: center;">
+                            <p class="mb-1" style="margin-bottom: 4px;">Yang Menerima,</p>
+                            <p class="text-muted small mb-0" style="margin-bottom: 0;">{{ $isPicOrSubdit ? 'Perwakilan Subdirektorat' : 'Pegawai Pemohon' }}</p>
+                            <div style="height: 55px;"></div>
+                            <p class="mb-0 fw-bold" style="margin-bottom: 0;"><u>{{ $requestItem->receiver_name ?? ($requesterUser->name_with_title ?? ($requesterUser->name ?? 'Penerima')) }}</u></p>
+                            <small class="text-muted d-block">{{ $isPicOrSubdit ? ($requesterUser->position ?? 'Perwakilan Subdirektorat') : ($requesterUser->position ?? 'Pegawai') }}</small>
+                            @if(!empty($requesterUser->nip))
+                                <small class="text-muted d-block">NIP. {{ $requesterUser->nip }}</small>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
 
-                <div class="col-4">
-                    <p class="mb-1">Yang Menerima,</p>
-                    <p class="text-muted small mb-0">{{ $isPicOrSubdit ? 'Perwakilan Subdirektorat' : 'Pegawai Pemohon' }}</p>
-                    <div style="height: 65px;"></div>
-                    <p class="mb-0 fw-bold"><u>{{ $requestItem->receiver_name ?? ($requesterUser->name_with_title ?? ($requesterUser->name ?? 'Penerima')) }}</u></p>
-                    <small class="text-muted d-block">{{ $isPicOrSubdit ? ($requesterUser->position ?? 'Perwakilan Subdirektorat') : ($requesterUser->position ?? 'Pegawai') }}</small>
-                    @if(!empty($requesterUser->nip))
-                        <small class="text-muted d-block">NIP. {{ $requesterUser->nip }}</small>
-                    @endif
-                </div>
-
-                <div class="col-4">
-                    <p class="mb-1">Mengetahui &amp; Menyetujui,</p>
-                    <p class="text-muted small mb-0">Kasubag Tata Usaha</p>
-                    <div style="height: 65px;"></div>
-                    <p class="mb-0 fw-bold"><u>{{ $namaKasubag }}</u></p>
-                    <small class="text-muted d-block">Kasubag Tata Usaha</small>
-                    @if(!empty($nipKasubag))
-                        <small class="text-muted d-block">NIP. {{ $nipKasubag }}</small>
-                    @endif
-                </div>
+                <!-- Baris 2: Mengetahui & Menyetujui (Posisi Tengah di Bawah) -->
+                <table style="width: 100%; border: none; text-align: center;">
+                    <tr>
+                        <td style="width: 25%; border: none;"></td>
+                        <td style="width: 50%; border: none; vertical-align: top; text-align: center;">
+                            <p class="mb-1" style="margin-bottom: 4px;">Mengetahui &amp; Menyetujui,</p>
+                            <p class="text-muted small mb-0" style="margin-bottom: 0;">Kasubag Tata Usaha</p>
+                            <div style="height: 55px;"></div>
+                            <p class="mb-0 fw-bold" style="margin-bottom: 0;"><u>{{ $namaKasubag }}</u></p>
+                            <small class="text-muted d-block">Kasubag Tata Usaha</small>
+                            @if(!empty($nipKasubag))
+                                <small class="text-muted d-block">NIP. {{ $nipKasubag }}</small>
+                            @endif
+                        </td>
+                        <td style="width: 25%; border: none;"></td>
+                    </tr>
+                </table>
             </div>
         </div>
 

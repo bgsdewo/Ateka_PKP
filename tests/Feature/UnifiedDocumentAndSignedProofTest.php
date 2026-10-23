@@ -291,14 +291,21 @@ class UnifiedDocumentAndSignedProofTest extends TestCase
 
     public function test_pegawai_gudang_distribusi_can_print_and_upload_signed_proof(): void
     {
-        // 1. Buat request yang statusnya approved (belum diserahkan)
-        $reqApproved = RequestItem::create([
+        // 1. Buat request PIC Subdit yang statusnya distributed
+        // Untuk tiket PIC: TIDAK ADA Cetak Bukti dan TIDAK ADA Upload / Ganti Berkas
+        $responseDistribusi = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
+        $responseDistribusi->assertStatus(200);
+        $responseDistribusi->assertDontSee(route('distribusi.bukti', $this->requestItem->id));
+        $responseDistribusi->assertDontSee('uploadSignedModal' . $this->requestItem->id);
+
+        // 2. Buat request pegawai biasa yang statusnya approved (belum diserahkan)
+        $reqPegawaiApproved = RequestItem::create([
             'request_code' => 'REQ-TEST-APP-01',
-            'user_id' => $this->picSdk->id,
-            'type' => 'subdit',
+            'user_id' => $this->pegawai->id,
+            'type' => 'individu',
             'status' => 'approved',
         ]);
-        $reqApproved->details()->create([
+        $reqPegawaiApproved->details()->create([
             'product_id' => $this->product->id,
             'item_name' => 'Baterai AA (isi 2)',
             'item_unit' => 'stock',
@@ -307,28 +314,62 @@ class UnifiedDocumentAndSignedProofTest extends TestCase
         ]);
 
         // Pada halaman distribusi, untuk barang yang belum diserahkan (approved),
-        // hanya ada tombol "Serahkan" dan TIDAK ADA tombol "Cetak Bukti" untuk tiket tersebut.
+        // hanya ada tombol "Serahkan"
         $responseDistribusi = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
-        $responseDistribusi->assertStatus(200);
         $responseDistribusi->assertSee('Serahkan');
         // Modal handover tidak memuat input Berkas Dokumen TTD Fisik (Opsional) maupun cetak Lembar fisik tanda terima ATK
         $responseDistribusi->assertDontSee('BERKAS DOKUMEN TTD FISIK (OPSIONAL)');
         $responseDistribusi->assertDontSee('Lembar fisik tanda terima ATK:');
 
-        // Untuk pengajuan yang sudah diserahkan (distributed) dan bukti sudah diunggah, tombol "Cetak Bukti" muncul
-        $responseDistribusi->assertSee('Cetak Bukti');
+        // 3. Buat request pegawai biasa yang statusnya distributed (sudah diserahkan)
+        $proofFile = UploadedFile::fake()->image('proof_pegawai.png');
+        $proofPath = $proofFile->store('distribution_proofs', 'public');
+        $reqPegawaiDistributed = RequestItem::create([
+            'request_code' => 'REQ-TEST-DIST-PEG',
+            'user_id' => $this->pegawai->id,
+            'type' => 'individu',
+            'status' => 'distributed',
+            'distributed_at' => now(),
+            'receiver_name' => 'Bagus Sadewo',
+            'distribution_proof' => $proofPath,
+        ]);
+        $reqPegawaiDistributed->details()->create([
+            'product_id' => $this->product->id,
+            'item_name' => 'Baterai AA (isi 2)',
+            'item_unit' => 'stock',
+            'quantity' => 1,
+            'approved_quantity' => 1,
+        ]);
 
-        // 2. Pegawai gudang distributor dapat mengunggah dokumen serah terima bertanda tangan
+        $responseDistribusiPegawai = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
+        // Untuk pengajuan Pegawai yang sudah diserahkan: Cetak Bukti dan tombol Upload (kuning) di kolom AKSI muncul
+        $responseDistribusiPegawai->assertSee('Cetak Bukti');
+        $responseDistribusiPegawai->assertSee('Upload');
+        $responseDistribusiPegawai->assertSee('uploadSignedModal' . $reqPegawaiDistributed->id);
+        // Kolom WAKTU / PENERIMA tidak ada tombol + Upload Berkas TTD maupun Ganti Berkas
+        $responseDistribusiPegawai->assertDontSee('+ Upload Berkas TTD');
+        $responseDistribusiPegawai->assertDontSee('Ganti Berkas');
+
+        // 4. Pegawai gudang distributor dapat mengunggah dokumen serah terima bertanda tangan untuk pengajuan pegawai
         $fakePdf = UploadedFile::fake()->create('dokumen_gudang_ttd.pdf', 350, 'application/pdf');
         $responseUpload = $this->actingAs($this->gudangUser)->post(
-            route('pengajuan.uploadSignedProof', $this->requestItem->id),
+            route('pengajuan.uploadSignedProof', $reqPegawaiDistributed->id),
             ['signed_proof' => $fakePdf]
         );
         $responseUpload->assertRedirect();
         $responseUpload->assertSessionHas('success');
 
-        $this->requestItem->refresh();
-        $this->assertNotNull($this->requestItem->signed_proof);
-        $this->assertEquals($this->gudangUser->id, $this->requestItem->signed_by);
+        $reqPegawaiDistributed->refresh();
+        $this->assertNotNull($reqPegawaiDistributed->signed_proof);
+        $this->assertEquals($this->gudangUser->id, $reqPegawaiDistributed->signed_by);
+
+        // Setelah berkas terunggah:
+        // - Di kolom AKSI muncul tombol hijau "Upload &check;"
+        // - Di kolom WAKTU / PENERIMA muncul "Download Berkas"
+        // - Tetap tidak ada "Ganti Berkas" di tabel
+        $responseAfterUpload = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
+        $responseAfterUpload->assertSee('Upload &check;', false);
+        $responseAfterUpload->assertSee('Download Berkas');
+        $responseAfterUpload->assertDontSee('Ganti Berkas');
     }
 }

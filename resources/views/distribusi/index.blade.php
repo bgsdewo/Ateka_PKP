@@ -471,39 +471,53 @@
                                             <td class="text-end">
                                                 <div class="d-flex justify-content-end gap-1 flex-wrap">
                                                     @if ($req->status === 'distributed')
-                                                        {{-- Tombol Cetak Dokumen Resmi Serah Terima (Hanya muncul jika sudah diserahkan / form & bukti terisi) --}}
-                                                        @if ($isKasubagTU || $canDistribute)
+                                                        @php
+                                                            $isPicRequest = ($req->type === 'subdit') || ($req->user && $req->user->isPicDistribusi());
+                                                        @endphp
+                                                        {{-- Tombol Cetak Dokumen Resmi Serah Terima & Upload (Hanya untuk pengajuan Pegawai biasa, PIC tidak perlu) --}}
+                                                        @if (!$isPicRequest && ($isKasubagTU || $canDistribute))
                                                             <a href="{{ route('distribusi.bukti', $req->id) }}" target="_blank"
-                                                                class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
-                                                                title="Cetak Bukti Penyerahan Barang ATK Resmi">
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                                                    <rect x="6" y="14" width="12" height="8"></rect>
-                                                                </svg>
+                                                                class="btn btn-xs btn-outline-secondary py-0.5 px-1.5 fw-semibold"
+                                                                style="font-size: 0.72rem; border-radius: 6px;"
+                                                                title="Cetak Dokumen Resmi Bukti Penyerahan ATK">
                                                                 Cetak Bukti
                                                             </a>
+
+                                                            <!-- Tombol Unggah / Status Berkas Dokumen -->
+                                                            @if ($req->signed_proof)
+                                                                <button type="button" class="btn btn-xs btn-success text-white py-0.5 px-1.5 fw-semibold"
+                                                                    data-bs-toggle="modal" data-bs-target="#uploadSignedModal{{ $req->id }}"
+                                                                    style="font-size: 0.72rem; border-radius: 6px;"
+                                                                    title="Berkas telah diunggah. Klik untuk melihat atau ganti berkas.">
+                                                                    Upload &check;
+                                                                </button>
+                                                            @else
+                                                                <button type="button" class="btn btn-xs btn-warning text-dark py-0.5 px-1.5 fw-semibold"
+                                                                    data-bs-toggle="modal" data-bs-target="#uploadSignedModal{{ $req->id }}"
+                                                                    style="font-size: 0.72rem; border-radius: 6px;"
+                                                                    title="Unggah berkas dokumen serah terima bertanda tangan">
+                                                                    Upload
+                                                                </button>
+                                                            @endif
                                                         @endif
-                                                        <span class="badge bg-light text-secondary border px-2 py-1 small">
+                                                        <span class="badge bg-light text-secondary border px-2 py-0.5 small" style="font-size: 0.68rem; border-radius: 6px;">
                                                             Selesai
                                                         </span>
                                                     @elseif ($req->status === 'approved')
                                                         @if ($canDistribute)
                                                             <!-- Tombol Serahkan Barang (Buka Modal Handover untuk mengisi form dan upload foto bukti) -->
-                                                            <button type="button" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1"
+                                                            <button type="button" class="btn btn-xs btn-success py-0.5 px-2 fw-semibold"
+                                                                style="font-size: 0.72rem; border-radius: 6px;"
                                                                 data-bs-toggle="modal" data-bs-target="#handoverModal{{ $req->id }}">
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                                </svg>
                                                                 Serahkan
                                                             </button>
                                                         @else
-                                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small">
+                                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-0.5 small" style="font-size: 0.68rem; border-radius: 6px;">
                                                                 Siap Diserahkan
                                                             </span>
                                                         @endif
                                                     @else
-                                                        <span class="badge bg-light text-secondary border px-2 py-1 small">
+                                                        <span class="badge bg-light text-secondary border px-2 py-0.5 small" style="font-size: 0.68rem; border-radius: 6px;">
                                                             Selesai
                                                         </span>
                                                     @endif
@@ -742,6 +756,73 @@
                                                     </div>
                                                 </div>
                                             </form>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- 4. Modal Upload Berkas Dokumen TTD Fisik (Khusus Pengajuan Pegawai Biasa) --}}
+                                @php
+                                    $isPicModal = ($req->type === 'subdit') || ($req->user && $req->user->isPicDistribusi());
+                                @endphp
+                                @if (!$isPicModal && $canDistribute)
+                                    <div class="modal fade" id="uploadSignedModal{{ $req->id }}" tabindex="-1" aria-labelledby="uploadSignedModalLabel{{ $req->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+                                            <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden text-start">
+                                                <div class="modal-header bg-primary text-white px-3 py-2.5 border-0">
+                                                    <h5 class="modal-title text-white d-flex align-items-center gap-2 fw-bold" style="font-size: 0.95rem;" id="uploadSignedModalLabel{{ $req->id }}">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                                                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                                                        </svg>
+                                                        Upload Berkas Dokumen TTD Fisik
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{ route('pengajuan.uploadSignedProof', $req->id) }}" method="POST" enctype="multipart/form-data" class="w-100">
+                                                    @csrf
+                                                    <div class="modal-body p-3">
+                                                        <div class="alert alert-light border rounded-2 mb-2.5 p-2.5">
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <strong class="font-monospace text-primary" style="font-size: 0.85rem;">{{ $req->request_code }}</strong>
+                                                                <span class="badge {{ $req->type === 'subdit' ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary' }} px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
+                                                                    {{ $req->type === 'subdit' ? 'Kolektif Subdit' : 'Perorangan Pegawai' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="text-muted small">
+                                                                Pemohon: <strong class="text-dark">{{ $req->user->name ?? '-' }}</strong> | Penerima: <strong class="text-dark">{{ $req->receiver_name ?? ($req->user->name ?? '-') }}</strong>
+                                                            </div>
+                                                        </div>
+
+                                                        @if ($req->signed_proof)
+                                                            <div class="alert alert-success border border-success-subtle p-2 mb-2.5 d-flex justify-content-between align-items-center">
+                                                                <div class="small">
+                                                                    <strong class="d-block text-success">&#10003; Berkas sudah pernah diunggah</strong>
+                                                                    <span class="text-muted" style="font-size: 0.72rem;">{{ $req->signed_at ? $req->signed_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') : '' }} WIB</span>
+                                                                </div>
+                                                                <a href="{{ $req->signed_proof_url }}" target="_blank" class="btn btn-xs btn-success text-white">Lihat Berkas</a>
+                                                            </div>
+                                                        @endif
+
+                                                        <div class="mb-2">
+                                                            <label class="form-label fw-bold text-dark text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.03em;">
+                                                                Pilih Berkas Dokumen TTD <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input type="file" name="signed_proof" class="form-control form-control-sm" accept=".pdf,.png,.jpg,.jpeg,.webp" required style="font-size: 0.8125rem;">
+                                                            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">
+                                                                Format berkas yang didukung: <strong>PDF, PNG, JPG, JPEG, WEBP</strong> (Maksimal 5 MB).
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer bg-light px-3 py-2 border-top d-flex justify-content-end gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-size: 0.8rem; height: 32px;">Batal</button>
+                                                        <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" style="font-size: 0.8rem; height: 32px;">
+                                                            {{ $req->signed_proof ? 'Perbarui Berkas TTD' : 'Simpan & Unggah Berkas' }}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 @endif
