@@ -291,12 +291,34 @@ class UnifiedDocumentAndSignedProofTest extends TestCase
 
     public function test_pegawai_gudang_distribusi_can_print_and_upload_signed_proof(): void
     {
-        // Pastikan akun pegawai gudang distributor melihat tombol Cetak Bukti pada daftar distribusi
+        // 1. Buat request yang statusnya approved (belum diserahkan)
+        $reqApproved = RequestItem::create([
+            'request_code' => 'REQ-TEST-APP-01',
+            'user_id' => $this->picSdk->id,
+            'type' => 'subdit',
+            'status' => 'approved',
+        ]);
+        $reqApproved->details()->create([
+            'product_id' => $this->product->id,
+            'item_name' => 'Baterai AA (isi 2)',
+            'item_unit' => 'stock',
+            'quantity' => 1,
+            'approved_quantity' => 1,
+        ]);
+
+        // Pada halaman distribusi, untuk barang yang belum diserahkan (approved),
+        // hanya ada tombol "Serahkan" dan TIDAK ADA tombol "Cetak Bukti" untuk tiket tersebut.
         $responseDistribusi = $this->actingAs($this->gudangUser)->get(route('distribusi.index'));
         $responseDistribusi->assertStatus(200);
+        $responseDistribusi->assertSee('Serahkan');
+        // Modal handover tidak memuat input Berkas Dokumen TTD Fisik (Opsional) maupun cetak Lembar fisik tanda terima ATK
+        $responseDistribusi->assertDontSee('BERKAS DOKUMEN TTD FISIK (OPSIONAL)');
+        $responseDistribusi->assertDontSee('Lembar fisik tanda terima ATK:');
+
+        // Untuk pengajuan yang sudah diserahkan (distributed) dan bukti sudah diunggah, tombol "Cetak Bukti" muncul
         $responseDistribusi->assertSee('Cetak Bukti');
 
-        // Pegawai gudang distributor dapat mengunggah dokumen serah terima bertanda tangan
+        // 2. Pegawai gudang distributor dapat mengunggah dokumen serah terima bertanda tangan
         $fakePdf = UploadedFile::fake()->create('dokumen_gudang_ttd.pdf', 350, 'application/pdf');
         $responseUpload = $this->actingAs($this->gudangUser)->post(
             route('pengajuan.uploadSignedProof', $this->requestItem->id),

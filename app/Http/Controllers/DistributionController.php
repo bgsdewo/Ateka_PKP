@@ -178,15 +178,11 @@ class DistributionController extends Controller
             'receiver_name' => 'required|string|max:255',
             'distribution_notes' => 'nullable|string',
             'distribution_proof' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'signed_proof' => 'nullable|file|mimes:pdf,jpeg,png,jpg,webp|max:5120',
         ], [
             'receiver_name.required' => 'Nama penerima barang fisik wajib diisi.',
             'distribution_proof.image' => 'File bukti penyerahan harus berupa foto/gambar.',
             'distribution_proof.mimes' => 'Format foto harus berupa JPEG, PNG, JPG, atau WEBP.',
             'distribution_proof.max' => 'Ukuran foto bukti tidak boleh melebihi 5 MB.',
-            'signed_proof.file' => 'File berkas dokumen tanda terima tidak valid.',
-            'signed_proof.mimes' => 'Format berkas dokumen harus berupa PDF, JPEG, PNG, JPG, atau WEBP.',
-            'signed_proof.max' => 'Ukuran berkas dokumen tidak boleh melebihi 5 MB.',
         ]);
 
         $proofPath = $requestItem->distribution_proof;
@@ -199,22 +195,6 @@ class DistributionController extends Controller
             $ext = in_array($ext, ['jpeg', 'png', 'jpg', 'webp']) ? $ext : 'jpg';
             $filename = 'proof_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $ext;
             $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
-        }
-
-        $signedProofPath = $requestItem->signed_proof;
-        $signedAt = $requestItem->signed_at;
-        $signedBy = $requestItem->signed_by;
-        if ($request->hasFile('signed_proof')) {
-            if ($signedProofPath && Storage::disk('public')->exists($signedProofPath)) {
-                Storage::disk('public')->delete($signedProofPath);
-            }
-            $sFile = $request->file('signed_proof');
-            $sExt = strtolower($sFile->getClientOriginalExtension());
-            $sExt = in_array($sExt, ['pdf', 'jpeg', 'png', 'jpg', 'webp']) ? $sExt : 'pdf';
-            $sFilename = 'signed_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $sExt;
-            $signedProofPath = $sFile->storeAs('signed_proofs', $sFilename, 'public');
-            $signedAt = now();
-            $signedBy = Auth::id();
         }
 
         $distributedById = $request->input('distributed_by');
@@ -234,9 +214,6 @@ class DistributionController extends Controller
             'receiver_name' => $request->receiver_name,
             'distribution_notes' => $request->distribution_notes,
             'distribution_proof' => $proofPath,
-            'signed_proof' => $signedProofPath,
-            'signed_at' => $signedAt,
-            'signed_by' => $signedBy,
         ]);
 
         return redirect()->back()
