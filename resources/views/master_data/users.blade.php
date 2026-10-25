@@ -111,6 +111,15 @@
                                                         Petugas Distribusi
                                                     </span>
                                                 @endif
+                                                @if ($user->role === 'pegawai_gudang' && $user->is_report_examiner)
+                                                    <span class="badge bg-info-subtle text-info border ms-1 px-2 py-0.5" style="font-size: 0.72rem;" title="Ditugaskan sebagai Petugas Pemeriksa Laporan Persediaan (Kolom Memeriksa)">
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5">
+                                                            <path d="M9 11l3 3L22 4"></path>
+                                                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                                        </svg>
+                                                        Pemeriksa Laporan
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="font-monospace small">{{ $user->email }}</span>
@@ -129,6 +138,7 @@
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
                                                         data-is-distributor="{{ $user->is_distributor ? '1' : '0' }}"
+                                                        data-is-report-examiner="{{ $user->is_report_examiner ? '1' : '0' }}"
                                                         data-position="{{ e($user->position) }}"
                                                         data-subdit-name="{{ e($user->subdit_name) }}"
                                                         data-role-label="{{ $roleLabel }}"
@@ -145,6 +155,7 @@
                                                         data-email="{{ e($user->email) }}"
                                                         data-role="{{ e($user->role) }}"
                                                         data-is-distributor="{{ $user->is_distributor ? '1' : '0' }}"
+                                                        data-is-report-examiner="{{ $user->is_report_examiner ? '1' : '0' }}"
                                                         data-position="{{ e($user->position) }}"
                                                         data-subdit-name="{{ e($user->subdit_name) }}">
                                                         Edit
@@ -224,6 +235,10 @@
                                     <small class="text-muted d-block">Wewenang Penyerahan Barang</small>
                                     <div id="detailDistributorStatus" class="mt-1">-</div>
                                 </div>
+                                <div class="col-md-12 d-none" id="detailExaminerWrap">
+                                    <small class="text-muted d-block">Wewenang Pemeriksaan Laporan</small>
+                                    <div id="detailExaminerStatus" class="mt-1">-</div>
+                                </div>
                             </div>
                         </div>
 
@@ -299,20 +314,38 @@
                                 <small class="text-muted" style="font-size: 0.75rem;">Terisi otomatis saat memilih unit penugasan PIC, atau dapat disesuaikan.</small>
                             </div>
 
-                            {{-- Pengaturan Wewenang Distribusi untuk Pegawai Gudang --}}
+                            {{-- Pengaturan Wewenang Penugasan untuk Pegawai Gudang --}}
                             <div class="col-12 d-none" id="gudangDistribusiContainer">
-                                <div class="p-3 border rounded-3 bg-light border-primary-subtle shadow-xs">
-                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <div style="max-width: 80%;">
-                                            <label class="form-check-label fw-bold text-dark mb-0 d-block" for="is_distributor">
-                                                Tugaskan Sebagai Petugas Distribusi (Yang Menyerahkan Barang)
-                                            </label>
-                                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                                Aktifkan jika akun Pegawai Gudang ini bertugas menyerahkan barang ke pemohon. Namanya akan otomatis diambil dan dicantumkan pada <strong>Bukti Serah Terima Barang</strong>.
-                                            </small>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="p-3 border rounded-3 bg-light border-primary-subtle shadow-xs">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div style="max-width: 80%;">
+                                                <label class="form-check-label fw-bold text-dark mb-0 d-block" for="is_distributor">
+                                                    Tugaskan Sebagai Petugas Distribusi (Yang Menyerahkan Barang)
+                                                </label>
+                                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                    Aktifkan jika akun Pegawai Gudang ini bertugas menyerahkan barang ke pemohon. Namanya akan otomatis diambil dan dicantumkan pada <strong>Bukti Serah Terima Barang</strong>.
+                                                </small>
+                                            </div>
+                                            <div class="form-check form-switch fs-4 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="is_distributor" id="is_distributor" value="1">
+                                            </div>
                                         </div>
-                                        <div class="form-check form-switch fs-4 mb-0">
-                                            <input class="form-check-input" type="checkbox" name="is_distributor" id="is_distributor" value="1">
+                                    </div>
+
+                                    <div class="p-3 border rounded-3 bg-light border-info-subtle shadow-xs">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div style="max-width: 80%;">
+                                                <label class="form-check-label fw-bold text-dark mb-0 d-block" for="is_report_examiner">
+                                                    Tugaskan Sebagai Petugas Pemeriksa Laporan Persediaan
+                                                </label>
+                                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                                    Aktifkan jika akun Pegawai Gudang ini bertugas memeriksa stok dan laporan persediaan. Namanya akan otomatis dicantumkan pada kolom <strong>Memeriksa</strong> di Cetak Laporan dan Export Excel.
+                                                </small>
+                                            </div>
+                                            <div class="form-check form-switch fs-4 mb-0">
+                                                <input class="form-check-input" type="checkbox" name="is_report_examiner" id="is_report_examiner" value="1">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -506,6 +539,7 @@
                 const $picUnitChoice = $('#pic_unit_choice');
                 const $gudangDistribusiContainer = $('#gudangDistribusiContainer');
                 const $isDistributor = $('#is_distributor');
+                const $isReportExaminer = $('#is_report_examiner');
                 const $password = $('#password');
                 const $passwordConfirmation = $('#password_confirmation');
                 const $passwordWrapper = $('.password-wrapper');
@@ -520,6 +554,8 @@
                 const $detailUpdatedAt = $('#detailUpdatedAt');
                 const $detailDistributorWrap = $('#detailDistributorWrap');
                 const $detailDistributorStatus = $('#detailDistributorStatus');
+                const $detailExaminerWrap = $('#detailExaminerWrap');
+                const $detailExaminerStatus = $('#detailExaminerStatus');
 
                 function updateRoleContainers() {
                     const roleVal = $role.val();
@@ -527,6 +563,7 @@
                         $picUnitContainer.removeClass('d-none');
                         $gudangDistribusiContainer.addClass('d-none');
                         $isDistributor.prop('checked', false);
+                        $isReportExaminer.prop('checked', false);
                     } else if (roleVal === 'pegawai_gudang') {
                         $picUnitContainer.addClass('d-none');
                         $gudangDistribusiContainer.removeClass('d-none');
@@ -537,6 +574,7 @@
                         $picUnitContainer.addClass('d-none');
                         $gudangDistribusiContainer.addClass('d-none');
                         $isDistributor.prop('checked', false);
+                        $isReportExaminer.prop('checked', false);
                         if (roleVal === 'kasubag_tu' && !$position.val()) {
                             $position.val('Kasubag TU');
                         }
@@ -600,9 +638,12 @@
                     $picUnitChoice.val('').prop('disabled', false);
                     $picUnitContainer.addClass('d-none');
                     $isDistributor.prop('checked', false).prop('disabled', false);
+                    $isReportExaminer.prop('checked', false).prop('disabled', false);
                     $gudangDistribusiContainer.addClass('d-none');
                     $detailDistributorWrap.addClass('d-none');
                     $detailDistributorStatus.text('-');
+                    $detailExaminerWrap.addClass('d-none');
+                    $detailExaminerStatus.text('-');
                     updateRoleContainers();
                     $password.prop('readonly', false).val('');
                     $passwordConfirmation.prop('readonly', false).val('');
@@ -656,6 +697,8 @@
 
                     const isDist = $(this).data('is-distributor') == '1';
                     $isDistributor.prop('checked', isDist).prop('disabled', false);
+                    const isExam = $(this).data('is-report-examiner') == '1';
+                    $isReportExaminer.prop('checked', isExam).prop('disabled', false);
 
                     const subditName = ($(this).data('subdit-name') || '').toString();
                     const pos = ($(this).data('position') || '').toString().toLowerCase();
@@ -695,6 +738,7 @@
                     const createdAt = $(this).data('created-at');
                     const updatedAt = $(this).data('updated-at');
                     const isDist = $(this).data('is-distributor') == '1';
+                    const isExam = $(this).data('is-report-examiner') == '1';
 
                     $name.val(name).prop('readonly', true);
                     $userTitle.val(titleVal).prop('readonly', true);
@@ -706,14 +750,21 @@
                     updateRoleContainers();
                     $picUnitChoice.prop('disabled', true);
                     $isDistributor.prop('checked', isDist).prop('disabled', true);
+                    $isReportExaminer.prop('checked', isExam).prop('disabled', true);
 
                     if (role === 'pegawai_gudang') {
                         $detailDistributorWrap.removeClass('d-none');
                         $detailDistributorStatus.html(isDist 
                             ? '<span class="badge bg-success-subtle text-success border px-2.5 py-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M1 3h15v13H1z"></path><path d="M16 8h4l3 3v5h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>Petugas Distribusi Resmi (Yang Menyerahkan pada Bukti Serah Terima)</span>' 
                             : '<span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Staf Gudang Umum (Bukan Petugas Distribusi)</span>');
+
+                        $detailExaminerWrap.removeClass('d-none');
+                        $detailExaminerStatus.html(isExam 
+                            ? '<span class="badge bg-info-subtle text-info border px-2.5 py-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>Petugas Pemeriksa Laporan Persediaan (Kolom Memeriksa)</span>' 
+                            : '<span class="badge bg-secondary-subtle text-secondary border px-2 py-1">Bukan Petugas Pemeriksa Laporan</span>');
                     } else {
                         $detailDistributorWrap.addClass('d-none');
+                        $detailExaminerWrap.addClass('d-none');
                     }
 
                     const pos = (position || '').toString().toLowerCase();
