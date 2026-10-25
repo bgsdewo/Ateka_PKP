@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_distributor',
+        'is_report_examiner',
         'position',
         'nip',
         'subdit_name',
@@ -50,12 +51,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_distributor' => 'boolean',
+            'is_report_examiner' => 'boolean',
         ];
     }
 
     public function isDistributor(): bool
     {
         return (bool) $this->is_distributor;
+    }
+
+    public function isReportExaminer(): bool
+    {
+        return (bool) $this->is_report_examiner;
     }
 
     /**

@@ -258,15 +258,11 @@
                 @endif
 
                 <!-- ======================================================== -->
-                <!-- 5. MENU LAPORAN & ARSIP (Kasubag TU, Pegawai Gudang) -->
+                <!-- 5. MENU LAPORAN PERSEDIAAN (Kasubag TU, Pegawai Gudang) -->
                 <!-- ======================================================== -->
                 @if ($isKasubagTU || $isPegawaiGudang)
-                    @php
-                        $laporanActive = request()->routeIs('reports.*');
-                    @endphp
                     <li class="nav-item">
-                        <a class="nav-link {{ $laporanActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#laporan-menu" role="button" aria-expanded="{{ $laporanActive ? 'true' : 'false' }}" title="Laporan & Arsip">
+                        <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}" title="Laporan Persediaan">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
                                     <path opacity="0.4"
@@ -275,29 +271,8 @@
                                     <path d="M8 8H16M8 12H16M8 16H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                                 </svg>
                             </i>
-                            <span class="item-name">Laporan & Arsip</span>
-                            <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
+                            <span class="item-name">Laporan Persediaan</span>
                         </a>
-
-                        <ul class="sub-nav collapse {{ $laporanActive ? 'show' : '' }}" id="laporan-menu" data-bs-parent="#sidebar-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}" title="Mutasi Persediaan">
-                                    <i class="sidenav-mini-icon">L</i>
-                                    <span class="item-name">Mutasi Persediaan</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('reports.rekapitulasi') ? 'active' : '' }}" href="{{ route('reports.rekapitulasi') }}" title="Rekapitulasi Arsip">
-                                    <i class="sidenav-mini-icon">R</i>
-                                    <span class="item-name">Rekapitulasi Arsip</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 @endif
 

@@ -92,6 +92,7 @@ class UserManagementController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_distributor' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_distributor') : false,
+            'is_report_examiner' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_report_examiner') : false,
             'position' => $position,
             'subdit_name' => $subditName,
         ]);
@@ -122,6 +123,7 @@ class UserManagementController extends Controller
             'password' => ['nullable', 'string', 'min:6', 'confirmed'],
             'role' => ['required', 'string', 'in:kasubag_tu,pic_distribusi,pegawai,admin,pegawai_gudang'],
             'is_distributor' => ['nullable'],
+            'is_report_examiner' => ['nullable'],
             'position' => ['nullable', 'string', 'max:255'],
             'pic_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
@@ -171,6 +173,7 @@ class UserManagementController extends Controller
             'nip' => $request->nip,
             'role' => $request->role,
             'is_distributor' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_distributor') : false,
+            'is_report_examiner' => ($request->role === 'pegawai_gudang') ? $request->boolean('is_report_examiner') : false,
             'position' => $position,
             'subdit_name' => $subditName,
         ];

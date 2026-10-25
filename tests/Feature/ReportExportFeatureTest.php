@@ -14,6 +14,7 @@ class ReportExportFeatureTest extends TestCase
     use DatabaseTransactions;
 
     protected User $kasubagUser;
+    protected User $gudangUser;
     protected User $picDistribusiUser;
     protected User $pegawaiUser;
     protected Product $product;
@@ -25,6 +26,11 @@ class ReportExportFeatureTest extends TestCase
         $this->kasubagUser = User::firstOrCreate(
             ['email' => 'kasubag_export_test@gmail.com'],
             ['name' => 'Utami M.', 'position' => 'Kasubag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu', 'nip' => '199812132025062010']
+        );
+
+        $this->gudangUser = User::firstOrCreate(
+            ['email' => 'gudang_export_test@gmail.com'],
+            ['name' => 'Irvan Gudang', 'position' => 'Pegawai Gudang', 'password' => bcrypt('password123'), 'role' => 'pegawai_gudang']
         );
 
         $this->picDistribusiUser = User::firstOrCreate(
@@ -80,7 +86,10 @@ class ReportExportFeatureTest extends TestCase
             $response->assertStatus(200);
             $response->assertSee('Laporan Persediaan Barang');
             $response->assertSee('Export Excel');
-            $response->assertSee('Export PDF');
+            $response->assertSee('Cetak Laporan');
+            $response->assertDontSee('id="btnExportPdf"', false);
+            $response->assertDontSee('Export PDF');
+            $response->assertDontSee(route('reports.rekapitulasi'), false);
         }
     }
 
@@ -91,7 +100,7 @@ class ReportExportFeatureTest extends TestCase
 
         // Verify Table structure and new column headers
         $response->assertSee('id="laporanTable"', false);
-        $response->assertSee('Tanggal Faktur', false);
+        $response->assertSee('Tgl Faktur', false);
         $response->assertSee('Kode Barang', false);
         $response->assertSee('Uraian', false);
         $response->assertSee('<tfoot>', false);
@@ -167,21 +176,50 @@ class ReportExportFeatureTest extends TestCase
         $response->assertSee('showGridLines', false);
     }
 
-    public function test_pdf_export_script_contains_ministry_branding_and_signatures(): void
+    public function test_print_export_script_contains_ministry_branding_and_signatures_while_pdf_is_removed(): void
     {
         $response = $this->actingAs($this->kasubagUser)->get(route('reports.index'));
         $response->assertStatus(200);
 
-        // 1. Verify Ministry header
+        // 1. Verify Ministry header in print template
         $response->assertSee('KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN REPUBLIK INDONESIA', false);
-        $response->assertSee('SEKRETARIAT JENDERAL - PENGELOLAAN ARSIP & PERSEDIAAN BARANG (ATK)', false);
+        $response->assertSee('SEKRETARIAT JENDERAL - PENGELOLAAN ARSIP &amp; PERSEDIAAN BARANG (ATK)', false);
 
-        // 2. Verify PDF landscape orientation and layout table widths
-        $response->assertSee("orientation: 'landscape'", false);
-        $response->assertSee("pageSize: 'A4'", false);
+        // 2. Verify PDF export and archive recap button are removed
+        $response->assertDontSee("extend: 'pdfHtml5'", false);
+        $response->assertDontSee('btnExportPdf', false);
 
-        // 3. Verify Single Signature Block (Kasubag TU only)
+        // 3. Verify 3-Column Signature Blocks (Memeriksa, Menyetujui, Mengetahui)
         $response->assertDontSee('Arsiparis (Pelaporan & Administrasi)', false);
-        $response->assertSee('Kasubag TU (Approver / Pimpinan)', false);
+        $response->assertSee('Memeriksa,', false);
+        $response->assertSee('Menyetujui,', false);
+        $response->assertSee('Mengetahui,', false);
+        $response->assertSee('Petugas Pemeriksa Laporan', false);
+    }
+
+    public function test_user_management_contains_report_examiner_toggle_and_updates_successfully(): void
+    {
+        $response = $this->actingAs($this->kasubagUser)->get(route('master-data.manajemen-pengguna.index'));
+        $response->assertStatus(200);
+        $response->assertSee('is_report_examiner', false);
+        $response->assertSee('Tugaskan Sebagai Petugas Pemeriksa Laporan Persediaan', false);
+
+        // Test update user with examiner toggle
+        $updateResponse = $this->actingAs($this->kasubagUser)->put(
+            route('master-data.manajemen-pengguna.update', $this->gudangUser->id),
+            [
+                'name' => 'Pegawai Gudang Updated',
+                'email' => $this->gudangUser->email,
+                'role' => 'pegawai_gudang',
+                'position' => 'Pegawai Gudang',
+                'is_report_examiner' => '1',
+            ]
+        );
+
+        $updateResponse->assertRedirect();
+        $this->assertDatabaseHas('users', [
+            'id' => $this->gudangUser->id,
+            'is_report_examiner' => 1,
+        ]);
     }
 }

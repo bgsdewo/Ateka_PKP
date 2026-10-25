@@ -1,15 +1,38 @@
 @extends('layouts.app')
 
 @php
+    // 1. Kolom Memeriksa: Pegawai Gudang yang ditugaskan sebagai Petugas Pemeriksa Laporan Persediaan
+    $examinerUser = \App\Models\User::where('role', 'pegawai_gudang')->where('is_report_examiner', true)->first()
+        ?: \App\Models\User::where('role', 'pegawai_gudang')->first();
+    $examinerName = $examinerUser ? ($examinerUser->name_with_title ?: $examinerUser->name) : 'Petugas Pemeriksa';
+    $examinerNip = $examinerUser && $examinerUser->nip ? $examinerUser->nip : '-';
+    $examinerTitle = 'Petugas Pemeriksa Laporan';
+
+    // 2. Kolom Menyetujui: Kasubag TU
     $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
     $kasubagName = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
-    $kasubagNip = $kasubagUser->nip ?? '199812132025062010';
+    $kasubagNip = $kasubagUser->nip ?? '19850612 201001 2 003';
+    $kasubagTitle = 'Kasubag Tata Usaha';
+
+    // 3. Kolom Mengetahui: Kasubag TU / Kepala Bagian
+    $pimpinanUser = \App\Models\User::where(function($q) use ($kasubagUser) {
+        $q->where('position', 'like', '%Kepala Bagian%')
+          ->orWhere('position', 'like', '%Kabag%')
+          ->orWhere('role', 'pimpinan');
+        if ($kasubagUser) {
+            $q->where('id', '!=', $kasubagUser->id);
+        }
+    })->first();
+
+    $mengetahuiTitle = $pimpinanUser ? ($pimpinanUser->position ?: 'Kepala Bagian Umum') : 'Kepala Bagian Umum';
+    $mengetahuiName = $pimpinanUser ? ($pimpinanUser->name_with_title ?: $pimpinanUser->name) : ($kasubagName ?: 'Kepala Bagian Umum');
+    $mengetahuiNip = $pimpinanUser ? ($pimpinanUser->nip ?: '-') : ($kasubagNip ?: '-');
 @endphp
 
 @section('page-header')
     <style>
         .signature-section {
-            display: none;
+            margin-top: 30px;
         }
 
         @media print {
@@ -633,15 +656,6 @@
 
                         {{-- Tombol Ekspor Rapi di Header Kartu --}}
                         <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <a href="{{ route('reports.rekapitulasi') }}"
-                                class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                                Rekapitulasi Arsip
-                            </a>
                             <button type="button" id="btnExportExcel"
                                 class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -652,17 +666,6 @@
                                     <line x1="8" y1="17" x2="16" y2="17"></line>
                                 </svg>
                                 Export Excel
-                            </button>
-                            <button type="button" id="btnExportPdf"
-                                class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                </svg>
-                                Export PDF
                             </button>
                             <button type="button" id="btnExportPrint"
                                 class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
@@ -905,16 +908,41 @@
                                 </tfoot>
                             </table>
 
-                        {{-- Tanda Tangan Khusus untuk Print / Tampilan Bawah (Kasubag TU) --}}
-                        <div class="signature-section mt-5 pt-3">
-                            <div class="row justify-content-end text-center" style="width: 100%;">
-                                <div class="col-6">
-                                    <p class="mb-1">Jakarta, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                                    <p class="mb-5">Mengetahui & Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
-                                    <div style="height: 50px;"></div>
+                        {{-- Tanda Tangan: Baris 1 (Memeriksa & Mengetahui), Baris 2 (Menyetujui di Bawah Tengah seperti Gambar 2) --}}
+                        <div class="signature-section mt-5 pt-4 border-top">
+                            <!-- Baris 1: Memeriksa (Kiri) & Mengetahui (Kanan) -->
+                            <div class="row justify-content-between text-center mb-4" style="width: 100%;">
+                                <div class="col-md-5 col-12">
+                                    <p class="mb-1 text-muted small">&nbsp;</p>
+                                    <p class="mb-1 fw-bold text-dark">Memeriksa,</p>
+                                    <p class="text-muted small mb-0">{{ $examinerTitle }}</p>
+                                    <div style="height: 55px;"></div>
                                     <p class="mb-0">
-                                        <strong><u>{{ $kasubagName }}</u></strong><br>
-                                        <small class="text-muted">NIP. {{ $kasubagNip }}</small>
+                                        <strong class="text-dark"><u>{{ $examinerName }}</u></strong><br>
+                                        <span class="text-muted small">NIP. {{ $examinerNip }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-5 col-12">
+                                    <p class="mb-1 text-muted small">Jakarta, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+                                    <p class="mb-1 fw-bold text-dark">Mengetahui,</p>
+                                    <p class="text-muted small mb-0">{{ $mengetahuiTitle }}</p>
+                                    <div style="height: 55px;"></div>
+                                    <p class="mb-0">
+                                        <strong class="text-dark"><u>{{ $mengetahuiName }}</u></strong><br>
+                                        <span class="text-muted small">NIP. {{ $mengetahuiNip }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Baris 2: Menyetujui (Posisi Tengah di Bawah seperti Gambar 2) -->
+                            <div class="row justify-content-center text-center" style="width: 100%;">
+                                <div class="col-md-5 col-12">
+                                    <p class="mb-1 fw-bold text-dark">Menyetujui,</p>
+                                    <p class="text-muted small mb-0">{{ $kasubagTitle }}</p>
+                                    <div style="height: 55px;"></div>
+                                    <p class="mb-0">
+                                        <strong class="text-dark"><u>{{ $kasubagName }}</u></strong><br>
+                                        <span class="text-muted small">NIP. {{ $kasubagNip }}</span>
                                     </p>
                                 </div>
                             </div>
@@ -928,8 +956,6 @@
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
@@ -1070,9 +1096,10 @@
 
                                 var fonts = styles.getElementsByTagName('fonts')[0];
                                 var fontCount = parseInt(fonts.getAttribute('count') || '5');
-                                function addFont(sz, name, bold, colorRgb) {
+                                function addFont(sz, name, bold, colorRgb, underline) {
                                     var f = styles.createElement('font');
                                     if (bold) { f.appendChild(styles.createElement('b')); }
+                                    if (underline) { f.appendChild(styles.createElement('u')); }
                                     var s = styles.createElement('sz'); s.setAttribute('val', sz); f.appendChild(s);
                                     if (colorRgb) {
                                         var c = styles.createElement('color'); c.setAttribute('rgb', colorRgb); f.appendChild(c);
@@ -1096,7 +1123,7 @@
                                 var fontSigRoleIdx = fontCount;
                                 addFont('10', 'Calibri', true, 'FF334155');
                                 var fontSigNameIdx = fontCount;
-                                addFont('11', 'Calibri', true, 'FF0F172A');
+                                addFont('11', 'Calibri', true, 'FF0F172A', true);
                                 fonts.setAttribute('count', fontCount);
 
                                 var fills = styles.getElementsByTagName('fills')[0];
@@ -1325,256 +1352,60 @@
                                     }
                                 }
 
-                                // 6. Section Tanda Tangan Resmi (Kasubag TU)
+                                // 6. Section Tanda Tangan Resmi: Baris 1 (Memeriksa & Mengetahui), Baris 2 (Menyetujui di Bawah Tengah)
                                 var sigStartRow = (totalRows > 0 ? (endDataRow + 1) : 4) + 2;
                                 var tglSkrXml = xmlEscape('Jakarta, ' + tglHariIni);
-                                var kasubagNameXml = xmlEscape(@json($kasubagName));
-                                var kasubagNipXml = xmlEscape('{{ $kasubagNip }}');
+                                var examinerNameXml = xmlEscape(@json($examinerName));
+                                var examinerNipXml = xmlEscape(@json($examinerNip));
+                                var examinerTitleXml = xmlEscape(@json($examinerTitle));
 
-                                var signatureXml = '<row r="' + sigStartRow + '">' +
-                                    '<c r="L' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>' + tglSkrXml + '</t></is></c></row>' +
+                                var kasubagNameXml = xmlEscape(@json($kasubagName));
+                                var kasubagNipXml = xmlEscape(@json($kasubagNip));
+                                var kasubagTitleXml = xmlEscape(@json($kasubagTitle));
+
+                                var mengetahuiNameXml = xmlEscape(@json($mengetahuiName));
+                                var mengetahuiNipXml = xmlEscape(@json($mengetahuiNip));
+                                var mengetahuiTitleXml = xmlEscape(@json($mengetahuiTitle));
+
+                                var sigRow2 = sigStartRow + 10;
+
+                                var signatureXml = 
+                                    // Baris 1: Memeriksa (C) & Mengetahui (L)
+                                    '<row r="' + sigStartRow + '">' +
+                                        '<c r="L' + sigStartRow + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>' + tglSkrXml + '</t></is></c>' +
+                                    '</row>' +
                                     '<row r="' + (sigStartRow + 1) + '">' +
-                                    '<c r="L' + (sigStartRow + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Mengetahui &amp; Mengesahkan,</t></is></c></row>' +
+                                        '<c r="C' + (sigStartRow + 1) + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>Memeriksa,</t></is></c>' +
+                                        '<c r="L' + (sigStartRow + 1) + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>Mengetahui,</t></is></c>' +
+                                    '</row>' +
                                     '<row r="' + (sigStartRow + 2) + '">' +
-                                    '<c r="L' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>Kasubag TU (Approver / Pimpinan)</t></is></c></row>' +
+                                        '<c r="C' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>' + examinerTitleXml + '</t></is></c>' +
+                                        '<c r="L' + (sigStartRow + 2) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>' + mengetahuiTitleXml + '</t></is></c>' +
+                                    '</row>' +
                                     '<row r="' + (sigStartRow + 6) + '">' +
-                                    '<c r="L' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + kasubagNameXml + '</t></is></c></row>' +
+                                        '<c r="C' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + examinerNameXml + '</t></is></c>' +
+                                        '<c r="L' + (sigStartRow + 6) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + mengetahuiNameXml + '</t></is></c>' +
+                                    '</row>' +
                                     '<row r="' + (sigStartRow + 7) + '">' +
-                                    '<c r="L' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + kasubagNipXml + '</t></is></c></row>';
+                                        '<c r="C' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + examinerNipXml + '</t></is></c>' +
+                                        '<c r="L' + (sigStartRow + 7) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + mengetahuiNipXml + '</t></is></c>' +
+                                    '</row>' +
+
+                                    // Baris 2: Menyetujui (G - Tengah Bawah seperti Gambar 2)
+                                    '<row r="' + sigRow2 + '">' +
+                                        '<c r="G' + sigRow2 + '" s="' + styleSigTitle + '" t="inlineStr"><is><t>Menyetujui,</t></is></c>' +
+                                    '</row>' +
+                                    '<row r="' + (sigRow2 + 1) + '">' +
+                                        '<c r="G' + (sigRow2 + 1) + '" s="' + styleSigRole + '" t="inlineStr"><is><t>' + kasubagTitleXml + '</t></is></c>' +
+                                    '</row>' +
+                                    '<row r="' + (sigRow2 + 5) + '">' +
+                                        '<c r="G' + (sigRow2 + 5) + '" s="' + styleSigName + '" t="inlineStr"><is><t>' + kasubagNameXml + '</t></is></c>' +
+                                    '</row>' +
+                                    '<row r="' + (sigRow2 + 6) + '">' +
+                                        '<c r="G' + (sigRow2 + 6) + '" s="' + styleSigNip + '" t="inlineStr"><is><t>NIP. ' + kasubagNipXml + '</t></is></c>' +
+                                    '</row>';
 
                                 $('sheetData', sheet).append(signatureXml);
-                            }
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            orientation: 'landscape',
-                            pageSize: 'A4',
-                            filename: 'Laporan_Persediaan_ATK_' + new Date().toISOString().slice(0, 10),
-                            exportOptions: {
-                                columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-                                format: {
-                                    header: function(data, columnIdx) {
-                                        return $('<div>').html(data).text().trim();
-                                    },
-                                    body: function(data, row, column, node) {
-                                        var cleanText = $('<div>').html(data).text().trim();
-                                        if (column === 6) {
-                                            if (cleanText.indexOf('Masuk') !== -1) return 'Masuk';
-                                            if (cleanText.indexOf('Subdit') !== -1) return 'Keluar (Subdit)';
-                                            if (cleanText.indexOf('Individu') !== -1) return 'Keluar (Individu)';
-                                            return 'Keluar';
-                                        }
-                                        return cleanText;
-                                    }
-                                }
-                            },
-                            customize: function(doc) {
-                                doc.pageMargins = [20, 20, 20, 28];
-
-                                // Header Resmi Dokumen PDF Berstandar Kementerian PKP
-                                doc.content.splice(0, 1, {
-                                    stack: [
-                                        {
-                                            text: 'KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN REPUBLIK INDONESIA',
-                                            fontSize: 10.5,
-                                            bold: true,
-                                            alignment: 'center',
-                                            color: '#144B59',
-                                            characterSpacing: 0.5,
-                                            margin: [0, 0, 0, 2]
-                                        },
-                                        {
-                                            text: 'SEKRETARIAT JENDERAL - PENGELOLAAN ARSIP & PERSEDIAAN BARANG (ATK)',
-                                            fontSize: 8,
-                                            alignment: 'center',
-                                            color: '#64748B',
-                                            margin: [0, 0, 0, 4]
-                                        },
-                                        {
-                                            canvas: [{
-                                                type: 'line',
-                                                x1: 0, y1: 0,
-                                                x2: 798, y2: 0,
-                                                lineWidth: 1.5,
-                                                lineColor: '#144B59'
-                                            }]
-                                        },
-                                        {
-                                            text: 'LAPORAN MUTASI & PERSEDIAAN BARANG (ATK)',
-                                            fontSize: 13,
-                                            bold: true,
-                                            alignment: 'center',
-                                            color: '#0F172A',
-                                            margin: [0, 8, 0, 3]
-                                        },
-                                        {
-                                            text: 'Periode: ' + periodeStr + '   |   Dicetak pada: ' + tglHariIni,
-                                            fontSize: 8,
-                                            alignment: 'center',
-                                            color: '#475569',
-                                            margin: [0, 0, 0, 10]
-                                        }
-                                    ]
-                                });
-
-                                var tableNode = doc.content.find(function(node) {
-                                    return node.table;
-                                });
-
-                                if (tableNode) {
-                                    tableNode.table.widths = [20, 50, 48, 55, 95, 65, 45, 42, 44, 42, 58, 70, 70, 80];
-
-                                    tableNode.layout = {
-                                        hLineWidth: function(i, node) {
-                                            return (i === 0 || i === 1 || i === node.table.body.length) ? 1 : 0.5;
-                                        },
-                                        vLineWidth: function(i, node) {
-                                            return 0.5;
-                                        },
-                                        hLineColor: function(i, node) {
-                                            return (i === 0 || i === 1) ? '#144B59' : '#CBD5E1';
-                                        },
-                                        vLineColor: function(i, node) {
-                                            return '#E2E8F0';
-                                        },
-                                        paddingLeft: function(i, node) { return 3; },
-                                        paddingRight: function(i, node) { return 3; },
-                                        paddingTop: function(i, node) { return 4; },
-                                        paddingBottom: function(i, node) { return 4; }
-                                    };
-
-                                    var body = tableNode.table.body;
-                                    var sumAwal = 0;
-                                    var sumDipinjam = 0;
-                                    var sumSisa = 0;
-                                    var sumSaldo = 0;
-
-                                    for (var i = 0; i < body.length; i++) {
-                                        var row = body[i];
-                                        if (i === 0) {
-                                            for (var j = 0; j < row.length; j++) {
-                                                row[j].fillColor = '#144B59';
-                                                row[j].color = '#FFFFFF';
-                                                row[j].fontSize = 7.5;
-                                                row[j].bold = true;
-                                                row[j].alignment = 'center';
-                                            }
-                                        } else {
-                                            var isEven = (i % 2 === 0);
-                                            var rowBg = isEven ? '#F8FAFC' : '#FFFFFF';
-
-                                            for (var j = 0; j < row.length; j++) {
-                                                row[j].fontSize = 7;
-                                                row[j].fillColor = rowBg;
-                                                row[j].color = '#1E293B';
-
-                                                if (j === 0 || j === 1 || j === 2 || j === 6) {
-                                                    row[j].alignment = 'center';
-                                                } else if (j === 7 || j === 8 || j === 9) {
-                                                    row[j].alignment = 'center';
-                                                } else if (j === 10 || j === 11) {
-                                                    row[j].alignment = 'right';
-                                                } else {
-                                                    row[j].alignment = 'left';
-                                                }
-                                            }
-
-                                            var numAwal = parseInt(String(row[7].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numDipinjam = parseInt(String(row[8].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numSisa = parseInt(String(row[9].text || '').replace(/[^\d]/g, ''), 10) || 0;
-                                            var numSaldo = parseInt(String(row[11].text || '').replace(/[^\d]/g, ''), 10) || 0;
-
-                                            sumAwal += numAwal;
-                                            sumDipinjam += numDipinjam;
-                                            sumSisa += numSisa;
-                                            sumSaldo += numSaldo;
-                                        }
-                                    }
-
-                                    // Tambahkan Baris Total Rekapitulasi di akhir tabel PDF
-                                    if (body.length > 1) {
-                                        body.push([
-                                            { text: 'TOTAL REKAPITULASI', colSpan: 7, alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            {}, {}, {}, {}, {}, {},
-                                            { text: sumAwal.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: sumDipinjam.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: sumSisa.toLocaleString('id-ID'), alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: 'Rp ' + sumSaldo.toLocaleString('id-ID'), alignment: 'right', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' },
-                                            { text: '-', alignment: 'center', bold: true, fontSize: 7.5, fillColor: '#E2E8F0', color: '#0F172A' }
-                                        ]);
-                                    }
-                                }
-
-                                // Blok Tanda Tangan Tunggal: Kasubag TU di Kanan
-                                doc.content.push({
-                                    unbreakable: true,
-                                    margin: [0, 20, 0, 0],
-                                    columns: [
-                                        {
-                                            width: '*',
-                                            text: ''
-                                        },
-                                        {
-                                            width: 250,
-                                            alignment: 'center',
-                                            margin: [0, 0, 10, 0],
-                                            stack: [{
-                                                    text: 'Jakarta, ' + tglHariIni,
-                                                    fontSize: 8.5,
-                                                    color: '#334155',
-                                                    margin: [0, 0, 0, 2]
-                                                },
-                                                {
-                                                    text: 'Mengetahui & Mengesahkan,',
-                                                    fontSize: 8.5,
-                                                    color: '#334155',
-                                                    margin: [0, 0, 0, 0]
-                                                },
-                                                {
-                                                    text: 'Kasubag TU (Approver / Pimpinan)',
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    color: '#0F172A',
-                                                    margin: [0, 0, 0, 42]
-                                                },
-                                                {
-                                                    text: @json($kasubagName),
-                                                    fontSize: 8.5,
-                                                    bold: true,
-                                                    decoration: 'underline',
-                                                    color: '#0F172A'
-                                                },
-                                                {
-                                                    text: 'NIP. {{ $kasubagNip }}',
-                                                    fontSize: 7.5,
-                                                    color: '#475569'
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                });
-
-                                // Footer Nomor Halaman
-                                doc.footer = function(currentPage, pageCount) {
-                                    return {
-                                        margin: [20, 10, 20, 0],
-                                        columns: [
-                                            {
-                                                text: 'Sistem Informasi Pengelolaan ATK (ATEKA) - Kementerian PKP RI',
-                                                fontSize: 7.5,
-                                                color: '#94A3B8'
-                                            },
-                                            {
-                                                text: 'Halaman ' + currentPage + ' dari ' + pageCount,
-                                                fontSize: 7.5,
-                                                alignment: 'right',
-                                                color: '#64748B'
-                                            }
-                                        ]
-                                    };
-                                };
                             }
                         },
                         {
@@ -1620,12 +1451,33 @@
                                 });
 
                                 $(win.document.body).append(`
-                                    <div style="margin-top: 40px; width: 100%; display: flex; justify-content: flex-end; page-break-inside: avoid;">
-                                        <div style="text-align: center; width: 250px;">
-                                            <p style="margin-bottom: 3px; font-size: 8.5pt;">Jakarta, ${tglHariIni}</p>
-                                            <p style="margin-bottom: 50px; font-size: 8.5pt;">Mengetahui &amp; Mengesahkan,<br><strong>Kasubag TU (Approver / Pimpinan)</strong></p>
-                                            <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($kasubagName)}</u></strong><br>
-                                            <span style="color: #475569; font-size: 8pt;">NIP. {{ $kasubagNip }}</span></p>
+                                    <div style="margin-top: 40px; width: 100%; page-break-inside: avoid;">
+                                        <!-- Baris 1: Memeriksa (Kiri) & Mengetahui (Kanan) -->
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                                            <div style="text-align: center; width: 38%;">
+                                                <p style="margin-bottom: 3px; font-size: 8.5pt;">&nbsp;</p>
+                                                <p style="margin-bottom: 3px; font-size: 8.5pt; font-weight: bold;">Memeriksa,</p>
+                                                <p style="margin-bottom: 50px; font-size: 8pt; color: #475569;">${@json($examinerTitle)}</p>
+                                                <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($examinerName)}</u></strong><br>
+                                                <span style="color: #475569; font-size: 8pt;">NIP. ${@json($examinerNip)}</span></p>
+                                            </div>
+                                            <div style="text-align: center; width: 38%;">
+                                                <p style="margin-bottom: 3px; font-size: 8.5pt;">Jakarta, ${tglHariIni}</p>
+                                                <p style="margin-bottom: 3px; font-size: 8.5pt; font-weight: bold;">Mengetahui,</p>
+                                                <p style="margin-bottom: 50px; font-size: 8pt; color: #475569;">${@json($mengetahuiTitle)}</p>
+                                                <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($mengetahuiName)}</u></strong><br>
+                                                <span style="color: #475569; font-size: 8pt;">NIP. ${@json($mengetahuiNip)}</span></p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Baris 2: Menyetujui (Posisi Tengah di Bawah) -->
+                                        <div style="display: flex; justify-content: center;">
+                                            <div style="text-align: center; width: 38%;">
+                                                <p style="margin-bottom: 3px; font-size: 8.5pt; font-weight: bold;">Menyetujui,</p>
+                                                <p style="margin-bottom: 50px; font-size: 8pt; color: #475569;">${@json($kasubagTitle)}</p>
+                                                <p style="margin-bottom: 0; font-size: 8.5pt;"><strong><u>${@json($kasubagName)}</u></strong><br>
+                                                <span style="color: #475569; font-size: 8pt;">NIP. ${@json($kasubagNip)}</span></p>
+                                            </div>
                                         </div>
                                     </div>
                                 `);
@@ -1653,9 +1505,6 @@
                 // Sambungkan tombol ekspor di Header Kartu ke fungsi ekspor DataTables
                 $('#btnExportExcel').on('click', function() {
                     dataTableInstance.button('.buttons-excel').trigger();
-                });
-                $('#btnExportPdf').on('click', function() {
-                    dataTableInstance.button('.buttons-pdf').trigger();
                 });
                 $('#btnExportPrint').on('click', function() {
                     dataTableInstance.button('.buttons-print').trigger();
