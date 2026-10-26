@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Daftar Kebutuhan ATK dan Supplais Komputer - {{ $monthPeriodLabel ?? $periodLabel }}</title>
+    <title>Daftar Kebutuhan ATK dan Supplais Komputer - {{ $monthPeriodLabel ?? ($periodLabel ?? 'Kementerian PKP RI') }}</title>
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}">
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css') }}">
 
@@ -308,13 +308,15 @@
                 $detectedSubdit = $requesterUser->position ?? ($isPicOrSubdit ? 'Subdirektorat' : 'Pegawai Perorangan');
             }
 
+            // Label Subdirektorat khusus untuk Akun PIC (tanpa kata Perwakilan agar tidak kepanjangan)
             $cleanedSubditForPerwakilan = trim($detectedSubdit);
             $cleanedSubditForPerwakilan = preg_replace('/^pic\s+distribusi\s+/i', '', $cleanedSubditForPerwakilan);
             if (stripos($cleanedSubditForPerwakilan, 'subdirektorat') === 0 || stripos($cleanedSubditForPerwakilan, 'subbagian') === 0) {
-                $perwakilanSubditText = 'Perwakilan ' . $cleanedSubditForPerwakilan;
+                $subditText = $cleanedSubditForPerwakilan;
             } else {
-                $perwakilanSubditText = 'Perwakilan Subdirektorat ' . $cleanedSubditForPerwakilan;
+                $subditText = 'Subdirektorat ' . $cleanedSubditForPerwakilan;
             }
+            $perwakilanSubditText = $subditText;
         @endphp
 
         <!-- ========================================================================= -->
@@ -367,7 +369,7 @@
                             <td style="vertical-align: top; padding: 2px 0;"><strong>Permintaan</strong></td>
                             <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
                             <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
-                                <strong>{{ $perwakilanSubditText }}</strong>
+                                <strong>{{ $subditText }}</strong>
                             </td>
                         </tr>
                     @endif

@@ -164,14 +164,15 @@
             $subditLabel = $requesterUser->position ?? ($isPicOrSubdit ? 'Subdirektorat' : 'Pegawai Perorangan');
         }
 
-        // Label Perwakilan Subdirektorat khusus untuk Akun PIC
+        // Label Subdirektorat khusus untuk Akun PIC (tanpa kata Perwakilan agar tidak kepanjangan)
         $cleanedSubditForPerwakilan = trim($subditLabel);
         $cleanedSubditForPerwakilan = preg_replace('/^pic\s+distribusi\s+/i', '', $cleanedSubditForPerwakilan);
         if (stripos($cleanedSubditForPerwakilan, 'subdirektorat') === 0 || stripos($cleanedSubditForPerwakilan, 'subbagian') === 0) {
-            $perwakilanSubditText = 'Perwakilan ' . $cleanedSubditForPerwakilan;
+            $subditText = $cleanedSubditForPerwakilan;
         } else {
-            $perwakilanSubditText = 'Perwakilan Subdirektorat ' . $cleanedSubditForPerwakilan;
+            $subditText = 'Subdirektorat ' . $cleanedSubditForPerwakilan;
         }
+        $perwakilanSubditText = $subditText;
 
         // Team Name Sheet 1 (TIM SDK, TIM PJF, dsb)
         if (!$isPicOrSubdit) {
@@ -417,7 +418,7 @@
                         <td style="vertical-align: top; padding: 2px 0;"><strong>Permintaan</strong></td>
                         <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
                         <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
-                            <strong>{{ $perwakilanSubditText }}</strong>
+                            <strong>{{ $subditText }}</strong>
                         </td>
                     </tr>
                 @endif
