@@ -211,7 +211,7 @@ class UserNotification extends Model
 
         $title = 'Usulan Pengadaan Disetujui Kasubbag TU';
         $message = "Kasubbag TU telah menyetujui usulan pengadaan #{$requestItem->request_code} dari {$pemohonName} ({$itemSummary}). Silakan lakukan penambahan stok barang di Master Data.";
-        $link = route('products.index') . '#pengadaan-section';
+        $link = route('master-data.daftar-barang.index') . '#pengadaan-section';
 
         foreach ($examiners as $examiner) {
             $existing = self::where('user_id', $examiner->id)
