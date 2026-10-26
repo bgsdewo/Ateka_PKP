@@ -265,8 +265,8 @@ class ReportExportFeatureTest extends TestCase
         $printResponse->assertSee('Devi Ismiyantati', false);
         $printResponse->assertSee('Petugas Distribusi Gudang ATK', false);
         $printResponse->assertSee('12345678911', false);
-        $printResponse->assertSee('Irvan Pemeriksa', false);
-        $printResponse->assertSee('Utami M.', false);
+        $printResponse->assertSee('Petugas Pemeriksa Laporan', false);
+        $printResponse->assertSee('Kasubbag Tata Usaha', false);
     }
 
     public function test_dedicated_printable_report_route_access_and_structure(): void
