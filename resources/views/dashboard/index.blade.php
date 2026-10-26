@@ -32,7 +32,7 @@
                     <div class="d-flex flex-column justify-content-center text-white">
                         <h1 class="text-white fw-bold mb-2.5">Selamat Datang, {{ $user->name }}</h1>
 
-                        {{-- 4 Fitur Aksi Cepat Role-Based tepat di bawah Selamat Datang --}}
+                        {{-- Fitur Aksi Cepat Role-Based tepat di bawah Selamat Datang --}}
                         <div class="d-flex align-items-center gap-2 flex-wrap">
                             @if ($isKasubagTU)
                                 <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
@@ -41,9 +41,6 @@
                                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                                     </svg>
                                     Review Pengajuan ({{ $pendingRequestsCount }} Pending)
-                                </a>
-                                <a href="{{ route('rekapitulasi-permintaan.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Rekapitulasi Permintaan
                                 </a>
                                 <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
                                     + Pengadaan (Barang Masuk)

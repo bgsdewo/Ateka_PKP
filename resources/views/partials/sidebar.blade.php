@@ -70,28 +70,27 @@
                 </li>
 
                 <!-- ======================================================== -->
-                <!-- 1. MENU KHUSUS KASUBAG TU (Approver / Pimpinan) -->
+                <!-- 1. MENU KHUSUS KASUBBAG TU (Approver / Pimpinan) -->
                 <!-- ======================================================== -->
                 @if ($isKasubagTU)
                     @php
                         $activeCategory = request('category', 'pengadaan');
                         $isPersediaanRoute = request()->routeIs('persetujuan.*') && $activeCategory === 'persediaan';
                         $isPengadaanRoute = (request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*')) && $activeCategory !== 'persediaan';
-                        $isRekapRoute = request()->routeIs('rekapitulasi-permintaan.*');
-                        $verifikasiActive = request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*') || $isRekapRoute;
+                        $verifikasiActive = request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*');
                         $totalPendingVerifikasi = ($pendingProcurementCount ?? 0) + ($pendingStockCount ?? 0);
                     @endphp
 
-                    {{-- Menu Group: Verifikasi & Rekapitulasi (Collapsible) --}}
+                    {{-- Menu Group: Verifikasi & Persetujuan (Collapsible) --}}
                     <li class="nav-item">
                         <a class="nav-link {{ $verifikasiActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#verifikasi-menu" role="button" aria-expanded="{{ $verifikasiActive ? 'true' : 'false' }}" title="Verifikasi & Rekapitulasi">
+                            href="#verifikasi-menu" role="button" aria-expanded="{{ $verifikasiActive ? 'true' : 'false' }}" title="Verifikasi & Persetujuan">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4" />
                                 </svg>
                             </i>
-                            <span class="item-name">Verifikasi & Rekapitulasi</span>
+                            <span class="item-name">Verifikasi & Persetujuan</span>
                             <i class="right-icon" style="flex-shrink: 0;">
                                 <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -117,16 +116,6 @@
                                    title="Verifikasi Permintaan Stok">
                                     <i class="sidenav-mini-icon">V</i>
                                     <span class="item-name">Verifikasi Permintaan</span>
-                                </a>
-                            </li>
-
-                            {{-- 1C. Rekapitulasi Permintaan --}}
-                            <li class="nav-item">
-                                <a class="nav-link {{ $isRekapRoute ? 'active' : '' }}" 
-                                   href="{{ route('rekapitulasi-permintaan.index') }}" 
-                                   title="Rekapitulasi Permintaan">
-                                    <i class="sidenav-mini-icon">R</i>
-                                    <span class="item-name">Rekapitulasi Permintaan</span>
                                 </a>
                             </li>
                         </ul>

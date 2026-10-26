@@ -457,13 +457,15 @@ class UserRequestFeaturesTest extends TestCase
         $this->assertEquals(10, $requestsApproval->perPage());
         $resApproval->assertSee('10 per halaman');
 
-        // Check rekapitulasi-permintaan pagination
+        // Check rekapitulasi-permintaan is disabled for Kasubbag TU and redirects to dashboard
         $resRecap = $this->actingAs($this->buUtami)->get(route('rekapitulasi-permintaan.index'));
-        $resRecap->assertStatus(200);
-        /** @var \Illuminate\Pagination\LengthAwarePaginator $requestsRecap */
-        $requestsRecap = $resRecap->viewData('requests');
-        $this->assertEquals(10, $requestsRecap->perPage());
-        $resRecap->assertSee('10 per halaman');
+        $resRecap->assertRedirect(route('dashboard'));
+
+        // Check Kasubbag TU dashboard and sidebar do not show Rekapitulasi Permintaan
+        $resDash = $this->actingAs($this->buUtami)->get(route('dashboard'));
+        $resDash->assertStatus(200);
+        $resDash->assertDontSee('Rekapitulasi Permintaan');
+        $resDash->assertSee('Verifikasi &amp; Persetujuan', false);
     }
 }
 

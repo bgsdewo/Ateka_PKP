@@ -97,7 +97,7 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     // 1. ROUTE VERIFIKASI & PERSETUJUAN - KASUBAG TU
     // ==========================================
-    Route::middleware('role:kasubag_tu')->group(function () {
+    Route::middleware('role:kasubag_tu,admin')->group(function () {
         Route::get('/persetujuan', [ApprovalController::class, 'index'])
             ->name('persetujuan.index');
 

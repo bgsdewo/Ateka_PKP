@@ -16,6 +16,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
     use DatabaseTransactions;
 
     protected User $buUtami;
+    protected User $adminUser;
     protected User $pegawaiUser;
     protected User $subditUser;
     protected Product $productA;
@@ -28,6 +29,11 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $this->buUtami = User::firstOrCreate(
             ['email' => 'utami@gmail.com'],
             ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
+        );
+
+        $this->adminUser = User::firstOrCreate(
+            ['email' => 'admin_test_recap@gmail.com'],
+            ['name' => 'Admin Test', 'position' => 'Administrator', 'password' => bcrypt('password123'), 'role' => 'admin']
         );
 
         $this->pegawaiUser = User::firstOrCreate(
@@ -74,15 +80,10 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         );
     }
 
-    public function test_kasubag_tu_can_access_rekapitulasi_permintaan_page(): void
+    public function test_kasubag_tu_cannot_access_rekapitulasi_permintaan_page(): void
     {
         $response = $this->actingAs($this->buUtami)->get(route('rekapitulasi-permintaan.index'));
-
-        $response->assertStatus(200);
-        $response->assertSee('Rekapitulasi Permintaan ATK');
-        $response->assertDontSee('Buka Verifikasi Permintaan');
-        $response->assertDontSee('Rekap per Pemohon / Tiket');
-        $response->assertDontSee('Rekap Kebutuhan per Jenis Barang');
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_rekapitulasi_permintaan_filtering_by_type(): void
@@ -117,7 +118,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         ]);
 
         // Filter type subdit
-        $responseSubdit = $this->actingAs($this->buUtami)
+        $responseSubdit = $this->actingAs($this->adminUser)
             ->get(route('rekapitulasi-permintaan.index', ['type' => 'subdit']));
 
         $responseSubdit->assertStatus(200);
@@ -125,7 +126,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $responseSubdit->assertDontSee('REQ-REKAP-001');
 
         // All items shown when unfiltered
-        $responseAll = $this->actingAs($this->buUtami)
+        $responseAll = $this->actingAs($this->adminUser)
             ->get(route('rekapitulasi-permintaan.index'));
 
         $responseAll->assertStatus(200);
@@ -612,7 +613,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
             'approved_quantity' => 50,
         ]);
 
-        $response = $this->actingAs($this->buUtami)->get(route('rekapitulasi-permintaan.index'));
+        $response = $this->actingAs($this->adminUser)->get(route('rekapitulasi-permintaan.index'));
         $response->assertStatus(200);
         $response->assertSee('Total Barang Diminta');
         $response->assertSee('Total Disetujui TU');

@@ -17,7 +17,11 @@ class RequestRecapController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        if (!$user || !in_array($user->role, ['kasubag_tu', 'admin'])) {
+        if ($user && $user->role === 'kasubag_tu') {
+            return redirect()->route('dashboard')->with('info', 'Menu Rekapitulasi Permintaan telah dinonaktifkan untuk akun Kasubbag TU.');
+        }
+
+        if (!$user || !in_array($user->role, ['admin'])) {
             return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki hak akses ke halaman Rekapitulasi Subbag TU.');
         }
 
