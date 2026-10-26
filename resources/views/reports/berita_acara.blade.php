@@ -243,11 +243,11 @@
             $kasubagNip = $kasubagUser->nip ?? '199812132025062010';
         @endphp
 
-        <!-- TANDA TANGAN TUNGGAL: KASUBAG TU -->
+        <!-- TANDA TANGAN TUNGGAL: KASUBBAG TU -->
         <div class="row justify-content-end text-center mt-5" style="font-size: 12px;">
             <div class="col-6">
                 <p class="mb-1">Mengetahui & Mengesahkan,</p>
-                <p class="text-muted small mb-0"><strong>Kasubag Tata Usaha (Pimpinan)</strong></p>
+                <p class="text-muted small mb-0"><strong>Kasubbag Tata Usaha (Pimpinan)</strong></p>
                 <div style="height: 65px;"></div>
                 <p class="mb-0 fw-bold"><u>{{ $kasubagName }}</u></p>
                 <small class="text-muted">NIP. {{ $kasubagNip }}</small>

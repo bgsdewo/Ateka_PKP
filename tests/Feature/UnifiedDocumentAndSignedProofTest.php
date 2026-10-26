@@ -30,7 +30,7 @@ class UnifiedDocumentAndSignedProofTest extends TestCase
 
         $this->kasubagTu = User::firstOrCreate(
             ['email' => 'utami_test_bundle@pkp.go.id'],
-            ['name' => 'Utami M.', 'position' => 'Kasubag TU', 'password' => bcrypt('password'), 'role' => 'kasubag_tu']
+            ['name' => 'Utami M.', 'position' => 'Kasubbag TU', 'password' => bcrypt('password'), 'role' => 'kasubag_tu']
         );
 
         $this->gudangUser = User::firstOrCreate(

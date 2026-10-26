@@ -21,7 +21,7 @@ class UserManagementTest extends TestCase
             ['email' => 'utami@gmail.com'],
             [
                 'name' => 'Utami M',
-                'position' => 'Kasubag TU',
+                'position' => 'Kasubbag TU',
                 'nip' => '19850612 201001 2 003',
                 'password' => bcrypt('password123'),
                 'role' => 'kasubag_tu',

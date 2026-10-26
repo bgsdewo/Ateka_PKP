@@ -20,7 +20,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $month = $request->get('month');
@@ -178,7 +178,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
+            return redirect()->back()->with('error', 'Hanya Kasubbag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
         }
 
         // Auto-detect category & code jika tidak diisi secara manual saat isi stok
@@ -334,7 +334,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $daftar_barang)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
+            return redirect()->back()->with('error', 'Hanya Kasubbag TU dan Pegawai Gudang yang memiliki hak akses untuk menambah atau mengubah data master barang.');
         }
 
         // Auto-fill category & code jika tidak dikirimkan saat isi stok barang eksisting
@@ -502,7 +502,7 @@ class ProductController extends Controller
     public function destroy(Product $daftar_barang)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->back()->with('error', 'Hanya Kasubag TU dan Pegawai Gudang yang memiliki hak akses untuk menghapus data master barang.');
+            return redirect()->back()->with('error', 'Hanya Kasubbag TU dan Pegawai Gudang yang memiliki hak akses untuk menghapus data master barang.');
         }
 
         DB::beginTransaction();

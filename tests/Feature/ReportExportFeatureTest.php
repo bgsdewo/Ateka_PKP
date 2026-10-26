@@ -25,7 +25,7 @@ class ReportExportFeatureTest extends TestCase
 
         $this->kasubagUser = User::firstOrCreate(
             ['email' => 'kasubag_export_test@gmail.com'],
-            ['name' => 'Utami M.', 'position' => 'Kasubag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu', 'nip' => '199812132025062010']
+            ['name' => 'Utami M.', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu', 'nip' => '199812132025062010']
         );
 
         $this->gudangUser = User::firstOrCreate(

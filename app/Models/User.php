@@ -208,7 +208,7 @@ class User extends Authenticatable
     public function getRoleTitleAttribute(): string
     {
         return match ($this->role) {
-            'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
+            'kasubag_tu', 'admin' => 'Kasubbag TU (Approver / Pimpinan)',
             'pic_distribusi' => 'PIC Unit / Subdirektorat',
             'pegawai_gudang' => 'Pegawai Gudang',
             'pegawai' => 'Pegawai',

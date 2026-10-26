@@ -70,7 +70,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-warning mb-0 fs-3">{{ number_format($totalReady) }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Telah disetujui Kasubag TU</small>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Telah disetujui Kasubbag TU</small>
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ class BarangMasukController extends Controller
     public function index(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Gudang hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Gudang hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $month = $request->get('month');

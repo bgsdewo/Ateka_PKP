@@ -85,7 +85,7 @@ class RequestController extends Controller
             'request_code' => $requestCode,
             'type' => $requestType,
             'is_procurement' => $requiresProcurement,
-            'status' => 'pending', // Menunggu persetujuan Kasubag TU
+            'status' => 'pending', // Menunggu persetujuan Kasubbag TU
             'notes' => $request->notes,
         ]);
 
@@ -108,8 +108,8 @@ class RequestController extends Controller
         }
 
         $successMsg = $requiresProcurement
-            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Karena terdapat barang dengan stok belum tersedia di gudang, pengajuan otomatis diarahkan ke alur pengadaan Kasubag TU.'
-            : 'Pengajuan permintaan ATK berhasil dikirim dan menunggu persetujuan Kasubag TU.';
+            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Karena terdapat barang dengan stok belum tersedia di gudang, pengajuan otomatis diarahkan ke alur pengadaan Kasubbag TU.'
+            : 'Pengajuan permintaan ATK berhasil dikirim dan menunggu persetujuan Kasubbag TU.';
 
         return redirect()->route('pengajuan.index')->with('success', $successMsg);
     }
@@ -164,7 +164,7 @@ class RequestController extends Controller
         ]);
 
         $unitName = $selectedUnit ?: 'Stok';
-        $successMsg = 'Pesanan barang "' . $product->name . '" sebanyak ' . $request->quantity . ' ' . $unitName . ' berhasil diajukan (' . $requestCode . ')! Permintaan telah otomatis diteruskan ke Kasubag TU untuk diproses tanpa perlu mengisi formulir pengadaan terpisah.';
+        $successMsg = 'Pesanan barang "' . $product->name . '" sebanyak ' . $request->quantity . ' ' . $unitName . ' berhasil diajukan (' . $requestCode . ')! Permintaan telah otomatis diteruskan ke Kasubbag TU untuk diproses tanpa perlu mengisi formulir pengadaan terpisah.';
 
         return redirect()->back()->with('success', $successMsg);
     }

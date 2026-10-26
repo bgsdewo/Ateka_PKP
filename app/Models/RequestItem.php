@@ -75,12 +75,12 @@ class RequestItem extends Model
      */
     public function scopeForPic($query, User $picUser)
     {
-        // Kasubag TU & Pegawai Gudang yang ditugaskan sebagai distributor mengelola seluruh permohonan distribusi fisik
+        // Kasubbag TU & Pegawai Gudang yang ditugaskan sebagai distributor mengelola seluruh permohonan distribusi fisik
         if ($picUser->isKasubagTU() || ($picUser->isPegawaiGudang() && $picUser->isDistributor())) {
             return $query;
         }
 
-        // Pegawai Gudang yang TIDAK ditugaskan oleh Kasubag TU tidak menerima antrean distribusi
+        // Pegawai Gudang yang TIDAK ditugaskan oleh Kasubbag TU tidak menerima antrean distribusi
         if ($picUser->isPegawaiGudang() && !$picUser->isDistributor()) {
             return $query->whereRaw('1 = 0');
         }
@@ -160,7 +160,7 @@ class RequestItem extends Model
                     ? (($this->relationLoaded('details') ? $this->details->where('is_fulfilled', false)->isEmpty() : $this->details()->where('is_fulfilled', false)->doesntExist())
                         ? 'Disetujui & Telah Dibeli (Tersedia)'
                         : 'Disetujui (Sebagian Tersedia di Katalog)')
-                    : 'Disetujui Kasubag TU')
+                    : 'Disetujui Kasubbag TU')
                 : 'Disetujui TU (Siap Diambil)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',

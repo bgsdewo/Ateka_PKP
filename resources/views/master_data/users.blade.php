@@ -80,7 +80,7 @@
                                                 default => 'bg-secondary text-white',
                                             };
                                             $roleLabel = match ($user->role) {
-                                                'kasubag_tu', 'admin' => 'Kasubag TU (Approver)',
+                                                'kasubag_tu', 'admin' => 'Kasubbag TU (Approver)',
                                                 'pic_distribusi' => 'PIC Subdirektorat (Pemohon)',
                                                 'pegawai_gudang' => 'Pegawai Gudang',
                                                 default => 'Pegawai (Individu)',
@@ -283,7 +283,7 @@
                                     Peran / Role <span class="text-danger">*</span>
                                 </label>
                                 <select name="role" id="role" class="form-select" required>
-                                    <option value="kasubag_tu">Kasubag TU (Approver / Pimpinan)</option>
+                                    <option value="kasubag_tu">Kasubbag TU (Approver / Pimpinan)</option>
                                     <option value="pic_distribusi">PIC Subdirektorat (Pemohon Kolektif)</option>
                                     <option value="pegawai_gudang">Pegawai Gudang</option>
                                     <option value="pegawai" selected>Pegawai</option>
@@ -576,7 +576,7 @@
                         $isDistributor.prop('checked', false);
                         $isReportExaminer.prop('checked', false);
                         if (roleVal === 'kasubag_tu' && !$position.val()) {
-                            $position.val('Kasubag TU');
+                            $position.val('Kasubbag TU');
                         }
                     }
 

@@ -17,7 +17,7 @@ class DistributionController extends Controller
     public function index(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Distribusi Barang hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $filterType = $request->get('type'); // individu, subdit, or null
@@ -118,7 +118,7 @@ class DistributionController extends Controller
 
         $requests = $query->paginate(15)->withQueryString();
 
-        // Akun Pegawai Gudang yang ditunjuk Kasubag TU sebagai Petugas Distribusi resmi
+        // Akun Pegawai Gudang yang ditunjuk Kasubbag TU sebagai Petugas Distribusi resmi
         $defaultDistributor = \App\Models\User::where('role', 'pegawai_gudang')
             ->where('is_distributor', true)
             ->where('name', '!=', 'tes')
@@ -164,7 +164,7 @@ class DistributionController extends Controller
         $isAuthorizedDistributor = $authUser && ($authUser->isKasubagTU() || ($authUser->isPegawaiGudang() && $authUser->isDistributor()));
 
         if (!$isAuthorizedDistributor) {
-            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubag TU.');
+            return redirect()->route('dashboard')->with('error', 'Aksi penyerahan barang hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubbag TU.');
         }
 
         $requestItem = RequestItem::with(['user', 'details.product'])
@@ -230,7 +230,7 @@ class DistributionController extends Controller
         $isAuthorizedDistributor = $authUser && ($authUser->isKasubagTU() || ($authUser->isPegawaiGudang() && $authUser->isDistributor()));
 
         if (!$isAuthorizedDistributor) {
-            return redirect()->route('dashboard')->with('error', 'Aksi upload foto bukti penyerahan hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubag TU.');
+            return redirect()->route('dashboard')->with('error', 'Aksi upload foto bukti penyerahan hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubbag TU.');
         }
 
         $requestItem = RequestItem::where(function ($q) {
@@ -278,7 +278,7 @@ class DistributionController extends Controller
             })
             ->findOrFail($id);
 
-        // Validasi hak akses menyeluruh (Kasubag TU, Petugas Gudang Distributor, Pemohon bersangkutan, atau PIC penanggung jawab)
+        // Validasi hak akses menyeluruh (Kasubbag TU, Petugas Gudang Distributor, Pemohon bersangkutan, atau PIC penanggung jawab)
         $canAccess = $currentUser && (
             $currentUser->isKasubagTU()
             || ($currentUser->isPegawaiGudang() && $currentUser->isDistributor())

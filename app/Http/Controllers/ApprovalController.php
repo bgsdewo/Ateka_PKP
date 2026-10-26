@@ -17,7 +17,7 @@ class ApprovalController extends Controller
     public function index(Request $request)
     {
         if (!auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Verifikasi & Persetujuan hanya dapat diakses oleh Kasubag TU.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Verifikasi & Persetujuan hanya dapat diakses oleh Kasubbag TU.');
         }
 
         $category = $request->get('category'); // 'pengadaan' or 'persediaan' or null
@@ -116,7 +116,7 @@ class ApprovalController extends Controller
     public function updateStatus(Request $request, $id)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki wewenang untuk memverifikasi atau menyetujui permohonan ATK.');
+            abort(403, 'Akses ditolak: Hanya Kasubbag TU yang memiliki wewenang untuk memverifikasi atau menyetujui permohonan ATK.');
         }
 
         $item = RequestItem::with('details.product', 'user')->findOrFail($id);
@@ -220,7 +220,7 @@ class ApprovalController extends Controller
                     }
 
                     // Jika pengadaan barang: jangan tambahkan stok otomatis.
-                    // Stok baru akan diisi oleh Kasubag TU atau Pegawai Gudang melalui menu Daftar Barang (Master Data) atau Barang Masuk setelah barang fisik dibeli.
+                    // Stok baru akan diisi oleh Kasubbag TU atau Pegawai Gudang melalui menu Daftar Barang (Master Data) atau Barang Masuk setelah barang fisik dibeli.
                     if ($item->is_procurement) {
                         if (!$detail->product_id) {
                             $itemName = $detail->custom_product_name ?: $detail->item_name;
@@ -251,7 +251,7 @@ class ApprovalController extends Controller
                                 UserNotification::create([
                                     'user_id'    => $item->user_id,
                                     'title'      => 'Usulan Pengadaan Disetujui',
-                                    'message'    => "Usulan pengadaan \"{$itemName}\" telah disetujui Kasubag TU sebanyak {$d->approved_quantity} {$itemUnit}. Barang sedang dalam proses pembelian oleh Subbag TU & Gudang.",
+                                    'message'    => "Usulan pengadaan \"{$itemName}\" telah disetujui Kasubbag TU sebanyak {$d->approved_quantity} {$itemUnit}. Barang sedang dalam proses pembelian oleh Subbag TU & Gudang.",
                                     'type'       => 'procurement_approved',
                                     'icon'       => 'shopping-bag',
                                     'link'       => route('pengajuan.index'),
@@ -267,7 +267,7 @@ class ApprovalController extends Controller
                             }
                         }
                     }
-                    $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubag TU / Pegawai Gudang.';
+                    $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubbag TU / Pegawai Gudang.';
                 } else {
                     $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
                 }
@@ -303,12 +303,12 @@ class ApprovalController extends Controller
     }
 
     /**
-     * Pembelian / Pengadaan Barang Masuk Sesuai Permintaan Pegawai/Subdit (Kasubag TU)
+     * Pembelian / Pengadaan Barang Masuk Sesuai Permintaan Pegawai/Subdit (Kasubbag TU)
      */
     public function procureAndApprove(Request $request, $id)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki wewenang untuk melakukan pengadaan barang.');
+            abort(403, 'Akses ditolak: Hanya Kasubbag TU yang memiliki wewenang untuk melakukan pengadaan barang.');
         }
 
         $item = RequestItem::with('details.product', 'user')->findOrFail($id);
@@ -364,7 +364,7 @@ class ApprovalController extends Controller
 
                 $totalCost += ($price * $procureQty);
 
-                // 1. Catat Transaksi Masuk (Barang Masuk Hasil Pembelian Kasubag TU)
+                // 1. Catat Transaksi Masuk (Barang Masuk Hasil Pembelian Kasubbag TU)
                 $stockAfterIn = $product->stock + $procureQty;
                 StockTransaction::create([
                     'product_id'       => $product->id,
@@ -423,7 +423,7 @@ class ApprovalController extends Controller
                 'purchase_date'       => $request->purchase_date,
                 'purchase_price'      => $totalCost,
                 'purchase_notes'      => $request->purchase_notes,
-                'verification_notes'  => 'Barang telah dibeli oleh Kasubag TU (Faktur: ' . $request->no_faktur . ') dan siap diserahterimakan.',
+                'verification_notes'  => 'Barang telah dibeli oleh Kasubbag TU (Faktur: ' . $request->no_faktur . ') dan siap diserahterimakan.',
                 'rejection_reason'    => null,
             ]);
 

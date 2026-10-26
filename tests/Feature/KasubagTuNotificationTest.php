@@ -24,7 +24,7 @@ class KasubagTuNotificationTest extends TestCase
 
         $this->kasubagTu = User::firstOrCreate(
             ['email' => 'utami@gmail.com'],
-            ['name' => 'Utami M', 'position' => 'Kasubag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
+            ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
         );
 
         $this->pegawai = User::firstOrCreate(

@@ -23,11 +23,11 @@ class SecurityHardeningTest extends TestCase
         parent::setUp();
 
         $this->kasubag = User::create([
-            'name' => 'Kasubag TU Security Test',
+            'name' => 'Kasubbag TU Security Test',
             'email' => 'kasubag_sec@perumahan.go.id',
             'nip' => '19850101 201001 1 001',
             'role' => 'kasubag_tu',
-            'position' => 'Kasubag TU',
+            'position' => 'Kasubbag TU',
             'password' => Hash::make('password123'),
         ]);
 

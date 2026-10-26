@@ -48,7 +48,7 @@
                         return $first;
                     })->values()->take(5);
 
-                    // Khusus Kasubag TU: Ringkasan & Antrean Verifikasi Prioritas
+                    // Khusus Kasubbag TU: Ringkasan & Antrean Verifikasi Prioritas
                     $pendingVerifications = collect();
                     $totalPendingVerifikasi = 0;
                     $pendingProcurementCount = 0;
@@ -175,7 +175,7 @@
                             @endif
                         </div>
 
-                        {{-- Card Ringkasan Khusus Kasubag TU --}}
+                        {{-- Card Ringkasan Khusus Kasubbag TU --}}
                         @if($isKasubagTU && $totalPendingVerifikasi > 0)
                             <div class="p-2.5 m-2.5 mb-1 rounded-3 border" style="background: #f8fafc;">
                                 <div class="d-flex align-items-center justify-content-between mb-1.5">
@@ -184,7 +184,7 @@
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <polyline points="12 6 12 12 16 14"></polyline>
                                         </svg>
-                                        Antrean Verifikasi Kasubag TU
+                                        Antrean Verifikasi Kasubbag TU
                                     </span>
                                     <span class="badge bg-primary text-white rounded-pill px-2" style="font-size: 0.65rem;">{{ $totalPendingVerifikasi }} Antrean</span>
                                 </div>
@@ -224,7 +224,7 @@
                         @endif
 
                         <div class="list-group list-group-flush overflow-auto" id="nav-notif-list" style="max-height: 360px;">
-                            {{-- Item Verifikasi Pending untuk Kasubag TU --}}
+                            {{-- Item Verifikasi Pending untuk Kasubbag TU --}}
                             @foreach($pendingVerifications as $pv)
                                 <a href="{{ $pv->link }}" class="list-group-item list-group-item-action p-2.5 notif-item bg-light border-start border-warning border-4">
                                     <div class="d-flex align-items-start gap-2">
@@ -384,7 +384,7 @@
                                         default => 'bg-secondary text-white',
                                     };
                                     $roleTitle = match ($userRole) {
-                                        'kasubag_tu', 'admin' => 'Kasubag TU',
+                                        'kasubag_tu', 'admin' => 'Kasubbag TU',
                                         'pic_distribusi' => 'PIC Distribusi',
                                         'pegawai_gudang' => 'Pegawai Gudang',
                                         default => 'Pegawai',

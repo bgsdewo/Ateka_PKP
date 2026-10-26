@@ -8,13 +8,13 @@
     $examinerNip = $examinerUser && $examinerUser->nip ? $examinerUser->nip : '-';
     $examinerTitle = 'Petugas Pemeriksa Laporan';
 
-    // 2. Kolom Menyetujui: Kasubag TU
+    // 2. Kolom Menyetujui: Kasubbag TU
     $kasubagUser = \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
     $kasubagName = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
     $kasubagNip = $kasubagUser->nip ?? '19850612 201001 2 003';
-    $kasubagTitle = 'Kasubag Tata Usaha';
+    $kasubagTitle = 'Kasubbag Tata Usaha';
 
-    // 3. Kolom Mengetahui: Kasubag TU / Kepala Bagian
+    // 3. Kolom Mengetahui: Kasubbag TU / Kepala Bagian
     $pimpinanUser = \App\Models\User::where(function($q) use ($kasubagUser) {
         $q->where('position', 'like', '%Kepala Bagian%')
           ->orWhere('position', 'like', '%Kabag%')

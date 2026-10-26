@@ -68,13 +68,13 @@
         @php
             $role = $user->role ?? 'pegawai';
             $roleLabel = match ($role) {
-                'kasubag_tu', 'admin' => 'Kasubag TU',
+                'kasubag_tu', 'admin' => 'Kasubbag TU',
                 'pic_distribusi' => 'PIC Distribusi',
                 'pegawai_gudang' => 'Pegawai Gudang',
                 default => 'Pegawai',
             };
             $roleSubtitle = match ($role) {
-                'kasubag_tu', 'admin' => $user->position ?: 'Kasubag TU (Approver)',
+                'kasubag_tu', 'admin' => $user->position ?: 'Kasubbag TU (Approver)',
                 'pic_distribusi' => $user->position ?: ('PIC Distribusi' . ($user->subdit_name ? ' - ' . $user->subdit_name : '')),
                 'pegawai_gudang' => $user->position ?: 'Pegawai Gudang',
                 default => $user->position ?: 'Pegawai',

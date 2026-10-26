@@ -345,7 +345,7 @@
                                 </div>
                                 <div>
                                     <h5 class="modal-title fw-bold text-dark mb-0" id="modalPesanKatalogLabel">Pesan Barang ATK (Stok Belum Tersedia)</h5>
-                                    <small class="text-dark-50" style="font-size: 0.78rem;">Pemesanan otomatis diteruskan ke Kasubag TU untuk pengadaan</small>
+                                    <small class="text-dark-50" style="font-size: 0.78rem;">Pemesanan otomatis diteruskan ke Kasubbag TU untuk pengadaan</small>
                                 </div>
                             </div>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

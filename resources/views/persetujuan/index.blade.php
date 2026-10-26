@@ -91,7 +91,7 @@
             </div>
         @endif
 
-        {{-- 4 Kartu KPI Kasubag TU --}}
+        {{-- 4 Kartu KPI Kasubbag TU --}}
         <div class="row g-3 mb-4" id="approval-metrics">
             <div class="col-6 col-md-3">
                 <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
@@ -341,7 +341,7 @@
                                         <th>Pemohon / Unit Kerja</th>
                                         <th>Rincian Barang & Keperluan</th>
                                         <th>Status</th>
-                                        <th class="text-end">Aksi Kasubag TU</th>
+                                        <th class="text-end">Aksi Kasubbag TU</th>
                                     </tr>
                                 </thead>
                                 <tbody id="persetujuan-table-body">
@@ -590,7 +590,7 @@
                                             <td class="text-end" style="vertical-align: middle; white-space: nowrap;">
                                                 @if ($req->status == 'pending')
                                                     <div class="d-flex justify-content-end gap-1 flex-nowrap">
-                                                        <!-- Tombol Setujui (Kasubag TU) -->
+                                                        <!-- Tombol Setujui (Kasubbag TU) -->
                                                         <button type="button"
                                                             class="btn btn-success btn-sm d-inline-flex align-items-center gap-1 px-2 py-1 shadow-sm"
                                                             style="font-size: 0.72rem;"
@@ -622,7 +622,7 @@
                                                         </button>
                                                     </div>
 
-                                                    <!-- Modal Konfirmasi Persetujuan Kasubag TU -->
+                                                    <!-- Modal Konfirmasi Persetujuan Kasubbag TU -->
                                                     <div class="modal fade text-start"
                                                         id="approveModal{{ $req->id }}" tabindex="-1"
                                                         aria-hidden="true">
@@ -787,10 +787,10 @@
                                                                             </svg>
                                                                             <div style="font-size: 0.8rem;">
                                                                                 @if ($req->is_procurement)
-                                                                                    <div>1. Menyetujui usulan ini menandakan bahwa barang disetujui untuk diproses pembelian oleh Kasubag TU secara offline.</div>
-                                                                                    <div>2. Setelah barang dibeli offline, Kasubag TU menambahkan stok di <strong>Master Data &rarr; Daftar Barang ATK</strong>.</div>
+                                                                                    <div>1. Menyetujui usulan ini menandakan bahwa barang disetujui untuk diproses pembelian oleh Kasubbag TU secara offline.</div>
+                                                                                    <div>2. Setelah barang dibeli offline, Kasubbag TU menambahkan stok di <strong>Master Data &rarr; Daftar Barang ATK</strong>.</div>
                                                                                 @else
-                                                                                    <div>1. Menyetujui permintaan ini akan <strong>mengurangi stok gudang secara real-time</strong> sesuai kuantitas yang disetujui Kasubag TU.</div>
+                                                                                    <div>1. Menyetujui permintaan ini akan <strong>mengurangi stok gudang secara real-time</strong> sesuai kuantitas yang disetujui Kasubbag TU.</div>
                                                                                     <div>2. Data transaksi akan <strong>langsung tercatat di Barang Keluar</strong> dan valuasi persediaan otomatis berkurang.</div>
                                                                                     <div>3. Tiket ini selanjutnya siap diserahkan fisiknya oleh <strong>PIC Distribusi</strong>.</div>
                                                                                 @endif
@@ -863,7 +863,7 @@
                                                         </button>
                                                     </div>
 
-                                                    {{-- Modal Detail Permintaan / Pengadaan Kasubag TU --}}
+                                                    {{-- Modal Detail Permintaan / Pengadaan Kasubbag TU --}}
                                                     <div class="modal fade text-start" id="detailModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                                         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                                             <div class="modal-content d-flex flex-column h-100 overflow-hidden">
@@ -907,7 +907,7 @@
                                                                                     <th style="width: 5%;">No</th>
                                                                                     <th>Nama Barang</th>
                                                                                     <th style="width: 20%;" class="text-center">Diminta</th>
-                                                                                    <th style="width: 25%;" class="text-center">Disetujui Kasubag TU</th>
+                                                                                    <th style="width: 25%;" class="text-center">Disetujui Kasubbag TU</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
@@ -945,7 +945,7 @@
                                                                         </table>
                                                                     </div>
 
-                                                                    {{-- Catatan Pemohon & Kasubag TU --}}
+                                                                    {{-- Catatan Pemohon & Kasubbag TU --}}
                                                                     <div class="row g-2 mb-2">
                                                                         <div class="col-md-6">
                                                                             <div class="p-2.5 rounded bg-light border h-100">
@@ -955,7 +955,7 @@
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <div class="p-2.5 rounded bg-light border h-100">
-                                                                                <small class="text-muted fw-bold d-block mb-1">Catatan Verifikasi Kasubag TU:</small>
+                                                                                <small class="text-muted fw-bold d-block mb-1">Catatan Verifikasi Kasubbag TU:</small>
                                                                                 <span class="text-dark small">{{ $req->verification_notes ?: ($req->rejection_reason ?: '-') }}</span>
                                                                             </div>
                                                                         </div>
@@ -1014,7 +1014,7 @@
                                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                             </div>
                                                             <div class="modal-body p-4 overflow-y-auto">
-                                                                {{-- Banner Edukasi / Kontrol Kasubag TU --}}
+                                                                {{-- Banner Edukasi / Kontrol Kasubbag TU --}}
                                                                 <div class="alert alert-info py-2 px-3 small mb-3 border-0 rounded-3 d-flex align-items-center gap-2" style="background: #e0f2fe; border-left: 4px solid #0284c7 !important;">
                                                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info flex-shrink-0">
                                                                         <circle cx="12" cy="12" r="10"></circle>
@@ -1260,7 +1260,7 @@
                                                                                             <th width="4%">No</th>
                                                                                             <th>Kode Usulan &amp; Tanggal</th>
                                                                                             <th>Rincian Barang yang Diminta</th>
-                                                                                            <th>Status Kasubag TU</th>
+                                                                                            <th>Status Kasubbag TU</th>
                                                                                             <th>Informasi Faktur / Pembelian</th>
                                                                                             <th>Catatan Pemohon &amp; TU</th>
                                                                                         </tr>

@@ -146,10 +146,10 @@ class AuthController extends Controller
                 ->with('error', 'Kombinasi NIP dan Email dinas tidak sesuai dengan data pengguna manapun.');
         }
 
-        // KEAMANAN TINGKAT TINGGI: Akun Administrator / Kasubag TU dilarang reset mandiri melalui formulir publik
+        // KEAMANAN TINGKAT TINGGI: Akun Administrator / Kasubbag TU dilarang reset mandiri melalui formulir publik
         if ($user->isKasubagTU() || $user->isAdmin()) {
             return back()->withInput($request->only('nip', 'email'))
-                ->with('error', 'Demi perlindungan keamanan sistem instansi, akun Administrator / Kasubag TU tidak dapat direset melalui formulir publik. Silakan hubungi admin server internal.');
+                ->with('error', 'Demi perlindungan keamanan sistem instansi, akun Administrator / Kasubbag TU tidak dapat direset melalui formulir publik. Silakan hubungi admin server internal.');
         }
 
         $user->password = \Illuminate\Support\Facades\Hash::make($request->password);

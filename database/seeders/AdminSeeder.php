@@ -11,12 +11,12 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Role: Kasubag TU (Approver & Procurement)
+        // 1. Role: Kasubbag TU (Approver & Procurement)
         User::updateOrCreate(
             ['email' => 'utami@gmail.com'],
             [
                 'name' => 'Utami M',
-                'position' => 'Kasubag TU',
+                'position' => 'Kasubbag TU',
                 'nip' => '19850612 201001 2 003',
                 'subdit_name' => 'Subbagian Tata Usaha',
                 'password' => Hash::make('password123'),
@@ -25,7 +25,7 @@ class AdminSeeder extends Seeder
         );
 
         // Akun-akun dummy sebelumnya dinonaktifkan karena sistem beralih ke data asli pengguna.
-        // Hanya akun Kasubag TU yang dipertahankan.
+        // Hanya akun Kasubbag TU yang dipertahankan.
         /*
         // 2. Role: PIC Distribusi (4 Petugas PIC Distribusi Unit/Divisi)
         // 3A. PIC Distribusi SDK - Fairuz Armina Nur Azizah, S.T.

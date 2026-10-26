@@ -27,7 +27,7 @@ class PicDivisionDistributionTest extends TestCase
 
         $this->kasubagTu = User::firstOrCreate(
             ['email' => 'test_kasubag_div@pkp.com'],
-            ['name' => 'Utami M', 'position' => 'Kasubag TU', 'subdit_name' => 'Subbagian Tata Usaha', 'password' => bcrypt('secret'), 'role' => 'kasubag_tu']
+            ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'subdit_name' => 'Subbagian Tata Usaha', 'password' => bcrypt('secret'), 'role' => 'kasubag_tu']
         );
 
         $this->picSdk = User::firstOrCreate(
@@ -199,6 +199,7 @@ class PicDivisionDistributionTest extends TestCase
         $pemohonBuktiResponse->assertStatus(200);
         $pemohonBuktiResponse->assertSee('Bukti Foto Penyerahan Barang (PIC)');
         $pemohonBuktiResponse->assertSee($reqSdk->distribution_proof_url);
+        $pemohonBuktiResponse->assertDontSee('Kasubbag Tata Usaha');
         $pemohonBuktiResponse->assertDontSee('Kasubag Tata Usaha');
     }
 

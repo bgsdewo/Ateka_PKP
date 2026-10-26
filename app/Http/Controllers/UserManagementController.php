@@ -13,7 +13,7 @@ class UserManagementController extends Controller
     public function index()
     {
         if (!auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Manajemen Pengguna hanya dapat diakses oleh Kasubag TU.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Manajemen Pengguna hanya dapat diakses oleh Kasubbag TU.');
         }
 
         $users = User::orderBy('name', 'asc')->get();
@@ -24,7 +24,7 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk menambah pengguna.');
+            abort(403, 'Akses ditolak: Hanya Kasubbag TU yang memiliki hak akses untuk menambah pengguna.');
         }
 
         $request->validate([
@@ -72,7 +72,7 @@ class UserManagementController extends Controller
                 $subditName = 'Subbagian Tata Usaha';
             }
         } elseif ($request->role === 'kasubag_tu') {
-            $position = $position ?: 'Kasubag TU';
+            $position = $position ?: 'Kasubbag TU';
             $subditName = 'Subbagian Tata Usaha';
         } elseif ($request->role === 'pegawai_gudang') {
             $isDistributor = $request->boolean('is_distributor');
@@ -105,10 +105,10 @@ class UserManagementController extends Controller
     public function update(Request $request, User $manajemen_pengguna)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk mengubah data pengguna.');
+            abort(403, 'Akses ditolak: Hanya Kasubbag TU yang memiliki hak akses untuk mengubah data pengguna.');
         }
 
-        // Mencegah Kasubag TU menurunkan role akunnya sendiri yang dapat menyebabkan terkunci dari sistem
+        // Mencegah Kasubbag TU menurunkan role akunnya sendiri yang dapat menyebabkan terkunci dari sistem
         if (Auth::id() === $manajemen_pengguna->id && $request->role !== $manajemen_pengguna->role) {
             return redirect()->back()
                 ->with('error', 'Anda tidak dapat mengubah role akun Anda sendiri untuk mencegah kehilangan hak akses administrasi.');
@@ -192,7 +192,7 @@ class UserManagementController extends Controller
     public function destroy(User $manajemen_pengguna)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            abort(403, 'Akses ditolak: Hanya Kasubag TU yang memiliki hak akses untuk menghapus pengguna.');
+            abort(403, 'Akses ditolak: Hanya Kasubbag TU yang memiliki hak akses untuk menghapus pengguna.');
         }
 
         if (Auth::id() === $manajemen_pengguna->id) {

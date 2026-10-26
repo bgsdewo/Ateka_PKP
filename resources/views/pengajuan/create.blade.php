@@ -281,7 +281,7 @@
                                     Batal
                                 </a>
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    Kirim Pengajuan ke Kasubag TU
+                                    Kirim Pengajuan ke Kasubbag TU
                                 </button>
                             </div>
                         </form>
@@ -409,9 +409,9 @@
                             if (qtyInput) qtyInput.removeAttribute('max');
 
                             if (p.stock > 0) {
-                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubag TU.`;
+                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubbag TU.`;
                             } else {
-                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini akan otomatis diproses pengadaan oleh Kasubag TU.`;
+                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini akan otomatis diproses pengadaan oleh Kasubbag TU.`;
                             }
                         } else {
                             if (prodHidden) prodHidden.value = '';

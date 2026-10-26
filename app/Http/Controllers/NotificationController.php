@@ -32,7 +32,7 @@ class NotificationController extends Controller
         ];
 
         if ($isKasubagTU) {
-            // 1. Permintaan Pending yang Memerlukan Verifikasi Kasubag TU
+            // 1. Permintaan Pending yang Memerlukan Verifikasi Kasubbag TU
             $pendingQuery = RequestItem::where('status', 'pending')
                 ->with(['user', 'details.product']);
 
@@ -96,7 +96,7 @@ class NotificationController extends Controller
                 ]);
             }
 
-            // 2. Riwayat Keputusan Verifikasi Kasubag TU (Approved / Rejected)
+            // 2. Riwayat Keputusan Verifikasi Kasubbag TU (Approved / Rejected)
             $historyRequests = RequestItem::whereIn('status', ['approved', 'rejected'])
                 ->with(['user', 'details.product'])
                 ->latest('updated_at')
@@ -123,7 +123,7 @@ class NotificationController extends Controller
                     'request_id' => $req->id,
                     'request_code' => $req->request_code,
                     'title' => ($req->is_procurement ? 'Pengadaan: ' : 'Persediaan: ') . $itemName . ' (' . ($isApproved ? 'Disetujui' : 'Ditolak') . ')',
-                    'message' => 'Permintaan dari ' . $pemohonName . ' (' . $unitKerja . ') telah selesai diverifikasi oleh Kasubag TU.',
+                    'message' => 'Permintaan dari ' . $pemohonName . ' (' . $unitKerja . ') telah selesai diverifikasi oleh Kasubbag TU.',
                     'type' => $isApproved ? 'approved' : 'rejected',
                     'category' => 'history',
                     'badge_label' => $req->is_procurement ? 'Pengadaan' : 'Persediaan',
@@ -172,7 +172,7 @@ class NotificationController extends Controller
                     'request_id' => $req->id,
                     'request_code' => $req->request_code,
                     'title' => 'Barang Siap Diserahkan ke Pemohon: ' . $itemName,
-                    'message' => 'Permintaan barang dari ' . $pemohonName . ' (' . $unitKerja . ') telah disetujui Kasubag TU dan siap diserahterimakan fisiknya.',
+                    'message' => 'Permintaan barang dari ' . $pemohonName . ' (' . $unitKerja . ') telah disetujui Kasubbag TU dan siap diserahterimakan fisiknya.',
                     'type' => 'ready_distribution',
                     'category' => 'ready',
                     'badge_label' => $req->type === 'subdit' ? 'Kolektif Subdit' : 'Perorangan Pegawai',

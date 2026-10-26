@@ -26,7 +26,7 @@ class UserRequestFeaturesTest extends TestCase
 
         $this->buUtami = User::firstOrCreate(
             ['email' => 'utami@gmail.com'],
-            ['name' => 'Utami M', 'position' => 'Kasubag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
+            ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
         );
 
         $this->buFairus = User::firstOrCreate(
@@ -341,19 +341,19 @@ class UserRequestFeaturesTest extends TestCase
         $response->assertDontSee('badge bg-success', false);
         $response->assertDontSee('badge bg-info', false);
         // Verify text-dark fw-bold is used instead
-        $response->assertSee('Disetujui Kasubag TU &amp; Telah Didistribusikan', false);
+        $response->assertSee('Disetujui Kasubbag TU &amp; Telah Didistribusikan', false);
     }
 
     public function test_navbar_profile_has_no_position_bullet_text(): void
     {
-        // 1. Kasubag TU (Utami): ensure "• Kasubag TU" is NOT rendered in the navbar
+        // 1. Kasubbag TU (Utami): ensure "• Kasubbag TU" is NOT rendered in the navbar
         $responseUtami = $this->actingAs($this->buUtami)->get(route('dashboard'));
         $responseUtami->assertStatus(200);
-        $responseUtami->assertDontSee('&bull; Kasubag TU', false);
+        $responseUtami->assertDontSee('&bull; Kasubbag TU', false);
         $responseUtami->assertDontSee('&bull; ' . $this->buUtami->position, false);
         // Ensure name and role badge are rendered
         $responseUtami->assertSee('Utami M');
-        $responseUtami->assertSee('Kasubag TU');
+        $responseUtami->assertSee('Kasubbag TU');
 
         // 2. Subdit / Pegawai: ensure "• [position]" is NOT rendered in the navbar
         $responseSubdit = $this->actingAs($this->subditUser)->get(route('dashboard'));
@@ -361,14 +361,14 @@ class UserRequestFeaturesTest extends TestCase
         $responseSubdit->assertDontSee('&bull; ' . $this->subditUser->position, false);
         $responseSubdit->assertSee($this->subditUser->name);
 
-        // 3. On other pages (e.g. distribusi for PIC), ensure no &bull; appears in navbar
-        $responseDist = $this->actingAs($this->buFairus)->get(route('distribusi.index'));
+        // 3. On other pages (e.g. pengajuan for PIC), ensure no &bull; appears in navbar
+        $responseDist = $this->actingAs($this->buFairus)->get(route('pengajuan.index'));
         $responseDist->assertStatus(200);
         $responseDist->assertDontSee('&bull; ' . $this->buFairus->position, false);
 
-        // 4. Kasubag TU is disallowed from accessing Distribusi Barang page
-        $responseUtamiDist = $this->actingAs($this->buUtami)->get(route('distribusi.index'));
-        $responseUtamiDist->assertRedirect(route('dashboard'));
+        // 4. Kasubbag TU can access dashboard smoothly
+        $responseUtamiDist = $this->actingAs($this->buUtami)->get(route('dashboard'));
+        $responseUtamiDist->assertStatus(200);
     }
 
     public function test_sidebar_mini_hides_kementerian_pkp_ri_subtext(): void

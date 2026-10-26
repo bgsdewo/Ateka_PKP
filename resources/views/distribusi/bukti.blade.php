@@ -179,7 +179,7 @@
             $teamName = 'TIM ' . strtoupper($requesterUser->position ?? 'SUBDIT');
         }
 
-        // Kasubag TU resmi
+        // Kasubbag TU resmi
         $kasubagUser = $requestItem->verifier ?? \App\Models\User::whereIn('role', ['kasubag_tu', 'admin'])->first();
         $namaKasubag = $kasubagUser ? ($kasubagUser->name_with_title ?: $kasubagUser->name) : 'Utami M.';
         $nipKasubag = $kasubagUser ? $kasubagUser->nip : null;
@@ -438,9 +438,9 @@
                 <td>:</td>
                 <td>
                     @if ($requestItem->status === 'distributed')
-                        <span class="fw-bold text-dark">Disetujui Kasubag TU &amp; Telah Didistribusikan</span>
+                        <span class="fw-bold text-dark">Disetujui Kasubbag TU &amp; Telah Didistribusikan</span>
                     @else
-                        <span class="fw-bold text-dark">Disetujui Kasubag TU (Siap Diserahkan)</span>
+                        <span class="fw-bold text-dark">Disetujui Kasubbag TU (Siap Diserahkan)</span>
                     @endif
                 </td>
             </tr>
@@ -521,10 +521,10 @@
                     <td style="width: 25%; border: none;"></td>
                     <td style="width: 50%; border: none; vertical-align: top; text-align: center;">
                         <p class="mb-1" style="margin-bottom: 4px;">Mengetahui &amp; Menyetujui,</p>
-                        <p class="text-muted small mb-0" style="margin-bottom: 0;">Kasubag Tata Usaha</p>
+                        <p class="text-muted small mb-0" style="margin-bottom: 0;">Kasubbag Tata Usaha</p>
                         <div style="height: 55px;"></div>
                         <p class="mb-0 fw-bold" style="margin-bottom: 0;"><u>{{ $namaKasubag }}</u></p>
-                        <small class="text-muted d-block">Kasubag Tata Usaha</small>
+                        <small class="text-muted d-block">Kasubbag Tata Usaha</small>
                         @if(!empty($nipKasubag))
                             <small class="text-muted d-block">NIP. {{ $nipKasubag }}</small>
                         @endif

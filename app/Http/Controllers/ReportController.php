@@ -18,7 +18,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Laporan & Arsip hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Laporan & Arsip hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $type = $request->type;
@@ -123,7 +123,7 @@ class ReportController extends Controller
     public function rekapitulasi(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Rekapitulasi Laporan hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Rekapitulasi Laporan hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $year = $request->get('year', date('Y'));
@@ -271,7 +271,7 @@ class ReportController extends Controller
     public function beritaAcara(Request $request)
     {
         if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Berita Acara hanya dapat diakses oleh Kasubag TU dan Pegawai Gudang.');
+            return redirect()->route('dashboard')->with('error', 'Halaman Berita Acara hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $year = $request->get('year', date('Y'));

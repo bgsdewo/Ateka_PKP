@@ -103,7 +103,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-dark mb-0 fs-3">{{ $countPending }}</h2>
-                        <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubag TU</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubbag TU</small>
                     </div>
                 </div>
             </div>

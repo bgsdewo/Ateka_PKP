@@ -17,7 +17,7 @@
     };
 
     $roleTitle = match ($role) {
-        'kasubag_tu', 'admin' => 'Kasubag TU (Approver / Pimpinan)',
+        'kasubag_tu', 'admin' => 'Kasubbag TU (Approver / Pimpinan)',
         'pic_distribusi' => 'PIC Distribusi',
         'pegawai_gudang' => 'Pegawai Gudang',
         default => 'Pegawai',
@@ -357,7 +357,7 @@
                                     // Step 1: Usulan Diajukan
                                     $s1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
 
-                                    // Step 2: Verifikasi Kasubag TU
+                                    // Step 2: Verifikasi Kasubbag TU
                                     if ($status === 'pending') {
                                         $s2Class = 'step-current';
                                     } elseif ($status === 'rejected') {
@@ -384,7 +384,7 @@
                                     // Step 1: Pengajuan Dibuat
                                     $s1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
 
-                                    // Step 2: Verifikasi Kasubag TU
+                                    // Step 2: Verifikasi Kasubbag TU
                                     if ($status === 'pending') {
                                         $s2Class = 'step-current';
                                     } elseif ($status === 'rejected') {
@@ -463,7 +463,7 @@
                                             // Step 1: Usulan Diajukan
                                             $itemS1Class = ($status === 'pending') ? 'step-done line-completed' : (($status === 'rejected') ? 'step-done line-rejected' : 'step-done line-completed');
 
-                                            // Step 2: Verifikasi Kasubag TU
+                                            // Step 2: Verifikasi Kasubbag TU
                                             if ($status === 'pending') {
                                                 $itemS2Class = 'step-current';
                                             } elseif ($status === 'rejected') {
@@ -507,9 +507,9 @@
                                             <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
                                                 @if($tReq->is_procurement)
                                                     @if($status === 'rejected')
-                                                        <span class="badge bg-danger text-white">Ditolak Kasubag TU</span>
+                                                        <span class="badge bg-danger text-white">Ditolak Kasubbag TU</span>
                                                     @elseif($status === 'pending')
-                                                        <span class="badge bg-warning text-dark">Menunggu Review Kasubag TU</span>
+                                                        <span class="badge bg-warning text-dark">Menunggu Review Kasubbag TU</span>
                                                     @elseif($dFulfilled)
                                                         <span class="badge bg-success text-white py-1 px-2.5 d-inline-flex align-items-center gap-1 shadow-xs" style="font-size: 0.78rem;">
                                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -580,7 +580,7 @@
                                                 <div class="atk-step-time">{{ $tReq->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB</div>
                                             </div>
 
-                                            {{-- STEP 2: Verifikasi Kasubag TU --}}
+                                            {{-- STEP 2: Verifikasi Kasubbag TU --}}
                                             <div class="atk-stepper-item {{ $itemS2Class }}">
                                                 <div class="atk-step-circle">
                                                     @if($status === 'rejected')
@@ -598,11 +598,11 @@
                                                 </div>
                                                 <div class="atk-step-title">
                                                     @if($status === 'rejected')
-                                                        Ditolak Kasubag TU
+                                                        Ditolak Kasubbag TU
                                                     @elseif($status === 'pending')
                                                         Menunggu Review TU
                                                     @else
-                                                        Disetujui Kasubag TU
+                                                        Disetujui Kasubbag TU
                                                     @endif
                                                 </div>
                                                 <div class="atk-step-subtitle">
@@ -647,7 +647,7 @@
                                                 <div class="atk-step-subtitle">
                                                     @if($tReq->is_procurement)
                                                         @if($status === 'approved')
-                                                            {{ $dFulfilled ? '(Telah Dibeli Subbag TU)' : '(Sedang Dibeli Kasubag TU)' }}
+                                                            {{ $dFulfilled ? '(Telah Dibeli Subbag TU)' : '(Sedang Dibeli Kasubbag TU)' }}
                                                         @else
                                                             (Menunggu Persetujuan)
                                                         @endif
@@ -805,7 +805,7 @@
                                                 <div class="atk-step-time">{{ $tReq->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB</div>
                                             </div>
 
-                                            {{-- STEP 2: Verifikasi Kasubag TU --}}
+                                            {{-- STEP 2: Verifikasi Kasubbag TU --}}
                                             <div class="atk-stepper-item {{ $s2Class }}">
                                                 <div class="atk-step-circle">
                                                     @if($status === 'rejected')
@@ -823,11 +823,11 @@
                                                 </div>
                                                 <div class="atk-step-title">
                                                     @if($status === 'rejected')
-                                                        Ditolak Kasubag TU
+                                                        Ditolak Kasubbag TU
                                                     @elseif($status === 'pending')
                                                         Menunggu Review TU
                                                     @else
-                                                        Disetujui Kasubag TU
+                                                        Disetujui Kasubbag TU
                                                     @endif
                                                 </div>
                                                 <div class="atk-step-subtitle">
@@ -877,7 +877,7 @@
                                                             @elseif($hasAnyFulfilled)
                                                                 (Sebagian Barang Telah Dibeli)
                                                             @else
-                                                                (Sedang Dibeli Kasubag TU)
+                                                                (Sedang Dibeli Kasubbag TU)
                                                             @endif
                                                         @else
                                                             (Menunggu Persetujuan)
@@ -990,7 +990,7 @@
                         </div>
                         <div>
                             <h2 class="fw-bold text-dark mb-0 fs-3">{{ $userPendingCount }}</h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubag TU</small>
+                            <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubbag TU</small>
                         </div>
                     </div>
                 </div>
