@@ -25,3 +25,5 @@ yarn-error.log
 *.ppt
 *.pptx
 *.pptm
+
+/public/manual_book
