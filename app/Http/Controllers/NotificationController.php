@@ -181,7 +181,7 @@ class NotificationController extends Controller
                     'badge_class' => $req->type === 'subdit' ? 'bg-success-subtle text-success border border-success' : 'bg-primary-subtle text-primary border border-primary',
                     'status_badge' => 'Siap Diserahkan',
                     'status_badge_class' => 'bg-warning text-dark',
-                    'link' => route('distribusi.index', ['status' => 'ready']),
+                    'link' => route('distribusi.index'),
                     'action_text' => 'Proses Serah Terima',
                     'is_read' => false,
                     'is_pending' => true,

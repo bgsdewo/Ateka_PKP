@@ -22,6 +22,13 @@ class DistributionController extends Controller
 
         $filterType = $request->get('type'); // individu, subdit, or null
         $filterStatus = $request->get('status', 'all'); // default to 'all' so handed over items remain visible
+
+        // Jika user baru saja menyelesaikan serah terima barang (session print_id aktif),
+        // pastikan status otomatis kembali ke 'all' (Semua Status) agar riwayat barang yang baru diserahkan langsung muncul
+        // di tabel riwayat tanpa harus user me-refresh atau mengganti filter secara manual.
+        if (session('print_id') && $filterStatus === 'ready') {
+            $filterStatus = 'all';
+        }
         $search = $request->get('search');
         $monthInput = $request->get('month');
         $yearInput = $request->get('year');
@@ -216,7 +223,7 @@ class DistributionController extends Controller
             'distribution_proof' => $proofPath,
         ]);
 
-        return redirect()->back()
+        return redirect()->route('distribusi.index')
             ->with('success', 'Barang berhasil diserahterimakan ke ' . $request->receiver_name . ' (' . $requestItem->request_code . ').' . ($proofPath ? ' Foto bukti serah terima berhasil diunggah.' : ''))
             ->with('print_id', $requestItem->id);
     }
@@ -261,7 +268,7 @@ class DistributionController extends Controller
             'distribution_proof' => $proofPath,
         ]);
 
-        return redirect()->back()
+        return redirect()->route('distribusi.index')
             ->with('success', 'Foto bukti serah terima barang untuk ' . $requestItem->request_code . ' berhasil disimpan.');
     }
 

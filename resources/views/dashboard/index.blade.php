@@ -50,7 +50,7 @@
                                 </a>
                             @elseif ($isPegawaiGudang)
                                 @if (auth()->user()->isDistributor())
-                                    <a href="{{ route('distribusi.index', ['status' => 'ready']) }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                    <a href="{{ route('distribusi.index') }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>

@@ -121,7 +121,7 @@
                             $pendingDistributions->push((object)[
                                 'title' => 'Distribusi Barang',
                                 'message' => 'Permintaan "' . $itemSummary . '" dari ' . $pemohonName . ' (' . $ri->request_code . ') siap diserahkan.',
-                                'link' => route('distribusi.index', ['status' => 'ready']),
+                                'link' => route('distribusi.index'),
                                 'type' => 'ready_distribution',
                                 'badge_label' => $ri->type === 'subdit' ? 'Kolektif Subdit' : 'Perorangan',
                                 'badge_class' => $ri->type === 'subdit' ? 'bg-success text-white' : 'bg-primary text-white',
@@ -231,7 +231,7 @@
                                     <span class="badge bg-warning text-dark fw-bold rounded-pill px-2" style="font-size: 0.65rem;">{{ $totalPendingDistribusi }} Siap</span>
                                 </div>
                                 <small class="text-muted d-block mb-1.5" style="font-size: 0.72rem;">Barang telah disetujui TU dan siap diserahkan ke unit kerja/pemohon.</small>
-                                <a href="{{ route('distribusi.index', ['status' => 'ready']) }}" class="btn btn-xs btn-warning text-dark fw-bold rounded-pill w-100 py-1 text-center" style="font-size: 0.72rem;">
+                                <a href="{{ route('distribusi.index') }}" class="btn btn-xs btn-warning text-dark fw-bold rounded-pill w-100 py-1 text-center" style="font-size: 0.72rem;">
                                     Buka Antrean Distribusi &rarr;
                                 </a>
                             </div>
