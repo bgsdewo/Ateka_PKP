@@ -34,7 +34,7 @@ class ReportExaminerNotificationTest extends TestCase
             ['name' => 'Bagus Sadewo, S.Kom', 'position' => 'Staf Subdit', 'password' => bcrypt('password123'), 'role' => 'pegawai']
         );
 
-        $this->examinerGudang = User::firstOrCreate(
+        $this->examinerGudang = User::updateOrCreate(
             ['email' => 'irvan_examiner_test@gmail.com'],
             [
                 'name' => 'Irvan, S.K.',
@@ -46,7 +46,7 @@ class ReportExaminerNotificationTest extends TestCase
             ]
         );
 
-        $this->regularGudang = User::firstOrCreate(
+        $this->regularGudang = User::updateOrCreate(
             ['email' => 'gudang_regular_test@gmail.com'],
             [
                 'name' => 'Budi Gudang',
@@ -98,6 +98,10 @@ class ReportExaminerNotificationTest extends TestCase
             ],
             'verification_notes' => 'Disetujui untuk diproses pembelian secara offline oleh Subbag TU.',
         ]);
+
+        if (session('error')) {
+            $this->fail('Persetujuan gagal dengan error: ' . session('error'));
+        }
 
         $response->assertRedirect();
 

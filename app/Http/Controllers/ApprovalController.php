@@ -241,6 +241,8 @@ class ApprovalController extends Controller
                     'rejection_reason' => null,
                 ]);
 
+                $item->load('details.product');
+
                 if ($item->is_procurement) {
                     // Kirim notifikasi ke pemohon bahwa usulan pengadaan telah disetujui (dalam proses pembelian)
                     if ($item->user) {
