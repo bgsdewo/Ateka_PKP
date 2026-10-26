@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Panduan PIC Distribusi Subdirektorat - Sistem ATEKA Kemen PKP</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.42;
+            font-size: 8.8pt;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 272mm;
+            max-height: 272mm;
+            height: 272mm;
+            overflow: hidden;
+            position: relative;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        .header-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px solid #144b59;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            font-size: 7.5pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+            margin-top: auto;
+            font-size: 7.5pt;
+            color: #64748b;
+        }
+
+        .content-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* COVER PAGE STYLING */
+        .cover-page {
+            min-height: 272mm;
+            max-height: 272mm;
+            height: 272mm;
+            border: 3px double #144b59;
+            padding: 16mm 14mm 12mm 14mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            page-break-after: always;
+        }
+
+        .cover-logo {
+            width: 95px;
+            height: 95px;
+            object-fit: contain;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
+
+        .cover-ministry {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #144b59;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .cover-subministry {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 18px;
+        }
+
+        .cover-title-box {
+            background: #144b59;
+            color: #ffffff;
+            padding: 22px 18px;
+            border-radius: 8px;
+            margin: 12px 0 16px 0;
+            box-shadow: 0 4px 12px rgba(20, 75, 89, 0.2);
+        }
+
+        .cover-title-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: #ffffff;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 14px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .cover-main-title {
+            font-size: 18.5pt;
+            font-weight: 800;
+            margin: 0 0 6px 0;
+            line-height: 1.25;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-subtitle {
+            font-size: 10.5pt;
+            font-weight: 400;
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+        .cover-role-card {
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 10px auto;
+            max-width: 90%;
+            text-align: left;
+            font-size: 8.5pt;
+        }
+
+        .cover-desc {
+            font-size: 8.8pt;
+            color: #334155;
+            max-width: 92%;
+            margin: 8px auto;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .cover-meta {
+            padding-top: 12px;
+            border-top: 1px solid #cbd5e1;
+            font-size: 8.2pt;
+            color: #475569;
+        }
+
+        .cover-meta strong {
+            color: #0f172a;
+        }
+
+        /* HEADINGS & TEXT */
+        h1.chapter-title {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #144b59;
+            border-bottom: 2px solid #144b59;
+            padding-bottom: 4px;
+            margin-top: 0;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2.section-title {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 8px;
+            margin-bottom: 5px;
+            border-left: 3.5px solid #144b59;
+            padding-left: 6px;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 5px;
+            text-align: justify;
+        }
+
+        /* SCREENSHOT FIGURES */
+        .figure-card {
+            margin: 5px 0 7px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px;
+            background-color: #f8fafc;
+            text-align: center;
+        }
+
+        .figure-card img {
+            max-width: 98%;
+            max-height: 88mm;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .figure-caption {
+            font-size: 7.8pt;
+            font-weight: 600;
+            color: #475569;
+            margin-top: 4px;
+            margin-bottom: 0px;
+        }
+
+        /* TABLES */
+        table.spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.8pt;
+            margin: 5px 0 6px 0;
+        }
+
+        table.spec-table th {
+            background-color: #144b59;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 4px 6px;
+            border: 1px solid #0e343e;
+            text-align: left;
+        }
+
+        table.spec-table td {
+            padding: 3.5px 6px;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+        }
+
+        table.spec-table tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        /* CALLOUT BOXES */
+        .callout {
+            border-radius: 5px;
+            padding: 5px 9px;
+            margin: 5px 0;
+            font-size: 7.8pt;
+            border-left: 3.5px solid;
+            line-height: 1.4;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-color: #16a34a;
+            color: #166534;
+        }
+
+        .callout-tip {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #1e40af;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .callout strong {
+            font-weight: 700;
+        }
+
+        /* STEP LIST */
+        ol.step-list {
+            margin: 3px 0 5px 0;
+            padding-left: 17px;
+        }
+
+        ol.step-list li {
+            margin-bottom: 3.5px;
+            text-align: justify;
+        }
+
+        ul.feature-list {
+            margin: 3px 0 5px 0;
+            padding-left: 16px;
+        }
+
+        ul.feature-list li {
+            margin-bottom: 2.5px;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            font-size: 6.8pt;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-primary { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-danger  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-pic     { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+        /* TOC */
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0;
+        }
+
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4.5px;
+            font-size: 8.2pt;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .toc-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted #94a3b8;
+            margin: 0 6px;
+        }
+
+        .toc-page {
+            font-weight: 700;
+            color: #144b59;
+        }
+
+        /* WORKFLOW DIAGRAM */
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 6px 0;
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            padding: 4px;
+        }
+
+        .flow-step-num {
+            width: 22px;
+            height: 22px;
+            background: #144b59;
+            color: #ffffff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 7.5pt;
+            margin-bottom: 3px;
+        }
+
+        .flow-step-title {
+            font-weight: 700;
+            font-size: 7.2pt;
+            color: #0f172a;
+            display: block;
+        }
+
+        .flow-step-sub {
+            font-size: 6.5pt;
+            color: #64748b;
+            display: block;
+        }
+
+        .flow-arrow {
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 11pt;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         HALAMAN 1: COVER RESMI
+         ========================================== -->
+    <div class="cover-page">
+        <div>
+            <img src="images/kemenkp.jpeg" alt="Logo Kementerian PKP" class="cover-logo">
+            <div class="cover-ministry">Kementerian Perumahan dan Kawasan Permukiman</div>
+            <div class="cover-subministry">Republik Indonesia</div>
+            
+            <div class="cover-title-box">
+                <div class="cover-title-badge">Modul Resmi &bull; Edisi PIC Unit Kerja</div>
+                <h1 class="cover-main-title">BUKU PANDUAN PENGGUNA<br>SISTEM INVENTORI ATK (ATEKA)</h1>
+                <p class="cover-subtitle">Panduan Operasional Terpadu bagi Person In Charge (PIC) Distribusi Subdirektorat</p>
+            </div>
+
+            <div class="cover-role-card">
+                <div style="font-weight: 700; color: #166534; margin-bottom: 2px;">
+                    <span class="badge badge-success" style="margin-right: 4px;">AKUN PERCONTOHAN OPERASIONAL</span>
+                    Nama Pegawai: Fairuz Armina Nur Azizah
+                </div>
+                <div style="color: #334155; font-size: 8pt;">
+                    <strong>Peran Jabatan:</strong> PIC Distribusi Subdirektorat SDK | 
+                    <strong>Email Kedinasan:</strong> <code>fairuz@pkp.com</code>
+                </div>
+            </div>
+
+            <p class="cover-desc">
+                Buku panduan ini disusun secara sistematis berdasarkan tangkapan layar antarmuka pengguna (UI/UX) resmi sistem ATEKA. Dirancang khusus untuk memandu PIC Subdirektorat dalam melaksanakan usulan pengadaan barang baru (beli baru) ke supplier, pemantauan approval Kasubbag TU, pengajuan permintaan stok persediaan kantor, pencetakan Surat Bukti Penyerahan Barang ATK resmi, hingga pengunggahan berkas bertanda tangan fisik sebagai akuntabilitas BMN.
+            </p>
+        </div>
+
+        <div class="cover-meta">
+            <div><strong>Diterbitkan Oleh:</strong> Subbagian Tata Usaha & Tim Transformasi Digital Logistik Kemen PKP RI</div>
+            <div><strong>Sistem Informasi:</strong> ATEKA (Aplikasi E-Katalog &amp; Manajemen Persediaan ATK) &bull; Versi 2.0 (Oktober 2026)</div>
+            <div style="margin-top: 4px; font-size: 7.5pt; color: #64748b;">Klasifikasi: Dokumen Pedoman Internal Kedinasan &bull; Hak Cipta &copy; 2026 Kementerian PKP RI</div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 2: KATA PENGANTAR & DAFTAR ISI
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BUKU PANDUAN PIC DISTRIBUSI &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">Kata Pengantar &amp; Peran Strategis PIC Subdirektorat</h1>
+            <p>
+                Puji syukur ke hadirat Tuhan Yang Maha Esa atas tersusunnya <strong>Buku Panduan Pengguna Sistem Informasi Inventori ATK (ATEKA)</strong> khusus Modul <strong>PIC Distribusi Subdirektorat / Unit Kerja</strong> di lingkungan Kementerian Perumahan dan Kawasan Permukiman Republik Indonesia.
+            </p>
+            <p>
+                Peran <strong>PIC Distribusi</strong> merupakan simpul krusial dalam tata kelola logistik kedinasan. Berbeda dengan akun pegawai biasa yang hanya dapat mengajukan permintaan barang perorangan, PIC Distribusi bertindak sebagai koordinator kebutuhan sarana kerja di tingkat unit kerja/subdirektorat dengan kewenangan ganda:
+            </p>
+
+            <table class="spec-table" style="margin-bottom: 6px;">
+                <thead>
+                    <tr>
+                        <th width="30%">Aspek Kewenangan</th>
+                        <th width="35%">Pegawai Biasa (Individual)</th>
+                        <th width="35%">PIC Distribusi Subdirektorat (Kolektif)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Cakupan Pengajuan</strong></td>
+                        <td>Hanya atas nama individu pribadi.</td>
+                        <td>Dapat mengajukan atas nama <strong>Subdirektorat / Unit Kerja</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pengadaan Barang Baru</strong></td>
+                        <td>Hanya mengajukan usulan restock terbatas.</td>
+                        <td>Mengajukan usulan beli baru multi-item ke supplier resmi.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cetak Dokumen Bukti</strong></td>
+                        <td>Tidak memiliki akses cetak dokumen resmi.</td>
+                        <td><strong>Dapat mencetak Dokumen Resmi Bukti Penyerahan ATK</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Upload Berkas Fisik TTD</strong></td>
+                        <td>Tidak diwajibkan mengunggah arsip.</td>
+                        <td><strong>Wajib mengunggah scan berita acara/bukti bertanda tangan</strong>.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Alur Siklus Kerja PIC Subdirektorat (End-to-End)</h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-step-num">1</div>
+                    <span class="flow-step-title">Cek Katalog</span>
+                    <span class="flow-step-sub">Identifikasi Stok</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">2</div>
+                    <span class="flow-step-title">Usul Pengadaan</span>
+                    <span class="flow-step-sub">Beli Baru Supplier</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">3</div>
+                    <span class="flow-step-title">Approval TU</span>
+                    <span class="flow-step-sub">Penerimaan Gudang</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">4</div>
+                    <span class="flow-step-title">Permintaan Subdit</span>
+                    <span class="flow-step-sub">Kolektif Unit Kerja</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">5</div>
+                    <span class="flow-step-title">Serah Terima</span>
+                    <span class="flow-step-sub">Cetak &amp; Upload TTD</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">Daftar Isi Buku Panduan Sesuai Urutan Antarmuka</h2>
+            <ul class="toc-list">
+                <li class="toc-item"><span class="toc-title">BAB 1: Akses Masuk &amp; Otentikasi Login PIC</span><span class="toc-dots"></span><span class="toc-page">Hal 3</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 2: Mengenal Antarmuka Dashboard PIC Distribusi</span><span class="toc-dots"></span><span class="toc-page">Hal 4</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 3: Pengecekan Ketersediaan Barang &amp; Deteksi Stok Habis di E-Katalog</span><span class="toc-dots"></span><span class="toc-page">Hal 5</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 4: Formulir Pengajuan Usulan Pengadaan Barang Baru ke Supplier</span><span class="toc-dots"></span><span class="toc-page">Hal 6</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 5: Pemantauan Riwayat Usulan Pengadaan (Tiket REQ-BUY)</span><span class="toc-dots"></span><span class="toc-page">Hal 7</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 6: Pelacakan Status Pengadaan Terkini pada Dashboard PIC</span><span class="toc-dots"></span><span class="toc-page">Hal 8</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 7: Notifikasi Persetujuan Kasubbag TU &amp; Kesiapan Barang di Gudang</span><span class="toc-dots"></span><span class="toc-page">Hal 9</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 8: Verifikasi Barang Tersedia di Katalog &amp; Inisiasi Permintaan ATK</span><span class="toc-dots"></span><span class="toc-page">Hal 10</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 9: Pengisian Formulir Permintaan Barang Persediaan Subdirektorat</span><span class="toc-dots"></span><span class="toc-page">Hal 11</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 10: Pelacakan Status Permintaan Persediaan Terkini pada Dashboard</span><span class="toc-dots"></span><span class="toc-page">Hal 12</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 11: Serah Terima Barang, Cetak Bukti Resmi &amp; Unggah Berkas Tanda Tangan</span><span class="toc-dots"></span><span class="toc-page">Hal 13</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 12: Rekapitulasi Riwayat Permintaan Subdirektorat &amp; Bantuan</span><span class="toc-dots"></span><span class="toc-page">Hal 14</span></li>
+            </ul>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 2 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 3: BAB 1 - LOGIN PIC (image1.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 1: AKSES MASUK SISTEM &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 1: Akses Masuk &amp; Otentikasi Login PIC</h1>
+            <p>
+                Sebelum menjalankan tugas operasional logistik, PIC Distribusi wajib melakukan otentikasi login ke dalam sistem ATEKA melalui portal resmi persediaan Kementerian PKP RI.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image1.png" alt="Gambar 1: Halaman Login Portal Sistem Persediaan ATEKA">
+                <div class="figure-caption">Gambar 1: Halaman Login Portal Sistem Informasi Persediaan ATK Kementerian PKP RI</div>
+            </div>
+
+            <h2 class="section-title">Komponen Antarmuka Form Login</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="25%">Elemen Form</th>
+                        <th width="18%">Tipe Input</th>
+                        <th>Fungsi &amp; Data Masukan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Email Pegawai</strong></td>
+                        <td><span class="badge badge-primary">Text Email</span></td>
+                        <td>Masukkan alamat email kedinasan terdaftar akun PIC (contoh: <code>fairuz@pkp.com</code>).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kata Sandi</strong></td>
+                        <td><span class="badge badge-primary">Password Field</span></td>
+                        <td>Masukkan kombinasi kata sandi akun rahasia yang telah diberikan administrator/dibuat saat registrasi.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ingat Saya</strong></td>
+                        <td><span class="badge badge-warning">Checkbox</span></td>
+                        <td>Centang opsi ini apabila menggunakan perangkat kerja kedinasan pribadi agar sesi tersimpan aman.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tombol Masuk ke Sistem</strong></td>
+                        <td><span class="badge badge-success">Action Button</span></td>
+                        <td>Klik untuk memvalidasi kredensial login dan langsung diarahkan ke Dashboard PIC Distribusi.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Catatan Hak Akses PIC:</strong> Sistem secara otomatis mendeteksi role akun Anda sebagai <code>PIC Distribusi</code> dan unit kerja <code>Subdirektorat SDK</code>. Hak akses form usulan pengadaan beli baru dan tombol cetak bukti serah terima akan aktif secara otomatis.
+            </div>
+
+            <div class="callout callout-warning">
+                <strong>Pemberitahuan Keamanan:</strong> Jangan membagikan kata sandi akun PIC kepada pihak manapun. Seluruh aksi pengajuan pengadaan, persetujuan serah terima, dan pengunggahan berkas memiliki implikasi audit Barang Milik Negara (BMN).
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 3 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 4: BAB 2 - DASHBOARD PIC (image2.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 2: ANTARMUKA DASHBOARD &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 2: Mengenal Antarmuka Dashboard PIC Distribusi</h1>
+            <p>
+                Setelah berhasil masuk, Anda akan disambut oleh Dashboard PIC Distribusi yang menyajikan ringkasan operasional logistik, akses cepat, serta panel pelacakan status secara terpadu.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image2.png" alt="Gambar 2: Dashboard Utama PIC Distribusi Subdirektorat">
+                <div class="figure-caption">Gambar 2: Dashboard Utama Akun PIC Distribusi (Fairuz Armina Nur Azizah - Subdirektorat SDK)</div>
+            </div>
+
+            <h2 class="section-title">Struktur Informasi &amp; Metrik Kunci Dashboard</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="28%">Komponen Dashboard</th>
+                        <th width="22%">Nilai / Tampilan</th>
+                        <th>Penjelasan Fungsi Operasional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Header Sambutan &amp; Profil</strong></td>
+                        <td><code>Fairuz Armina Nur Azizah</code></td>
+                        <td>Menampilkan nama pemegang akun, badge hijau <strong>PIC Distribusi</strong>, dan unit kerja <strong>Subdirektorat SDK</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kartu Metrik KPI (4 Angka)</strong></td>
+                        <td>Total, Menunggu, Disetujui, Selesai</td>
+                        <td>Menampilkan jumlah berkas pengajuan ATK subdirektorat secara realtime berdasarkan status tahapan saat ini.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aksi Cepat (Quick Actions)</strong></td>
+                        <td>3 Tombol Navigasi Cepat</td>
+                        <td>Tombol hijau <em>Ajukan Permintaan ATK</em>, tombol cyan <em>Katalog ATK</em>, dan tombol ungu <em>Riwayat Saya</em>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Panel Pelacakan Pengajuan</strong></td>
+                        <td>Status Terkini Berjalan</td>
+                        <td>Memantau pengajuan aktif yang sedang diproses. Bila kosong, menampilkan pesan <em>"Belum ada pengajuan aktif"</em>.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-tip">
+                <strong>Tips Navigasi PIC:</strong> Anda dapat mengakses menu utama kapan saja melalui Sidebar Kiri: <strong>Dashboard</strong>, <strong>Katalog ATK</strong>, <strong>Ajukan ATK</strong>, <strong>Pengadaan (Beli Baru)</strong>, dan <strong>Riwayat Saya</strong>.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 4 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 5: BAB 3 - KATALOG & STOK HABIS (image3.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 3: E-KATALOG &amp; DETEKSI STOK &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 3: Menjelajahi Katalog ATK &amp; Deteksi Stok Habis</h1>
+            <p>
+                Sebelum mengajukan kebutuhan sarana kerja, PIC Distribusi bertugas memeriksa ketersediaan barang pada <strong>Katalog Alat Tulis Kantor (ATK)</strong> untuk mengetahui apakah stok mencukupi atau habis.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image3.png" alt="Gambar 3: Katalog ATK Menampilkan Barang dengan Status Stok Habis">
+                <div class="figure-caption">Gambar 3: Halaman Katalog ATK Menampilkan Amplop Coklat A4 Air Mail dengan Status Stok Habis (0 Stock)</div>
+            </div>
+
+            <h2 class="section-title">Fitur Pencarian &amp; Indikator Ketersediaan Barang</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="28%">Fitur / Elemen</th>
+                        <th width="20%">Kondisi Tampilan</th>
+                        <th>Fungsi &amp; Tindakan yang Harus Diambil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Kolom Pencarian Barang</strong></td>
+                        <td>Search Bar Interaktif</td>
+                        <td>Mencari nama spesifik alat tulis (contoh: ketik <em>"Amplop Coklat"</em>) atau kode referensi barang gudang.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Filter Kategori &amp; Status</strong></td>
+                        <td>Dropdown Seleksi</td>
+                        <td>Menyaring daftar barang berdasarkan kategori (Kertas, Alat Tulis, Ordner) dan status stok (Tersedia / Habis).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Badge Status "Stok Habis"</strong></td>
+                        <td><span class="badge badge-danger">Stok Habis (0 Stock)</span></td>
+                        <td>Menandakan jumlah fisik di gudang saat ini adalah 0 sehingga permohonan persediaan belum dapat dilayani langsung.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tombol Pesan Barang Ini (Restock)</strong></td>
+                        <td><span class="badge badge-primary">Tombol Aksi Biru</span></td>
+                        <td>Mengalihkan PIC secara instan ke formulir Usulan Pengadaan Barang Baru (Beli Baru) dengan data barang terisi otomatis.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Banner Informasi Sistem:</strong> Pada bagian atas katalog terdapat pengingat: <em>"Barang Belum Tersedia / Stok Habis? Klik tombol di bawah untuk mengajukan pengadaan barang baru."</em> Fitur ini memudahkan PIC tanpa perlu mencari tautan form terpisah.
+            </div>
+
+            <div class="callout callout-tip">
+                <strong>Alur Kerja Rekomendasi:</strong> Apabila staf di subdirektorat membutuhkan barang yang stoknya habis, jangan menunggu. Klik tombol <strong>Pesan Barang Ini (Restock) &rarr;</strong> untuk mengusulkan pembelian baru ke Kasubbag TU.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 5 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 6: BAB 4 - FORM PENGADAAN BELI BARU (image4.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 4: PENGADAAN BELI BARU &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 4: Formulir Pengajuan Pengadaan Barang Baru ke Supplier</h1>
+            <p>
+                Formulir ini digunakan oleh PIC Distribusi untuk mengusulkan pembelian barang ATK baru ke supplier resmi melalui persetujuan Kasubbag TU, baik untuk restock maupun barang yang belum terdaftar di katalog.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image4.png" alt="Gambar 4: Formulir Permintaan Pengadaan Barang Baru ke Supplier">
+                <div class="figure-caption">Gambar 4: Formulir Pengadaan Multi-Item (Amplop Coklat A4 Air Mail &amp; Bak Stempel Joyko No. 1)</div>
+            </div>
+
+            <h2 class="section-title">Panduan Pengisian Formulir Pengadaan Subdirektorat</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Kolom Formulir</th>
+                        <th width="16%">Sifat</th>
+                        <th>Aturan Pengisian &amp; Contoh Sesuai Tangkapan Layar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Jenis Permintaan</strong></td>
+                        <td><span class="badge badge-success">Otomatis</span></td>
+                        <td>Terpilih <strong>Subdirektorat / Unit Kerja</strong> (Sebagai PIC, Anda mengajukan atas nama Subdirektorat SDK).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nama Pemohon</strong></td>
+                        <td><span class="badge badge-success">Otomatis</span></td>
+                        <td>Terisi data akun: <code>Fairuz Armina Nur Azizah (PIC Distribusi Subdirektorat SDK)</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Keperluan Pengadaan</strong></td>
+                        <td><span class="badge badge-danger">Wajib</span></td>
+                        <td>Tuliskan urgensi pengadaan secara jelas. Contoh: <code>Kebutuhan Subdirektorat SDK</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Item 1: Amplop Coklat</strong></td>
+                        <td><span class="badge badge-danger">Wajib</span></td>
+                        <td>Nama: <em>Amplop Coklat A4 Air Mail</em> | Kategori: <em>ATK</em> | Jumlah: <em>1 Stock</em> | Est. Harga: <em>Rp 20.000</em> | Ket: <em>stok habis</em>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Item 2: Bak Stempel</strong></td>
+                        <td><span class="badge badge-primary">Multi-Item</span></td>
+                        <td>Nama: <em>Bak Stempel Joyko No. 1</em> | Kategori: <em>ATK</em> | Jumlah: <em>1 Buah</em> | Est. Harga: <em>Rp 15.000</em> | Ket: <em>belum ada di katalog</em>.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Langkah-Langkah Mengirim Usulan Pengadaan</h2>
+            <ol class="step-list">
+                <li>Buka formulir pengadaan melalui menu <strong>Pengadaan (Beli Baru)</strong> atau tombol restock dari katalog.</li>
+                <li>Verifikasi bahwa jenis pengajuan telah berada pada mode unit kerja Subdirektorat SDK.</li>
+                <li>Lengkapi keperluan dinas pengadaan pada kotak teks yang tersedia.</li>
+                <li>Isi rincian barang pertama, lalu klik tombol biru <strong>+ Tambah Barang Lain</strong> apabila terdapat lebih dari satu barang yang dibutuhkan.</li>
+                <li>Periksa estimasi total anggaran, kemudian klik tombol hijau <strong>Kirim Pengajuan Pengadaan</strong>.</li>
+            </ol>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 6 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 7: BAB 5 - RIWAYAT PENGADAAN (image5.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 5: RIWAYAT USULAN PENGADAAN &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 5: Pemantauan Riwayat Usulan Pengadaan (Tiket REQ-BUY)</h1>
+            <p>
+                Setiap usulan pengadaan barang baru yang telah dikirimkan secara otomatis diterbitkan nomor registrasi tiket resmi bertanda awalan <code>REQ-BUY</code> dan dicatat pada tabel riwayat pengadaan.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image5.png" alt="Gambar 5: Tabel Riwayat Pengajuan Pengadaan PIC">
+                <div class="figure-caption">Gambar 5: Tabel Riwayat Pengajuan Pengadaan dengan Tiket REQ-BUY-20261026-T4SM Berstatus Pending Pengadaan</div>
+            </div>
+
+            <h2 class="section-title">Struktur Data Riwayat Pengadaan PIC Subdirektorat</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Kolom Tabel</th>
+                        <th width="24%">Nilai Data Layar</th>
+                        <th>Makna &amp; Fungsi Administrasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Kode Pengajuan</strong></td>
+                        <td><code>REQ-BUY-20261026-T4SM</code></td>
+                        <td>Kodefikasi unik usulan pengadaan (REQ-BUY = Pengadaan Pembelian Baru ke Supplier).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tipe Permintaan</strong></td>
+                        <td><span class="badge badge-pic">Subdit</span></td>
+                        <td>Identifikasi bahwa usulan diajukan atas nama Subdirektorat SDK secara kolektif oleh PIC.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tanggal &amp; Waktu</strong></td>
+                        <td><code>26 Okt 2026, 10:48</code></td>
+                        <td>Stempel waktu resmi pencatatan pengajuan ke dalam basis data sistem persediaan.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Keperluan</strong></td>
+                        <td>Kebutuhan Subdirektorat SDK</td>
+                        <td>Justifikasi tujuan pemanfaatan barang untuk operasional kedinasan subdirektorat.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Item Barang</strong></td>
+                        <td>Amplop Coklat &amp; Bak Stempel</td>
+                        <td>Daftar ringkas seluruh komoditas barang yang tercakup di dalam paket usulan pengadaan.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status Tiket</strong></td>
+                        <td><span class="badge badge-warning">Pending Pengadaan</span></td>
+                        <td>Menandakan berkas usulan sedang menunggu pemeriksaan dan telaah persetujuan Kasubbag TU.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Tombol Aksi Detail:</strong> Klik tombol <strong>Detail</strong> pada baris tabel untuk melihat rincian kalkulasi estimasi harga satuan, spesifikasi merk yang diminta, dan rekam jejak riwayat verifikasi Kasubbag TU.
+            </div>
+
+            <div class="callout callout-tip">
+                <strong>Tip Pengelolaan:</strong> Catat kode tiket <code>REQ-BUY-20261026-T4SM</code> apabila Anda ingin melakukan konfirmasi koordinasi lisan atau konfirmasi tindak lanjut langsung dengan Subbagian Tata Usaha.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 7 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 8: BAB 6 - STEPPER DASHBOARD PENGADAAN (image6.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 6: STEPPER PELACAKAN PENGADAAN &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 6: Pelacakan Status Pengadaan Terkini pada Dashboard PIC</h1>
+            <p>
+                Sistem ATEKA dilengkapi fitur visual <strong>Stepper Timeline Pelacakan</strong> interaktif pada halaman depan Dashboard. Fitur ini memungkinkan PIC memantau perjalanan berkas usulan tanpa harus membuka menu laporan.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image6.png" alt="Gambar 6: Pelacakan Status Pengadaan Terkini pada Dashboard PIC">
+                <div class="figure-caption">Gambar 6: Stepper Pelacakan Pengadaan REQ-BUY-20261026-T4SM (Status: Menunggu Review Kasubbag TU)</div>
+            </div>
+
+            <h2 class="section-title">Penjelasan 4 Tahapan Siklus Pengadaan Barang Baru</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="8%">Step</th>
+                        <th width="26%">Nama Tahapan</th>
+                        <th width="20%">Status Visual</th>
+                        <th>Uraian Proses &amp; Penanggung Jawab</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td><strong>Pengajuan Diajukan</strong></td>
+                        <td><span class="badge badge-success">Hijau Selesai</span></td>
+                        <td>PIC Subdirektorat telah berhasil mengirimkan formulir usulan pengadaan ke dalam sistem.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td><strong>Review Kasubbag TU</strong></td>
+                        <td><span class="badge badge-warning">Kuning Aktif</span></td>
+                        <td>Usulan sedang ditelaah oleh Kasubbag TU terkait ketersediaan anggaran dan urgensi dinas.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td><strong>Pembelian ke Supplier</strong></td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#64748b;">Abu-abu Antrean</span></td>
+                        <td>Kasubbag TU telah menyetujui, Subbag TU memesan barang langsung kepada penyedia/vendor resmi.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td><strong>Barang Diterima Gudang</strong></td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#64748b;">Abu-abu Antrean</span></td>
+                        <td>Barang tiba di kantor, diperiksa fisiknya oleh pegawai gudang, dan didaftarkan ke stok persediaan.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Informasi Tiket pada Panel:</strong> Panel menampilkan rincian tiket meliputi nomor usulan (<code>REQ-BUY-20261026-T4SM</code>), kategori permintaan (<em>Pengadaan Beli Baru - Subdirektorat SDK</em>), dan stempel tanggal pengajuan.
+            </div>
+
+            <div class="callout callout-tip">
+                <strong>Otomatisasi Sistem:</strong> PIC tidak perlu merefresh browser secara berkala. Begitu Kasubbag TU memberikan persetujuan, sistem akan memperbarui stepper dan memicu notifikasi real-time pada lonceng navbar.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 8 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 9: BAB 7 - NOTIFIKASI LONCENG PIC (image7.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 7: NOTIFIKASI SISTEM PIC &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 7: Notifikasi Persetujuan Kasubbag TU &amp; Kesiapan Gudang</h1>
+            <p>
+                Sistem ATEKA mengintegrasikan pusat pemberitahuan (Notification Center) real-time melalui ikon lonceng pada navbar atas, memberikan kepastian transparansi bagi PIC Distribusi saat berkas diproses.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image7.png" alt="Gambar 7: Panel Dropdown Notifikasi Lonceng Akun PIC">
+                <div class="figure-caption">Gambar 7: Panel Lonceng Notifikasi Menampilkan Persetujuan Pengadaan &amp; Barang Sudah Masuk ke Katalog</div>
+            </div>
+
+            <h2 class="section-title">Jenis &amp; Makna Notifikasi yang Diterima PIC</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="28%">Judul Notifikasi</th>
+                        <th width="32%">Isi Pesan Notifikasi</th>
+                        <th>Implikasi Tindak Lanjut bagi PIC Subdit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Usulan Pengadaan Disetujui</strong></td>
+                        <td><em>"Kasubbag TU telah menyetujui usulan pengadaan REQ-BUY-20261026-T4SM."</em></td>
+                        <td>Menandakan usulan telah disetujui untuk dibeli ke supplier resmi melalui anggaran operasional TU.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Barang Sudah Tersedia di Gudang</strong></td>
+                        <td><em>"Barang Amplop Coklat A4 Air Mail telah diterima pegawai gudang dan siap diajukan permintaannya."</em></td>
+                        <td>Barang pesanan telah tiba secara fisik, lolos uji periksa gudang, dan stoknya telah dibuka di E-Katalog.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Prosedur Membuka &amp; Merespon Notifikasi</h2>
+            <ol class="step-list">
+                <li>Perhatikan indikator titik merah atau angka pada <strong>Ikon Lonceng</strong> di pojok kanan atas layar.</li>
+                <li>Klik ikon lonceng untuk menampilkan jendela dropdown notifikasi terbaru.</li>
+                <li>Klik langsung pada teks notifikasi untuk membuka halaman rincian berkas atau diarahkan ke Katalog ATK.</li>
+                <li>Gunakan tautan cepat untuk segera memproses pengajuan permintaan ATK persediaan untuk unit kerja Subdirektorat SDK.</li>
+            </ol>
+
+            <div class="callout callout-tip">
+                <strong>Keuntungan bagi Unit Kerja:</strong> Dengan adanya notifikasi ganda ini, PIC dapat langsung mengetahui barang telah ready stock tanpa perlu bolak-balik bertanya ke gudang penyimpanan fisik.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 9 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 10: BAB 8 - KATALOG BARANG TERSEDIA (image8.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 8: KATALOG STOK TERSEDIA &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 8: Verifikasi Barang Tersedia di Katalog &amp; Inisiasi Permintaan</h1>
+            <p>
+                Setelah pegawai gudang menyelesaikan pencatatan barang masuk dari supplier, data stok pada Katalog ATK akan diperbarui secara otomatis dari kondisi kosong menjadi siap diminta.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image8.png" alt="Gambar 8: Katalog ATK Terkini Menampilkan Barang yang Telah Berstatus Tersedia">
+                <div class="figure-caption">Gambar 8: Amplop Coklat A4 Air Mail Berstatus Tersedia (1 Stock) dengan Tombol "+ Ajukan Barang Ini"</div>
+            </div>
+
+            <h2 class="section-title">Perbandingan Perubahan Status Barang pada Katalog</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="26%">Atribut Kartu Barang</th>
+                        <th width="37%">Sebelum Pengadaan (Bab 3)</th>
+                        <th width="37%">Setelah Pengadaan Tuntas (Bab 8)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Badge Ketersediaan</strong></td>
+                        <td><span class="badge badge-danger">Stok Habis</span> (Warna Merah)</td>
+                        <td><span class="badge badge-success">Tersedia</span> (Warna Hijau Segar)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jumlah Stok Fisik</strong></td>
+                        <td><code>0 Stock</code> (Gudang kosong)</td>
+                        <td><code>1 Stock</code> (Siap didistribusikan ke unit)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tombol Aksi Utama</strong></td>
+                        <td><code>Pesan Barang Ini (Restock) &rarr;</code> (Biru)</td>
+                        <td><code>+ Ajukan Barang Ini</code> (Tombol Hijau Interaktif)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Arah Alur Kerja</strong></td>
+                        <td>Pengadaan Beli Baru ke Supplier</td>
+                        <td>Permintaan Barang Persediaan Subbag TU</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Langkah Melakukan Permintaan dari Katalog</h2>
+            <ol class="step-list">
+                <li>Buka menu <strong>Katalog ATK</strong> pada bilah navigasi samping kiri atau tombol cepat dashboard.</li>
+                <li>Ketik nama barang yang telah tiba (contoh: <em>"Amplop Coklat A4"</em>) pada bilah pencarian.</li>
+                <li>Pastikan label barang menunjukkan status hijau <strong>Tersedia</strong> dengan jumlah stok yang mencukupi.</li>
+                <li>Klik tombol hijau <strong>+ Ajukan Barang Ini</strong>. Sistem secara otomatis membuka formulir permintaan persediaan dengan memilih barang tersebut.</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <strong>Alokasi Terarah:</strong> Barang yang diadakan melalui usulan PIC Subdit SDK diprioritaskan untuk pemenuhan unit kerja pemohon, sehingga PIC dapat langsung meminta alokasi tersebut.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 10 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 11: BAB 9 - FORM PERMINTAAN PERSADAAN (image9.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 9: PERMINTAAN ATK SUBDIT &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 9: Formulir Permintaan Barang Persediaan Subdirektorat</h1>
+            <p>
+                Formulir Permintaan Barang Persediaan digunakan oleh PIC Distribusi untuk menarik barang ATK dari gudang Subbag TU untuk keperluan operasional rutin maupun rapat kedinasan di subdirektorat.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image9.png" alt="Gambar 9: Formulir Permintaan Barang Persediaan Subbag TU">
+                <div class="figure-caption">Gambar 9: Pengisian Formulir Permintaan ATK untuk Kebutuhan Operasional Subdirektorat SDK</div>
+            </div>
+
+            <h2 class="section-title">Rincian Pengisian Formulir Permintaan Subdirektorat</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Field Formulir</th>
+                        <th width="18%">Jenis Pilihan</th>
+                        <th>Penjelasan &amp; Contoh Pengisian Sesuai Standar Layar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Jenis Permintaan</strong></td>
+                        <td><span class="badge badge-warning">Radio Button</span></td>
+                        <td>Pilih <strong>Subdirektorat / Unit Kerja</strong> (Opsi ini khusus dimiliki PIC untuk kebutuhan bersama).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pemohon / Unit</strong></td>
+                        <td><span class="badge badge-success">Otomatis</span></td>
+                        <td>Tertera identitas PIC: <code>Fairuz Armina Nur Azizah (PIC Distribusi Subdirektorat SDK)</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Keperluan Permintaan</strong></td>
+                        <td><span class="badge badge-primary">Textarea</span></td>
+                        <td>Isi keterangan penggunaan dinas. Contoh: <code>Kebutuhan operasional rapat koordinasi dan administrasi berkas bulan ini</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pilih Barang ATK</strong></td>
+                        <td><span class="badge badge-danger">Wajib</span></td>
+                        <td>Pilih <strong>Amplop Coklat A4 Air Mail</strong> (Tertera info sistem: <em>Stok tersedia: 1 Stock</em>).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jumlah Permintaan</strong></td>
+                        <td><span class="badge badge-danger">Wajib Angka</span></td>
+                        <td>Masukkan kuantitas yang diminta (contoh: <code>1</code> Stock). Kuantitas tidak boleh melebihi stok gudang.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Prosedur Pengiriman Permintaan</h2>
+            <ol class="step-list">
+                <li>Pastikan tombol radio <strong>Subdirektorat / Unit Kerja</strong> dalam keadaan terpilih.</li>
+                <li>Tuliskan uraian keperluan dinas secara lengkap agar Kasubbag TU dapat menyetujui dengan cepat.</li>
+                <li>Tentukan jumlah barang sesuai kebutuhan riil kerja.</li>
+                <li>Klik tombol hijau <strong>Kirim Permintaan ATK</strong> di bagian bawah formulir untuk menerbitkan nomor tiket permintaan.</li>
+            </ol>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 11 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 12: BAB 10 - STEPPER PERMINTAAN STOK (image10.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 10: PELACAKAN PERMINTAAN &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 10: Pelacakan Status Permintaan Persediaan Terkini</h1>
+            <p>
+                Setelah formulir permintaan persediaan dikirim, tiket registrasi bernomor <code>REQ-20261026-1VF5</code> diterbitkan dan progresnya dapat langsung dipantau melalui Stepper 5 Tahap di Dashboard.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image10.png" alt="Gambar 10: Stepper Pelacakan Permintaan Barang Berstatus Menunggu Review TU">
+                <div class="figure-caption">Gambar 10: Stepper Permintaan REQ-20261026-1VF5 pada Tahap 2: Menunggu Review TU / Verifikasi Kasubbag TU</div>
+            </div>
+
+            <h2 class="section-title">Anatomi Stepper 5 Tahap Siklus Permintaan ATK Persediaan</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="7%">Step</th>
+                        <th width="24%">Nama Tahapan</th>
+                        <th width="20%">Status Layar</th>
+                        <th>Penjelasan Prosedur Operasional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td><strong>Pengajuan Diajukan</strong></td>
+                        <td><span class="badge badge-success">Selesai (Hijau)</span></td>
+                        <td>Tiket <code>REQ-20261026-1VF5</code> berhasil masuk ke antrean verifikasi persediaan kantor.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td><strong>Verifikasi Subbag TU</strong></td>
+                        <td><span class="badge badge-warning">Dalam Review</span></td>
+                        <td>Kasubbag TU menelaah alokasi kuota subdirektorat dan menyetujui pengeluaran barang gudang.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td><strong>Disiapkan Gudang</strong></td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#64748b;">Menunggu</span></td>
+                        <td>Pegawai gudang yang bertugas menyiapkan fisik barang dan mengemas sesuai daftar permintaan.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td><strong>Siap Diserahkan</strong></td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#64748b;">Menunggu</span></td>
+                        <td>Barang telah siap di meja serah terima distribusi logistik Subbag TU.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td><strong>Selesai</strong></td>
+                        <td><span class="badge" style="background:#f1f5f9; color:#64748b;">Menunggu</span></td>
+                        <td>Barang telah diterima PIC Subdit, dokumen bukti ditandatangani, dan transaksi ditutup.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Ketepatan Waktu (SLA):</strong> Proses verifikasi Kasubbag TU hingga penyiapan fisik gudang biasanya berlangsung cepat dalam 1 hari kerja kerja efektif kedinasan.
+            </div>
+
+            <div class="callout callout-tip">
+                <strong>Fitur Real-Time:</strong> Status kartu di dashboard menampilkan badge oranye <em>"Menunggu Review TU"</em>, memberikan transparansi penuh bahwa permintaan sedang dalam disposisi atasan.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 12 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 13: BAB 11 - SERAH TERIMA & UPLOAD TTD (image11.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 11: SERAH TERIMA &amp; BERKAS TTD &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 11: Serah Terima Barang, Cetak Bukti &amp; Upload Berkas TTD</h1>
+            <p>
+                Ketika barang telah diserahkan fisik oleh pegawai gudang, status tiket berubah menjadi <strong>Selesai (Sudah Diserahkan)</strong>. Pada tahapan ini, PIC Distribusi memiliki kewenangan penting untuk mencetak dokumen dan mengunggah bukti tanda tangan basah.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image11.png" alt="Gambar 11: Dashboard Status Selesai dengan Tombol Cetak Bukti dan Upload Berkas TTD">
+                <div class="figure-caption">Gambar 11: Tiket REQ-20261026-1VF5 Selesai &bull; Tombol Cetak Bukti Penyerahan &amp; Upload Berkas Tanda Tangan Aktif</div>
+            </div>
+
+            <h2 class="section-title">Dua Fitur Vital Khusus PIC Distribusi</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="28%">Tombol Aksi Khusus</th>
+                        <th width="20%">Warna Tombol</th>
+                        <th>Fungsi Regulasi &amp; Panduan Penggunaan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Cetak Bukti Penyerahan (PDF)</strong></td>
+                        <td><span class="badge badge-primary">Tombol Biru</span></td>
+                        <td>Membuka dokumen resmi <strong>Surat Bukti Penyerahan Barang ATK</strong> berformat PDF standar kementerian yang memuat rincian barang, nomor tiket, tanda tangan Kasubbag TU, Pegawai Gudang Distribusi, dan PIC Penerima.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Upload Berkas Tanda Tangan</strong></td>
+                        <td><span class="badge badge-warning">Tombol Kuning</span></td>
+                        <td>Membuka modal dialog untuk mengunggah berkas pindaian (scan/foto) Surat Bukti Penyerahan yang telah ditandatangani basah secara fisik oleh pihak terkait sebagai bukti pertanggungjawaban BMN.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">SOP Penyelesaian Serah Terima Fisik Barang ATK</h2>
+            <ol class="step-list">
+                <li>Datangi ruang logistik Subbag TU dan periksa fisik barang (Amplop Coklat A4 Air Mail) bersama staf gudang.</li>
+                <li>Setelah pegawai gudang mengonfirmasi serah terima di sistem, refresh halaman dashboard Anda.</li>
+                <li>Pastikan seluruh 5 lingkaran tahapan pada stepper berwarna hijau lengkap dengan status <strong>Selesai (Sudah Diserahkan)</strong>.</li>
+                <li>Klik tombol <strong>Cetak Bukti Penyerahan (PDF)</strong> lalu cetak dokumen fisik untuk ditandatangani basah.</li>
+                <li>Klik tombol <strong>Upload Berkas Tanda Tangan</strong>, pilih file pindaian (PDF/JPG/PNG), lalu klik simpan untuk mengarsipkan dokumen secara permanen di server kementerian.</li>
+            </ol>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 13 dari 14</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 14: BAB 12 - REKAPITULASI & BANTUAN (image12.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 12: REKAPITULASI &amp; FAQ &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 12: Rekapitulasi Riwayat Permintaan Subdirektorat &amp; Bantuan</h1>
+            <p>
+                Halaman <strong>Daftar Riwayat Permintaan Anda</strong> merupakan pusat arsip digital yang merangkum seluruh rekam jejak permintaan persediaan rutin dan usulan pengadaan yang diajukan oleh PIC Subdirektorat SDK.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image12.png" alt="Gambar 12: Halaman Daftar Riwayat Permintaan Anda Akun PIC">
+                <div class="figure-caption">Gambar 12: Rekapitulasi Riwayat Terpadu Menampilkan Permintaan Selesai (Cetak/Upload) &amp; Pengadaan Tersedia</div>
+            </div>
+
+            <h2 class="section-title">Ringkasan Tabel Arsip Logistik PIC</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="20%">Nomor Tiket</th>
+                        <th width="12%">Tipe</th>
+                        <th width="28%">Rincian Barang &amp; Keperluan</th>
+                        <th width="16%">Status Akhir</th>
+                        <th>Aksi Dokumen Lanjutan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>REQ-20261026-1VF5</code></td>
+                        <td><span class="badge badge-pic">Subdit</span></td>
+                        <td>Amplop Coklat A4 Air Mail (1 Stock) &bull; Rapat Koordinasi</td>
+                        <td><span class="badge badge-success">Selesai</span></td>
+                        <td>Tombol <strong>Cetak Bukti</strong> &amp; <strong>Upload Berkas TTD</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>REQ-BUY-20261026-T4SM</code></td>
+                        <td><span class="badge badge-pic">Subdit</span></td>
+                        <td>Amplop Coklat &amp; Bak Stempel Joyko No. 1</td>
+                        <td><span class="badge badge-success">Tersedia</span></td>
+                        <td>Tombol <strong>Detail</strong> &amp; Riwayat Pengadaan Beli Baru</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Tanya Jawab (FAQ) &amp; Pusat Dukungan Teknis</h2>
+            <div class="callout callout-info" style="margin-bottom: 4px;">
+                <strong>Q1: Apakah PIC Distribusi boleh mengajukan barang atas nama pribadi?</strong><br>
+                Ya, pada formulir permintaan, PIC dapat memilih jenis <em>Individu</em> untuk pemakaian perorangan atau memilih <em>Subdirektorat</em> untuk kebutuhan kolektif unit kerja.
+            </div>
+            <div class="callout callout-tip" style="margin-bottom: 4px;">
+                <strong>Q2: Bagaimana jika berkas tanda tangan fisik yang diunggah salah file?</strong><br>
+                PIC dapat mengklik kembali tombol <strong>Ganti Berkas / Upload Berkas</strong> pada tabel riwayat untuk mengunggah dokumen pindaian pengganti yang telah diperbaiki.
+            </div>
+
+            <div class="callout callout-warning">
+                <strong>Kontak Layanan Bantuan Logistik &amp; Helpdesk TI:</strong><br>
+                Subbagian Tata Usaha &bull; Gedung Utama Kementerian Perumahan dan Kawasan Permukiman RI<br>
+                Email Dukungan: <code>tu.persediaan@pkp.go.id</code> &bull; Ext. Telepon: 1402 &bull; Helpdesk Sistem ATEKA
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional PIC Distribusi ATEKA</span>
+            <span>Halaman 14 dari 14</span>
+        </div>
+    </div>
+
+</body>
+</html>
