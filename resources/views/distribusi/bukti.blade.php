@@ -405,63 +405,70 @@
         </p>
 
         <!-- IDENTITAS PEMOHON SESUAI GAMBAR 2 -->
-        <table class="table table-borderless table-sm mb-3" style="font-size: 13px; width: 100%;">
-            @if ($isPicOrSubdit)
+        <table class="table table-borderless table-sm mb-3" style="font-size: 13px; width: 100%; table-layout: fixed;">
+            <colgroup>
+                <col style="width: 210px;">
+                <col style="width: 15px;">
+                <col style="width: auto;">
+            </colgroup>
+            <tbody>
+                @if ($isPicOrSubdit)
+                    <tr>
+                        <td style="vertical-align: top; padding: 2px 0;"><strong>Permintaan</strong></td>
+                        <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                        <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
+                            <strong>{{ $perwakilanSubditText }}</strong>
+                        </td>
+                    </tr>
+                @endif
                 <tr>
-                    <td width="25%"><strong>Permintaan</strong></td>
-                    <td width="2%">:</td>
-                    <td width="73%">
-                        <strong>{{ $perwakilanSubditText }}</strong>
+                    <td style="vertical-align: top; padding: 2px 0;"><strong>{{ $isPicOrSubdit ? 'Nama Penerima (Perwakilan)' : 'Nama Penerima / Pemohon' }}</strong></td>
+                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
+                        <strong>{{ $requestItem->receiver_name ?? ($requesterUser ? ($requesterUser->name_with_title ?: $requesterUser->name) : '-') }}</strong>
+                        @if ($isPicOrSubdit)
+                            <span class="text-muted ms-1">(Perwakilan Subdirektorat)</span>
+                        @endif
                     </td>
                 </tr>
-            @endif
-            <tr>
-                <td width="25%"><strong>{{ $isPicOrSubdit ? 'Nama Penerima (Perwakilan)' : 'Nama Penerima / Pemohon' }}</strong></td>
-                <td width="2%">:</td>
-                <td width="73%">
-                    <strong>{{ $requestItem->receiver_name ?? ($requesterUser ? ($requesterUser->name_with_title ?: $requesterUser->name) : '-') }}</strong>
-                    @if ($isPicOrSubdit)
-                        <span class="text-muted ms-1">(Perwakilan Subdirektorat)</span>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <td><strong>Unit Kerja / Subdirektorat</strong></td>
-                <td>:</td>
-                <td>
-                    @if ($isPicOrSubdit && !empty($requesterUser->subdit_name))
-                        <strong>{{ $requesterUser->subdit_name }}</strong>
-                        @if (!empty($requesterUser->position))
-                            <span class="text-muted d-block small">{{ $requesterUser->position }}</span>
+                <tr>
+                    <td style="vertical-align: top; padding: 2px 0;"><strong>Unit Kerja / Subdirektorat</strong></td>
+                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
+                        @if ($isPicOrSubdit && !empty($requesterUser->subdit_name))
+                            <strong>{{ $requesterUser->subdit_name }}</strong>
+                            @if (!empty($requesterUser->position))
+                                <span class="text-muted d-block small">{{ $requesterUser->position }}</span>
+                            @endif
+                        @else
+                            {{ $requesterUser->position ?? ($requesterUser->name ?? '-') }}
                         @endif
-                    @else
-                        {{ $requesterUser->position ?? ($requesterUser->name ?? '-') }}
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <td><strong>Jenis Permintaan</strong></td>
-                <td>:</td>
-                <td>
-                    {{ $isPicOrSubdit ? 'Permintaan Subdirektorat (Perwakilan PIC)' : 'Individu (Pegawai)' }}
-                </td>
-            </tr>
-            <tr>
-                <td><strong>Keperluan / Catatan</strong></td>
-                <td>:</td>
-                <td>{{ $requestItem->notes ?? 'Kebutuhan operasional kantor' }}</td>
-            </tr>
-            <tr>
-                <td><strong>Status Verifikasi</strong></td>
-                <td>:</td>
-                <td>
-                    @if ($requestItem->status === 'distributed')
-                        <span class="fw-bold text-dark">Disetujui Kasubbag TU &amp; Telah Didistribusikan</span>
-                    @else
-                        <span class="fw-bold text-dark">Disetujui Kasubbag TU (Siap Diserahkan)</span>
-                    @endif
-                </td>
-            </tr>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; padding: 2px 0;"><strong>Jenis Permintaan</strong></td>
+                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
+                        {{ $isPicOrSubdit ? 'Permintaan Subdirektorat (Perwakilan PIC)' : 'Individu (Pegawai)' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; padding: 2px 0;"><strong>Keperluan / Catatan</strong></td>
+                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">{{ $requestItem->notes ?? 'Kebutuhan operasional kantor' }}</td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top; padding: 2px 0;"><strong>Status Verifikasi</strong></td>
+                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
+                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
+                        @if ($requestItem->status === 'distributed')
+                            <span class="fw-bold text-dark">Disetujui Kasubbag TU &amp; Telah Didistribusikan</span>
+                        @else
+                            <span class="fw-bold text-dark">Disetujui Kasubbag TU (Siap Diserahkan)</span>
+                        @endif
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <!-- TABEL RINCIAN BARANG SESUAI GAMBAR 2 -->
