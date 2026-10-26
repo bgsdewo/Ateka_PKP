@@ -150,29 +150,42 @@
         $monthPeriodLabel = ($requestItem->created_at ?? now())->locale('id')->translatedFormat('F Y');
 
         // Subdit Label Sheet 1
+        $userPos = strtolower($requesterUser->position ?? '');
+        $userSubdit = strtolower($requesterUser->subdit_name ?? '');
+        $userText = $userPos . ' ' . $userSubdit;
+
         if ($requesterUser && !empty($requesterUser->subdit_name)) {
             $subditLabel = $requesterUser->subdit_name;
-        } elseif ($requesterUser && ($requesterUser->isSdk() || str_contains(strtolower($requesterUser->position ?? ''), 'sdk'))) {
+        } elseif (str_contains($userText, 'sdk') || str_contains($userText, 'sumber daya')) {
             $subditLabel = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
-        } elseif ($requesterUser && ($requesterUser->isPjf() || str_contains(strtolower($requesterUser->position ?? ''), 'pjf'))) {
+        } elseif (str_contains($userText, 'pjf') || str_contains($userText, 'fungsional')) {
             $subditLabel = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
-        } elseif ($requesterUser && ($requesterUser->isKbr() || str_contains(strtolower($requesterUser->position ?? ''), 'kbr'))) {
+        } elseif (str_contains($userText, 'kbr') || str_contains($userText, 'kendala')) {
             $subditLabel = 'Subdirektorat Kendala Bangunan Rumah';
-        } elseif ($requesterUser && ($requesterUser->isTu() || str_contains(strtolower($requesterUser->position ?? ''), 'tata usaha'))) {
+        } elseif (str_contains($userText, 'tata usaha') || str_contains($userText, 'tu')) {
             $subditLabel = 'Subbagian Tata Usaha';
         } else {
             $subditLabel = $requesterUser->position ?? ($isPicOrSubdit ? 'Subdirektorat' : 'Pegawai Perorangan');
         }
 
-        // Label Subdirektorat khusus untuk Akun PIC (tanpa kata Perwakilan agar tidak kepanjangan)
-        $cleanedSubditForPerwakilan = trim($subditLabel);
-        $cleanedSubditForPerwakilan = preg_replace('/^pic\s+distribusi\s+/i', '', $cleanedSubditForPerwakilan);
-        if (stripos($cleanedSubditForPerwakilan, 'subdirektorat') === 0 || stripos($cleanedSubditForPerwakilan, 'subbagian') === 0) {
-            $subditText = $cleanedSubditForPerwakilan;
+        // Label Ringkas Subdirektorat untuk Akun PIC (Format ringkas: Perwakilan Subdirektorat SDK / PJF / KBR)
+        if (str_contains($userText, 'sdk') || str_contains($userText, 'sumber daya')) {
+            $shortSubdit = 'Subdirektorat SDK';
+        } elseif (str_contains($userText, 'pjf') || str_contains($userText, 'fungsional')) {
+            $shortSubdit = 'Subdirektorat PJF';
+        } elseif (str_contains($userText, 'kbr') || str_contains($userText, 'kendala')) {
+            $shortSubdit = 'Subdirektorat KBR';
+        } elseif (str_contains($userText, 'tata usaha') || str_contains($userText, 'tu')) {
+            $shortSubdit = 'Subbagian TU';
         } else {
-            $subditText = 'Subdirektorat ' . $cleanedSubditForPerwakilan;
+            $candidate = preg_replace('/^pic\s+distribusi\s+/i', '', trim($requesterUser->position ?? ($requesterUser->subdit_name ?? 'Subdirektorat')));
+            if (stripos($candidate, 'subdirektorat') === 0 || stripos($candidate, 'subbagian') === 0) {
+                $shortSubdit = $candidate;
+            } else {
+                $shortSubdit = 'Subdirektorat ' . $candidate;
+            }
         }
-        $perwakilanSubditText = $subditText;
+        $permintaanText = 'Perwakilan ' . $shortSubdit;
 
         // Team Name Sheet 1 (TIM SDK, TIM PJF, dsb)
         if (!$isPicOrSubdit) {
@@ -418,7 +431,7 @@
                         <td style="vertical-align: top; padding: 2px 0;"><strong>Permintaan</strong></td>
                         <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
                         <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
-                            <strong>{{ $subditText }}</strong>
+                            <strong>{{ $permintaanText }}</strong>
                         </td>
                     </tr>
                 @endif
