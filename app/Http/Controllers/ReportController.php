@@ -118,6 +118,103 @@ class ReportController extends Controller
     }
 
     /**
+     * Cetak Dokumen Resmi Laporan Mutasi & Persediaan Barang (Kop Surat & Tanda Tangan)
+     */
+    public function printReport(Request $request)
+    {
+        if (!auth()->user()->isKasubagTU() && !auth()->user()->isPegawaiGudang()) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Cetak Laporan hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
+        }
+
+        $type = $request->type;
+        $recipientType = $request->recipient_type;
+        $month = $request->month;
+        $year = $request->year;
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $categoryId = $request->category_id;
+
+        $query = StockTransaction::with(['product.category', 'user', 'requestItem.user'])
+            ->when($year, function ($q) use ($year) {
+                $q->whereYear('transaction_date', $year);
+            })
+            ->when($month, function ($q) use ($month) {
+                $q->whereMonth('transaction_date', $month);
+            })
+            ->when($type, function ($q) use ($type) {
+                $q->where('type', $type);
+            })
+            ->when($recipientType, function ($q) use ($recipientType) {
+                if ($recipientType === 'subdit') {
+                    $q->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'subdit')
+                              ->orWhere('note', 'like', '%Subdit%')
+                              ->orWhere('uraian', 'like', '%Subdit%');
+                      });
+                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
+                    $q->where('type', 'keluar')
+                      ->where(function ($sub) {
+                          $sub->where('recipient_type', 'individu')
+                              ->orWhere('note', 'like', '%Individu%')
+                              ->orWhere('note', 'like', '%Pegawai%')
+                              ->orWhere(function ($fallback) {
+                                  $fallback->whereNull('recipient_type')
+                                           ->where('note', 'not like', '%Subdit%')
+                                           ->where('uraian', 'not like', '%Subdit%');
+                              });
+                      });
+                }
+            })
+            ->when($startDate, function ($q) use ($startDate) {
+                $q->whereDate('transaction_date', '>=', $startDate);
+            })
+            ->when($endDate, function ($q) use ($endDate) {
+                $q->whereDate('transaction_date', '<=', $endDate);
+            })
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $q->whereHas('product', function ($pq) use ($categoryId) {
+                    $pq->where('category_id', $categoryId);
+                });
+            })
+            ->orderBy('transaction_date', 'asc')
+            ->orderBy('id', 'asc');
+
+        $transactions = $query->get();
+
+        $totalTransactions = $transactions->count();
+        $totalIn = $transactions->where('type', 'masuk')->sum('quantity');
+        $totalOut = $transactions->where('type', 'keluar')->sum('quantity');
+        $selectedCategory = $categoryId ? Category::find($categoryId) : null;
+
+        if ($startDate && $endDate) {
+            $periodLabel = \Carbon\Carbon::parse($startDate)->translatedFormat('d F Y') . ' s/d ' . \Carbon\Carbon::parse($endDate)->translatedFormat('d F Y');
+        } elseif ($month && $year) {
+            $periodLabel = \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
+        } elseif ($year) {
+            $periodLabel = "Tahun {$year}";
+        } else {
+            $periodLabel = "Semua Periode Transaksi";
+        }
+
+        return view('reports.print', compact(
+            'transactions',
+            'totalTransactions',
+            'totalIn',
+            'totalOut',
+            'type',
+            'recipientType',
+            'month',
+            'year',
+            'startDate',
+            'endDate',
+            'categoryId',
+            'selectedCategory',
+            'periodLabel'
+        ));
+    }
+
+    /**
      * Rekapitulasi Data Mutasi Barang
      */
     public function rekapitulasi(Request $request)

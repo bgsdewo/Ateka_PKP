@@ -14,19 +14,17 @@
     $kasubagNip = $kasubagUser->nip ?? '19850612 201001 2 003';
     $kasubagTitle = 'Kasubbag Tata Usaha';
 
-    // 3. Kolom Mengetahui: Kasubbag TU / Kepala Bagian
-    $pimpinanUser = \App\Models\User::where(function($q) use ($kasubagUser) {
-        $q->where('position', 'like', '%Kepala Bagian%')
-          ->orWhere('position', 'like', '%Kabag%')
-          ->orWhere('role', 'pimpinan');
-        if ($kasubagUser) {
-            $q->where('id', '!=', $kasubagUser->id);
-        }
-    })->first();
+    // 3. Kolom Mengetahui: Pegawai Gudang yang ditugaskan sebagai Petugas Distribusi Barang (Yang Menyerahkan Barang)
+    $distributorUser = \App\Models\User::where('role', 'pegawai_gudang')
+        ->where('is_distributor', true)
+        ->latest('id')
+        ->first()
+        ?: \App\Models\User::where('role', 'pic_distribusi')->latest('id')->first()
+        ?: \App\Models\User::where('role', 'pegawai_gudang')->latest('id')->first();
 
-    $mengetahuiTitle = $pimpinanUser ? ($pimpinanUser->position ?: 'Kepala Bagian Umum') : 'Kepala Bagian Umum';
-    $mengetahuiName = $pimpinanUser ? ($pimpinanUser->name_with_title ?: $pimpinanUser->name) : ($kasubagName ?: 'Kepala Bagian Umum');
-    $mengetahuiNip = $pimpinanUser ? ($pimpinanUser->nip ?: '-') : ($kasubagNip ?: '-');
+    $mengetahuiTitle = $distributorUser ? ($distributorUser->position ?: 'Petugas Distribusi Gudang ATK') : 'Petugas Distribusi Gudang ATK';
+    $mengetahuiName = $distributorUser ? ($distributorUser->name_with_title ?: $distributorUser->name) : 'Petugas Distribusi';
+    $mengetahuiNip = $distributorUser && $distributorUser->nip ? $distributorUser->nip : '-';
 @endphp
 
 @section('page-header')
@@ -667,8 +665,9 @@
                                 </svg>
                                 Export Excel
                             </button>
-                            <button type="button" id="btnExportPrint"
-                                class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
+                            <a href="{{ route('reports.print', request()->query()) }}" target="_blank" id="btnExportPrint"
+                                class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold"
+                                title="Cetak Dokumen Resmi Laporan Persediaan">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2">
                                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -677,7 +676,7 @@
                                     <rect x="6" y="14" width="12" height="8"></rect>
                                 </svg>
                                 Cetak Laporan
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -907,46 +906,6 @@
                                     </tr>
                                 </tfoot>
                             </table>
-
-                        {{-- Tanda Tangan: Baris 1 (Memeriksa & Mengetahui), Baris 2 (Menyetujui di Bawah Tengah seperti Gambar 2) --}}
-                        <div class="signature-section mt-5 pt-4 border-top">
-                            <!-- Baris 1: Memeriksa (Kiri) & Mengetahui (Kanan) -->
-                            <div class="row justify-content-between text-center mb-4" style="width: 100%;">
-                                <div class="col-md-5 col-12">
-                                    <p class="mb-1 text-muted small">&nbsp;</p>
-                                    <p class="mb-1 fw-bold text-dark">Memeriksa,</p>
-                                    <p class="text-muted small mb-0">{{ $examinerTitle }}</p>
-                                    <div style="height: 55px;"></div>
-                                    <p class="mb-0">
-                                        <strong class="text-dark"><u>{{ $examinerName }}</u></strong><br>
-                                        <span class="text-muted small">NIP. {{ $examinerNip }}</span>
-                                    </p>
-                                </div>
-                                <div class="col-md-5 col-12">
-                                    <p class="mb-1 text-muted small">Jakarta, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-                                    <p class="mb-1 fw-bold text-dark">Mengetahui,</p>
-                                    <p class="text-muted small mb-0">{{ $mengetahuiTitle }}</p>
-                                    <div style="height: 55px;"></div>
-                                    <p class="mb-0">
-                                        <strong class="text-dark"><u>{{ $mengetahuiName }}</u></strong><br>
-                                        <span class="text-muted small">NIP. {{ $mengetahuiNip }}</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Baris 2: Menyetujui (Posisi Tengah di Bawah seperti Gambar 2) -->
-                            <div class="row justify-content-center text-center" style="width: 100%;">
-                                <div class="col-md-5 col-12">
-                                    <p class="mb-1 fw-bold text-dark">Menyetujui,</p>
-                                    <p class="text-muted small mb-0">{{ $kasubagTitle }}</p>
-                                    <div style="height: 55px;"></div>
-                                    <p class="mb-0">
-                                        <strong class="text-dark"><u>{{ $kasubagName }}</u></strong><br>
-                                        <span class="text-muted small">NIP. {{ $kasubagNip }}</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1502,12 +1461,17 @@
                     }
                 });
 
-                // Sambungkan tombol ekspor di Header Kartu ke fungsi ekspor DataTables
+                // Sambungkan tombol ekspor di Header Kartu
                 $('#btnExportExcel').on('click', function() {
                     dataTableInstance.button('.buttons-excel').trigger();
                 });
-                $('#btnExportPrint').on('click', function() {
-                    dataTableInstance.button('.buttons-print').trigger();
+                $('#btnExportPrint').on('click', function(e) {
+                    var filterForm = document.getElementById('filterReportForm');
+                    if (filterForm) {
+                        var formData = new FormData(filterForm);
+                        var params = new URLSearchParams(formData).toString();
+                        $(this).attr('href', "{{ route('reports.print') }}" + (params ? ('?' + params) : ''));
+                    }
                 });
             }
 

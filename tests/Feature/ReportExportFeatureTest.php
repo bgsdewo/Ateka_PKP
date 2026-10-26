@@ -222,4 +222,72 @@ class ReportExportFeatureTest extends TestCase
             'is_report_examiner' => 1,
         ]);
     }
+
+    public function test_reports_page_does_not_display_signature_section_on_web_view(): void
+    {
+        $response = $this->actingAs($this->kasubagUser)->get(route('reports.index'));
+        $response->assertStatus(200);
+
+        // Web view harus bersih dari paraf di bawah tabel
+        $response->assertDontSee('signature-section mt-5', false);
+        $response->assertSee('id="btnExportPrint"', false);
+        $response->assertSee(route('reports.print'), false);
+    }
+
+    public function test_mengetahui_signature_is_derived_from_distributor_assigned_by_kasubbag_tu(): void
+    {
+        $distributor = User::create([
+            'name' => 'Devi Ismiyantati',
+            'email' => 'devi_distributor_test@gmail.com',
+            'password' => bcrypt('password123'),
+            'role' => 'pegawai_gudang',
+            'position' => 'Petugas Distribusi Gudang ATK',
+            'nip' => '12345678911',
+            'is_distributor' => 1,
+            'is_report_examiner' => 0,
+        ]);
+
+        $this->gudangUser->update([
+            'is_report_examiner' => 1,
+            'name' => 'Irvan Pemeriksa',
+        ]);
+
+        // 1. Cek pada script export Excel di halaman reports.index
+        $indexResponse = $this->actingAs($this->kasubagUser)->get(route('reports.index'));
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertSee('Devi Ismiyantati', false);
+        $indexResponse->assertSee('Petugas Distribusi Gudang ATK', false);
+        $indexResponse->assertSee('12345678911', false);
+
+        // 2. Cek pada halaman Cetak Laporan (reports.print)
+        $printResponse = $this->actingAs($this->kasubagUser)->get(route('reports.print'));
+        $printResponse->assertStatus(200);
+        $printResponse->assertSee('Devi Ismiyantati', false);
+        $printResponse->assertSee('Petugas Distribusi Gudang ATK', false);
+        $printResponse->assertSee('12345678911', false);
+        $printResponse->assertSee('Irvan Pemeriksa', false);
+        $printResponse->assertSee('Utami M.', false);
+    }
+
+    public function test_dedicated_printable_report_route_access_and_structure(): void
+    {
+        // 1. Akses ditolak untuk pegawai biasa
+        $forbiddenResponse = $this->actingAs($this->pegawaiUser)->get(route('reports.print'));
+        $forbiddenResponse->assertRedirect(route('dashboard'));
+
+        // 2. Akses diizinkan untuk Kasubbag TU
+        $kasubagResponse = $this->actingAs($this->kasubagUser)->get(route('reports.print'));
+        $kasubagResponse->assertStatus(200);
+        $kasubagResponse->assertSee('KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN REPUBLIK INDONESIA', false);
+        $kasubagResponse->assertSee('LAPORAN MUTASI &amp; PERSEDIAAN BARANG (ATK)', false);
+        $kasubagResponse->assertSee('TOTAL REKAPITULASI', false);
+        $kasubagResponse->assertSee('window.print()', false);
+        $kasubagResponse->assertSee('Memeriksa,', false);
+        $kasubagResponse->assertSee('Mengetahui,', false);
+        $kasubagResponse->assertSee('Menyetujui,', false);
+
+        // 3. Akses diizinkan untuk Pegawai Gudang
+        $gudangResponse = $this->actingAs($this->gudangUser)->get(route('reports.print'));
+        $gudangResponse->assertStatus(200);
+    }
 }

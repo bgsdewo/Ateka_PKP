@@ -178,6 +178,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan', [ReportController::class, 'index'])
             ->name('reports.index');
 
+        Route::get('/laporan/cetak', [ReportController::class, 'printReport'])
+            ->name('reports.print');
+
         Route::get('/laporan/rekapitulasi', [ReportController::class, 'rekapitulasi'])
             ->name('reports.rekapitulasi');
 
