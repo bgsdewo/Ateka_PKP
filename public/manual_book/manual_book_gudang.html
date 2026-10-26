@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Panduan Pegawai Gudang Distribusi - Sistem ATEKA Kemen PKP</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.42;
+            font-size: 8.8pt;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 272mm;
+            max-height: 272mm;
+            height: 272mm;
+            overflow: hidden;
+            position: relative;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        .header-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px solid #144b59;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            font-size: 7.5pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4px;
+            margin-top: auto;
+            font-size: 7.5pt;
+            color: #64748b;
+        }
+
+        .content-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* COVER PAGE STYLING */
+        .cover-page {
+            min-height: 272mm;
+            max-height: 272mm;
+            height: 272mm;
+            border: 3px double #144b59;
+            padding: 16mm 14mm 12mm 14mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            page-break-after: always;
+        }
+
+        .cover-logo {
+            width: 95px;
+            height: 95px;
+            object-fit: contain;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
+
+        .cover-ministry {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #144b59;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .cover-subministry {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 18px;
+        }
+
+        .cover-title-box {
+            background: #144b59;
+            color: #ffffff;
+            padding: 22px 18px;
+            border-radius: 8px;
+            margin: 12px 0 16px 0;
+            box-shadow: 0 4px 12px rgba(20, 75, 89, 0.2);
+        }
+
+        .cover-title-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: #ffffff;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 14px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .cover-main-title {
+            font-size: 18.5pt;
+            font-weight: 800;
+            margin: 0 0 6px 0;
+            line-height: 1.25;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-subtitle {
+            font-size: 10.5pt;
+            font-weight: 400;
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+        .cover-role-card {
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin: 10px auto;
+            max-width: 90%;
+            text-align: left;
+            font-size: 8.5pt;
+        }
+
+        .cover-desc {
+            font-size: 8.8pt;
+            color: #334155;
+            max-width: 92%;
+            margin: 8px auto;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .cover-meta {
+            padding-top: 12px;
+            border-top: 1px solid #cbd5e1;
+            font-size: 8.2pt;
+            color: #475569;
+        }
+
+        .cover-meta strong {
+            color: #0f172a;
+        }
+
+        /* HEADINGS & TEXT */
+        h1.chapter-title {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #144b59;
+            border-bottom: 2px solid #144b59;
+            padding-bottom: 4px;
+            margin-top: 0;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2.section-title {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 8px;
+            margin-bottom: 5px;
+            border-left: 3.5px solid #144b59;
+            padding-left: 6px;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 5px;
+            text-align: justify;
+        }
+
+        /* SCREENSHOT FIGURES */
+        .figure-card {
+            margin: 5px 0 7px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px;
+            background-color: #f8fafc;
+            text-align: center;
+        }
+
+        .figure-card img {
+            max-width: 98%;
+            max-height: 88mm;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .figure-caption {
+            font-size: 7.8pt;
+            font-weight: 600;
+            color: #475569;
+            margin-top: 4px;
+            margin-bottom: 0px;
+        }
+
+        /* TABLES */
+        table.spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.8pt;
+            margin: 5px 0 6px 0;
+        }
+
+        table.spec-table th {
+            background-color: #144b59;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 4px 6px;
+            border: 1px solid #0e343e;
+            text-align: left;
+        }
+
+        table.spec-table td {
+            padding: 3.5px 6px;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+        }
+
+        table.spec-table tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        /* CALLOUT BOXES */
+        .callout {
+            border-radius: 5px;
+            padding: 5px 9px;
+            margin: 5px 0;
+            font-size: 7.8pt;
+            border-left: 3.5px solid;
+            line-height: 1.4;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-color: #16a34a;
+            color: #166534;
+        }
+
+        .callout-tip {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #1e40af;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-color: #d97706;
+            color: #92400e;
+        }
+
+        .callout strong {
+            font-weight: 700;
+        }
+
+        /* STEP LIST */
+        ol.step-list {
+            margin: 3px 0 5px 0;
+            padding-left: 17px;
+        }
+
+        ol.step-list li {
+            margin-bottom: 3.5px;
+            text-align: justify;
+        }
+
+        ul.feature-list {
+            margin: 3px 0 5px 0;
+            padding-left: 16px;
+        }
+
+        ul.feature-list li {
+            margin-bottom: 2.5px;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            font-size: 6.8pt;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-primary { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-danger  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-gudang  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+        /* TOC */
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0;
+        }
+
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+            font-size: 8.4pt;
+        }
+
+        .toc-title {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .toc-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted #94a3b8;
+            margin: 0 6px;
+        }
+
+        .toc-page {
+            font-weight: 700;
+            color: #144b59;
+        }
+
+        /* WORKFLOW DIAGRAM */
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 6px 0;
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            padding: 4px;
+        }
+
+        .flow-step-num {
+            width: 22px;
+            height: 22px;
+            background: #144b59;
+            color: #ffffff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 7.5pt;
+            margin-bottom: 3px;
+        }
+
+        .flow-step-title {
+            font-weight: 700;
+            font-size: 7.2pt;
+            color: #0f172a;
+            display: block;
+        }
+
+        .flow-step-sub {
+            font-size: 6.5pt;
+            color: #64748b;
+            display: block;
+        }
+
+        .flow-arrow {
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 11pt;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         HALAMAN 1: COVER RESMI
+         ========================================== -->
+    <div class="cover-page">
+        <div>
+            <img src="images/kemenkp.jpeg" alt="Logo Kementerian PKP" class="cover-logo">
+            <div class="cover-ministry">Kementerian Perumahan dan Kawasan Permukiman</div>
+            <div class="cover-subministry">Republik Indonesia</div>
+            
+            <div class="cover-title-box">
+                <div class="cover-title-badge">Modul Resmi &bull; Edisi Pengelola Logistik</div>
+                <h1 class="cover-main-title">BUKU PANDUAN PENGGUNA<br>SISTEM INVENTORI ATK (ATEKA)</h1>
+                <p class="cover-subtitle">Panduan Operasional Pegawai Gudang &amp; Petugas Distribusi Logistik Persediaan</p>
+            </div>
+
+            <div class="cover-role-card">
+                <div style="font-weight: 700; color: #166534; margin-bottom: 2px;">
+                    <span class="badge badge-success" style="margin-right: 4px;">AKUN OPERASIONAL PENUGASAN</span>
+                    Nama Petugas: Devi Ismiyantati
+                </div>
+                <div style="color: #334155; font-size: 8pt;">
+                    <strong>Role Sistem:</strong> Pegawai Gudang (Ditugaskan sebagai Petugas Distribusi Barang) &bull;
+                    <strong>NIP:</strong> 12345678911 &bull; 
+                    <strong>Email Kedinasan:</strong> <code>devi@pkp.com</code>
+                </div>
+            </div>
+
+            <p class="cover-desc">
+                Buku panduan operasional ini disusun secara sistematis berdasarkan alur nyata aplikasi persediaan ATEKA. Ditujukan khusus untuk Pegawai Gudang yang memegang amanah penugasan distribusi barang logistik Subbagian Tata Usaha. Memuat panduan lengkap penerimaan notifikasi real-time persetujuan Kasubbag TU, eksekusi fisik serah terima barang ke pemohon (Subdirektorat &amp; Individu), pencetakan bukti serah terima resmi, pengunggahan scan berkas tanda tangan basah, hingga validasi laporan persediaan mutasi barang dan penandatanganan pengesahan dokumen cetak (Mengetahui).
+            </p>
+        </div>
+
+        <div class="cover-meta">
+            <div><strong>Diterbitkan Oleh:</strong> Subbagian Tata Usaha &amp; Pengelola Barang Milik Negara (BMN) Kemen PKP RI</div>
+            <div><strong>Sistem Informasi:</strong> ATEKA (Aplikasi E-Katalog &amp; Manajemen Persediaan ATK) &bull; Versi 2.0 (Oktober 2026)</div>
+            <div style="margin-top: 4px; font-size: 7.5pt; color: #64748b;">Klasifikasi: Dokumen Pedoman Internal Kedinasan &bull; Hak Cipta &copy; 2026 Kementerian PKP RI</div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 2: KATA PENGANTAR & DAFTAR ISI
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BUKU PANDUAN PEGAWAI GUDANG DISTRIBUSI &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">Kata Pengantar &amp; Peran Strategis Petugas Gudang Distribusi</h1>
+            <p>
+                Puji syukur ke hadirat Tuhan Yang Maha Esa atas diterbitkannya <strong>Buku Panduan Pengguna Sistem Informasi Inventori ATK (ATEKA)</strong> khusus Modul <strong>Pegawai Gudang (Petugas Distribusi Barang)</strong> di lingkungan Kementerian Perumahan dan Kawasan Permukiman Republik Indonesia.
+            </p>
+            <p>
+                Petugas Gudang Distribusi merupakan pilar eksekusi fisik dan akuntabilitas persediaan. Ketika Kasubbag TU menyetujui permohonan sarana kerja, sistem secara otomatis meneruskan mandat distribusi kepada Petugas Gudang. Tugas dan wewenang pokok mencakup:
+            </p>
+
+            <table class="spec-table" style="margin-bottom: 6px;">
+                <thead>
+                    <tr>
+                        <th width="28%">Bidang Tugas</th>
+                        <th width="36%">Tanggung Jawab Operasional</th>
+                        <th width="36%">Dampak Terhadap Akuntabilitas BMN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Penerimaan Notifikasi</strong></td>
+                        <td>Menerima notifikasi instan begitu tiket disetujui Kasubbag TU.</td>
+                        <td>Mempercepat SLA penyiapan barang dari gudang penyimpanan.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Serah Terima Fisik</strong></td>
+                        <td>Menyerahkan barang ke pemohon disertai bukti foto penyerahan.</td>
+                        <td>Mencegah selisih fisik barang dan menghindari klaim sepihak.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dokumentasi &amp; Berkas TTD</strong></td>
+                        <td>Mencetak Surat Bukti Penyerahan &amp; mengunggah pindaian tanda tangan basah.</td>
+                        <td>Sebagai bukti sah pengeluaran persediaan saat audit internal/BPK.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pengesahan Laporan Mutasi</strong></td>
+                        <td>Memvalidasi data mutasi persediaan dan menjadi penandatangan resmi (Mengetahui).</td>
+                        <td>Menjamin validitas saldo awal, barang keluar, dan saldo akhir gudang.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Alur Siklus Distribusi &amp; Pelaporan Logistik Gudang</h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-step-num">1</div>
+                    <span class="flow-step-title">Notifikasi TU</span>
+                    <span class="flow-step-sub">Approval Disetujui</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">2</div>
+                    <span class="flow-step-title">Siapkan Barang</span>
+                    <span class="flow-step-sub">Cek Stok Fisik</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">3</div>
+                    <span class="flow-step-title">Serah Terima</span>
+                    <span class="flow-step-sub">Handover &amp; Foto</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">4</div>
+                    <span class="flow-step-title">Cetak Bukti</span>
+                    <span class="flow-step-sub">Upload Berkas TTD</span>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-num">5</div>
+                    <span class="flow-step-title">Laporan Mutasi</span>
+                    <span class="flow-step-sub">Export &amp; Cetak Sah</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">Daftar Isi Buku Panduan Sesuai Antarmuka Sistem</h2>
+            <ul class="toc-list">
+                <li class="toc-item"><span class="toc-title">BAB 1: Akses Masuk &amp; Otentikasi Login Petugas Gudang</span><span class="toc-dots"></span><span class="toc-page">Hal 3</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 2: Antarmuka Dashboard &amp; Notifikasi Antrean Distribusi Siap Serah</span><span class="toc-dots"></span><span class="toc-page">Hal 4</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 3: Manajemen Distribusi &amp; Penyerahan Barang ke Pemohon</span><span class="toc-dots"></span><span class="toc-page">Hal 5</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 4: Administrasi Bukti Serah Terima, Cetak Bukti &amp; Upload Berkas TTD</span><span class="toc-dots"></span><span class="toc-page">Hal 6</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 5: Monitoring Laporan Mutasi &amp; Valuasi Persediaan Gudang</span><span class="toc-dots"></span><span class="toc-page">Hal 7</span></li>
+                <li class="toc-item"><span class="toc-title">BAB 6: Prosedur Ekspor Excel, Cetak Laporan Sah &amp; Pusat Bantuan</span><span class="toc-dots"></span><span class="toc-page">Hal 8</span></li>
+            </ul>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 2 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 3: BAB 1 - LOGIN PEGAWAI GUDANG (image1.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 1: AKSES MASUK SISTEM &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 1: Akses Masuk &amp; Otentikasi Petugas Gudang</h1>
+            <p>
+                Untuk memulai operasional harian logistik gudang dan penanganan serah terima barang, Petugas Gudang wajib masuk ke portal sistem persediaan resmi Kementerian PKP RI.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image1.png" alt="Gambar 1: Halaman Login Portal Sistem Inventori ATK Pegawai Gudang">
+                <div class="figure-caption">Gambar 1: Halaman Login Sistem Inventori ATK Kementerian PKP RI (Akun: devi@pkp.com)</div>
+            </div>
+
+            <h2 class="section-title">Panduan Pengisian Kredensial Login</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Field Formulir</th>
+                        <th width="18%">Jenis Input</th>
+                        <th>Penjelasan Pengisian &amp; Hak Akses Kedinasan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Alamat Email</strong></td>
+                        <td><span class="badge badge-primary">Text Email</span></td>
+                        <td>Masukkan email kedinasan terdaftar Petugas Gudang: <code>devi@pkp.com</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kata Sandi</strong></td>
+                        <td><span class="badge badge-primary">Password</span></td>
+                        <td>Masukkan kata sandi terproteksi. Klik ikon mata untuk melihat karakter apabila diperlukan.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tombol Masuk</strong></td>
+                        <td><span class="badge badge-success">Tombol Biru</span></td>
+                        <td>Klik tombol <strong>Masuk ke Sistem</strong> untuk memvalidasi otentikasi ke server.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-info">
+                <strong>Status Penugasan Distribusi:</strong> Ketika akun <code>devi@pkp.com</code> berhasil login, sistem secara otomatis mengenali peran ganda sebagai <strong>Pegawai Gudang</strong> dan penugasan khusus <strong>Petugas Distribusi Barang (is_distributor = true)</strong>. Hal ini memberikan akses penuh terhadap menu *Distribusi Barang* dan notifikasi persetujuan Kasubbag TU.
+            </div>
+
+            <div class="callout callout-warning">
+                <strong>Ketentuan Keamanan:</strong> Akun Petugas Gudang memiliki kewenangan eksekusi pengurangan stok barang dan pengunggahan dokumen legalitas. Jangan pernah meninggalkan peramban dalam keadaan login di komputer bersama.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 3 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 4: BAB 2 - DASHBOARD & NOTIFIKASI (image2.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 2: DASHBOARD &amp; NOTIFIKASI &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 2: Antarmuka Dashboard &amp; Notifikasi Antrean Siap Serah</h1>
+            <p>
+                Dashboard Petugas Gudang menyajikan ringkasan statistik stok fisik, valuasi saldo persediaan, mutasi keluar-masuk, serta pusat pemberitahuan antrean penyerahan barang secara real-time.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image2.png" alt="Gambar 2: Dashboard Pegawai Gudang Menampilkan Notifikasi Antrean Distribusi Siap Serah">
+                <div class="figure-caption">Gambar 2: Dashboard Devi Ismiyantati &bull; Notifikasi 1 Antrean Distribusi Siap Serah dari Persetujuan Kasubbag TU</div>
+            </div>
+
+            <h2 class="section-title">Mekanisme Notifikasi Antrean Distribusi Real-Time</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="28%">Komponen Notifikasi</th>
+                        <th width="24%">Tampilan Pada Layar</th>
+                        <th>Penjelasan Fungsi Operasional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ikon Lonceng Navbar</strong></td>
+                        <td><span class="badge badge-danger">Badge Merah "1"</span></td>
+                        <td>Memberitahu adanya tiket permintaan baru yang telah disetujui Kasubbag TU dan menunggu serah terima fisik.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Banner Antrean Distribusi</strong></td>
+                        <td>Antrean Distribusi Barang (1 Siap)</td>
+                        <td>Ringkasan instan: <em>"Barang telah disetujui TU dan siap diserahkan ke unit kerja/pemohon."</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rincian Permintaan</strong></td>
+                        <td>Permintaan Bak Stempel Besar</td>
+                        <td>Rincian pemohon: <code>Bagus Sadewo, S.Kom.</code> &bull; Tiket: <code>REQ-20261026-QTIA</code> &bull; Status: Perorangan &bull; Waktu: 14 detik lalu.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tombol Buka Antrean</strong></td>
+                        <td><span class="badge badge-warning">Tombol Oranye</span></td>
+                        <td>Mengalihkan Petugas Gudang langsung ke tabel modul Distribusi Barang untuk mengeksekusi serah terima fisik.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">5 Indikator Metrik Kunci Persediaan Gudang</h2>
+            <ul class="feature-list">
+                <li><strong>Total Item Master:</strong> <code>564 Jenis ATK</code> yang terdaftar resmi dalam database kementerian.</li>
+                <li><strong>Total Stok Fisik:</strong> <code>2 Pcs</code> akumulasi sisa kuantitas barang di gudang.</li>
+                <li><strong>Valuasi Persediaan:</strong> <code>Rp 80.000</code> nilai nominal aset persediaan fisik yang ada di gudang.</li>
+                <li><strong>Total Barang Masuk (Pengadaan):</strong> <code>+12 Pcs</code> (Nilai Rp 580.000) barang masuk hasil belanja TU Oktober 2026.</li>
+                <li><strong>Total Barang Keluar (Distribusi):</strong> <code>-10 Pcs</code> (Nilai -Rp 500.000) pengeluaran untuk kebutuhan staf individu.</li>
+            </ul>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 4 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 5: BAB 3 - MENU DISTRIBUSI BARANG (image3.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 3: MANAJEMEN DISTRIBUSI &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 3: Manajemen Distribusi &amp; Penyerahan Barang ke Pemohon</h1>
+            <p>
+                Halaman <strong>Distribusi Barang</strong> merupakan modul kerja utama bagi Petugas Gudang untuk mengelola penyerahan fisik barang persediaan kepada pemohon perorangan maupun unit kerja/subdirektorat.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image3.png" alt="Gambar 3: Halaman Modul Distribusi Barang Menampilkan Daftar Penyerahan ke Pemohon">
+                <div class="figure-caption">Gambar 3: Modul Distribusi Barang &bull; Tabel Daftar Penyerahan Barang kepada Pemohon Subdit dan Perorangan</div>
+            </div>
+
+            <h2 class="section-title">Struktur Informasi &amp; Tabel Penyerahan Barang</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="18%">Nomor Tiket</th>
+                        <th width="26%">Pemohon &amp; Kategori</th>
+                        <th width="24%">Daftar Barang &amp; Qty</th>
+                        <th width="18%">Status Distribusi</th>
+                        <th>Waktu &amp; Bukti Foto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>REQ-20261026-1VF5</code></td>
+                        <td>Fairuz Armina Nur Azizah (PIC SDK)<br><span class="badge badge-primary">Kolektif Subdit</span></td>
+                        <td>Amplop Coklat A4 Air Mail (isi 10)<br><strong>1 Pcs</strong></td>
+                        <td><span class="badge badge-success">Telah Diserahterimakan</span></td>
+                        <td>26/10/2026 11:11 WIB<br><span class="badge badge-primary">Lihat Bukti Foto</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>REQ-20261026-QTIA</code></td>
+                        <td>Bagus Sadewo (Asisten Data)<br><span class="badge badge-warning">Perorangan</span></td>
+                        <td>Bak Stempel Besar<br><strong>10 Pcs</strong></td>
+                        <td><span class="badge badge-success">Telah Diserahterimakan</span></td>
+                        <td>26/10/2026 10:32 WIB<br><span class="badge badge-primary">Lihat Bukti Foto</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">SOP Eksekusi Serah Terima Barang Fisik (Handover)</h2>
+            <ol class="step-list">
+                <li>Buka menu <strong>Distribusi Barang</strong> pada sidebar navigasi kiri.</li>
+                <li>Periksa kartu KPI atas: jika ada angka pada <strong>Siap Didistribusikan</strong>, segera siapkan fisik barang di rak penyimpanan.</li>
+                <li>Saat pemohon datang ke gudang, cocokkan nomor tiket dan identitas pemohon.</li>
+                <li>Klik tombol <strong>Serahkan Barang</strong> pada baris tiket terkait untuk memunculkan modal serah terima.</li>
+                <li>Masukkan nama penerima fisik dan unggah/ambil foto dokumentasi penyerahan barang secara langsung.</li>
+                <li>Klik <strong>Konfirmasi Serah Terima</strong>. Sistem secara otomatis memperbarui status menjadi <em>Telah Diserahterimakan</em> dan riwayat langsung tampil pada tabel tanpa harus merefresh peramban.</li>
+            </ol>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 5 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 6: BAB 4 - BUKTI SERAH TERIMA & UPLOAD (image3_table.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 4: DOKUMENTASI &amp; BERKAS TTD &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 4: Administrasi Bukti Serah Terima, Cetak &amp; Upload TTD</h1>
+            <p>
+                Tertib administrasi Barang Milik Negara (BMN) mewajibkan setiap penyerahan fisik barang memiliki bukti dokumentasi visual (foto) serta bukti sah tertulis bertanda tangan basah pihak penerima dan petugas gudang.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image3_table.png" alt="Gambar 4: Detail Aksi Cetak Bukti dan Upload Berkas TTD pada Tabel Distribusi">
+                <div class="figure-caption">Gambar 4: Tombol Aksi "Lihat Bukti Foto", "Cetak Bukti", dan "Upload" Berkas Bertanda Tangan Fisik</div>
+            </div>
+
+            <h2 class="section-title">Tiga Fitur Vital Dokumentasi Pertanggungjawaban</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Fitur / Tombol</th>
+                        <th width="18%">Tampilan Tombol</th>
+                        <th>Penjelasan Fungsi Legalitas Kedinasan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Lihat Bukti Foto</strong></td>
+                        <td><span class="badge badge-primary">Tombol Biru Muda</span></td>
+                        <td>Membuka pop-up gambar foto serah terima barang fisik di ruang logistik yang diambil saat handover.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cetak Bukti</strong></td>
+                        <td><span class="badge" style="background:#ffffff; border:1px solid #144b59; color:#144b59;">Tombol Outline</span></td>
+                        <td>Menghasilkan <strong>Surat Bukti Penyerahan Barang ATK Resmi (PDF)</strong> berlogo kementerian, memuat rincian barang, kolom tanda tangan Kasubbag TU, Petugas Gudang (Devi Ismiyantati), dan Penerima.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Upload Berkas TTD</strong></td>
+                        <td><span class="badge badge-warning">Tombol Oranye</span></td>
+                        <td>Mengunggah dokumen pindaian (PDF/JPG) Surat Bukti Penyerahan yang telah ditandatangani basah secara fisik oleh pihak penerima sebagai bukti audit permanen.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Prosedur Pengarsipan Berkas Tanda Tangan Fisik</h2>
+            <ol class="step-list">
+                <li>Setelah barang diserahkan, klik tombol <strong>Cetak Bukti</strong> pada baris tiket yang telah diserahterimakan.</li>
+                <li>Cetak dokumen PDF tersebut pada kertas fisik dan mintakan tanda tangan basah penerima barang.</li>
+                <li>Petugas Gudang turut membubuhkan tanda tangan basah pada kolom <em>"Yang Menyerahkan"</em>.</li>
+                <li>Pindai (*scan*) atau foto dokumen fisik yang telah bertanda tangan lengkap.</li>
+                <li>Klik tombol <strong>Upload</strong> pada aplikasi, pilih berkas dokumen hasil pindai, lalu klik simpan.</li>
+                <li>Label tombol akan berubah menjadi <strong>Upload &check;</strong> menandakan arsip telah tersimpan aman di server kementerian.</li>
+            </ol>
+
+            <div class="callout callout-tip">
+                <strong>Audit Readiness:</strong> Dengan mengunggah scan berkas bertanda tangan, Subbagian TU dan Petugas Gudang memiliki arsip digital ganda yang siap diaudit sewaktu-waktu oleh Inspektorat maupun BPK RI.
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 6 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 7: BAB 5 - LAPORAN PERSEDIAAN (image4.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 5: LAPORAN MUTASI &amp; PERSEDIAAN &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 5: Monitoring Laporan Mutasi &amp; Valuasi Persediaan Gudang</h1>
+            <p>
+                Halaman <strong>Laporan Persediaan</strong> menyajikan buku besar mutasi seluruh transaksi barang masuk (hasil pengadaan) dan barang keluar (hasil distribusi) beserta nilai valuasi saldo rupiah secara transparan.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image4.png" alt="Gambar 5: Halaman Laporan Persediaan Menampilkan Data Mutasi Keluar-Masuk dan Rekapitulasi">
+                <div class="figure-caption">Gambar 5: Modul Laporan Persediaan &bull; Filter Multi-Kriteria, Daftar Mutasi Transaksi, dan Rekapitulasi Saldo Gudang</div>
+            </div>
+
+            <h2 class="section-title">Fitur Filter Multi-Dimensi Laporan Mutasi</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="26%">Parameter Filter</th>
+                        <th width="24%">Pilihan Tersedia</th>
+                        <th>Kegunaan untuk Analisis &amp; Rekonsiliasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Periode Bulan &amp; Tahun</strong></td>
+                        <td>Dropdown Bulan &amp; Tahun</td>
+                        <td>Memfilter data transaksi pada bulan berjalan (contoh: <em>Oktober 2026</em>) atau seluruh tahun anggaran.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jenis Mutasi</strong></td>
+                        <td>Masuk, Keluar, Semua</td>
+                        <td>Memisahkan antara transaksi penambahan barang (beli baru) dan pengeluaran barang (distribusi pemohon).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kategori Pemohon</strong></td>
+                        <td>Pegawai, Subdit, Semua</td>
+                        <td>Menganalisis proporsi barang yang diserap oleh perorangan pegawai dibandingkan unit kerja subdirektorat.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rentang Tanggal Spesifik</strong></td>
+                        <td>Date Range Picker</td>
+                        <td>Menarik data transaksi pada rentang hari tertentu untuk keperluan audit berkala/mingguan.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Pembacaan Baris Rekapitulasi Total Saldo Gudang</h2>
+            <p>
+                Pada bagian bawah tabel transaksi, sistem secara otomatis mengkalkulasi baris <strong>TOTAL REKAPITULASI</strong>:
+            </p>
+            <ul class="feature-list">
+                <li><strong>Total Stok Awal:</strong> <code>24 Pcs</code> akumulasi volume barang yang tercatat pada awal periode.</li>
+                <li><strong>Total Barang Keluar (Dipinjam/Diserahkan):</strong> <code>11 Pcs</code> (1 Pcs Subdit SDK + 10 Pcs Bagus Sadewo).</li>
+                <li><strong>Total Stok Sisa Akhir:</strong> <code>13 Pcs</code> sisa stok fisik riil yang masih tersimpan di gudang.</li>
+                <li><strong>Total Nilai Saldo Persediaan:</strong> <code>Rp 860.000</code> valuasi rupiah persediaan aktif milik kementerian.</li>
+            </ul>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 7 dari 8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 8: BAB 6 - EKSPOR, CETAK SAH & FAQ (image4_table.png)
+         ========================================== -->
+    <div class="page">
+        <div class="header-strip">
+            <span>KEMENTERIAN PERUMAHAN DAN KAWASAN PERMUKIMAN RI</span>
+            <span>BAB 6: EKSPOR LAPORAN &amp; FAQ &bull; ATEKA</span>
+        </div>
+        <div class="content-body">
+            <h1 class="chapter-title">BAB 6: Prosedur Ekspor Excel, Cetak Laporan Sah &amp; Bantuan</h1>
+            <p>
+                Sistem menyediakan opsi keluaran ganda: <strong>Export Excel</strong> untuk pembukuan digital dan <strong>Cetak Laporan</strong> untuk dokumen fisik resmi yang memuat kolom tanda tangan pengesahan Petugas Gudang Distribusi.
+            </p>
+
+            <div class="figure-card">
+                <img src="images/image4_table.png" alt="Gambar 6: Tombol Export Excel dan Cetak Laporan Resmi pada Halaman Laporan Persediaan">
+                <div class="figure-caption">Gambar 6: Tombol Export Excel &amp; Cetak Laporan Resmi Lengkap dengan Tanda Tangan Mengetahui Petugas Gudang</div>
+            </div>
+
+            <h2 class="section-title">Ketentuan Pengesahan Dokumen Cetak Laporan</h2>
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th width="24%">Aksi Laporan</th>
+                        <th width="18%">Format Keluaran</th>
+                        <th>Ketentuan Tanda Tangan &amp; Legalitas Administrasi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Export Excel</strong></td>
+                        <td><span class="badge badge-success">File .XLSX</span></td>
+                        <td>Data mentah seluruh kolom mutasi, siap diolah untuk laporan keuangan kementerian dan rekonsiliasi SAIBA/SIMAK-BMN.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cetak Laporan</strong></td>
+                        <td><span class="badge badge-primary">Halaman Cetak Resmi</span></td>
+                        <td>Membuka tampilan cetak formal berstandar kementerian. Pada bagian bawah lembar laporan, tercantum kolom tanda tangan resmi:<br>
+                        <strong>Mengetahui:</strong> <code>Devi Ismiyantati (Petugas Distribusi Gudang ATK &bull; NIP: 12345678911)</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Tanya Jawab Operasional (FAQ) Pegawai Gudang</h2>
+            <div class="callout callout-info" style="margin-bottom: 3px;">
+                <strong>Q1: Mengapa nama Petugas Gudang tercantum otomatis pada kolom pengesahan Cetak Laporan?</strong><br>
+                Sistem secara cerdas mendeteksi akun Pegawai Gudang yang ditunjuk sebagai penanggung jawab distribusi barang (<code>is_distributor = true</code>), sehingga tanda tangan pengesahan laporan secara resmi diamanahkan kepada Petugas terkait.
+            </div>
+            <div class="callout callout-tip" style="margin-bottom: 3px;">
+                <strong>Q2: Apakah setelah konfirmasi serah terima perlu merefresh halaman?</strong><br>
+                Tidak perlu. Pembaruan terbaru sistem langsung mengarahkan Anda ke tabel riwayat dengan status *Telah Diserahterimakan* tanpa memuat ulang manual.
+            </div>
+
+            <div class="callout callout-warning">
+                <strong>Kontak Layanan Koordinasi Gudang &amp; Dukungan TI:</strong><br>
+                Subbagian Tata Usaha &bull; Gedung Utama Kementerian Perumahan dan Kawasan Permukiman RI<br>
+                Email Dukungan: <code>gudang.persediaan@pkp.go.id</code> &bull; Ext. Gudang: 1405 &bull; Helpdesk Sistem ATEKA
+            </div>
+        </div>
+        <div class="footer-strip">
+            <span>Kementerian PKP RI &bull; Panduan Operasional Pegawai Gudang Distribusi ATEKA</span>
+            <span>Halaman 8 dari 8</span>
+        </div>
+    </div>
+
+</body>
+</html>
