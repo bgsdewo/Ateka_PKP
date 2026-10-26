@@ -164,6 +164,15 @@
             $subditLabel = $requesterUser->position ?? ($isPicOrSubdit ? 'Subdirektorat' : 'Pegawai Perorangan');
         }
 
+        // Label Perwakilan Subdirektorat khusus untuk Akun PIC
+        $cleanedSubditForPerwakilan = trim($subditLabel);
+        $cleanedSubditForPerwakilan = preg_replace('/^pic\s+distribusi\s+/i', '', $cleanedSubditForPerwakilan);
+        if (stripos($cleanedSubditForPerwakilan, 'subdirektorat') === 0 || stripos($cleanedSubditForPerwakilan, 'subbagian') === 0) {
+            $perwakilanSubditText = 'Perwakilan ' . $cleanedSubditForPerwakilan;
+        } else {
+            $perwakilanSubditText = 'Perwakilan Subdirektorat ' . $cleanedSubditForPerwakilan;
+        }
+
         // Team Name Sheet 1 (TIM SDK, TIM PJF, dsb)
         if (!$isPicOrSubdit) {
             $teamName = $requesterUser ? ($requesterUser->name_with_title ?: $requesterUser->name) : 'Pegawai';
@@ -397,6 +406,15 @@
 
         <!-- IDENTITAS PEMOHON SESUAI GAMBAR 2 -->
         <table class="table table-borderless table-sm mb-3" style="font-size: 13px; width: 100%;">
+            @if ($isPicOrSubdit)
+                <tr>
+                    <td width="25%"><strong>Permintaan</strong></td>
+                    <td width="2%">:</td>
+                    <td width="73%">
+                        <strong>{{ $perwakilanSubditText }}</strong>
+                    </td>
+                </tr>
+            @endif
             <tr>
                 <td width="25%"><strong>{{ $isPicOrSubdit ? 'Nama Penerima (Perwakilan)' : 'Nama Penerima / Pemohon' }}</strong></td>
                 <td width="2%">:</td>

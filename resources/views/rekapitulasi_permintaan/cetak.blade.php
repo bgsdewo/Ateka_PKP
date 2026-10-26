@@ -289,6 +289,30 @@
             $namaDistributor = $distributorUser ? ($distributorUser->name_with_title ?: $distributorUser->name) : 'Petugas Gudang';
             $nipDistributor = $distributorUser ? $distributorUser->nip : null;
             $jabatanDistributor = $distributorUser ? ($distributorUser->position ?: 'Petugas Distribusi Gudang ATK') : 'Petugas Distribusi Gudang ATK';
+
+            // Subdit Label untuk PIC
+            $detectedSubdit = null;
+            if ($requesterUser && !empty($requesterUser->subdit_name)) {
+                $detectedSubdit = $requesterUser->subdit_name;
+            } elseif ($requesterUser && ($requesterUser->isSdk() || str_contains(strtolower($requesterUser->position ?? ''), 'sdk'))) {
+                $detectedSubdit = 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman';
+            } elseif ($requesterUser && ($requesterUser->isPjf() || str_contains(strtolower($requesterUser->position ?? ''), 'pjf'))) {
+                $detectedSubdit = 'Subdirektorat Pengelolaan Jabatan Fungsional Perumahan dan Pengembangan Profesi';
+            } elseif ($requesterUser && ($requesterUser->isKbr() || str_contains(strtolower($requesterUser->position ?? ''), 'kbr'))) {
+                $detectedSubdit = 'Subdirektorat Kendala Bangunan Rumah';
+            } elseif ($requesterUser && ($requesterUser->isTu() || str_contains(strtolower($requesterUser->position ?? ''), 'tata usaha'))) {
+                $detectedSubdit = 'Subbagian Tata Usaha';
+            } else {
+                $detectedSubdit = $requesterUser->position ?? ($isPicOrSubdit ? 'Subdirektorat' : 'Pegawai Perorangan');
+            }
+
+            $cleanedSubditForPerwakilan = trim($detectedSubdit);
+            $cleanedSubditForPerwakilan = preg_replace('/^pic\s+distribusi\s+/i', '', $cleanedSubditForPerwakilan);
+            if (stripos($cleanedSubditForPerwakilan, 'subdirektorat') === 0 || stripos($cleanedSubditForPerwakilan, 'subbagian') === 0) {
+                $perwakilanSubditText = 'Perwakilan ' . $cleanedSubditForPerwakilan;
+            } else {
+                $perwakilanSubditText = 'Perwakilan Subdirektorat ' . $cleanedSubditForPerwakilan;
+            }
         @endphp
 
         <!-- ========================================================================= -->
@@ -330,6 +354,15 @@
 
             <!-- IDENTITAS PEMOHON SESUAI GAMBAR 2 -->
             <table class="table table-borderless table-sm mb-3" style="font-size: 13px; width: 100%;">
+                @if ($isPicOrSubdit)
+                    <tr>
+                        <td width="25%"><strong>Permintaan</strong></td>
+                        <td width="2%">:</td>
+                        <td width="73%">
+                            <strong>{{ $perwakilanSubditText }}</strong>
+                        </td>
+                    </tr>
+                @endif
                 <tr>
                     <td width="25%"><strong>{{ $isPicOrSubdit ? 'Nama Penerima (Perwakilan)' : 'Nama Penerima / Pemohon' }}</strong></td>
                     <td width="2%">:</td>
