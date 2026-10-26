@@ -58,6 +58,16 @@
                                         Distribusi ATK ({{ $readyDistribusiCount }} Siap Serah)
                                     </a>
                                 @endif
+                                @if (auth()->user()->isReportExaminer() && ($pendingProcurementsExaminerCount ?? 0) > 0)
+                                    <a href="{{ route('master-data.daftar-barang.index') }}#pengadaan-section" class="btn btn-warning text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </svg>
+                                        Pengadaan Menunggu Stok ({{ $pendingProcurementsExaminerCount }} Usulan)
+                                    </a>
+                                @endif
                                 <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <rect x="3" y="3" width="7" height="7"></rect>

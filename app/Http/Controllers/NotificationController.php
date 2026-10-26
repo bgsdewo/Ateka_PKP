@@ -22,12 +22,14 @@ class NotificationController extends Controller
 
         $isKasubagTU = $user->isKasubagTU();
         $isDistributorGudang = $user->isPegawaiGudang() && $user->isDistributor();
+        $isReportExaminer = $user->isPegawaiGudang() && $user->isReportExaminer();
 
         $notifications = collect();
         $stats = [
             'total_pending' => 0,
             'pending_procurement' => 0,
             'pending_stock' => 0,
+            'pending_procurement_stock' => 0,
             'history_count' => 0,
         ];
 
@@ -195,6 +197,20 @@ class NotificationController extends Controller
 
             $unreadCount = $stats['total_pending'] + $user->unreadNotificationsCount;
 
+        } elseif ($isReportExaminer) {
+            // Antrean Usulan Pengadaan yang telah disetujui Kasubbag TU dan menunggu penambahan stok oleh Pemeriksa Laporan
+            $pendingPengadaanGudangQuery = RequestItem::where('status', 'approved')
+                ->where('is_procurement', true)
+                ->whereHas('details', function ($q) {
+                    $q->where('is_fulfilled', false);
+                });
+
+            $pendingPengadaanCount = (clone $pendingPengadaanGudangQuery)->count();
+            $stats['total_pending'] = $pendingPengadaanCount;
+            $stats['pending_procurement_stock'] = $pendingPengadaanCount;
+
+            $unreadCount = max($pendingPengadaanCount, $user->unreadNotificationsCount);
+
         } else {
             // Pengguna Reguler (Pegawai / Subdit)
             $unreadCount = $user->unreadNotificationsCount;
@@ -203,22 +219,23 @@ class NotificationController extends Controller
         // Ambil notifikasi dari tabel user_notifications (milik user saat ini)
         $userNotifs = $user->notifications()->take(30)->get();
         foreach ($userNotifs as $notif) {
+            $isExaminerNotif = $notif->type === 'procurement_approved_examiner';
             $notifications->push([
                 'id' => $notif->id,
-                'request_id' => null,
-                'request_code' => null,
+                'request_id' => $notif->request_id,
+                'request_code' => $notif->data['request_code'] ?? null,
                 'title' => $notif->title,
                 'message' => $notif->message,
                 'type' => $notif->type,
-                'category' => 'system',
-                'badge_label' => 'Sistem ATK',
-                'badge_class' => 'bg-info-subtle text-info border border-info',
+                'category' => $isExaminerNotif ? 'procurement' : 'system',
+                'badge_label' => $isExaminerNotif ? 'Pengadaan Disetujui' : 'Sistem ATK',
+                'badge_class' => $isExaminerNotif ? 'bg-warning-subtle text-warning border border-warning' : 'bg-info-subtle text-info border border-info',
                 'status_badge' => $notif->is_read ? 'Sudah Dibaca' : 'Baru',
                 'status_badge_class' => $notif->is_read ? 'bg-light text-secondary border' : 'bg-danger text-white',
                 'link' => $notif->link,
-                'action_text' => 'Buka',
+                'action_text' => $isExaminerNotif ? 'Isi Stok' : 'Buka',
                 'is_read' => (bool) $notif->is_read,
-                'is_pending' => false,
+                'is_pending' => $isExaminerNotif && !$notif->is_read,
                 'time_ago' => $notif->created_at->diffForHumans(),
                 'created_at' => $notif->created_at->format('d/m/Y H:i'),
                 'timestamp' => $notif->created_at->timestamp,

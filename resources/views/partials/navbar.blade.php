@@ -35,6 +35,7 @@
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
                     $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
                     $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
+                    $isReportExaminer = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isReportExaminer();
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
@@ -129,13 +130,26 @@
                         }
                     }
 
+                    // Khusus Petugas Pemeriksa Laporan Persediaan: Ringkasan Pengadaan Menunggu Penambahan Stok
+                    $totalPendingPengadaanGudang = 0;
+                    if ($isReportExaminer) {
+                        $totalPendingPengadaanGudang = \App\Models\RequestItem::where('status', 'approved')
+                            ->where('is_procurement', true)
+                            ->whereHas('details', function ($q) {
+                                $q->where('is_fulfilled', false);
+                            })->count();
+                    }
+
                     $navBadgeCount = $isKasubagTU 
                         ? ($unreadNotifCount + $totalPendingVerifikasi) 
-                        : ($isDistributorGudang 
-                            ? ($unreadNotifCount + $totalPendingDistribusi) 
-                            : $unreadNotifCount);
+                        : ($unreadNotifCount 
+                            + ($isDistributorGudang ? $totalPendingDistribusi : 0) 
+                            + ($isReportExaminer ? $totalPendingPengadaanGudang : 0));
 
-                    $hasAnyNotifications = $totalPendingVerifikasi > 0 || $totalPendingDistribusi > 0 || $userNotifications->isNotEmpty();
+                    $hasAnyNotifications = $totalPendingVerifikasi > 0 
+                        || $totalPendingDistribusi > 0 
+                        || ($isReportExaminer && $totalPendingPengadaanGudang > 0) 
+                        || $userNotifications->isNotEmpty();
                 @endphp
                 <li class="nav-item dropdown me-2">
                     <a href="#" class="nav-link position-relative p-2 rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border"
@@ -223,6 +237,27 @@
                             </div>
                         @endif
 
+                        {{-- Card Ringkasan Khusus Petugas Pemeriksa Laporan Persediaan --}}
+                        @if($isReportExaminer && $totalPendingPengadaanGudang > 0)
+                            <div class="p-2.5 m-2.5 mb-1 rounded-3 border" style="background: #eff6ff; border-color: #dbeafe !important;">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="small fw-bold text-dark d-flex align-items-center gap-1" style="font-size: 0.76rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                        </svg>
+                                        Pengadaan Menunggu Stok
+                                    </span>
+                                    <span class="badge bg-primary text-white fw-bold rounded-pill px-2" style="font-size: 0.65rem;">{{ $totalPendingPengadaanGudang }} Usulan</span>
+                                </div>
+                                <small class="text-muted d-block mb-1.5" style="font-size: 0.72rem;">Usulan pengadaan telah disetujui Kasubbag TU dan menunggu penambahan stok barang ke sistem.</small>
+                                <a href="{{ route('master-data.daftar-barang.index') }}#pengadaan-section" class="btn btn-xs btn-primary text-white fw-bold rounded-pill w-100 py-1 text-center" style="font-size: 0.72rem;">
+                                    Buka Daftar Barang &rarr;
+                                </a>
+                            </div>
+                        @endif
+
                         <div class="list-group list-group-flush overflow-auto" id="nav-notif-list" style="max-height: 360px;">
                             {{-- Item Verifikasi Pending untuk Kasubbag TU --}}
                             @foreach($pendingVerifications as $pv)
@@ -293,8 +328,8 @@
                             @foreach($userNotifications as $notif)
                                 <div class="list-group-item list-group-item-action p-2.5 notif-item {{ !$notif->is_read ? 'bg-light border-start border-primary border-4' : '' }}" id="notif-item-{{ $notif->id }}">
                                     <div class="d-flex align-items-start gap-2">
-                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ $notif->type === 'procurement_available' ? 'bg-success text-white' : 'bg-primary-subtle text-primary' }}" style="width: 32px; height: 32px;">
-                                            @if($notif->type === 'procurement_available')
+                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']) ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary' }}" style="width: 32px; height: 32px;">
+                                            @if(in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']))
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                                                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -312,6 +347,9 @@
                                             <div class="d-flex justify-content-between align-items-center mb-0.5">
                                                 <h6 class="mb-0 small fw-bold text-dark text-truncate" style="font-size: 0.8rem;">{{ $notif->title }}</h6>
                                                 <div class="d-flex align-items-center gap-1 ms-1">
+                                                    @if($notif->type === 'procurement_approved_examiner')
+                                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill" style="font-size: 0.58rem;">Pengadaan</span>
+                                                    @endif
                                                     @if(($notif->duplicate_count ?? 1) > 1)
                                                         <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.6rem;">{{ $notif->duplicate_count }}x</span>
                                                     @endif

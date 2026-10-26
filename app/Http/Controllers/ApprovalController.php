@@ -267,6 +267,9 @@ class ApprovalController extends Controller
                             }
                         }
                     }
+                    // Kirim notifikasi ke Pegawai Gudang yang ditugaskan memeriksa laporan persediaan
+                    UserNotification::sendProcurementApprovedToExaminers($item);
+
                     $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubbag TU / Pegawai Gudang.';
                 } else {
                     $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
@@ -434,6 +437,9 @@ class ApprovalController extends Controller
                     UserNotification::sendConsolidatedProcurementNotification($item, $purchasedProducts, $request->no_faktur);
                 }
             }
+
+            // Kirim notifikasi ke Pegawai Gudang yang ditugaskan memeriksa laporan persediaan
+            UserNotification::sendProcurementApprovedToExaminers($item);
 
             DB::commit();
 

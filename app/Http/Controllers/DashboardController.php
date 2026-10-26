@@ -174,6 +174,11 @@ class DashboardController extends Controller
 
         $readyDistribusiCount = $readyDistribusiQuery->count();
         $totalDistributedCount = $totalDistributedQuery->count();
+        $pendingProcurementsExaminerCount = RequestItem::where('status', 'approved')
+            ->where('is_procurement', true)
+            ->whereHas('details', function ($q) {
+                $q->where('is_fulfilled', false);
+            })->count();
 
         // Data khusus user requester yang sedang login (Subdit / Pegawai)
         $userId = auth()->id();
@@ -278,6 +283,7 @@ class DashboardController extends Controller
             'chartOut',
             'pendingRequestsCount',
             'readyDistribusiCount',
+            'pendingProcurementsExaminerCount',
             'totalDistributedCount',
             'userRequests',
             'trackedRequests',

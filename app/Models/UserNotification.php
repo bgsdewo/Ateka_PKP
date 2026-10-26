@@ -163,4 +163,96 @@ class UserNotification extends Model
             ],
         ]);
     }
+
+    /**
+     * Kirim notifikasi ke Petugas Gudang (Pemeriksa Laporan Persediaan)
+     * saat usulan pengadaan disetujui oleh Kasubbag TU
+     */
+    public static function sendProcurementApprovedToExaminers(RequestItem $requestItem): void
+    {
+        // Cari pegawai gudang yang ditugaskan memeriksa laporan persediaan
+        $examiners = User::where('role', 'pegawai_gudang')
+            ->where('is_report_examiner', true)
+            ->get();
+
+        // Jika belum ada yang ditugaskan secara spesifik, kirimkan ke semua pegawai gudang
+        if ($examiners->isEmpty()) {
+            $examiners = User::where('role', 'pegawai_gudang')->get();
+        }
+
+        if ($examiners->isEmpty()) {
+            return;
+        }
+
+        $pemohonName = $requestItem->user 
+            ? ($requestItem->user->name_with_title ?: $requestItem->user->name) 
+            : 'Pegawai';
+        $unitKerja = $requestItem->user 
+            ? ($requestItem->user->position ?? ($requestItem->type === 'subdit' ? 'Subdirektorat' : 'Pegawai')) 
+            : 'Pegawai';
+
+        $approvedDetails = $requestItem->details->filter(function ($d) {
+            return $d->approved_quantity > 0 || (is_null($d->approved_quantity) && $d->quantity > 0);
+        });
+
+        $itemNames = $approvedDetails->map(function ($d) {
+            $name = $d->product ? $d->product->name : ($d->custom_product_name ?: 'Barang');
+            $qty = $d->approved_quantity ?: $d->quantity;
+            $unit = $d->product ? ($d->product->unit ?: 'Stock') : ($d->custom_unit ?: 'Stock');
+            return "{$name} ({$qty} {$unit})";
+        })->values();
+
+        $itemSummary = $itemNames->take(2)->join(', ');
+        if ($itemNames->count() > 2) {
+            $itemSummary .= ' (+' . ($itemNames->count() - 2) . ' barang lainnya)';
+        } elseif ($itemNames->isEmpty()) {
+            $itemSummary = 'Barang ATK';
+        }
+
+        $title = 'Usulan Pengadaan Disetujui Kasubbag TU';
+        $message = "Kasubbag TU telah menyetujui usulan pengadaan #{$requestItem->request_code} dari {$pemohonName} ({$itemSummary}). Silakan lakukan penambahan stok barang di Master Data.";
+        $link = route('products.index') . '#pengadaan-section';
+
+        foreach ($examiners as $examiner) {
+            $existing = self::where('user_id', $examiner->id)
+                ->where('request_id', $requestItem->id)
+                ->where('type', 'procurement_approved_examiner')
+                ->where('is_read', false)
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'title' => $title,
+                    'message' => $message,
+                    'link' => $link,
+                    'data' => [
+                        'request_code' => $requestItem->request_code,
+                        'requester' => $pemohonName,
+                        'unit_name' => $unitKerja,
+                        'item_summary' => $itemSummary,
+                        'total_items' => $approvedDetails->count(),
+                    ],
+                ]);
+            } else {
+                self::create([
+                    'user_id' => $examiner->id,
+                    'title' => $title,
+                    'message' => $message,
+                    'type' => 'procurement_approved_examiner',
+                    'icon' => 'box',
+                    'link' => $link,
+                    'request_id' => $requestItem->id,
+                    'product_id' => $approvedDetails->first()->product_id ?? null,
+                    'is_read' => false,
+                    'data' => [
+                        'request_code' => $requestItem->request_code,
+                        'requester' => $pemohonName,
+                        'unit_name' => $unitKerja,
+                        'item_summary' => $itemSummary,
+                        'total_items' => $approvedDetails->count(),
+                    ],
+                ]);
+            }
+        }
+    }
 }
