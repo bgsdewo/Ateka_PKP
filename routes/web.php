@@ -77,9 +77,6 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('/daftar-barang', ProductController::class)
             ->middleware('role:kasubag_tu,pegawai_gudang');
-        Route::get('/daftar-barang', [ProductController::class, 'index'])
-            ->middleware('role:kasubag_tu,pegawai_gudang')
-            ->name('products.index');
 
         Route::resource('/manajemen-pengguna', UserManagementController::class)
             ->middleware('role:kasubag_tu');

@@ -132,7 +132,7 @@ class ReportExaminerNotificationTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $feedData['unread_count']);
 
         // 6. Verifikasi halaman produk / master data dapat diakses oleh pemeriksa
-        $prodResponse = $this->actingAs($this->examinerGudang)->get(route('products.index'));
+        $prodResponse = $this->actingAs($this->examinerGudang)->get(route('master-data.daftar-barang.index'));
         $prodResponse->assertStatus(200);
         $prodResponse->assertSee('Permintaan Pengadaan Menunggu Penambahan Barang');
         $prodResponse->assertSee('Bak Stempel Besar');
