@@ -465,7 +465,7 @@ class UserRequestFeaturesTest extends TestCase
         $resDash = $this->actingAs($this->buUtami)->get(route('dashboard'));
         $resDash->assertStatus(200);
         $resDash->assertDontSee('Rekapitulasi Permintaan');
-        $resDash->assertSee('Verifikasi &amp; Persetujuan', false);
+        $resDash->assertSee('Verifikasi & Persetujuan');
     }
 }
 
