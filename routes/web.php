@@ -201,3 +201,43 @@ Route::middleware('auth')->group(function () {
     Route::put('/ubah-password', [ProfileController::class, 'updatePassword'])
         ->name('profile.password.update');
 });
+
+// ==========================================
+// 5. ROUTE SINKRONISASI BMN & DATABASE MAINTENANCE (HOSTING)
+// ==========================================
+Route::get('/system/sync-bmn-database', function (\Illuminate\Http\Request $request) {
+    $secret = 'ateka_sync_2026';
+    $isAuthorized = (auth()->check() && in_array(auth()->user()->role, ['kasubag_tu', 'pegawai_gudang']))
+                    || ($request->query('token') === $secret);
+
+    if (!$isAuthorized) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Akses ditolak. Silakan login sebagai Kasubbag TU / Pegawai Gudang, atau sertakan token otorisasi yang valid (?token=ateka_sync_2026).'
+        ], 403);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        $clearOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sinkronisasi database BMN, Kategori Barang, dan Daftar Barang berhasil di server hosting!',
+            'details' => [
+                'migration' => trim($migrateOutput),
+                'cache' => trim($clearOutput),
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Gagal melakukan sinkronisasi: ' . $e->getMessage(),
+        ], 500);
+    }
+})->name('system.sync-bmn-database');
+

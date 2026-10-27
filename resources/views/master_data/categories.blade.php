@@ -65,9 +65,17 @@
                         <div class="header-title">
                             <h4 class="card-title mb-0">Master Data Kategori Barang</h4>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm btn-create-kategori">
-                            Tambah Kategori
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('system.sync-bmn-database') }}" class="btn btn-outline-primary btn-sm" onclick="return confirm('Jalankan sinkronisasi Kode Barang & Rincian BMN untuk seluruh Kategori dan Produk ATK?');">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                                </svg>
+                                Sinkronkan BMN
+                            </a>
+                            <button type="button" class="btn btn-primary btn-sm btn-create-kategori">
+                                Tambah Kategori
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-striped table-hover word-wrap"
