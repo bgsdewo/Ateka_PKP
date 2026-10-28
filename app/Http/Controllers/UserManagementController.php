@@ -76,7 +76,24 @@ class UserManagementController extends Controller
             $subditName = 'Subbagian Tata Usaha';
         } elseif ($request->role === 'pegawai_gudang') {
             $isDistributor = $request->boolean('is_distributor');
-            $position = $position ?: ($isDistributor ? 'Petugas Distribusi Gudang ATK' : 'Pegawai Gudang');
+            $isExaminer = $request->boolean('is_report_examiner');
+            $defaultGudangPositions = [
+                'Pegawai Gudang',
+                'Petugas Distribusi Gudang ATK',
+                'Petugas Pemeriksa Laporan Persediaan',
+                'Petugas Distribusi & Pemeriksa Laporan Persediaan'
+            ];
+            if (!$position || in_array($position, $defaultGudangPositions)) {
+                if ($isDistributor && $isExaminer) {
+                    $position = 'Petugas Distribusi & Pemeriksa Laporan Persediaan';
+                } elseif ($isDistributor) {
+                    $position = 'Petugas Distribusi Gudang ATK';
+                } elseif ($isExaminer) {
+                    $position = 'Petugas Pemeriksa Laporan Persediaan';
+                } else {
+                    $position = 'Pegawai Gudang';
+                }
+            }
             $subditName = 'Gudang Persediaan ATK';
         } elseif ($request->role === 'pegawai') {
             $subditName = 'Pegawai Perorangan';
@@ -158,7 +175,24 @@ class UserManagementController extends Controller
             }
         } elseif ($request->role === 'pegawai_gudang') {
             $isDist = $request->boolean('is_distributor');
-            $position = $position ?: ($isDist ? 'Petugas Distribusi Gudang ATK' : 'Pegawai Gudang');
+            $isExam = $request->boolean('is_report_examiner');
+            $defaultGudangPositions = [
+                'Pegawai Gudang',
+                'Petugas Distribusi Gudang ATK',
+                'Petugas Pemeriksa Laporan Persediaan',
+                'Petugas Distribusi & Pemeriksa Laporan Persediaan'
+            ];
+            if (!$position || in_array($position, $defaultGudangPositions)) {
+                if ($isDist && $isExam) {
+                    $position = 'Petugas Distribusi & Pemeriksa Laporan Persediaan';
+                } elseif ($isDist) {
+                    $position = 'Petugas Distribusi Gudang ATK';
+                } elseif ($isExam) {
+                    $position = 'Petugas Pemeriksa Laporan Persediaan';
+                } else {
+                    $position = 'Pegawai Gudang';
+                }
+            }
             $subditName = $subditName ?: 'Gudang Persediaan ATK';
         } elseif ($request->role === 'pegawai') {
             $subditName = 'Pegawai Perorangan';
