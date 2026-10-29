@@ -108,7 +108,7 @@ class RequestController extends Controller
         }
 
         $successMsg = $requiresProcurement
-            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Karena terdapat barang dengan stok belum tersedia di gudang, pengajuan otomatis diarahkan ke alur pengadaan Kasubbag TU.'
+            ? 'Pengajuan permintaan ATK (' . $requestCode . ') berhasil dikirim! Barang akan diproses pengadaan oleh Subbag TU dan otomatis dialokasikan untuk Anda setelah tiba tanpa perlu mengajukan ulang.'
             : 'Pengajuan permintaan ATK berhasil dikirim dan menunggu persetujuan Kasubbag TU.';
 
         return redirect()->route('pengajuan.index')->with('success', $successMsg);

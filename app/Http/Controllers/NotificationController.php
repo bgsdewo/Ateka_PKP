@@ -152,7 +152,14 @@ class NotificationController extends Controller
             // Antrean Distribusi Fisik Barang untuk Petugas Gudang (Distributor)
             $readyDistribusiQuery = RequestItem::where('status', 'approved')
                 ->where(function ($q) {
-                    $q->where('is_procurement', false)->orWhereNull('is_procurement');
+                    $q->where(function ($sub) {
+                        $sub->where('is_procurement', false)->orWhereNull('is_procurement');
+                    })->orWhere(function ($sub) {
+                        $sub->where('is_procurement', true)
+                            ->whereDoesntHave('details', function ($dq) {
+                                $dq->where('is_fulfilled', false);
+                            });
+                    });
                 })
                 ->with(['user', 'details.product']);
 

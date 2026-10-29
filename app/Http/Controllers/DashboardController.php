@@ -241,7 +241,7 @@ class DashboardController extends Controller
             ->count();
 
         $recentProcurementNotifications = auth()->user()->notifications()
-            ->where('type', 'procurement_available')
+            ->whereIn('type', ['procurement_ready_distribution', 'procurement_available'])
             ->where('is_read', false)
             ->with('product')
             ->latest()

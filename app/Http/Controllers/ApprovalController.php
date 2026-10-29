@@ -38,6 +38,14 @@ class ApprovalController extends Controller
         $pendingStockCount = RequestItem::where('status', 'pending')->where(function ($q) {
             $q->where('is_procurement', false)->orWhereNull('is_procurement');
         })->count();
+        $pendingAllCount = RequestItem::where('status', 'pending')->count();
+
+        // Hitung total tiket masing-masing kategori
+        $totalAllCategoryCount = RequestItem::count();
+        $totalStockCategoryCount = RequestItem::where(function ($q) {
+            $q->where('is_procurement', false)->orWhereNull('is_procurement');
+        })->count();
+        $totalProcurementCategoryCount = RequestItem::where('is_procurement', true)->count();
 
         $baseQuery = RequestItem::query()
             ->when($category === 'pengadaan', function ($q) {
@@ -109,7 +117,11 @@ class ApprovalController extends Controller
             'rejectedCount',
             'totalCount',
             'pendingProcurementCount',
-            'pendingStockCount'
+            'pendingStockCount',
+            'pendingAllCount',
+            'totalAllCategoryCount',
+            'totalStockCategoryCount',
+            'totalProcurementCategoryCount'
         ));
     }
 
@@ -182,42 +194,8 @@ class ApprovalController extends Controller
                         'verification_note' => $itemNote,
                     ]);
 
-                    // Jika permintaan barang persediaan dari stok gudang & disetujui > 0
-                    if (!$item->is_procurement && $detail->product_id && $approvedQty > 0) {
-                        $product = Product::lockForUpdate()->find($detail->product_id);
-                        if ($product) {
-                            $stockAfter = max(0, $product->stock - $approvedQty);
-                            $product->stock = $stockAfter;
-                            $product->save();
-
-                            $pemohonName = $item->user->name ?? 'Pegawai';
-                            $pemohonUnit = $item->user->position ? ' (' . $item->user->position . ')' : '';
-                            $uraianPenerima = $pemohonName . $pemohonUnit;
-
-                            $noteText = 'Pengeluaran ' . $product->name . ' Untuk ' . $pemohonName;
-                            if ($itemNote) {
-                                $noteText .= ' - ' . $itemNote;
-                            } elseif ($request->filled('verification_notes')) {
-                                $noteText .= ' - ' . $request->verification_notes;
-                            }
-
-                            // Catat transaksi Barang Keluar secara real-time
-                            StockTransaction::create([
-                                'product_id'       => $product->id,
-                                'user_id'          => Auth::id(),
-                                'type'             => 'keluar',
-                                'recipient_type'   => $item->type ?? 'individu',
-                                'quantity'         => $approvedQty,
-                                'stock_after'      => $stockAfter,
-                                'transaction_date' => now()->toDateString(),
-                                'no_faktur'        => $item->request_code,
-                                'uraian'           => $uraianPenerima,
-                                'kondisi'          => 'Baik',
-                                'harga_perolehan'  => $product->purchase_price ?? 0,
-                                'note'             => $noteText,
-                            ]);
-                        }
-                    }
+                    // Catatan: Pemotongan stok dan pencatatan mutasi Barang Keluar ditangani
+                    // saat Petugas Gudang Distribusi melakukan serah terima fisik barang kepada pemohon.
 
                     // Jika pengadaan barang: jangan tambahkan stok otomatis.
                     // Stok baru akan diisi oleh Kasubbag TU atau Pegawai Gudang melalui menu Daftar Barang (Master Data) atau Barang Masuk setelah barang fisik dibeli.
@@ -399,24 +377,8 @@ class ApprovalController extends Controller
                     'verification_note' => 'Dibeli melalui Faktur: ' . $request->no_faktur . ($request->supplier_name ? ' (' . $request->supplier_name . ')' : ''),
                 ]);
 
-                // 3. Catat Transaksi Keluar (Alokasi Persediaan untuk Pemohon)
-                $stockAfterOut = $product->stock - $approvedQty;
-                $product->stock = $stockAfterOut;
-                $product->save();
-
-                StockTransaction::create([
-                    'product_id'       => $product->id,
-                    'user_id'          => Auth::id(),
-                    'type'             => 'keluar',
-                    'recipient_type'   => $item->type ?? 'individu',
-                    'quantity'         => $approvedQty,
-                    'stock_after'      => $stockAfterOut,
-                    'uraian'           => $item->user->name ?? 'Pegawai',
-                    'kondisi'          => 'Baik',
-                    'harga_perolehan'  => $price,
-                    'transaction_date' => $request->purchase_date,
-                    'note'             => 'Pengeluaran ' . $product->name . ' Untuk ' . ($item->user->name ?? 'Pegawai') . ' via Faktur ' . $request->no_faktur
-                ]);
+                // Catatan: Pemotongan stok dan mutasi Barang Keluar akan dicatat
+                // saat Petugas Gudang Distribusi melakukan serah terima fisik barang.
             }
 
             // 4. Update Header Request
@@ -446,7 +408,7 @@ class ApprovalController extends Controller
             DB::commit();
 
             return redirect()->route('persetujuan.index')
-                ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Notifikasi telah dikirimkan ke pemohon usulan.');
+                ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Notifikasi telah dikirimkan ke Petugas Gudang Distribusi.');
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -212,7 +212,14 @@
                                                                         </td>
                                                                         <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
                                                                         <td class="text-end text-nowrap">
-                                                                            @if ($canDistribute)
+                                                                            @php
+                                                                                $isSubWaitingStock = $subItem->is_procurement && !($subItem->is_purchased || ($subItem->relationLoaded('details') ? $subItem->details->where('is_fulfilled', true)->isNotEmpty() : $subItem->details()->where('is_fulfilled', true)->exists()));
+                                                                            @endphp
+                                                                            @if ($isSubWaitingStock)
+                                                                                <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5" style="font-size: 0.68rem;" title="Menunggu stok diisi di Master Data">
+                                                                                    Menunggu Stok Masuk
+                                                                                </span>
+                                                                            @elseif ($canDistribute)
                                                                                 <button type="button" class="btn btn-xs btn-success py-1 px-2"
                                                                                     data-bs-toggle="modal" data-bs-target="#handoverModal{{ $subItem->id }}">
                                                                                     Serahkan
@@ -402,14 +409,30 @@
                                                     @endforeach
                                                 </ul>
                                                 @if ($req->verification_notes)
-                                                    <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $req->verification_notes }}</small>
+                                                    @php
+                                                        $cleanedDistNote = str_replace(
+                                                            'Seluruh barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.',
+                                                            'Barang telah dibeli/tersedia di gudang dan siap diserahterimakan.',
+                                                            $req->verification_notes
+                                                        );
+                                                    @endphp
+                                                    <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $cleanedDistNote }}</small>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($req->status === 'approved')
-                                                    <span class="badge bg-warning text-dark">
-                                                        Siap Diambil / Diserahkan
-                                                    </span>
+                                                    @php
+                                                        $isReqWaitingStock = $req->is_procurement && !($req->is_purchased || ($req->relationLoaded('details') ? $req->details->where('is_fulfilled', true)->isNotEmpty() : $req->details()->where('is_fulfilled', true)->exists()));
+                                                    @endphp
+                                                    @if ($isReqWaitingStock)
+                                                        <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                                            Menunggu Stok Masuk
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">
+                                                            Siap Diambil / Diserahkan
+                                                        </span>
+                                                    @endif
                                                 @elseif ($req->status === 'distributed')
                                                     <span class="badge bg-success">
                                                         Telah Diserahterimakan
@@ -504,7 +527,14 @@
                                                             Selesai
                                                         </span>
                                                     @elseif ($req->status === 'approved')
-                                                        @if ($canDistribute)
+                                                        @php
+                                                            $isReqWaitingStock = $req->is_procurement && !($req->is_purchased || ($req->relationLoaded('details') ? $req->details->where('is_fulfilled', true)->isNotEmpty() : $req->details()->where('is_fulfilled', true)->exists()));
+                                                        @endphp
+                                                        @if ($isReqWaitingStock)
+                                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5 small" style="font-size: 0.68rem; border-radius: 6px;" title="Menunggu Petugas Pemeriksa Gudang mengisi stok barang di Master Data">
+                                                                Menunggu Stok Masuk
+                                                            </span>
+                                                        @elseif ($canDistribute)
                                                             <!-- Tombol Serahkan Barang (Buka Modal Handover untuk mengisi form dan upload foto bukti) -->
                                                             <button type="button" class="btn btn-xs btn-success py-0.5 px-2 fw-semibold"
                                                                 style="font-size: 0.72rem; border-radius: 6px;"

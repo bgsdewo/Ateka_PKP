@@ -11,7 +11,7 @@
     $pendingProcurementCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count() : 0;
     $pendingStockCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
     $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
-    $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::where('status', 'approved')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
+    $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::where('status', 'approved')->count() : 0;
 @endphp
 
 <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all">
@@ -74,54 +74,25 @@
                 <!-- ======================================================== -->
                 @if ($isKasubagTU)
                     @php
-                        $activeCategory = request('category', 'pengadaan');
-                        $isPersediaanRoute = request()->routeIs('persetujuan.*') && $activeCategory === 'persediaan';
-                        $isPengadaanRoute = (request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*')) && $activeCategory !== 'persediaan';
                         $verifikasiActive = request()->routeIs('persetujuan.*') || request()->routeIs('verifikasi.*');
-                        $totalPendingVerifikasi = ($pendingProcurementCount ?? 0) + ($pendingStockCount ?? 0);
+                        $totalPendingVerifikasi = $pendingApprovalsCount;
                     @endphp
 
-                    {{-- Menu Group: Verifikasi & Persetujuan (Collapsible) --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ $verifikasiActive ? 'active' : '' }}" data-bs-toggle="collapse"
-                            href="#verifikasi-menu" role="button" aria-expanded="{{ $verifikasiActive ? 'true' : 'false' }}" title="Verifikasi & Persetujuan">
+                        <a class="nav-link {{ $verifikasiActive ? 'active' : '' }}" href="{{ route('persetujuan.index') }}" title="Verifikasi & Persetujuan">
                             <i class="icon">
                                 <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4" />
                                 </svg>
                             </i>
                             <span class="item-name">Verifikasi & Persetujuan</span>
-                            <i class="right-icon" style="flex-shrink: 0;">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </i>
+                            @if ($totalPendingVerifikasi > 0)
+                                <span class="badge rounded-pill bg-danger text-white ms-auto fw-bold" style="font-size: 0.68rem; padding: 0.25em 0.6em;">
+                                    {{ $totalPendingVerifikasi }}
+                                </span>
+                            @endif
                         </a>
-
-                        <ul class="sub-nav collapse {{ $verifikasiActive ? 'show' : '' }}" id="verifikasi-menu" data-bs-parent="#sidebar-menu">
-                            {{-- 1A. Verifikasi Usulan Pengadaan (Beli Baru) --}}
-                            <li class="nav-item">
-                                <a class="nav-link {{ $isPengadaanRoute ? 'active' : '' }}" 
-                                   href="{{ route('persetujuan.index', ['category' => 'pengadaan']) }}" 
-                                   title="Verifikasi Pengadaan (Beli Baru)">
-                                    <i class="sidenav-mini-icon">P</i>
-                                    <span class="item-name">Verifikasi Pengadaan</span>
-                                </a>
-                            </li>
-
-                            {{-- 1B. Verifikasi Permintaan Barang Stok (Persediaan) --}}
-                            <li class="nav-item">
-                                <a class="nav-link {{ $isPersediaanRoute ? 'active' : '' }}" 
-                                   href="{{ route('persetujuan.index', ['category' => 'persediaan']) }}" 
-                                   title="Verifikasi Permintaan Stok">
-                                    <i class="sidenav-mini-icon">V</i>
-                                    <span class="item-name">Verifikasi Permintaan</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
-
-                    {{-- Catatan: Fitur Distribusi Barang dihapus dari menu Kasubag TU sesuai hak akses khusus PIC Distribusi --}}
                 @endif
 
                 <!-- ======================================================== -->
@@ -223,14 +194,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.pengadaan.create') }}" title="Permintaan Pengadaan">
-                                    <i class="sidenav-mini-icon">P</i>
-                                    <span class="item-name">Permintaan Pengadaan</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Barang">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.create') || request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Barang">
                                     <i class="sidenav-mini-icon">+</i>
                                     <span class="item-name">Buat Pengajuan Barang</span>
                                 </a>

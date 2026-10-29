@@ -285,14 +285,14 @@
                                         Ajukan Barang Ini
                                     </a>
                                 @else
-                                    <a href="{{ route('pengajuan.pengadaan.create') }}?product_id={{ $item->id }}"
-                                        class="btn btn-sm btn-warning text-white fw-bold w-100 d-inline-flex justify-content-center align-items-center gap-1.5 shadow-sm">
+                                    <a href="{{ route('pengajuan.create') }}?product_id={{ $item->id }}"
+                                        class="btn btn-sm btn-warning text-white fw-bold w-100 d-inline-flex justify-content-center align-items-center gap-1.5 shadow-sm"
+                                        title="Stok saat ini kosong di gudang. Permintaan akan langsung diajukan untuk proses pengadaan Kasubbag TU.">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
                                         </svg>
-                                        Pesan Barang Ini (Restock)
+                                        Ajukan Permintaan (Pengadaan)
                                     </a>
                                 @endif
                             </div>

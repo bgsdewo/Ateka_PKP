@@ -154,14 +154,12 @@ class RequestItem extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'pending' => $this->is_procurement ? 'Menunggu Verifikasi Pengadaan' : 'Menunggu Verifikasi Subbag TU',
+            'pending' => 'Menunggu Verifikasi TU',
             'approved' => $this->is_procurement
                 ? ($this->is_purchased || ($this->relationLoaded('details') ? $this->details->where('is_fulfilled', true)->isNotEmpty() : $this->details()->where('is_fulfilled', true)->exists())
-                    ? (($this->relationLoaded('details') ? $this->details->where('is_fulfilled', false)->isEmpty() : $this->details()->where('is_fulfilled', false)->doesntExist())
-                        ? 'Disetujui & Telah Dibeli (Tersedia)'
-                        : 'Disetujui (Sebagian Tersedia di Katalog)')
-                    : 'Disetujui Kasubbag TU')
-                : 'Disetujui TU (Siap Diambil)',
+                    ? 'Disetujui TU (Siap Diserahkan)'
+                    : 'Disetujui Kasubbag TU (Dalam Proses Pembelian)')
+                : 'Disetujui TU (Siap Diserahkan)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',
             default => ucfirst($this->status),

@@ -318,7 +318,7 @@ class ProductController extends Controller
 
             $successMsg = 'Barang berhasil ditambahkan dan tercatat di Barang Masuk.';
             if (!empty($notifiedNames)) {
-                $successMsg .= ' Status pengajuan pengadaan telah diperbarui menjadi Tersedia dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+                $successMsg .= ' Barang pengadaan siap diserahterimakan dan notifikasi telah dikirimkan ke Petugas Gudang Distribusi (Pemohon: ' . implode(', ', array_unique($notifiedNames)) . ').';
             }
 
             return redirect()
@@ -487,7 +487,7 @@ class ProductController extends Controller
 
             $successMsg = 'Barang berhasil diperbarui dan riwayat di Barang Masuk tersinkronisasi secara real-time.';
             if (!empty($notifiedNames)) {
-                $successMsg .= ' Status pengajuan pengadaan telah diperbarui menjadi Tersedia dan notifikasi telah dikirimkan ke pemohon (' . implode(', ', array_unique($notifiedNames)) . ').';
+                $successMsg .= ' Barang pengadaan siap diserahterimakan dan notifikasi telah dikirimkan ke Petugas Gudang Distribusi (Pemohon: ' . implode(', ', array_unique($notifiedNames)) . ').';
             }
 
             return redirect()
@@ -688,8 +688,15 @@ class ProductController extends Controller
 
             $reqItem = $det->requestItem;
             if ($reqItem) {
-                $itemTotalCost = ($product->purchase_price ?? 0) * ($det->approved_quantity ?: $det->quantity);
+                $requestedQty = (int) $det->quantity;
+                $approvedQty = $det->approved_quantity ? (int) $det->approved_quantity : $requestedQty;
+                $itemTotalCost = ($product->purchase_price ?? 0) * $approvedQty;
                 $newTotalPrice = ((float) $reqItem->purchase_price) + $itemTotalCost;
+
+                // Set approved quantity pada detail barang pengadaan
+                $det->update(['approved_quantity' => $approvedQty]);
+                // Catatan: Pemotongan stok dan pencatatan mutasi Barang Keluar akan dicatat
+                // ketika Petugas Gudang Distribusi melakukan serah terima fisik barang kepada pemohon.
 
                 // Cek apakah SELURUH item dalam pengadaan ini telah diisi stoknya
                 $hasUnfulfilled = $reqItem->details()->where('is_fulfilled', false)->exists();
@@ -705,8 +712,8 @@ class ProductController extends Controller
                     // Semua item di tiket pengadaan ini sudah lengkap dibeli & diisi stoknya
                     $updateData['purchase_invoice']   = $noFaktur ?: ($reqItem->purchase_invoice ?: '-');
                     $updateData['purchase_date']      = $transactionDate ?: ($reqItem->purchase_date ?: now());
-                    $updateData['purchase_notes']     = $uraian ?: ($reqItem->purchase_notes ?: 'Seluruh barang telah ditambahkan di Master Data');
-                    $updateData['verification_notes'] = $reqItem->verification_notes ?: 'Seluruh barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.';
+                    $updateData['purchase_notes']     = $uraian ?: ($reqItem->purchase_notes ?: 'Barang telah diisi stoknya oleh Petugas Gudang');
+                    $updateData['verification_notes'] = 'Barang telah tersedia di gudang dan dialokasikan untuk pemohon. Siap diserahterimakan oleh Petugas Distribusi.';
                 } else {
                     if ($noFaktur && !$reqItem->purchase_notes) {
                         $updateData['purchase_notes'] = 'Sebagian barang telah ditambahkan (' . $product->name . ')';
@@ -715,8 +722,8 @@ class ProductController extends Controller
 
                 $reqItem->update($updateData);
 
+                UserNotification::sendProcurementNotification($reqItem, $product, $noFaktur);
                 if ($reqItem->user) {
-                    UserNotification::sendProcurementNotification($reqItem, $product, $noFaktur);
                     $notifiedNames[] = $reqItem->user->name_with_title ?: $reqItem->user->name;
                     $notifiedUserIds[] = $reqItem->user_id;
                 }

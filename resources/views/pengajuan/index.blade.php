@@ -169,15 +169,7 @@
                             <h4 class="card-title mb-0 fw-bold">Daftar Riwayat Permintaan Anda</h4>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-success btn-sm fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" title="Ajukan kebutuhan barang yang belum ada di gudang agar dibeli oleh Subbag TU">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                </svg>
-                                Permintaan Pengadaan
-                            </a>
-                            <a href="{{ route('pengajuan.create') }}" class="btn btn-primary btn-sm fw-semibold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" title="Pengajuan dari stok gudang">
+                            <a href="{{ route('pengajuan.create') }}" class="btn btn-primary btn-sm fw-semibold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" title="Buat Pengajuan Kebutuhan ATK">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -266,7 +258,14 @@
                                                                 </svg>
                                                                 Catatan TU:
                                                             </strong>
-                                                            <div class="mt-0.5" style="word-break: break-word;">{{ $req->verification_notes }}</div>
+                                                            @php
+                                                                $displayVerifNote = str_replace(
+                                                                    'Seluruh barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.',
+                                                                    'Barang telah dibeli/tersedia di gudang dan dialokasikan untuk Anda. Siap diserahterimakan.',
+                                                                    $req->verification_notes
+                                                                );
+                                                            @endphp
+                                                            <div class="mt-0.5" style="word-break: break-word;">{{ $displayVerifNote }}</div>
                                                         </div>
                                                     </div>
                                                 @endif
@@ -280,14 +279,23 @@
                                             <td style="vertical-align: middle;">
                                                 @php
                                                     $shortStatus = match ($req->status) {
-                                                        'pending' => $req->is_procurement ? 'Pending Pengadaan' : 'Pending TU',
-                                                        'approved' => $req->is_procurement ? ($req->is_purchased ? 'Tersedia' : 'Disetujui TU') : 'Disetujui TU',
-                                                        'distributed' => 'Selesai',
+                                                        'pending' => 'Menunggu Review TU',
+                                                        'approved' => $req->is_procurement 
+                                                            ? ($req->is_purchased ? 'Siap Diserahkan' : 'Disetujui (Proses Beli)') 
+                                                            : 'Disetujui (Siap Diserahkan)',
+                                                        'distributed' => 'Selesai Diterima',
                                                         'rejected' => 'Ditolak',
                                                         default => ucfirst($req->status),
                                                     };
+                                                    $statusBadgeClass = match ($req->status) {
+                                                        'pending' => 'bg-warning text-dark',
+                                                        'approved' => ($req->is_procurement && !$req->is_purchased) ? 'bg-info text-white' : 'bg-success text-white',
+                                                        'distributed' => 'bg-primary text-white',
+                                                        'rejected' => 'bg-danger text-white',
+                                                        default => 'bg-secondary text-white',
+                                                    };
                                                 @endphp
-                                                <span class="badge {{ $req->status_badge }}" style="font-size: 0.68rem; padding: 0.22rem 0.45rem; white-space: nowrap;" title="{{ $req->status_label }}">
+                                                <span class="badge {{ $statusBadgeClass }}" style="font-size: 0.68rem; padding: 0.22rem 0.45rem; white-space: nowrap;" title="{{ $req->status_label }}">
                                                     {{ $shortStatus }}
                                                 </span>
                                                 @if ($req->is_procurement && $req->purchase_invoice)
@@ -297,11 +305,11 @@
                                                         </span>
                                                     </div>
                                                 @endif
-                                                @if ($req->is_procurement && $req->is_purchased)
+                                                @if ($req->status === 'approved' && (!$req->is_procurement || $req->is_purchased))
                                                     <div class="mt-0.5">
-                                                        <a href="{{ route('katalog-atk') }}" class="badge bg-success-subtle text-success border text-decoration-none px-1.5 py-0.2" style="font-size: 0.64rem;">
-                                                            Katalog &rarr;
-                                                        </a>
+                                                        <span class="badge bg-success-subtle text-success border px-1.5 py-0.2" style="font-size: 0.64rem;">
+                                                            Siap Serah Terima &check;
+                                                        </span>
                                                     </div>
                                                 @endif
                                                 @if($req->status == 'distributed' && $req->receiver_name)
@@ -403,20 +411,27 @@
 
                                                                 @if ($req->purchase_invoice)
                                                                     <div class="card bg-success-subtle border border-success-subtle p-2.5 mb-2">
-                                                                        <small class="text-success fw-bold d-block">Barang Telah Dibeli Subbag TU &amp; Masuk Daftar Barang:</small>
+                                                                        <small class="text-success fw-bold d-block">Barang Telah Dibeli / Tersedia di Gudang:</small>
                                                                         <span class="text-dark small">Nomor Faktur: <strong>{{ $req->purchase_invoice }}</strong> ({{ $req->purchase_date ? $req->purchase_date->format('d/m/Y') : '-' }})</span>
                                                                         <div class="mt-1 pt-1 border-top border-success-subtle">
-                                                                            <a href="{{ route('katalog-atk') }}" class="badge bg-success text-white text-decoration-none py-1 px-2">
-                                                                                Cek Ketersediaan di Katalog ATK &rarr;
-                                                                            </a>
+                                                                            <span class="badge bg-success text-white py-1 px-2">
+                                                                                Siap Diserahterimakan oleh Petugas Distribusi &check;
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 @endif
 
                                                                 @if ($req->verification_notes)
+                                                                    @php
+                                                                        $modalVerifNote = str_replace(
+                                                                            'Seluruh barang telah ditambahkan ke Master Data dan kini tersedia di Katalog ATK.',
+                                                                            'Barang telah dibeli/tersedia di gudang dan dialokasikan untuk Anda. Siap diserahterimakan.',
+                                                                            $req->verification_notes
+                                                                        );
+                                                                    @endphp
                                                                     <div class="card bg-info-subtle border-0 p-2.5 mb-2">
                                                                         <small class="text-primary fw-bold d-block">Catatan Verifikasi Subbag TU:</small>
-                                                                        <span class="text-dark small">{{ $req->verification_notes }}</span>
+                                                                        <span class="text-dark small">{{ $modalVerifNote }}</span>
                                                                     </div>
                                                                 @endif
 

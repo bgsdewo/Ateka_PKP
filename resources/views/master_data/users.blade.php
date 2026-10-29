@@ -567,9 +567,7 @@
                     } else if (roleVal === 'pegawai_gudang') {
                         $picUnitContainer.addClass('d-none');
                         $gudangDistribusiContainer.removeClass('d-none');
-                        if (!$position.val()) {
-                            $position.val('Pegawai Gudang');
-                        }
+                        updateGudangPosition();
                     } else {
                         $picUnitContainer.addClass('d-none');
                         $gudangDistribusiContainer.addClass('d-none');
@@ -596,17 +594,35 @@
 
                 $role.on('change', updateRoleContainers);
 
-                $isDistributor.on('change', function() {
-                    if ($(this).is(':checked')) {
-                        if (!$position.val() || $position.val() === 'Pegawai Gudang') {
+                function updateGudangPosition() {
+                    if ($role.val() !== 'pegawai_gudang') return;
+
+                    const isDist = $isDistributor.is(':checked');
+                    const isExam = $isReportExaminer.is(':checked');
+                    const currentPos = ($position.val() || '').trim();
+                    const defaultPositions = [
+                        '',
+                        'Pegawai Gudang',
+                        'Petugas Distribusi Gudang ATK',
+                        'Petugas Pemeriksa Laporan Persediaan',
+                        'Petugas Distribusi & Pemeriksa Laporan Persediaan'
+                    ];
+
+                    if (defaultPositions.includes(currentPos)) {
+                        if (isDist && isExam) {
+                            $position.val('Petugas Distribusi & Pemeriksa Laporan Persediaan');
+                        } else if (isDist) {
                             $position.val('Petugas Distribusi Gudang ATK');
-                        }
-                    } else {
-                        if ($position.val() === 'Petugas Distribusi Gudang ATK') {
+                        } else if (isExam) {
+                            $position.val('Petugas Pemeriksa Laporan Persediaan');
+                        } else {
                             $position.val('Pegawai Gudang');
                         }
                     }
-                });
+                }
+
+                $isDistributor.on('change', updateGudangPosition);
+                $isReportExaminer.on('change', updateGudangPosition);
 
                 $picUnitChoice.on('change', function() {
                     const val = $(this).val();

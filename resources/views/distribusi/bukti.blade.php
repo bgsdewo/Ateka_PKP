@@ -308,6 +308,11 @@
                 <td style="border: none; padding: 2px 0;">{{ $subditLabel }}</td>
             </tr>
             <tr>
+                <td style="font-weight: 500; border: none; padding: 2px 0;">Nama</td>
+                <td style="border: none; padding: 2px 0;">:</td>
+                <td style="border: none; padding: 2px 0;">{{ $signerName }}</td>
+            </tr>
+            <tr>
                 <td style="font-weight: 500; border: none; padding: 2px 0;">Bulan</td>
                 <td style="border: none; padding: 2px 0;">:</td>
                 <td style="border: none; padding: 2px 0;">{{ $monthPeriodLabel }}</td>
@@ -326,10 +331,12 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">NO</th>
-                    <th style="width: 20%;">NO. TIKET</th>
+                    <th style="width: 15%;">KODE BARANG</th>
                     <th style="text-align: left; padding-left: 10px;">NAMA BARANG</th>
                     <th style="width: 14%;">QTY</th>
-                    <th style="width: 30%; text-align: left; padding-left: 10px;">NAMA PENGGUNA BARANG</th>
+                    @if ($isPicOrSubdit)
+                        <th style="width: 25%; text-align: left; padding-left: 10px;">NAMA PENGGUNA BARANG</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -337,7 +344,7 @@
                     <tr>
                         <td style="text-align: center;">{{ $index + 1 }}</td>
                         <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
-                            {{ $requestItem->request_code }}
+                            {{ $detail->product->code ?? '-' }}
                         </td>
                         <td style="text-align: left; padding-left: 10px;">
                             <span class="fw-bold">{{ $detail->item_name }}</span>
@@ -348,9 +355,11 @@
                         <td style="text-align: center;">
                             {{ $detail->quantity }} {{ strtolower($detail->item_unit) }}
                         </td>
-                        <td style="text-align: left; padding-left: 10px; font-weight: bold;">
-                            {{ $teamName }}
-                        </td>
+                        @if ($isPicOrSubdit)
+                            <td style="text-align: left; padding-left: 10px; font-weight: bold;">
+                                {{ $teamName }}
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
@@ -445,20 +454,7 @@
                         @endif
                     </td>
                 </tr>
-                <tr>
-                    <td style="vertical-align: top; padding: 2px 0;"><strong>Unit Kerja / Subdirektorat</strong></td>
-                    <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
-                    <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
-                        @if ($isPicOrSubdit && !empty($requesterUser->subdit_name))
-                            <strong>{{ $requesterUser->subdit_name }}</strong>
-                            @if (!empty($requesterUser->position))
-                                <span class="text-muted d-block small">{{ $requesterUser->position }}</span>
-                            @endif
-                        @else
-                            {{ $requesterUser->position ?? ($requesterUser->name ?? '-') }}
-                        @endif
-                    </td>
-                </tr>
+
                 <tr>
                     <td style="vertical-align: top; padding: 2px 0;"><strong>Jenis Permintaan</strong></td>
                     <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
@@ -515,11 +511,7 @@
             </tbody>
         </table>
 
-        @if ($requestItem->verification_notes)
-            <div class="p-2 border bg-light my-2" style="font-size: 12px;">
-                <strong>Catatan Verifikasi Subbag TU:</strong> {{ $requestItem->verification_notes }}
-            </div>
-        @endif
+
 
         <p style="font-size: 13px; line-height: 1.5;" class="mt-3 mb-4">
             Demikian Bukti Serah Terima Barang ini dibuat dengan sebenarnya dalam rangkap untuk dipergunakan sebagai arsip administrasi persediaan ATK kantor.
@@ -599,7 +591,7 @@
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
                 <h6 class="fw-bold mb-0 text-uppercase text-dark" style="font-size: 12.5px;">
-                    Foto Dokumentasi Fisik Penyerahan Barang (Petugas Gudang)
+                    Foto Dokumentasi Fisik Penyerahan Barang
                 </h6>
                 <span class="text-muted small" style="font-size: 11px;">
                     Tiket: <strong>{{ $requestItem->request_code }}</strong>
