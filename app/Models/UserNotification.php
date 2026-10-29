@@ -60,59 +60,82 @@ class UserNotification extends Model
     }
 
     /**
-     * Kirim notifikasi pengadaan barang telah dibeli dan tersedia di daftar barang / katalog
-     * Dilengkapi proteksi anti-duplikasi otomatis (mencegah spam jika produk sama diajukan berulang)
+     * Kirim notifikasi ke Petugas Gudang Distribusi saat barang pengadaan telah diisi stoknya
+     * oleh Petugas Pemeriksa Gudang dan siap untuk diserahterimakan ke pemohon.
      */
-    public static function sendProcurementNotification(RequestItem $requestItem, Product $product, ?string $invoice = null): self
+    public static function sendProcurementNotification(RequestItem $requestItem, Product $product, ?string $invoice = null): ?self
     {
-        $title = 'Barang yang Diminta Sudah Tersedia!';
-        $message = "Barang \"{$product->name}\" pada pengajuan #{$requestItem->request_code} telah ditambahkan di Master Data dan kini stoknya sudah tersedia di Katalog ATK.";
+        $pemohonName = $requestItem->user 
+            ? ($requestItem->user->name_with_title ?: $requestItem->user->name) 
+            : 'Pemohon';
 
-        // Cegah spam: jika notifikasi barang yang sama untuk user ini sudah ada dan belum dibaca, perbarui pesannya
-        $existing = self::where('user_id', $requestItem->user_id)
-            ->where('product_id', $product->id)
-            ->where('type', 'procurement_available')
-            ->where('is_read', false)
-            ->first();
+        $title = 'Barang Pengadaan Siap Didistribusikan!';
+        $message = "Barang pengadaan \"{$product->name}\" untuk permohonan #{$requestItem->request_code} ({$pemohonName}) telah diisi stoknya oleh Petugas Pemeriksa Gudang dan siap diserahterimakan.";
 
-        if ($existing) {
-            $existing->update([
-                'title' => $title,
-                'message' => $message,
-                'request_id' => $requestItem->id,
-                'link' => route('katalog-atk', ['search' => $product->code]),
-                'data' => [
-                    'product_name' => $product->name,
-                    'request_code' => $requestItem->request_code,
-                    'invoice' => $invoice,
-                ],
-            ]);
-            $existing->touch();
-            return $existing;
+        // Cari Petugas Gudang Distribusi
+        $distributors = User::where('role', 'pegawai_gudang')
+            ->where('is_distributor', true)
+            ->get();
+
+        if ($distributors->isEmpty()) {
+            $distributors = User::where('role', 'pegawai_gudang')->get();
         }
 
-        return self::create([
-            'user_id' => $requestItem->user_id,
-            'title' => $title,
-            'message' => $message,
-            'type' => 'procurement_available',
-            'icon' => 'box',
-            'link' => route('katalog-atk', ['search' => $product->code]),
-            'request_id' => $requestItem->id,
-            'product_id' => $product->id,
-            'is_read' => false,
-            'data' => [
-                'product_name' => $product->name,
-                'request_code' => $requestItem->request_code,
-                'invoice' => $invoice,
-            ],
-        ]);
+        if ($distributors->isEmpty()) {
+            return null;
+        }
+
+        $lastNotif = null;
+        foreach ($distributors as $distributor) {
+            $existing = self::where('user_id', $distributor->id)
+                ->where('request_id', $requestItem->id)
+                ->where('product_id', $product->id)
+                ->where('type', 'procurement_ready_distribution')
+                ->where('is_read', false)
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'title' => $title,
+                    'message' => $message,
+                    'link' => route('distribusi.index'),
+                    'data' => [
+                        'product_name' => $product->name,
+                        'request_code' => $requestItem->request_code,
+                        'requester' => $pemohonName,
+                        'invoice' => $invoice,
+                    ],
+                ]);
+                $existing->touch();
+                $lastNotif = $existing;
+            } else {
+                $lastNotif = self::create([
+                    'user_id' => $distributor->id,
+                    'title' => $title,
+                    'message' => $message,
+                    'type' => 'procurement_ready_distribution',
+                    'icon' => 'truck',
+                    'link' => route('distribusi.index'),
+                    'request_id' => $requestItem->id,
+                    'product_id' => $product->id,
+                    'is_read' => false,
+                    'data' => [
+                        'product_name' => $product->name,
+                        'request_code' => $requestItem->request_code,
+                        'requester' => $pemohonName,
+                        'invoice' => $invoice,
+                    ],
+                ]);
+            }
+        }
+
+        return $lastNotif;
     }
 
     /**
-     * Kirim notifikasi pengadaan gabungan (konsolidasi) jika satu tiket usulan memiliki banyak item barang
+     * Kirim notifikasi pengadaan gabungan (konsolidasi) ke Petugas Gudang Distribusi jika satu tiket memiliki banyak item barang
      */
-    public static function sendConsolidatedProcurementNotification(RequestItem $requestItem, iterable $products, ?string $invoice = null): self
+    public static function sendConsolidatedProcurementNotification(RequestItem $requestItem, iterable $products, ?string $invoice = null): ?self
     {
         $productsCollection = collect($products)->filter();
         $count = $productsCollection->count();
@@ -126,42 +149,70 @@ class UserNotification extends Model
         $remainingCount = $count - 2;
         $summaryText = $remainingCount > 0 ? "{$firstTwo}, dan {$remainingCount} barang lainnya" : $names->join(', ');
 
-        // Cegah duplikasi per tiket pengadaan
-        $existing = self::where('user_id', $requestItem->user_id)
-            ->where('request_id', $requestItem->id)
-            ->where('type', 'procurement_available')
-            ->where('is_read', false)
-            ->first();
+        $pemohonName = $requestItem->user 
+            ? ($requestItem->user->name_with_title ?: $requestItem->user->name) 
+            : 'Pemohon';
 
-        if ($existing) {
-            $existing->update([
-                'title' => "{$count} Barang Usulan Telah Tersedia",
-                'message' => "Barang pada usulan #{$requestItem->request_code} ({$summaryText}) telah dibeli Subbag TU dan kini tersedia di persediaan ATK.",
-                'data' => [
-                    'product_names' => $names->toArray(),
-                    'total_items' => $count,
-                    'invoice' => $invoice,
-                ],
-            ]);
-            return $existing;
+        $title = "{$count} Barang Pengadaan Siap Didistribusikan!";
+        $message = "Barang pengadaan untuk permohonan #{$requestItem->request_code} ({$pemohonName}: {$summaryText}) telah tersedia di gudang dan siap diserahterimakan.";
+
+        $distributors = User::where('role', 'pegawai_gudang')
+            ->where('is_distributor', true)
+            ->get();
+
+        if ($distributors->isEmpty()) {
+            $distributors = User::where('role', 'pegawai_gudang')->get();
         }
 
-        return self::create([
-            'user_id' => $requestItem->user_id,
-            'title' => "{$count} Barang Usulan Telah Tersedia",
-            'message' => "Barang pada usulan #{$requestItem->request_code} ({$summaryText}) telah dibeli Subbag TU dan kini tersedia di persediaan ATK.",
-            'type' => 'procurement_available',
-            'icon' => 'box',
-            'link' => route('katalog-atk'),
-            'request_id' => $requestItem->id,
-            'product_id' => $productsCollection->first()->id ?? null,
-            'is_read' => false,
-            'data' => [
-                'product_names' => $names->toArray(),
-                'total_items' => $count,
-                'invoice' => $invoice,
-            ],
-        ]);
+        if ($distributors->isEmpty()) {
+            return null;
+        }
+
+        $lastNotif = null;
+        foreach ($distributors as $distributor) {
+            $existing = self::where('user_id', $distributor->id)
+                ->where('request_id', $requestItem->id)
+                ->where('type', 'procurement_ready_distribution')
+                ->where('is_read', false)
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'title' => $title,
+                    'message' => $message,
+                    'link' => route('distribusi.index'),
+                    'data' => [
+                        'product_names' => $names->toArray(),
+                        'total_items' => $count,
+                        'requester' => $pemohonName,
+                        'request_code' => $requestItem->request_code,
+                        'invoice' => $invoice,
+                    ],
+                ]);
+                $lastNotif = $existing;
+            } else {
+                $lastNotif = self::create([
+                    'user_id' => $distributor->id,
+                    'title' => $title,
+                    'message' => $message,
+                    'type' => 'procurement_ready_distribution',
+                    'icon' => 'truck',
+                    'link' => route('distribusi.index'),
+                    'request_id' => $requestItem->id,
+                    'product_id' => $productsCollection->first()->id ?? null,
+                    'is_read' => false,
+                    'data' => [
+                        'product_names' => $names->toArray(),
+                        'total_items' => $count,
+                        'requester' => $pemohonName,
+                        'request_code' => $requestItem->request_code,
+                        'invoice' => $invoice,
+                    ],
+                ]);
+            }
+        }
+
+        return $lastNotif;
     }
 
     /**

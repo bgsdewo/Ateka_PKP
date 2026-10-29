@@ -100,6 +100,13 @@
 </head>
 
 <body>
+    @php
+        $requesterUser = isset($requestItem) ? $requestItem->user : null;
+        $isPicOrSubdit = isset($requestItem)
+            ? (($requestItem->type === 'subdit') || ($requesterUser && $requesterUser->isPicDistribusi()))
+            : true;
+    @endphp
+
     {{-- Non-printable Bar --}}
     <div class="no-print-bar">
         <div class="d-flex align-items-center gap-2">
@@ -175,6 +182,11 @@
                 <td style="border: none; padding: 2px 0;">{{ $subditLabel ?? 'Subdirektorat Sumber Daya Konstruksi Perumahan dan Kawasan Permukiman' }}</td>
             </tr>
             <tr>
+                <td style="font-weight: 500; border: none; padding: 2px 0;">Nama</td>
+                <td style="border: none; padding: 2px 0;">:</td>
+                <td style="border: none; padding: 2px 0;">{{ $signerName ?? ($requesterUser ? ($requesterUser->name_with_title ?: $requesterUser->name) : 'Pengaju Permintaan') }}</td>
+            </tr>
+            <tr>
                 <td style="font-weight: 500; border: none; padding: 2px 0;">Bulan</td>
                 <td style="border: none; padding: 2px 0;">:</td>
                 <td style="border: none; padding: 2px 0;">{{ $monthPeriodLabel ?? ($periodLabel ?? '-') }}</td>
@@ -193,19 +205,31 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">NO</th>
-                    <th style="width: 20%;">NO. TIKET</th>
+                    @if (isset($requestItem))
+                        <th style="width: 15%;">KODE BARANG</th>
+                    @else
+                        <th style="width: 20%;">NO. TIKET</th>
+                    @endif
                     <th style="text-align: left; padding-left: 10px;">NAMA BARANG</th>
                     <th style="width: 14%;">QTY</th>
-                    <th style="width: 30%; text-align: left; padding-left: 10px;">NAMA PENGGUNA BARANG</th>
+                    @if (!isset($requestItem) || $isPicOrSubdit)
+                        <th style="width: 25%; text-align: left; padding-left: 10px;">NAMA PENGGUNA BARANG</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
                 @forelse ($items ?? [] as $index => $item)
                     <tr>
                         <td style="text-align: center;">{{ $index + 1 }}</td>
-                        <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
-                            {{ $item->request_code }}
-                        </td>
+                        @if (isset($requestItem))
+                            <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
+                                {{ $item->product_code ?? ($item->product->code ?? ($item->code ?? '-')) }}
+                            </td>
+                        @else
+                            <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
+                                {{ $item->request_code }}
+                            </td>
+                        @endif
                         <td style="text-align: left; padding-left: 10px;">
                             <span class="fw-bold">{{ $item->item_name }}</span>
                             @if (!empty($item->specification))
@@ -215,13 +239,15 @@
                         <td style="text-align: center;">
                             {{ $item->quantity }} {{ strtolower($item->unit) }}
                         </td>
-                        <td style="text-align: left; padding-left: 10px; font-weight: bold;">
-                            {{ $item->user_or_spec }}
-                        </td>
+                        @if (!isset($requestItem) || $isPicOrSubdit)
+                            <td style="text-align: left; padding-left: 10px; font-weight: bold;">
+                                {{ $item->user_or_spec }}
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 20px;">
+                        <td colspan="{{ (!isset($requestItem) || $isPicOrSubdit) ? 5 : 4 }}" style="text-align: center; padding: 20px;">
                             Tidak ada data kebutuhan barang pada periode ini.
                         </td>
                     </tr>
@@ -396,20 +422,7 @@
                             @endif
                         </td>
                     </tr>
-                    <tr>
-                        <td style="vertical-align: top; padding: 2px 0;"><strong>Unit Kerja / Subdirektorat</strong></td>
-                        <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
-                        <td style="vertical-align: top; word-break: break-word; overflow-wrap: break-word; padding: 2px 0;">
-                            @if ($isPicOrSubdit && !empty($requesterUser->subdit_name))
-                                <strong>{{ $requesterUser->subdit_name }}</strong>
-                                @if (!empty($requesterUser->position))
-                                    <span class="text-muted d-block small">{{ $requesterUser->position }}</span>
-                                @endif
-                            @else
-                                {{ $requesterUser->position ?? ($requesterUser->name ?? '-') }}
-                            @endif
-                        </td>
-                    </tr>
+
                     <tr>
                         <td style="vertical-align: top; padding: 2px 0;"><strong>Jenis Permintaan</strong></td>
                         <td style="vertical-align: top; text-align: center; padding: 2px 0;">:</td>
@@ -466,11 +479,7 @@
                 </tbody>
             </table>
 
-            @if ($requestItem->verification_notes)
-                <div class="p-2 border bg-light my-2" style="font-size: 12px;">
-                    <strong>Catatan Verifikasi Subbag TU:</strong> {{ $requestItem->verification_notes }}
-                </div>
-            @endif
+
 
             <p style="font-size: 13px; line-height: 1.5;" class="mt-3 mb-4">
                 Demikian Bukti Serah Terima Barang ini dibuat dengan sebenarnya dalam rangkap untuk dipergunakan sebagai arsip administrasi persediaan ATK kantor.
@@ -549,7 +558,7 @@
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
                     <h6 class="fw-bold mb-0 text-uppercase text-dark" style="font-size: 12.5px;">
-                        Foto Dokumentasi Fisik Penyerahan Barang (Petugas Gudang)
+                        Foto Dokumentasi Fisik Penyerahan Barang
                     </h6>
                     <span class="text-muted small" style="font-size: 11px;">
                         Tiket: <strong>{{ $requestItem->request_code }}</strong>

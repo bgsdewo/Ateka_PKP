@@ -104,7 +104,14 @@
                     if ($isDistributorGudang) {
                         $readyDistribusiQuery = \App\Models\RequestItem::where('status', 'approved')
                             ->where(function ($q) {
-                                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+                                $q->where(function ($sub) {
+                                    $sub->where('is_procurement', false)->orWhereNull('is_procurement');
+                                })->orWhere(function ($sub) {
+                                    $sub->where('is_procurement', true)
+                                        ->whereDoesntHave('details', function ($dq) {
+                                            $dq->where('is_fulfilled', false);
+                                        });
+                                });
                             })
                             ->with(['user', 'details.product']);
 
@@ -328,8 +335,15 @@
                             @foreach($userNotifications as $notif)
                                 <div class="list-group-item list-group-item-action p-2.5 notif-item {{ !$notif->is_read ? 'bg-light border-start border-primary border-4' : '' }}" id="notif-item-{{ $notif->id }}">
                                     <div class="d-flex align-items-start gap-2">
-                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']) ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary' }}" style="width: 32px; height: 32px;">
-                                            @if(in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']))
+                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ $notif->type === 'procurement_ready_distribution' ? 'bg-info-subtle text-info' : (in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']) ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary') }}" style="width: 32px; height: 32px;">
+                                            @if($notif->type === 'procurement_ready_distribution')
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                                </svg>
+                                            @elseif(in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']))
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                                                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -349,6 +363,8 @@
                                                 <div class="d-flex align-items-center gap-1 ms-1">
                                                     @if($notif->type === 'procurement_approved_examiner')
                                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill" style="font-size: 0.58rem;">Pengadaan</span>
+                                                    @elseif($notif->type === 'procurement_ready_distribution')
+                                                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill" style="font-size: 0.58rem;">Siap Distribusi</span>
                                                     @endif
                                                     @if(($notif->duplicate_count ?? 1) > 1)
                                                         <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.6rem;">{{ $notif->duplicate_count }}x</span>

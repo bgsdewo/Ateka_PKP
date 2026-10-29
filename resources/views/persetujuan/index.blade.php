@@ -6,12 +6,23 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <h1 class="text-white fw-bold mb-1">
-                        @if (($category ?? 'pengadaan') === 'persediaan')
+                        @if (($category ?? null) === 'persediaan')
                             Verifikasi Permintaan Stok (Persediaan)
+                        @elseif (($category ?? null) === 'pengadaan')
+                            Verifikasi Usulan Pengadaan (Beli Baru)
                         @else
-                            Verifikasi Pengadaan (Beli Baru)
+                            Verifikasi & Persetujuan Permintaan ATK
                         @endif
                     </h1>
+                    <p class="text-white-50 mb-0" style="font-size: 0.9rem;">
+                        @if (($category ?? null) === 'persediaan')
+                            Pemeriksaan dan persetujuan pengeluaran barang dari persediaan fisik gudang.
+                        @elseif (($category ?? null) === 'pengadaan')
+                            Pemeriksaan dan persetujuan usulan pengadaan belanja baru ATK.
+                        @else
+                            Pusat kendali Kasubbag TU untuk verifikasi seluruh permohonan persediaan stok dan pengadaan ATK.
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -107,7 +118,13 @@
                     <div>
                         <h2 class="fw-bold text-warning mb-0 fs-3">{{ $pendingCount }}</h2>
                         <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                            {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Permintaan dari stok gudang' : 'Perlu tindakan persetujuan' }}
+                            @if (($category ?? null) === 'persediaan')
+                                Permintaan dari stok gudang
+                            @elseif (($category ?? null) === 'pengadaan')
+                                Usulan beli baru perlu persetujuan
+                            @else
+                                Seluruh antrean permohonan baru
+                            @endif
                         </small>
                     </div>
                 </div>
@@ -126,7 +143,13 @@
                     <div>
                         <h2 class="fw-bold text-success mb-0 fs-3">{{ $approvedCount }}</h2>
                         <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                            {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Siap diserahkan oleh PIC Distribusi' : 'Akan diproses pembelian TU' }}
+                            @if (($category ?? null) === 'persediaan')
+                                Siap diserahkan oleh PIC Distribusi
+                            @elseif (($category ?? null) === 'pengadaan')
+                                Disetujui dalam proses pengadaan
+                            @else
+                                Telah diverifikasi &amp; disetujui
+                            @endif
                         </small>
                     </div>
                 </div>
@@ -155,7 +178,7 @@
                 <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">
-                            Total {{ ($category ?? 'pengadaan') === 'persediaan' ? 'Permintaan Stok' : 'Usulan Pengadaan' }}
+                            Total {{ ($category ?? null) === 'persediaan' ? 'Permintaan Stok' : (($category ?? null) === 'pengadaan' ? 'Usulan Pengadaan' : 'Permintaan ATK') }}
                         </span>
                         <div class="kpi-icon-squircle" style="background-color: var(--brand-primary-light); color: var(--brand-primary);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -166,7 +189,15 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-dark mb-0 fs-3">{{ $totalCount }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Seluruh arsip kategori ini</small>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                            @if (($category ?? null) === 'persediaan')
+                                Arsip permintaan stok gudang
+                            @elseif (($category ?? null) === 'pengadaan')
+                                Arsip usulan pengadaan barang baru
+                            @else
+                                Seluruh arsip permohonan ATK
+                            @endif
+                        </small>
                     </div>
                 </div>
             </div>
@@ -179,30 +210,61 @@
                     <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.5rem 1.75rem 1.6rem 1.75rem !important;">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                             <div>
-                                @if (($category ?? 'pengadaan') === 'persediaan')
+                                @if (($category ?? null) === 'persediaan')
                                     <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
-                                @else
+                                    <p class="text-muted mb-0 small">Verifikasi permohonan pengeluaran barang dari stok fisik gudang.</p>
+                                @elseif (($category ?? null) === 'pengadaan')
                                     <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
+                                    <p class="text-muted mb-0 small">Verifikasi usulan belanja/pengadaan baru ATK.</p>
+                                @else
+                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Verifikasi &amp; Persetujuan Permintaan ATK</h4>
+                                    <p class="text-muted mb-0 small">Pusat kendali Kasubbag TU untuk verifikasi permohonan persediaan stok dan usulan pengadaan.</p>
                                 @endif
                             </div>
                         </div>
 
-                        {{-- Tombol Filter Status dengan jarak lega dari bar filter --}}
-                        <div class="d-flex align-items-center gap-2.5 flex-wrap mb-1" id="status-filter-tabs">
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan'])) }}"
-                                class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5 fw-semibold" style="font-size: 0.82rem;">
-                                Semua ({{ $totalCount }})
+                        {{-- Kategori Pills Switcher (Semua, Stok Gudang, Perlu Pengadaan) --}}
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-3 p-2 rounded-3" style="background-color: #f1f5f9;">
+                            <span class="small fw-bold text-muted me-1 d-none d-md-inline" style="font-size: 0.78rem;">Kategori Permintaan:</span>
+                            <a href="{{ route('persetujuan.index', request()->except(['category', 'page'])) }}"
+                                class="btn btn-sm {{ empty($category) ? 'btn-primary text-white shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
+                                📋 Semua Permintaan ({{ $totalAllCategoryCount ?? $totalCount }})
+                                @if(($pendingAllCount ?? 0) > 0)
+                                    <span class="badge {{ empty($category) ? 'bg-white text-primary' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingAllCount }}</span>
+                                @endif
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'pending'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'persediaan'])) }}"
+                                class="btn btn-sm {{ ($category ?? '') === 'persediaan' ? 'btn-success text-white shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
+                                📦 Stok Gudang (Persediaan) ({{ $totalStockCategoryCount ?? 0 }})
+                                @if(($pendingStockCount ?? 0) > 0)
+                                    <span class="badge {{ ($category ?? '') === 'persediaan' ? 'bg-white text-success' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingStockCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'pengadaan'])) }}"
+                                class="btn btn-sm {{ ($category ?? '') === 'pengadaan' ? 'btn-warning text-dark shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
+                                🛒 Perlu Pengadaan (Beli Baru) ({{ $totalProcurementCategoryCount ?? 0 }})
+                                @if(($pendingProcurementCount ?? 0) > 0)
+                                    <span class="badge {{ ($category ?? '') === 'pengadaan' ? 'bg-dark text-warning' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingProcurementCount }}</span>
+                                @endif
+                            </a>
+                        </div>
+
+                        {{-- Tombol Filter Status --}}
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-1" id="status-filter-tabs">
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), !empty($category) ? ['category' => $category] : [])) }}"
+                                class="btn btn-sm {{ empty($statusFilter) || $statusFilter === 'all' ? 'btn-dark text-white shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1 fw-semibold" style="font-size: 0.82rem;">
+                                Semua Status ({{ $totalCount }})
+                            </a>
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), !empty($category) ? ['category' => $category, 'status' => 'pending'] : ['status' => 'pending'])) }}"
+                                class="btn btn-sm {{ $statusFilter === 'pending' ? 'btn-warning text-dark fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1" style="font-size: 0.82rem;">
                                 Menunggu Verifikasi ({{ $pendingCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'approved'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), !empty($category) ? ['category' => $category, 'status' => 'approved'] : ['status' => 'approved'])) }}"
+                                class="btn btn-sm {{ $statusFilter === 'approved' ? 'btn-success text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1" style="font-size: 0.82rem;">
                                 Disetujui ({{ $approvedCount }})
                             </a>
-                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), ['category' => $category ?? 'pengadaan', 'status' => 'rejected'])) }}"
-                                class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1.5" style="font-size: 0.82rem;">
+                            <a href="{{ route('persetujuan.index', array_merge(request()->except(['status', 'page']), !empty($category) ? ['category' => $category, 'status' => 'rejected'] : ['status' => 'rejected'])) }}"
+                                class="btn btn-sm {{ $statusFilter === 'rejected' ? 'btn-danger text-white fw-bold shadow-sm' : 'btn-light border text-secondary' }} rounded-pill px-3.5 py-1" style="font-size: 0.82rem;">
                                 Ditolak ({{ $rejectedCount }})
                             </a>
                         </div>
@@ -212,7 +274,9 @@
                     <div class="px-4 border-bottom" style="background-color: #f8fafc; padding-top: 1.25rem !important; padding-bottom: 1.25rem !important;">
                         <form id="persetujuan-filter-form" action="{{ route('persetujuan.index') }}" method="GET"
                             class="d-flex align-items-center flex-wrap gap-2.5">
-                            <input type="hidden" name="category" value="{{ $category ?? 'pengadaan' }}">
+                            @if(!empty($category))
+                                <input type="hidden" name="category" value="{{ $category }}">
+                            @endif
                             @if ($statusFilter)
                                 <input type="hidden" name="status" value="{{ $statusFilter }}">
                             @endif
@@ -305,7 +369,7 @@
                                         !empty($selectedYear) ||
                                         ($isAllMonths ?? false))
                                     @php
-                                        $resetParams = ['category' => $category ?? 'pengadaan'];
+                                        $resetParams = !empty($category) ? ['category' => $category] : [];
                                         if (!empty($statusFilter)) {
                                             $resetParams['status'] = $statusFilter;
                                         }
@@ -417,8 +481,12 @@
                                                         {{ $req->type }}
                                                     </span>
                                                     @if ($req->is_procurement)
-                                                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">
-                                                            Pengadaan (Beli Baru)
+                                                        <span class="badge bg-warning text-dark fw-semibold" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">
+                                                            🛒 Pengadaan (Beli Baru)
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">
+                                                            📦 Stok Gudang
                                                         </span>
                                                     @endif
                                                 </div>
@@ -439,19 +507,18 @@
                                                     </span>
                                                 @endif
 
-                                                {{-- Tombol Lihat History Pengadaan Pemohon --}}
-                                                @if (($category ?? 'pengadaan') !== 'persediaan')
-                                                    <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
-                                                        <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
-                                                            style="font-size: 0.66rem; line-height: 1.1;"
-                                                            data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
-                                                            title="Lihat riwayat akun pemohon untuk pengawasan kebutuhan ATK">
-                                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <circle cx="12" cy="12" r="10"></circle>
-                                                                <polyline points="12 6 12 12 16 14"></polyline>
-                                                            </svg>
-                                                            Riwayat Akun Pemohon
-                                                        </button>
+                                                {{-- Tombol Lihat History Pemohon --}}
+                                                <div class="mt-1 d-flex align-items-center gap-1 flex-wrap">
+                                                    <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-1 shadow-none"
+                                                        style="font-size: 0.66rem; line-height: 1.1;"
+                                                        data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}"
+                                                        title="Lihat riwayat akun pemohon untuk pengawasan kebutuhan ATK">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                        </svg>
+                                                        Riwayat Pemohon
+                                                    </button>
 
                                                         @if ($hasRepeatedItemsSameMonth)
                                                             <span class="badge bg-danger-subtle text-danger border rounded-pill px-1.5 py-0.5 d-inline-flex align-items-center gap-0.5"
@@ -472,7 +539,6 @@
                                                             </span>
                                                         @endif
                                                     </div>
-                                                @endif
                                             </td>
                                             <td style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;">
                                                 <ul class="mb-0 ps-3" style="font-size: 0.74rem; word-break: break-word; white-space: normal;">
@@ -787,12 +853,13 @@
                                                                             </svg>
                                                                             <div style="font-size: 0.8rem;">
                                                                                 @if ($req->is_procurement)
-                                                                                    <div>1. Menyetujui usulan ini menandakan bahwa barang disetujui untuk diproses pembelian oleh Kasubbag TU secara offline.</div>
-                                                                                    <div>2. Setelah barang dibeli offline, Kasubbag TU menambahkan stok di <strong>Master Data &rarr; Daftar Barang ATK</strong>.</div>
+                                                                                    <div>1. Menyetujui usulan ini menandakan bahwa barang disetujui untuk diproses pengadaan oleh Subbag TU &amp; Gudang.</div>
+                                                                                    <div>2. Setelah barang fisik dibeli/tiba, barang langsung masuk antrean distribusi untuk diserahkan ke pemohon.</div>
+                                                                                    <div>3. <strong>Pemohon tidak perlu mengajukan ulang</strong> karena permintaan ini otomatis terintegrasi ke serah terima barang.</div>
                                                                                 @else
-                                                                                    <div>1. Menyetujui permintaan ini akan <strong>mengurangi stok gudang secara real-time</strong> sesuai kuantitas yang disetujui Kasubbag TU.</div>
-                                                                                    <div>2. Data transaksi akan <strong>langsung tercatat di Barang Keluar</strong> dan valuasi persediaan otomatis berkurang.</div>
-                                                                                    <div>3. Tiket ini selanjutnya siap diserahkan fisiknya oleh <strong>PIC Distribusi</strong>.</div>
+                                                                                    <div>1. Menyetujui permintaan ini menandakan bahwa kuantitas barang disetujui untuk diserahkan kepada pemohon.</div>
+                                                                                    <div>2. Tiket selanjutnya masuk ke antrean <strong>Distribusi Barang</strong> untuk diserahkan fisiknya oleh Petugas Gudang Distribusi.</div>
+                                                                                    <div>3. <strong>Stok gudang dan mutasi Barang Keluar akan otomatis tercatat</strong> saat Petugas Gudang Distribusi melakukan serah terima fisik barang.</div>
                                                                                 @endif
                                                                             </div>
                                                                         </div>
@@ -971,18 +1038,14 @@
                                                                     @endif
                                                                 </div>
                                                                 <div class="modal-footer d-flex justify-content-between flex-shrink-0 bg-white border-top">
-                                                                    @if (($category ?? 'pengadaan') !== 'persediaan')
-                                                                        <button type="button" class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1"
-                                                                            data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}">
-                                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                                <circle cx="12" cy="12" r="10"></circle>
-                                                                                <polyline points="12 6 12 12 16 14"></polyline>
-                                                                            </svg>
-                                                                            Lihat Riwayat Pengadaan Pemohon
-                                                                        </button>
-                                                                    @else
-                                                                        <div></div>
-                                                                    @endif
+                                                                    <button type="button" class="btn btn-outline-info btn-sm d-inline-flex align-items-center gap-1"
+                                                                        data-bs-toggle="modal" data-bs-target="#userHistoryModal{{ $req->id }}">
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                                                        </svg>
+                                                                        Lihat Riwayat Pemohon
+                                                                    </button>
                                                                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
                                                                 </div>
                                                             </div>
@@ -990,9 +1053,8 @@
                                                     </div>
                                                 @endif
 
-                                                @if (($category ?? 'pengadaan') !== 'persediaan')
-                                                    {{-- Modal Riwayat Pengadaan & Permintaan Pemohon (Pencegahan Stocking / Hoarding) --}}
-                                                    <div class="modal fade text-start" id="userHistoryModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
+                                                {{-- Modal Riwayat Pengadaan & Permintaan Pemohon (Pencegahan Stocking / Hoarding) --}}
+                                                <div class="modal fade text-start" id="userHistoryModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                                                         <div class="modal-content d-flex flex-column h-100 overflow-hidden">
                                                             <div class="modal-header bg-primary text-white flex-shrink-0">
@@ -1340,7 +1402,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                @endif
                                             </td>
                                         </tr>
                                     @empty

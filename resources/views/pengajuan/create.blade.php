@@ -409,9 +409,9 @@
                             if (qtyInput) qtyInput.removeAttribute('max');
 
                             if (p.stock > 0) {
-                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika permintaan melebihi stok, kekurangan akan dibeli oleh Kasubbag TU.`;
+                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika jumlah melebihi stok, kekurangan otomatis diproses pengadaan dan diserahkan kepada Anda saat tiba.`;
                             } else {
-                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini akan otomatis diproses pengadaan oleh Kasubbag TU.`;
+                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini otomatis diproses pengadaan oleh Subbag TU dan langsung diserahkan kepada Anda setelah barang tiba (tanpa perlu pengajuan ulang).`;
                             }
                         } else {
                             if (prodHidden) prodHidden.value = '';

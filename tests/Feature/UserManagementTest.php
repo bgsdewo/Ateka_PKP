@@ -259,8 +259,9 @@ class UserManagementTest extends TestCase
             ->get(route('reports.berita-acara'))
             ->assertStatus(200);
 
-        // 3. Pegawai gudang hanya cek stok, dilarang menambah atau menghapus barang master
-        $storeResponse = $this->actingAs($pegawaiGudang)
+        // 3. Pegawai biasa dilarang menambah barang master
+        $pegawaiBiasa = User::factory()->create(['role' => 'pegawai']);
+        $storeResponse = $this->actingAs($pegawaiBiasa)
             ->post(route('master-data.daftar-barang.store'), [
                 'name' => 'Coba Tambah',
                 'code' => 'BRG-COBA-999',

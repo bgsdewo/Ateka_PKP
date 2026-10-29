@@ -550,7 +550,22 @@ class SubbagTuVerificationAndRecapTest extends TestCase
         $this->assertEquals(4, $txMasuk->quantity);
         $this->assertEquals(85000, $txMasuk->harga_perolehan);
 
-        // Check StockTransaction 'keluar'
+        // In the updated flow, stock deduction is deferred until distribution by Petugas Gudang Distribusi
+        $this->assertEquals('ready_to_distribute', $req->status);
+
+        $distributor = User::firstOrCreate(
+            ['email' => 'distributor.test@perumahan.go.id'],
+            [
+                'name' => 'Distributor Gudang Test',
+                'role' => 'pegawai_gudang',
+                'is_distributor' => true,
+                'password' => bcrypt('password123'),
+            ]
+        );
+        $this->actingAs($distributor)
+            ->post(route('distribusi.serahkan', $req->id));
+
+        // Check StockTransaction 'keluar' after handover
         $txKeluar = StockTransaction::where('product_id', $newProduct->id)
             ->where('type', 'keluar')
             ->first();
@@ -571,7 +586,7 @@ class SubbagTuVerificationAndRecapTest extends TestCase
 
         $response = $this->actingAs($this->buUtami)->get(route('persetujuan.index'));
         $response->assertStatus(200);
-        $response->assertSee('Selesai Ditinjau');
+        $response->assertSee('Disetujui TU');
         $response->assertDontSee('>Dokumen<', false);
     }
 

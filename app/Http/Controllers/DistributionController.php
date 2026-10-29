@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\RequestItem;
 use App\Models\Product;
+use App\Models\StockTransaction;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,10 +43,6 @@ class DistributionController extends Controller
 
         $baseQuery = RequestItem::with(['user', 'details.product', 'distributor'])
             ->whereIn('status', ['approved', 'distributed'])
-            ->where(function ($q) {
-                $q->where('is_procurement', false)
-                  ->orWhereNull('is_procurement');
-            })
             ->when($filterType, function ($q) use ($filterType) {
                 $q->where('type', $filterType);
             })
@@ -175,9 +173,6 @@ class DistributionController extends Controller
         }
 
         $requestItem = RequestItem::with(['user', 'details.product'])
-            ->where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            })
             ->findOrFail($id);
 
         $request->validate([
@@ -192,40 +187,134 @@ class DistributionController extends Controller
             'distribution_proof.max' => 'Ukuran foto bukti tidak boleh melebihi 5 MB.',
         ]);
 
-        $proofPath = $requestItem->distribution_proof;
-        if ($request->hasFile('distribution_proof')) {
-            if ($proofPath && Storage::disk('public')->exists($proofPath)) {
-                Storage::disk('public')->delete($proofPath);
+        DB::beginTransaction();
+        try {
+            $proofPath = $requestItem->distribution_proof;
+            if ($request->hasFile('distribution_proof')) {
+                if ($proofPath && Storage::disk('public')->exists($proofPath)) {
+                    Storage::disk('public')->delete($proofPath);
+                }
+                $file = $request->file('distribution_proof');
+                $ext = strtolower($file->getClientOriginalExtension());
+                $ext = in_array($ext, ['jpeg', 'png', 'jpg', 'webp']) ? $ext : 'jpg';
+                $filename = 'proof_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $ext;
+                $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
             }
-            $file = $request->file('distribution_proof');
-            $ext = strtolower($file->getClientOriginalExtension());
-            $ext = in_array($ext, ['jpeg', 'png', 'jpg', 'webp']) ? $ext : 'jpg';
-            $filename = 'proof_' . $requestItem->request_code . '_' . \Illuminate\Support\Str::random(16) . '.' . $ext;
-            $proofPath = $file->storeAs('distribution_proofs', $filename, 'public');
+
+            $distributedById = $request->input('distributed_by');
+            if (!$distributedById) {
+                $defaultDist = \App\Models\User::where('role', 'pegawai_gudang')
+                    ->where('is_distributor', true)
+                    ->where('name', '!=', 'tes')
+                    ->latest('id')
+                    ->first();
+                $distributedById = $defaultDist ? $defaultDist->id : Auth::id();
+            }
+
+            $distributorUser = \App\Models\User::find($distributedById);
+            $distributorName = $distributorUser ? ($distributorUser->name_with_title ?: $distributorUser->name) : 'Petugas Distribusi Gudang';
+
+            // ========================================================
+            // MUTASI BARANG KELUAR & PEMOTONGAN STOK GUDANG RIIL
+            // Dilakukan saat Petugas Gudang Distribusi menyerahkan fisik barang
+            // ========================================================
+            $pemohonName = $requestItem->user ? ($requestItem->user->name_with_title ?: $requestItem->user->name) : 'Pemohon';
+            $pemohonUnit = ($requestItem->user && $requestItem->user->position) ? ' (' . $requestItem->user->position . ')' : '';
+            $penerimaUraian = $request->receiver_name . ($request->receiver_name !== $pemohonName ? ' (untuk ' . $pemohonName . $pemohonUnit . ')' : $pemohonUnit);
+
+            foreach ($requestItem->details as $detail) {
+                $qtyToDeduct = $detail->effective_quantity ?? ($detail->approved_quantity !== null ? (int) $detail->approved_quantity : (int) $detail->quantity);
+                if ($qtyToDeduct <= 0) {
+                    continue;
+                }
+
+                if ($detail->product_id) {
+                    $product = Product::lockForUpdate()->find($detail->product_id);
+                    if ($product) {
+                        // Cek apakah mutasi keluar untuk tiket & produk ini sudah pernah tercatat sebelumnya (idempotency)
+                        $existingTx = StockTransaction::where('type', 'keluar')
+                            ->where('product_id', $product->id)
+                            ->where('no_faktur', $requestItem->request_code)
+                            ->first();
+
+                        $noteText = 'Penyerahan ATK kepada ' . $request->receiver_name . ' (' . $requestItem->request_code . ')';
+                        if ($request->filled('distribution_notes')) {
+                            $noteText .= ' - ' . $request->distribution_notes;
+                        }
+
+                        if ($existingTx) {
+                            // Update data transaksi yang ada agar mencerminkan serah terima riil
+                            $existingTx->update([
+                                'user_id'          => $distributedById,
+                                'quantity'         => $qtyToDeduct,
+                                'transaction_date' => now()->toDateString(),
+                                'uraian'           => $penerimaUraian,
+                                'note'             => $noteText,
+                            ]);
+                        } else {
+                            // Potong stok gudang saat fisik barang diserahkan
+                            $stockAfterOut = max(0, $product->stock - $qtyToDeduct);
+                            $product->stock = $stockAfterOut;
+                            $product->save();
+
+                            // Catat mutasi Barang Keluar
+                            StockTransaction::create([
+                                'product_id'       => $product->id,
+                                'user_id'          => $distributedById, // Petugas Gudang Distribusi yang menyerahkan
+                                'type'             => 'keluar',
+                                'recipient_type'   => $requestItem->type ?? 'individu',
+                                'quantity'         => $qtyToDeduct,
+                                'stock_after'      => $stockAfterOut,
+                                'transaction_date' => now()->toDateString(),
+                                'no_faktur'        => $requestItem->request_code,
+                                'uraian'           => $penerimaUraian,
+                                'kondisi'          => 'Baik',
+                                'harga_perolehan'  => $product->purchase_price ?? 0,
+                                'note'             => $noteText,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            $requestItem->update([
+                'status'             => 'distributed',
+                'distributed_at'     => now(),
+                'distributed_by'     => $distributedById,
+                'receiver_name'      => $request->receiver_name,
+                'distribution_notes' => $request->distribution_notes,
+                'distribution_proof' => $proofPath,
+            ]);
+
+            // Kirim notifikasi ke pemohon bahwa barang fisik telah diserahterimakan
+            if ($requestItem->user) {
+                UserNotification::create([
+                    'user_id'    => $requestItem->user_id,
+                    'title'      => 'Barang ATK Telah Diserahterimakan',
+                    'message'    => "Permintaan ATK #{$requestItem->request_code} telah diserahkan oleh {$distributorName} dan diterima oleh {$request->receiver_name}.",
+                    'type'       => 'distribution_completed',
+                    'icon'       => 'check-circle',
+                    'link'       => route('pengajuan.index'),
+                    'request_id' => $requestItem->id,
+                    'is_read'    => false,
+                    'data'       => [
+                        'request_code'  => $requestItem->request_code,
+                        'receiver_name' => $request->receiver_name,
+                        'distributor'   => $distributorName,
+                    ],
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('distribusi.index')
+                ->with('success', 'Barang berhasil diserahterimakan ke ' . $request->receiver_name . ' (' . $requestItem->request_code . '). Mutasi barang keluar telah dicatat oleh Petugas Distribusi.' . ($proofPath ? ' Foto bukti serah terima berhasil diunggah.' : ''))
+                ->with('print_id', $requestItem->id);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memproses serah terima barang: ' . $e->getMessage());
         }
-
-        $distributedById = $request->input('distributed_by');
-        if (!$distributedById) {
-            $defaultDist = \App\Models\User::where('role', 'pegawai_gudang')
-                ->where('is_distributor', true)
-                ->where('name', '!=', 'tes')
-                ->latest('id')
-                ->first();
-            $distributedById = $defaultDist ? $defaultDist->id : Auth::id();
-        }
-
-        $requestItem->update([
-            'status' => 'distributed',
-            'distributed_at' => now(),
-            'distributed_by' => $distributedById,
-            'receiver_name' => $request->receiver_name,
-            'distribution_notes' => $request->distribution_notes,
-            'distribution_proof' => $proofPath,
-        ]);
-
-        return redirect()->route('distribusi.index')
-            ->with('success', 'Barang berhasil diserahterimakan ke ' . $request->receiver_name . ' (' . $requestItem->request_code . ').' . ($proofPath ? ' Foto bukti serah terima berhasil diunggah.' : ''))
-            ->with('print_id', $requestItem->id);
     }
 
     /**
@@ -240,10 +329,7 @@ class DistributionController extends Controller
             return redirect()->route('dashboard')->with('error', 'Aksi upload foto bukti penyerahan hanya dapat dilakukan oleh Petugas Distribusi yang ditugaskan resmi atau Kasubbag TU.');
         }
 
-        $requestItem = RequestItem::where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            })
-            ->findOrFail($id);
+        $requestItem = RequestItem::findOrFail($id);
 
         $request->validate([
             'distribution_proof' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -280,9 +366,6 @@ class DistributionController extends Controller
         $currentUser = auth()->user();
 
         $requestItem = RequestItem::with(['user', 'details.product', 'distributor'])
-            ->where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            })
             ->findOrFail($id);
 
         // Validasi hak akses menyeluruh (Kasubbag TU, Petugas Gudang Distributor, Pemohon bersangkutan, atau PIC penanggung jawab)
