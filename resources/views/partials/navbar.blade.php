@@ -8,8 +8,8 @@
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
-                <span class="logo-title fw-bold text-white mb-0 fs-6" style="letter-spacing: -0.02em; line-height: 1.2;">Inventori ATK</span>
-                <span class="d-none d-sm-block" style="font-size: 0.68rem; font-weight: 600; line-height: 1; color: #6ee7b7;">Kementerian PKP RI</span>
+                <span class="logo-title fw-semibold text-white mb-0 fs-6" style="letter-spacing: -0.01em; line-height: 1.2;">Inventori ATK</span>
+                <span class="d-none d-sm-block text-white-50" style="font-size: 0.72rem; font-weight: 400; line-height: 1.2;">Kementerian PKP RI</span>
             </div>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">

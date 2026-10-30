@@ -28,7 +28,7 @@
     transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* 1.1 Header Instansi */
+/* 1.1 Header Instansi (Resmi, Bersih & Tidak Norak) */
 .sidebar .sidebar-header {
     background: transparent !important;
     border-bottom: 1px solid var(--sidebar-border) !important;
@@ -46,14 +46,14 @@
 }
 
 .sidebar-brand-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: #ffffff;
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
     overflow: hidden;
     padding: 2px;
@@ -63,25 +63,25 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 .sidebar-brand-text .logo-title {
     color: #ffffff !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
+    font-size: 0.98rem !important;
+    font-weight: 600 !important;
     letter-spacing: -0.01em !important;
-    line-height: 1.2 !important;
+    line-height: 1.25 !important;
     margin: 0 !important;
 }
 
 .sidebar-brand-text .sidebar-subtext {
-    color: #6ee7b7 !important;
-    font-size: 0.68rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase !important;
-    margin-top: 2px !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-size: 0.72rem !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important; /* Huruf alami biasa, bukan ALL-CAPS neon */
+    margin-top: 1px !important;
     display: block !important;
 }
 
@@ -123,7 +123,7 @@
 
 /* 1.3 Menu Items (Sleek, Natural, Tidak Menggelembung) */
 .sidebar .sidebar-list {
-    padding: 0.4rem 0.75rem 1.2rem !important;
+    padding: 0.4rem 0.75rem 2rem !important;
 }
 
 .sidebar .nav-item {
@@ -249,70 +249,15 @@
     border: none !important;
 }
 
-/* 1.5 Footer Profil Pengguna (Resmi, Bersih & Profesional) */
+/* Nonaktifkan / Hapus Area User Footer di Sidebar Sesuai Permintaan */
 .sidebar-user-footer {
-    margin-top: auto !important;
-    padding: 0.75rem 0.85rem !important;
-    border-top: 1px solid var(--sidebar-border) !important;
-    background: rgba(0, 0, 0, 0.15) !important;
-}
-
-.sidebar-user-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.65rem !important;
-    padding: 0.45rem 0.55rem !important;
-    border-radius: 8px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    transition: background 0.18s ease !important;
-}
-
-.sidebar-user-card:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
-}
-
-.sidebar-user-avatar {
-    width: 34px !important;
-    height: 34px !important;
-    border-radius: 50% !important;
-    background: #143b2f !important;
-    color: #6ee7b7 !important;
-    font-weight: 600 !important;
-    font-size: 0.82rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 1px solid rgba(110, 231, 183, 0.25) !important;
-    box-shadow: none !important;
-    flex-shrink: 0 !important;
-}
-
-.sidebar-user-details {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
     overflow: hidden !important;
-    min-width: 0 !important;
-}
-
-.sidebar-user-name {
-    color: #ffffff !important;
-    font-size: 0.84rem !important;
-    font-weight: 600 !important;
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
-}
-
-.sidebar-user-role {
-    color: var(--sidebar-text-muted) !important;
-    font-size: 0.72rem !important;
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
-    margin-top: 1px !important;
 }
 
 
@@ -555,44 +500,6 @@
     border-color: #10b981 !important;
 }
 
-/* Footer Profil Mini */
-.sidebar.sidebar-mini .sidebar-user-footer {
-    padding: 0.75rem 0.2rem 0.85rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    border-top: 1px solid var(--sidebar-border) !important;
-}
-
-.sidebar.sidebar-mini .sidebar-user-card {
-    padding: 0 !important;
-    margin: 0 auto !important;
-    width: 36px !important;
-    height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: transparent !important;
-    border: none !important;
-}
-
-.sidebar.sidebar-mini .sidebar-user-details {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-}
-
-.sidebar.sidebar-mini .sidebar-user-avatar {
-    width: 34px !important;
-    height: 34px !important;
-    margin: 0 auto !important;
-}
-
 
 /* ==============================================================================
    3. TOP NAVBAR / HEADER (EXECUTIVE PINE GREEN)
@@ -620,14 +527,14 @@
 /* Brand Teks di Navbar */
 .iq-navbar .navbar-brand .logo-title {
     color: #ffffff !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     letter-spacing: -0.01em !important;
 }
 
 .iq-navbar .navbar-brand .text-muted,
 .iq-navbar .navbar-brand span:last-child {
-    color: #6ee7b7 !important;
-    font-weight: 500 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-weight: 400 !important;
 }
 
 /* Lonceng Notifikasi */

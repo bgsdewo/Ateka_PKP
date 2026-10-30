@@ -296,30 +296,4 @@
             </ul>
         </div>
     </div>
-
-    <!-- 8. Bagian Bawah: Profil Pengguna (Resmi & Elegan) -->
-    <div class="sidebar-user-footer">
-        <div class="sidebar-user-card">
-            <div class="sidebar-user-avatar">
-                {{ strtoupper(substr($currentUser->name ?? 'U', 0, 1)) }}
-            </div>
-            <div class="sidebar-user-details">
-                <span class="sidebar-user-name" title="{{ $currentUser->name ?? 'Pengguna' }}">
-                    {{ $currentUser->name ?? 'Pengguna' }}
-                </span>
-                <span class="sidebar-user-role" title="{{ $currentUser->nip ? 'NIP. ' . $currentUser->nip : ucfirst($role) }}">
-                    @if($currentUser && $currentUser->nip)
-                        NIP. {{ $currentUser->nip }}
-                    @else
-                        {{ match ($role) {
-                            'kasubag_tu', 'admin' => 'Kasubbag Tata Usaha',
-                            'pic_distribusi' => 'PIC Distribusi',
-                            'pegawai_gudang' => 'Petugas Gudang',
-                            default => 'Pegawai Pemohon',
-                        } }}
-                    @endif
-                </span>
-            </div>
-        </div>
-    </div>
 </aside>
