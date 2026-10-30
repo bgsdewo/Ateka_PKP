@@ -1,25 +1,17 @@
-<nav class="nav navbar navbar-expand-lg navbar-light iq-navbar">
+<nav class="nav navbar navbar-expand-lg iq-navbar">
     <div class="container-fluid navbar-inner">
         <a href="{{ route('dashboard') }}" class="navbar-brand">
             <div class="logo-main">
                 <div class="logo-normal">
                     <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP"
-                        width="40" height="40" style="width: 40px; height: 40px; object-fit: contain;">
+                        width="40" height="40" style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px;">
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
-                <span class="logo-title fw-bold text-dark mb-0 fs-6" style="letter-spacing: -0.02em; line-height: 1.2;">Inventori ATK</span>
-                <span class="text-muted d-none d-sm-block" style="font-size: 0.68rem; font-weight: 500; line-height: 1;">Kementerian PKP RI</span>
+                <span class="logo-title fw-bold text-white mb-0 fs-6" style="letter-spacing: -0.02em; line-height: 1.2;">Inventori ATK</span>
+                <span class="d-none d-sm-block" style="font-size: 0.68rem; font-weight: 600; line-height: 1; color: #6ee7b7;">Kementerian PKP RI</span>
             </div>
         </a>
-        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Buka tutup sidebar">
-            <i class="icon">
-                <svg width="20px" class="icon-20" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor"
-                        d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
-                </svg>
-            </i>
-        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">
             <span class="navbar-toggler-icon">
                 <span class="mt-2 navbar-toggler-bar bar1"></span>
@@ -159,7 +151,7 @@
                         || $userNotifications->isNotEmpty();
                 @endphp
                 <li class="nav-item dropdown me-2">
-                    <a href="#" class="nav-link position-relative p-2 rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border"
+                    <a href="#" class="nav-link position-relative p-2 rounded-circle d-flex align-items-center justify-content-center"
                         id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi Sistem" style="width: 40px; height: 40px;" title="Notifikasi Sistem">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -423,11 +415,11 @@
                 <li class="nav-item dropdown">
                     <a class="py-0 nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-label="Menu akun pengguna">
-                        <div class="avatar avatar-40 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border border-primary-subtle">
+                        <div class="avatar avatar-40 rounded-circle fw-bold d-flex align-items-center justify-content-center">
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
                         <div class="caption ms-3 d-none d-md-block text-start">
-                            <h6 class="mb-0 caption-title fw-bold text-dark">{{ auth()->user()->name ?? 'Pengguna' }}</h6>
+                            <h6 class="mb-0 caption-title fw-bold text-white">{{ auth()->user()->name ?? 'Pengguna' }}</h6>
                             <div class="d-flex align-items-center gap-1 mt-0.5">
                                 @php
                                     $userRole = auth()->user()->role ?? 'pegawai';
