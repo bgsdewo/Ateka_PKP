@@ -420,7 +420,7 @@
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
                         <div class="caption ms-2 d-none d-md-block text-start">
-                            <span class="caption-title d-block fw-semibold text-dark" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
+                            <span class="caption-title d-block fw-semibold text-white" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
                             @php
                                 $userRole = auth()->user()->role ?? 'pegawai';
                                 $roleTitle = match ($userRole) {
@@ -430,9 +430,9 @@
                                     default => 'Pegawai Pemohon',
                                 };
                             @endphp
-                            <span class="user-role-label text-muted d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
+                            <span class="user-role-label text-white-50 d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
                         </div>
-                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;">
+                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(255, 255, 255, 0.65);">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </a>
