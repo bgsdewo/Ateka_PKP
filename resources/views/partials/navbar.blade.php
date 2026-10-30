@@ -1,12 +1,5 @@
 <nav class="nav navbar navbar-expand-lg iq-navbar">
     <div class="container-fluid navbar-inner">
-        <!-- Title & Identitas Instansi di Header Kiri (Desktop) -->
-        <div class="d-none d-lg-flex align-items-center gap-2 text-white my-auto">
-            <span class="fw-semibold text-white" style="font-size: 0.92rem; letter-spacing: -0.01em;">Sistem Informasi Inventori ATK</span>
-            <span style="opacity: 0.35; font-size: 0.85rem;">•</span>
-            <span class="text-white-50" style="font-size: 0.78rem;">Kementerian Perumahan dan Kawasan Permukiman</span>
-        </div>
-
         <!-- Brand Logo di Header Kiri (Tampil saat Mobile) -->
         <a href="{{ route('dashboard') }}" class="navbar-brand d-lg-none">
             <div class="logo-main">
@@ -16,8 +9,8 @@
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
-                <span class="logo-title fw-semibold text-white mb-0 fs-6" style="letter-spacing: -0.01em; line-height: 1.2;">Inventori ATK</span>
-                <span class="d-none d-sm-block text-white-50" style="font-size: 0.72rem; font-weight: 400; line-height: 1.2;">Kementerian PKP RI</span>
+                <span class="logo-title fw-bold text-dark mb-0 fs-6" style="letter-spacing: -0.01em; line-height: 1.2;">Inventori ATK</span>
+                <span class="d-none d-sm-block text-muted" style="font-size: 0.72rem; font-weight: 400; line-height: 1.2;">Kementerian PKP RI</span>
             </div>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">
@@ -427,7 +420,7 @@
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
                         <div class="caption ms-2 d-none d-md-block text-start">
-                            <span class="caption-title d-block fw-semibold text-white" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
+                            <span class="caption-title d-block fw-semibold text-dark" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
                             @php
                                 $userRole = auth()->user()->role ?? 'pegawai';
                                 $roleTitle = match ($userRole) {
@@ -437,9 +430,9 @@
                                     default => 'Pegawai Pemohon',
                                 };
                             @endphp
-                            <span class="user-role-label text-white-50 d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
+                            <span class="user-role-label text-muted d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
                         </div>
-                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(255, 255, 255, 0.65);">
+                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </a>

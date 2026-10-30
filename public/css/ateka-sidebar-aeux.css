@@ -6,7 +6,7 @@
 
 :root {
     --sidebar-pine-bg: linear-gradient(180deg, #0e2a22 0%, #0a1f19 100%);
-    --header-pine-bg: linear-gradient(90deg, #185546 0%, #13483b 100%);
+    --header-pine-bg: transparent;
     --sidebar-text-muted: #84a599;
     --sidebar-text-hover: #ffffff;
     --sidebar-text-active: #ffffff;
@@ -496,16 +496,16 @@
 
 
 /* ==============================================================================
-   3. TOP NAVBAR / HEADER (FRESH, COMFORTABLE & ELEGANT FOREST GREEN)
-   Warna segar, tidak gelap pekat, nyaman dilihat oleh pegawai/pengguna
+   3. TOP NAVBAR / HEADER (TRANSPARENT / NO BACKGROUND COLOR - GAYA DONEZO)
+   Sesuai permintaan: bersih, menyatu alami dengan halaman, tanpa background tebal
    ============================================================================== */
 .iq-navbar {
-    background: var(--header-pine-bg) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
-    color: #ffffff !important;
-    padding-top: 0.65rem !important;
-    padding-bottom: 0.65rem !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    color: #0f172a !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
     transition: all 0.2s ease !important;
 }
 
@@ -519,106 +519,109 @@
     pointer-events: none !important;
 }
 
-/* Brand Teks di Navbar */
+/* Brand Teks di Navbar (Mobile) */
 .iq-navbar .navbar-brand .logo-title {
-    color: #ffffff !important;
-    font-weight: 600 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
     letter-spacing: -0.01em !important;
 }
 
 .iq-navbar .navbar-brand .text-muted,
 .iq-navbar .navbar-brand span:last-child {
-    color: rgba(255, 255, 255, 0.7) !important;
+    color: #64748b !important;
     font-weight: 400 !important;
 }
 
-/* Lonceng Notifikasi: Bersih, Rapi & Natural */
+/* Lonceng Notifikasi: Bersih & Minimalis di Atas Latar Terang */
 .iq-navbar #notificationDropdown {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    color: #ffffff !important;
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 8px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    color: #475569 !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     transition: all 0.18s ease !important;
-    box-shadow: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .iq-navbar #notificationDropdown:hover {
-    background: rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.22) !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
 .iq-navbar #nav-notif-badge {
     background: #ef4444 !important;
     color: #ffffff !important;
-    border: 1.5px solid #14483b !important;
+    border: 2px solid #ffffff !important;
     font-weight: 700 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Tombol Profil Pengguna di Navbar: Resmi, Sopan & Nyaman Dilihat */
+/* Tombol Profil Pengguna di Navbar: Clean Pill Card Bergaya Donezo */
 .iq-navbar #navbarDropdown {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    border-radius: 8px !important;
-    padding: 0.28rem 0.65rem !important;
-    gap: 0.55rem !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 28px !important;
+    padding: 0.32rem 0.85rem 0.32rem 0.4rem !important;
+    gap: 0.65rem !important;
     transition: all 0.18s ease !important;
     display: flex !important;
     align-items: center !important;
     text-decoration: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .iq-navbar #navbarDropdown:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.24) !important;
+    background: #f8fafc !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
 .iq-navbar #navbarDropdown .avatar {
-    width: 32px !important;
-    height: 32px !important;
-    background: #0f3d32 !important;
+    width: 34px !important;
+    height: 34px !important;
+    background: #0d3227 !important;
     color: #ffffff !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 0.82rem !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
     border-radius: 50% !important;
-    box-shadow: none !important;
+    box-shadow: 0 1px 3px rgba(13, 50, 39, 0.25) !important;
 }
 
 .iq-navbar #navbarDropdown .caption-title {
-    color: #ffffff !important;
+    color: #0f172a !important;
     font-weight: 600 !important;
     font-size: 0.84rem !important;
     line-height: 1.2 !important;
 }
 
 .iq-navbar #navbarDropdown .user-role-label {
-    color: rgba(255, 255, 255, 0.7) !important;
+    color: #64748b !important;
     font-size: 0.72rem !important;
     font-weight: 400 !important;
     line-height: 1.1 !important;
 }
 
 .iq-navbar #navbarDropdown svg.dropdown-arrow-icon {
-    color: rgba(255, 255, 255, 0.65) !important;
+    color: #94a3b8 !important;
 }
 
 /* Dropdown Menu Popup */
 .iq-navbar .dropdown-menu {
     background: #ffffff !important;
     border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
     overflow: hidden !important;
 }
 
 .iq-navbar .dropdown-menu .bg-primary {
-    background: #14483b !important;
+    background: #0d3227 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
