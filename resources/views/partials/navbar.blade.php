@@ -1,10 +1,18 @@
 <nav class="nav navbar navbar-expand-lg iq-navbar">
     <div class="container-fluid navbar-inner">
-        <a href="{{ route('dashboard') }}" class="navbar-brand">
+        <!-- Title & Identitas Instansi di Header Kiri (Desktop) -->
+        <div class="d-none d-lg-flex align-items-center gap-2 text-white my-auto">
+            <span class="fw-semibold text-white" style="font-size: 0.92rem; letter-spacing: -0.01em;">Sistem Informasi Inventori ATK</span>
+            <span style="opacity: 0.35; font-size: 0.85rem;">•</span>
+            <span class="text-white-50" style="font-size: 0.78rem;">Kementerian Perumahan dan Kawasan Permukiman</span>
+        </div>
+
+        <!-- Brand Logo di Header Kiri (Tampil saat Mobile) -->
+        <a href="{{ route('dashboard') }}" class="navbar-brand d-lg-none">
             <div class="logo-main">
                 <div class="logo-normal">
                     <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP"
-                        width="40" height="40" style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px;">
+                        width="36" height="36" style="width: 36px; height: 36px; object-fit: contain; border-radius: 6px;">
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
@@ -415,33 +423,23 @@
                 <li class="nav-item dropdown">
                     <a class="py-0 nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-label="Menu akun pengguna">
-                        <div class="avatar avatar-40 rounded-circle fw-bold d-flex align-items-center justify-content-center">
+                        <div class="avatar avatar-32 rounded-circle fw-semibold d-flex align-items-center justify-content-center">
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
-                        <div class="caption ms-3 d-none d-md-block text-start">
-                            <h6 class="mb-0 caption-title fw-bold text-white">{{ auth()->user()->name ?? 'Pengguna' }}</h6>
-                            <div class="d-flex align-items-center gap-1 mt-0.5">
-                                @php
-                                    $userRole = auth()->user()->role ?? 'pegawai';
-                                    $roleBadge = match ($userRole) {
-                                        'kasubag_tu', 'admin' => 'bg-primary text-white',
-                                        'pic_distribusi' => 'bg-warning text-dark',
-                                        'pegawai_gudang' => 'bg-dark text-white',
-                                        default => 'bg-secondary text-white',
-                                    };
-                                    $roleTitle = match ($userRole) {
-                                        'kasubag_tu', 'admin' => 'Kasubbag TU',
-                                        'pic_distribusi' => 'PIC Distribusi',
-                                        'pegawai_gudang' => 'Pegawai Gudang',
-                                        default => 'Pegawai',
-                                    };
-                                @endphp
-                                <span class="badge {{ $roleBadge }}" style="font-size: 0.68rem; padding: 2px 6px;">
-                                    {{ $roleTitle }}
-                                </span>
-                            </div>
+                        <div class="caption ms-2 d-none d-md-block text-start">
+                            <span class="caption-title d-block fw-semibold text-white" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
+                            @php
+                                $userRole = auth()->user()->role ?? 'pegawai';
+                                $roleTitle = match ($userRole) {
+                                    'kasubag_tu', 'admin' => 'Kasubbag Tata Usaha',
+                                    'pic_distribusi' => 'PIC Distribusi',
+                                    'pegawai_gudang' => 'Petugas Gudang',
+                                    default => 'Pegawai Pemohon',
+                                };
+                            @endphp
+                            <span class="user-role-label text-white-50 d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
                         </div>
-                        <svg class="ms-2 text-muted dropdown-arrow-icon d-none d-md-block" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
+                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(255, 255, 255, 0.65);">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </a>

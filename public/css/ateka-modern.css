@@ -1147,7 +1147,7 @@ textarea:focus-visible,
    4. GLASSMORPHIC TOP NAVBAR (.iq-navbar)
    ============================================================================== */
 .iq-navbar {
-    background: linear-gradient(90deg, #0d3227 0%, #09241c 50%, #071c16 100%) !important;
+    background: linear-gradient(90deg, #185546 0%, #13483b 100%) !important;
     backdrop-filter: blur(16px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
