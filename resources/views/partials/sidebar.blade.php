@@ -15,15 +15,11 @@
 @endphp
 
 <aside class="sidebar sidebar-default sidebar-base navs-rounded-all">
-    <!-- Header Sidebar: Logo & Nama Instansi Bergaya AeuxGlobal -->
+    <!-- Header Sidebar: Logo Kementerian & Identitas Instansi -->
     <div class="sidebar-header d-flex align-items-center justify-content-between">
         <a href="{{ route('dashboard') }}" class="navbar-brand">
-            <div class="sidebar-aeux-logo-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                    <path d="M2 17l10 5 10-5"></path>
-                    <path d="M2 12l10 5 10-5"></path>
-                </svg>
+            <div class="sidebar-brand-logo">
+                <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo Kementerian PKP" width="34" height="34" style="border-radius: 8px; object-fit: contain;">
             </div>
             <div class="sidebar-brand-text">
                 <h5 class="logo-title">Inventori ATK</h5>
@@ -32,8 +28,8 @@
         </a>
         <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Tutup sidebar">
             <i class="icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </i>
         </div>
@@ -44,10 +40,10 @@
         <div class="sidebar-list">
             <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
 
-                <!-- Header Kategori Menu: NAVIGATION (Sesuai Gambar 2) -->
+                <!-- Label Kategori Menu -->
                 <li class="nav-item static-item">
                     <a class="nav-link static-item disabled" href="#" tabindex="-1">
-                        <span class="default-icon">Navigation</span>
+                        <span class="default-icon">Menu Utama</span>
                         <span class="mini-icon">-</span>
                     </a>
                 </li>
@@ -301,19 +297,27 @@
         </div>
     </div>
 
-    <!-- 8. Bagian Bawah: USER ACCOUNT (Persis Sesuai Gambar 2) -->
+    <!-- 8. Bagian Bawah: Profil Pengguna (Resmi & Elegan) -->
     <div class="sidebar-user-footer">
-        <span class="user-account-label">User Account</span>
-        <div class="sidebar-user-pill-card">
-            <div class="sidebar-user-avatar-placeholder">
+        <div class="sidebar-user-card">
+            <div class="sidebar-user-avatar">
                 {{ strtoupper(substr($currentUser->name ?? 'U', 0, 1)) }}
             </div>
             <div class="sidebar-user-details">
-                <span class="sidebar-user-name" title="{{ $currentUser->name ?? 'User' }}">
+                <span class="sidebar-user-name" title="{{ $currentUser->name ?? 'Pengguna' }}">
                     {{ $currentUser->name ?? 'Pengguna' }}
                 </span>
-                <span class="sidebar-user-id" title="{{ $currentUser->nip ?? $currentUser->email }}">
-                    #{{ $currentUser->nip ? str_replace(' ', '', $currentUser->nip) : ($currentUser->position ?? 'pegawai') }}
+                <span class="sidebar-user-role" title="{{ $currentUser->nip ? 'NIP. ' . $currentUser->nip : ucfirst($role) }}">
+                    @if($currentUser && $currentUser->nip)
+                        NIP. {{ $currentUser->nip }}
+                    @else
+                        {{ match ($role) {
+                            'kasubag_tu', 'admin' => 'Kasubbag Tata Usaha',
+                            'pic_distribusi' => 'PIC Distribusi',
+                            'pegawai_gudang' => 'Petugas Gudang',
+                            default => 'Pegawai Pemohon',
+                        } }}
+                    @endif
                 </span>
             </div>
         </div>
