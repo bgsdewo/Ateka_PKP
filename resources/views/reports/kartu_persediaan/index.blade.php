@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <div class="iq-navbar-header" style="height: 220px;">
-        <div class="container-fluid iq-container">
-            <div class="row">
+    <div class="iq-navbar-header py-0" style="height: auto; min-height: 0; background: transparent; box-shadow: none; border: none; padding: 1.25rem 2rem 0.5rem 2rem; margin-bottom: 0.75rem !important;">
+        <div class="container-fluid iq-container p-0">
+            <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-white">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <h1 class="text-white fw-bold mb-1">Kartu Persediaan Barang</h1>
-                            <p class="text-white-50 mb-0">
-                                Buku kendali mutasi persediaan barang ATK per jenis barang sesuai format resmi kedinasan
+                            <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
+                                Kartu Persediaan Barang
+                            </h1>
+                            <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">
+                                Sistem Informasi Inventori Persediaan ATK (ATEKA) &bull; <strong style="color: #10b981;">Buku Kendali Mutasi Persediaan BMN</strong>
                             </p>
                         </div>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ route('reports.index') }}" class="btn btn-outline-light rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
+                            <a href="{{ route('reports.index') }}" class="btn btn-outline-secondary rounded-pill px-3.5 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold" style="border-color: #94a3b8 !important; color: #0c2b27 !important; background-color: #ffffff !important;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="19" y1="12" x2="5" y2="12"></line>
                                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -142,7 +144,7 @@
 @endpush
 
 @section('content')
-    <div class="container-fluid iq-container" style="margin-top: -60px;">
+    <div class="container-fluid iq-container py-0" style="margin-top: 0.75rem !important; padding-bottom: 2.5rem !important;">
         {{-- Card Filter & Pemilihan Barang Cerdas --}}
         <div class="card report-card mb-4 shadow-sm">
             <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">

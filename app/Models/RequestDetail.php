@@ -46,11 +46,19 @@ class RequestDetail extends Model
     }
 
     /**
-     * Satuan barang (pada alur permintaan diseragamkan sebagai Stock)
+     * Satuan barang
      */
     public function getItemUnitAttribute(): string
     {
-        return 'Stock';
+        if (!empty($this->custom_unit)) {
+            return $this->custom_unit;
+        }
+
+        if ($this->product && !empty($this->product->unit)) {
+            return $this->product->unit;
+        }
+
+        return 'Pcs';
     }
 
     /**

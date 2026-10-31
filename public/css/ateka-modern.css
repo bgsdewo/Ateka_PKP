@@ -1,775 +1,3 @@
-/* ==============================================================================
-   AEUX GLOBAL / DONEZO FOREST GREEN SIDEBAR THEME
-   Deep Emerald Green Gradient (#0c2e24 to #081f18)
-   Capsule / Pill Rounded Menu Items & Squircle Icons
-   ============================================================================== */
-
-:root {
-    --sidebar-aeux-bg: linear-gradient(180deg, #0d3227 0%, #0a271f 50%, #071c16 100%);
-    --sidebar-aeux-card: rgba(255, 255, 255, 0.06);
-    --sidebar-aeux-hover: rgba(255, 255, 255, 0.09);
-    --sidebar-aeux-active: rgba(255, 255, 255, 0.14);
-    --sidebar-aeux-text: #a8cfc0;
-    --sidebar-aeux-text-active: #ffffff;
-    --sidebar-aeux-accent: #5eead4;
-}
-
-/* Sidebar Container */
-.sidebar {
-    background: var(--sidebar-aeux-bg) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
-    box-shadow: 10px 0 35px -10px rgba(0, 0, 0, 0.35) !important;
-    color: #ffffff !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* Sidebar Header Brand (AeuxGlobal style) */
-.sidebar .sidebar-header {
-    background: transparent !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    padding: 1.5rem 1.4rem 1.3rem !important;
-    min-height: 80px !important;
-}
-
-.sidebar .navbar-brand {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.85rem !important;
-    text-decoration: none !important;
-}
-
-.sidebar-aeux-logo-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-    flex-shrink: 0;
-}
-
-.sidebar-brand-text .logo-title {
-    color: #ffffff !important;
-    font-size: 1.15rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.02em !important;
-    line-height: 1.15 !important;
-    margin: 0 !important;
-}
-
-.sidebar-brand-text .sidebar-subtext {
-    color: #6ee7b7 !important;
-    font-size: 0.7rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.4px !important;
-    text-transform: uppercase !important;
-    margin-top: 2px !important;
-    display: block !important;
-}
-
-/* Sidebar Toggle Arrow */
-.sidebar .sidebar-toggle {
-    color: #a8cfc0 !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-radius: 50% !important;
-    width: 30px !important;
-    height: 30px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.2s ease !important;
-}
-
-.sidebar .sidebar-toggle:hover {
-    background: rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-}
-
-/* Section Header (NAVIGATION / GENERAL) */
-.sidebar .nav-item.static-item {
-    padding: 1.25rem 1.4rem 0.5rem !important;
-    margin: 0 !important;
-}
-
-.sidebar .nav-item.static-item .default-icon {
-    font-size: 0.72rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    color: #5d8878 !important;
-}
-
-/* Main Navigation Items (Pills with Icon Squircle) */
-.sidebar .sidebar-list {
-    padding: 0.6rem 0.95rem 1.5rem !important;
-}
-
-.sidebar .nav-item {
-    margin-bottom: 0.35rem !important;
-}
-
-.sidebar .nav-item .nav-link {
-    border-radius: 30px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    color: var(--sidebar-aeux-text) !important;
-    padding: 0.55rem 0.75rem 0.55rem 0.6rem !important;
-    display: flex !important;
-    align-items: center !important;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    background-color: transparent !important;
-    border: 1px solid transparent !important;
-    box-shadow: none !important;
-    text-decoration: none !important;
-}
-
-.sidebar .nav-item .nav-link:hover {
-    background-color: var(--sidebar-aeux-hover) !important;
-    color: #ffffff !important;
-    transform: none !important;
-}
-
-/* Active State: Translucent Frosted Pill with Subtle Border (Sesuai Gambar 2) */
-.sidebar .nav-item .nav-link.active,
-.sidebar .nav-item .nav-link[aria-expanded="true"] {
-    background: var(--sidebar-aeux-active) !important;
-    color: var(--sidebar-aeux-text-active) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* Icon Squircle / Rounded Circle (Sesuai Gambar 2) */
-.sidebar-icon-squircle {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-right: 0.75rem !important;
-    color: #a8cfc0 !important;
-    flex-shrink: 0 !important;
-    transition: all 0.2s ease !important;
-}
-
-.sidebar .nav-item .nav-link:hover .sidebar-icon-squircle {
-    background: rgba(255, 255, 255, 0.14) !important;
-    color: #ffffff !important;
-}
-
-.sidebar .nav-item .nav-link.active .sidebar-icon-squircle,
-.sidebar .nav-item .nav-link[aria-expanded="true"] .sidebar-icon-squircle {
-    background: rgba(94, 234, 212, 0.22) !important;
-    color: #5eead4 !important;
-    box-shadow: 0 0 12px rgba(94, 234, 212, 0.2) !important;
-}
-
-.sidebar .nav-item .nav-link .item-name {
-    color: inherit !important;
-    font-size: 0.88rem !important;
-    font-weight: 500 !important;
-    letter-spacing: -0.01em !important;
-}
-
-.sidebar .nav-item .nav-link.active .item-name {
-    font-weight: 700 !important;
-    color: #ffffff !important;
-}
-
-.sidebar .nav-item .nav-link .right-icon {
-    margin-left: auto !important;
-    color: #6b9887 !important;
-    display: flex !important;
-    align-items: center !important;
-    transition: transform 0.25s ease !important;
-}
-
-.sidebar .nav-item .nav-link[aria-expanded="true"] .right-icon {
-    transform: rotate(90deg) !important;
-    color: #5eead4 !important;
-}
-
-/* Badge Notifikasi pada Sidebar */
-.sidebar-pill-badge {
-    background: #10b981 !important;
-    color: #ffffff !important;
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    padding: 0.2rem 0.55rem !important;
-    border-radius: 12px !important;
-    margin-left: auto !important;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4) !important;
-}
-
-/* Sub-nav Dropdown List */
-.sidebar .sub-nav {
-    list-style: none !important;
-    padding: 0.35rem 0 0.35rem 1.25rem !important;
-    margin: 0.25rem 0 0.35rem 0.75rem !important;
-    border-left: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.sidebar .sub-nav .nav-item .nav-link {
-    padding: 0.4rem 0.85rem !important;
-    font-size: 0.82rem !important;
-    font-weight: 500 !important;
-    border-radius: 16px !important;
-    color: #8bb3a2 !important;
-}
-
-.sidebar .sub-nav .nav-item .nav-link:hover {
-    color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-}
-
-.sidebar .sub-nav .nav-item .nav-link.active {
-    background: rgba(16, 185, 129, 0.2) !important;
-    color: #5eead4 !important;
-    border: 1px solid rgba(94, 234, 212, 0.25) !important;
-    font-weight: 600 !important;
-}
-
-/* Bottom User Profile Section (Persis Sesuai Gambar 2: USER ACCOUNT) */
-.sidebar-user-footer {
-    margin-top: auto !important;
-    padding: 1.15rem 1.2rem !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    background: rgba(0, 0, 0, 0.18) !important;
-}
-
-.sidebar-user-footer .user-account-label {
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    color: #5d8878 !important;
-    margin-bottom: 0.75rem !important;
-    display: block !important;
-}
-
-.sidebar-user-pill-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    text-decoration: none !important;
-    padding: 0.4rem 0.5rem !important;
-    border-radius: 18px !important;
-    transition: background 0.2s ease !important;
-}
-
-.sidebar-user-pill-card:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
-}
-
-.sidebar-user-avatar-circle {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    object-fit: cover !important;
-    border: 2px solid #10b981 !important;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3) !important;
-}
-
-.sidebar-user-avatar-placeholder {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 0.88rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 2px solid #5eead4 !important;
-    box-shadow: 0 0 10px rgba(94, 234, 212, 0.25) !important;
-    flex-shrink: 0 !important;
-}
-
-.sidebar-user-details {
-    overflow: hidden !important;
-}
-
-.sidebar-user-name {
-    color: #ffffff !important;
-    font-size: 0.88rem !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
-}
-
-.sidebar-user-id {
-    color: #6ee7b7 !important;
-    font-size: 0.72rem !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
-}
-
-
-/* Donezo Modern GovTech Dashboard Theme */
-.donezo-dashboard-wrapper {
-    background-color: #f1f4f6;
-    padding: 1rem 0.75rem 2.5rem;
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-}
-
-@media (min-width: 992px) {
-    .donezo-dashboard-wrapper {
-        padding: 1.5rem 1.85rem 3rem;
-    }
-}
-
-.donezo-canvas {
-    background-color: #ffffff;
-    border-radius: 36px;
-    padding: 2.2rem 2.4rem;
-    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(226, 232, 240, 0.85);
-    position: relative;
-    overflow: hidden;
-}
-
-@media (max-width: 767.98px) {
-    .donezo-canvas {
-        padding: 1.25rem 1rem;
-        border-radius: 24px;
-    }
-}
-
-.donezo-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    margin-bottom: 1.85rem;
-}
-
-.donezo-title {
-    font-size: 2.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -0.03em;
-    line-height: 1.15;
-    margin-bottom: 0.35rem;
-}
-
-.donezo-subtitle {
-    font-size: 0.92rem;
-    color: #64748b;
-    font-weight: 500;
-    margin: 0;
-}
-
-.donezo-actions-group {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    flex-wrap: wrap;
-}
-
-.btn-donezo-primary {
-    background: linear-gradient(135deg, #1b4d3e 0%, #143d31 100%);
-    color: #ffffff !important;
-    border: none;
-    border-radius: 30px;
-    padding: 0.68rem 1.35rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 14px rgba(27, 77, 62, 0.25);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.btn-donezo-primary:hover {
-    background: linear-gradient(135deg, #236350 0%, #1b4d3e 100%);
-    transform: translateY(-1.5px);
-    box-shadow: 0 8px 20px rgba(27, 77, 62, 0.35);
-    color: #ffffff !important;
-}
-
-.btn-donezo-outline {
-    background-color: #ffffff;
-    color: #334155 !important;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 30px;
-    padding: 0.65rem 1.25rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.btn-donezo-outline:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
-    color: #0f172a !important;
-    transform: translateY(-1px);
-}
-
-.donezo-filter-bar {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 0.85rem 1.25rem;
-    margin-bottom: 1.85rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.donezo-stat-card {
-    border-radius: 24px;
-    padding: 1.45rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.donezo-stat-card.featured-card {
-    background: linear-gradient(145deg, #184336 0%, #0f2c23 100%);
-    color: #ffffff;
-    box-shadow: 0 14px 30px -8px rgba(15, 44, 35, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.donezo-stat-card.featured-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 36px -6px rgba(15, 44, 35, 0.5);
-}
-
-.donezo-stat-card.light-card {
-    background-color: #ffffff;
-    border: 1.5px solid #edf2f7;
-    color: #0f172a;
-    box-shadow: 0 4px 18px -4px rgba(0, 0, 0, 0.04);
-}
-
-.donezo-stat-card.light-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08);
-    border-color: #cbd5e1;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.85rem;
-}
-
-.stat-header .stat-label {
-    font-size: 0.88rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.donezo-stat-card.featured-card .stat-label {
-    color: #cde4db;
-}
-
-.donezo-stat-card.light-card .stat-label {
-    color: #64748b;
-}
-
-.stat-arrow-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.donezo-stat-card.featured-card .stat-arrow-circle {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-}
-
-.donezo-stat-card.light-card .stat-arrow-circle {
-    background-color: #f1f5f9;
-    color: #475569;
-}
-
-.donezo-stat-card:hover .stat-arrow-circle {
-    transform: rotate(45deg);
-}
-
-.stat-number {
-    font-size: 2.35rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    margin-bottom: 0.75rem;
-}
-
-.stat-bottom-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.28rem 0.65rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    width: fit-content;
-}
-
-.donezo-stat-card.featured-card .stat-bottom-pill {
-    background-color: rgba(255, 255, 255, 0.14);
-    color: #e2f1ec;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.donezo-stat-card.light-card .stat-bottom-pill {
-    background-color: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-.donezo-card {
-    background-color: #ffffff;
-    border: 1.5px solid #edf2f7;
-    border-radius: 28px;
-    padding: 1.65rem 1.75rem;
-    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.04);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.2s ease;
-}
-
-.donezo-card:hover {
-    border-color: #e2e8f0;
-    box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.06);
-}
-
-.donezo-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-}
-
-.donezo-card-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0f172a;
-    letter-spacing: -0.02em;
-    margin: 0;
-}
-
-.donezo-reminder-card {
-    background: linear-gradient(145deg, #f0fdf4 0%, #ecfdf5 100%);
-    border: 1.5px solid #bbf7d0;
-    border-radius: 28px;
-    padding: 1.75rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-}
-
-.reminder-btn-green {
-    background: linear-gradient(135deg, #1b4d3e 0%, #143d31 100%);
-    color: #ffffff !important;
-    border: none;
-    border-radius: 24px;
-    padding: 0.72rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    box-shadow: 0 4px 14px rgba(27, 77, 62, 0.3);
-    transition: all 0.2s ease;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.reminder-btn-green:hover {
-    background: linear-gradient(135deg, #246551 0%, #1b4d3e 100%);
-    transform: translateY(-1.5px);
-    box-shadow: 0 8px 20px rgba(27, 77, 62, 0.4);
-    color: #ffffff !important;
-}
-
-.donezo-time-tracker-card {
-    background: radial-gradient(circle at 100% 0%, #1e5847 0%, #113328 60%, #0a1f18 100%);
-    border-radius: 28px;
-    padding: 1.65rem 1.75rem;
-    color: #ffffff;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 12px 30px -8px rgba(10, 31, 24, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.donezo-time-tracker-card::after {
-    content: "";
-    position: absolute;
-    right: -20px;
-    bottom: -20px;
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(94, 234, 212, 0.15) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-.digital-clock-display {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 2.25rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #ffffff;
-    margin: 0.65rem 0 0.85rem;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.tracker-control-btns {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.tracker-btn-circle {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.tracker-btn-pause {
-    background-color: #ffffff;
-    color: #113328;
-}
-
-.tracker-btn-pause:hover {
-    transform: scale(1.08);
-    background-color: #f1f5f9;
-}
-
-.tracker-btn-stop {
-    background-color: #ef4444;
-    color: #ffffff;
-}
-
-.tracker-btn-stop:hover {
-    transform: scale(1.08);
-    background-color: #dc2626;
-}
-
-.donezo-user-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.65rem 0;
-}
-
-.donezo-user-item:not(:last-child) {
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.donezo-avatar-placeholder {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1b4d3e 0%, #478c80 100%);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.82rem;
-    flex-shrink: 0;
-}
-
-.badge-donezo-status {
-    padding: 0.25rem 0.65rem;
-    border-radius: 16px;
-    font-size: 0.72rem;
-    font-weight: 600;
-}
-
-.badge-donezo-completed {
-    background-color: #e6f9f0;
-    color: #0d8a57;
-    border: 1px solid #c2f2dc;
-}
-
-.badge-donezo-progress {
-    background-color: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #ffedd5;
-}
-
-.badge-donezo-pending {
-    background-color: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fee2e2;
-}
-
-.donezo-project-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    padding: 0.65rem 0;
-}
-
-.donezo-project-item:not(:last-child) {
-    border-bottom: 1px solid #f8fafc;
-}
-
-.donezo-project-icon-box {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-
 /**
  * ==============================================================================
  * ATEKA MODERN DESIGN SYSTEM (V2.0 - ULTRA POLISHED)
@@ -794,13 +22,13 @@
     --pkp-cyan:     #06b6d4;
     --pkp-teal:     #0d9488;
 
-    /* Primary Gradient Brand System */
-    --brand-primary: #0f4c81;
-    --brand-primary-hover: #0a365c;
-    --brand-primary-light: #eff6ff;
-    --brand-gradient: linear-gradient(135deg, #0b345b 0%, #174e84 45%, #0284c7 100%);
-    --brand-gradient-hover: linear-gradient(135deg, #082643 0%, #113d68 45%, #0369a1 100%);
-    --brand-gradient-accent: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+    /* Primary Gradient Brand System - Forest Emerald GovTech */
+    --brand-primary: #0c2b27;
+    --brand-primary-hover: #16483f;
+    --brand-primary-light: #eaf3f0;
+    --brand-gradient: linear-gradient(135deg, #0c2b27 0%, #16483f 50%, #1e5a4f 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #16483f 0%, #1e5a4f 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #10b981 0%, #34d399 100%);
 
     /* Semantic Accent Colors */
     --accent-emerald: #059669;
@@ -1129,17 +357,21 @@ textarea:focus-visible,
 }
 
 .iq-navbar-header h1 {
-    font-size: 1.95rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.03em !important;
-    color: #ffffff !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 2.25rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.035em !important;
+    line-height: 1.15 !important;
+    color: #0c2b27 !important;
+    text-shadow: none !important;
 }
 
 .iq-navbar-header p {
-    font-size: 0.95rem !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 0.84rem !important;
     line-height: 1.55 !important;
-    color: rgba(255, 255, 255, 0.90) !important;
+    color: #64748b !important;
+    text-shadow: none !important;
     max-width: 820px;
 }
 
@@ -1147,11 +379,11 @@ textarea:focus-visible,
    4. GLASSMORPHIC TOP NAVBAR (.iq-navbar)
    ============================================================================== */
 .iq-navbar {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 1px 4px 0 rgba(15, 23, 42, 0.03) !important;
     transition: all 0.25s ease;
 }
 
@@ -1225,20 +457,21 @@ textarea:focus-visible,
 }
 
 .sidebar .nav-item .nav-link:hover {
-    background-color: #f1f5f9 !important;
-    color: var(--brand-primary) !important;
-    transform: translateX(3px);
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+    transform: none !important;
 }
 
 .sidebar .nav-item .nav-link.active {
-    background: var(--brand-gradient) !important;
+    background: rgba(255, 255, 255, 0.11) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
     font-weight: 600 !important;
-    box-shadow: 0 4px 14px -2px rgba(15, 76, 129, 0.35) !important;
+    box-shadow: none !important;
 }
 
 .sidebar .nav-item .nav-link.active svg {
-    color: #ffffff !important;
+    color: #34d399 !important;
 }
 
 /* ==============================================================================
@@ -3079,4 +2312,658 @@ body.modal-open .iq-navbar-header {
 
 
 
-@import url('ateka-donezo.css');
+
+
+/* ==============================================================================
+ * AEUXGLOBAL / DEEP FOREST GREEN DESIGN SYSTEM (GOVTECH ENTERPRISE EDITION)
+ * Matching reference image: Deep Green Sidebar (#0c2b27), Crisp White Canvas (#f5f8f6),
+ * Dark Pill Buttons (#0c2b27), Mint Accents (#10b981), & Clean Modern Cards.
+ * ============================================================================== */
+
+:root {
+    --theme-forest-dark: #0c2b27;
+    --theme-forest-darker: #08211d;
+    --theme-forest-medium: #143d37;
+    --theme-forest-surface: #184740;
+    --theme-mint: #10b981;
+    --theme-mint-light: #d1fae5;
+    --theme-mint-glow: rgba(16, 185, 129, 0.25);
+    --theme-emerald: #059669;
+    --theme-canvas: #f5f8f6;
+    --theme-card-bg: #ffffff;
+    --theme-card-border: #e2ebe6;
+    --theme-text-dark: #0c2b27;
+    --theme-text-body: #2b453d;
+    --theme-text-muted: #6b887f;
+    --theme-radius-card: 20px;
+    --theme-radius-pill: 24px;
+}
+
+/* Master Page Background & Layout Frame */
+body:not(.auth-page) {
+    background-color: var(--theme-canvas) !important;
+    color: var(--theme-text-body) !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    overflow-x: hidden;
+}
+
+/* ------------------------------------------------------------------------------
+ * SIDEBAR: Deep Forest Green (#0c2b27)
+ * ------------------------------------------------------------------------------ */
+.sidebar {
+    background-color: var(--theme-forest-dark) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 4px 0 24px rgba(12, 43, 39, 0.12) !important;
+}
+
+.sidebar .sidebar-header {
+    background-color: var(--theme-forest-dark) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 1.15rem 1.25rem !important;
+}
+
+.sidebar .sidebar-header .navbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+.sidebar .logo-title {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1.15rem !important;
+    letter-spacing: -0.02em !important;
+}
+
+.sidebar .sidebar-subtext {
+    color: #7aa597 !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+}
+
+.sidebar .sidebar-toggle {
+    color: #7aa597 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+.sidebar .sidebar-toggle:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Section Header: NAVIGATION */
+.sidebar .nav-item.static-item {
+    padding: 1.1rem 1.2rem 0.35rem 1.2rem !important;
+    margin: 0 !important;
+}
+
+.sidebar .nav-item.static-item .default-icon {
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #557d70 !important;
+    text-transform: uppercase !important;
+    display: block !important;
+}
+
+/* Navigation Links */
+.sidebar .iq-main-menu > .nav-item > .nav-link {
+    color: #9abdb2 !important;
+    border-radius: 14px !important;
+    margin: 3px 12px !important;
+    padding: 0.62rem 0.95rem !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.sidebar .iq-main-menu > .nav-item > .nav-link .icon,
+.sidebar .iq-main-menu > .nav-item > .nav-link .icon svg {
+    color: #7aa597 !important;
+    transition: color 0.2s ease !important;
+}
+
+.sidebar .iq-main-menu > .nav-item > .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+    transform: none !important;
+}
+
+.sidebar .iq-main-menu > .nav-item > .nav-link:hover .icon,
+.sidebar .iq-main-menu > .nav-item > .nav-link:hover .icon svg {
+    color: #34d399 !important;
+}
+
+.sidebar .iq-main-menu > .nav-item > .nav-link.active,
+.sidebar .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+.sidebar .iq-main-menu > .nav-item > .nav-link.active .icon,
+.sidebar .iq-main-menu > .nav-item > .nav-link.active .icon svg,
+.sidebar .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] .icon,
+.sidebar .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] .icon svg {
+    color: #34d399 !important;
+}
+
+.sidebar .right-icon {
+    margin-left: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: #6b8f83 !important;
+}
+
+.sidebar .nav-link[aria-expanded="true"] .right-icon {
+    transform: rotate(90deg) !important;
+    color: #34d399 !important;
+}
+
+/* Sub-Menu Items */
+.sidebar .sub-nav {
+    background: rgba(0, 0, 0, 0.18) !important;
+    border-radius: 12px !important;
+    margin: 4px 12px 8px 12px !important;
+    padding: 6px 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+.sidebar .sub-nav .nav-link {
+    color: #8bb0a4 !important;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.83rem !important;
+    margin: 2px 8px !important;
+    border-radius: 8px !important;
+    transition: all 0.18s ease !important;
+}
+
+.sidebar .sub-nav .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.sidebar .sub-nav .nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(16, 185, 129, 0.22) !important;
+    font-weight: 600 !important;
+}
+
+.sidebar .sub-nav .sidenav-mini-icon {
+    display: inline-block !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
+    text-align: center !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    margin-right: 8px !important;
+    color: #34d399 !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * TOP NAVBAR & CLEAN HEADER BAR
+ * ------------------------------------------------------------------------------ */
+.iq-navbar {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0.85rem 1.8rem 0.5rem 1.8rem !important;
+    border: none !important;
+}
+
+.iq-banner {
+    background: transparent !important;
+}
+
+.iq-navbar-header {
+    background: transparent !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0.75rem 2rem 0.5rem 2rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.iq-navbar-header h1,
+.iq-navbar-header .h1 {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    color: #0c2b27 !important;
+    font-weight: 700 !important;
+    font-size: 2.25rem !important;
+    letter-spacing: -0.035em !important;
+    line-height: 1.15 !important;
+    text-shadow: none !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.iq-navbar-header p,
+.iq-navbar-header .text-muted,
+.iq-navbar-header small {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    color: #64748b !important;
+    text-shadow: none !important;
+    font-size: 0.84rem !important;
+}
+
+.content-inner,
+.content-inner.mt-n5 {
+    margin-top: 0 !important;
+    padding: 0.75rem 2rem 2.5rem 2rem !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * BUTTONS: Dark Pill & Emerald Pill (Matching reference)
+ * ------------------------------------------------------------------------------ */
+.btn-dark-pill,
+.btn-primary:not(.btn-link) {
+    background: var(--theme-forest-dark) !important;
+    background-color: var(--theme-forest-dark) !important;
+    border-color: var(--theme-forest-dark) !important;
+    color: #ffffff !important;
+    border-radius: var(--theme-radius-pill) !important;
+    padding: 0.55rem 1.4rem !important;
+    font-weight: 600 !important;
+    font-size: 0.86rem !important;
+    letter-spacing: 0.01em !important;
+    box-shadow: 0 4px 12px rgba(12, 43, 39, 0.18) !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+}
+
+.btn-dark-pill:hover,
+.btn-primary:not(.btn-link):hover {
+    background: var(--theme-forest-medium) !important;
+    background-color: var(--theme-forest-medium) !important;
+    border-color: var(--theme-forest-medium) !important;
+    color: #ffffff !important;
+    transform: translateY(-1.5px) !important;
+    box-shadow: 0 8px 20px rgba(12, 43, 39, 0.28) !important;
+}
+
+.btn-emerald-pill,
+.btn-success {
+    background: var(--theme-mint) !important;
+    background-color: var(--theme-mint) !important;
+    border-color: var(--theme-mint) !important;
+    color: #ffffff !important;
+    border-radius: var(--theme-radius-pill) !important;
+    padding: 0.55rem 1.4rem !important;
+    font-weight: 600 !important;
+    font-size: 0.86rem !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22) !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border: 1px solid transparent !important;
+}
+
+.btn-emerald-pill:hover,
+.btn-success:hover {
+    background: var(--theme-emerald) !important;
+    background-color: var(--theme-emerald) !important;
+    border-color: var(--theme-emerald) !important;
+    transform: translateY(-1.5px) !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.32) !important;
+    color: #ffffff !important;
+}
+
+.btn-light,
+.btn-outline-secondary {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1.5px solid var(--theme-card-border) !important;
+    color: var(--theme-text-dark) !important;
+    border-radius: var(--theme-radius-pill) !important;
+    padding: 0.52rem 1.25rem !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-light:hover,
+.btn-outline-secondary:hover {
+    background: #f0f5f2 !important;
+    border-color: #ceddd6 !important;
+    color: var(--theme-text-dark) !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * CARDS: Modern Clean Rounded Cards (#ffffff, border-radius: 20px)
+ * ------------------------------------------------------------------------------ */
+.card {
+    background-color: var(--theme-card-bg) !important;
+    border: 1px solid var(--theme-card-border) !important;
+    border-radius: var(--theme-radius-card) !important;
+    box-shadow: 0 2px 8px rgba(12, 43, 39, 0.03) !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden !important;
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(12, 43, 39, 0.07) !important;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid #edf3f0 !important;
+    padding: 1.2rem 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--theme-forest-dark) !important;
+}
+
+.card-title,
+.card-header h4,
+.card-header h5,
+.card-header h6 {
+    color: var(--theme-forest-dark) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * STAT CARDS & MINI SPARKLINE (Matching reference top row)
+ * ------------------------------------------------------------------------------ */
+.aeux-stat-card {
+    padding: 1.4rem 1.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 125px;
+}
+
+.aeux-stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--theme-text-muted);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.aeux-stat-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--theme-forest-dark);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.35rem;
+}
+
+.aeux-stat-delta {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--theme-mint);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.aeux-stat-delta.delta-coral {
+    color: #f87171;
+}
+
+.aeux-stat-delta.delta-amber {
+    color: #d97706;
+}
+
+.aeux-stat-delta.delta-muted {
+    color: #64748b;
+}
+
+/* Pure CSS Mini Bar Sparkline */
+.mini-bar-sparkline {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 3.5px;
+    height: 38px;
+    padding-bottom: 2px;
+}
+
+.mini-bar-sparkline span {
+    width: 4.5px;
+    border-radius: 3px;
+    background-color: var(--theme-mint);
+    opacity: 0.85;
+}
+
+.mini-bar-sparkline.sparkline-coral span {
+    background-color: #f87171;
+}
+
+.mini-bar-sparkline.sparkline-amber span {
+    background-color: #fbbf24;
+}
+
+.mini-bar-sparkline.sparkline-sky span {
+    background-color: #38bdf8;
+}
+
+.mini-bar-sparkline.sparkline-dark span {
+    background-color: var(--theme-forest-dark);
+}
+
+/* ------------------------------------------------------------------------------
+ * FEATURED BOTANICAL ANNOUNCEMENT CARD ("Let's join our community" counterpart)
+ * ------------------------------------------------------------------------------ */
+.card-featured-emerald {
+    background: linear-gradient(135deg, #0c2b27 0%, #16483f 50%, #1a564b 100%) !important;
+    border: none !important;
+    border-radius: var(--theme-radius-card) !important;
+    color: #ffffff !important;
+    padding: 1.8rem !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 12px 32px rgba(12, 43, 39, 0.22) !important;
+}
+
+.card-featured-emerald .featured-title {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1.5rem !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.025em !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.card-featured-emerald .featured-sub {
+    color: #a4cdbf !important;
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+    margin-bottom: 1.25rem !important;
+    max-width: 85% !important;
+}
+
+.card-featured-emerald .pill-tag {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 20px !important;
+    padding: 0.35rem 0.8rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    display: inline-block !important;
+    margin-right: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.card-featured-emerald .arrow-link-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.card-featured-emerald .arrow-link-btn:hover {
+    background: #34d399;
+    color: #0c2b27;
+    transform: scale(1.08);
+}
+
+/* ------------------------------------------------------------------------------
+ * TABLES: Clean GovTech Table Styling
+ * ------------------------------------------------------------------------------ */
+.table thead th {
+    background-color: #f2f7f4 !important;
+    color: #3b5a4f !important;
+    font-size: 0.76rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 1.5px solid #dce8e1 !important;
+    padding: 0.85rem 1rem !important;
+}
+
+.table tbody td {
+    padding: 0.85rem 1rem !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #edf3f0 !important;
+    color: var(--theme-text-body) !important;
+    font-size: 0.875rem !important;
+}
+
+.table tbody tr:hover td {
+    background-color: #f7faf9 !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * FORM CONTROLS: Soft Rounded Inputs
+ * ------------------------------------------------------------------------------ */
+.form-control,
+.form-select {
+    border-radius: 14px !important;
+    border: 1.5px solid #d9e4de !important;
+    background-color: #ffffff !important;
+    color: var(--theme-text-dark) !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.88rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #ffffff !important;
+    border-color: var(--theme-mint) !important;
+    box-shadow: 0 0 0 3px var(--theme-mint-glow) !important;
+    outline: none !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * BADGES: Modern Soft Pills
+ * ------------------------------------------------------------------------------ */
+.badge {
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.02em !important;
+}
+
+.badge.bg-primary {
+    background-color: var(--theme-forest-dark) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-success {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+    border: 1px solid #bbf7d0 !important;
+}
+
+.badge.bg-warning {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #fde68a !important;
+}
+
+.badge.bg-danger {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    border: 1px solid #fecaca !important;
+}
+
+.badge.bg-info {
+    background-color: #e0f2fe !important;
+    color: #075985 !important;
+    border: 1px solid #bae6fd !important;
+}
+
+/* ------------------------------------------------------------------------------
+ * FOOTER
+ * ------------------------------------------------------------------------------ */
+.footer {
+    background: transparent !important;
+    border-top: 1px solid #e2ebe6 !important;
+    padding: 1.25rem 2rem !important;
+    color: var(--theme-text-muted) !important;
+    font-size: 0.8rem !important;
+}
+
+
+/* ==============================================================================
+ * GLOBAL TYPOGRAPHY UNIFORMITY (PLUS JAKARTA SANS & CRISP TEXT - MATCHING DASHBOARD)
+ * ============================================================================== */
+:root {
+    --bs-font-sans-serif: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    --bs-body-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+*, *::before, *::after {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body,
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+p, span, a, input, select, textarea, button,
+table, th, td, label, .card, .card-header, .card-title,
+.badge, .dropdown-menu, .modal, .modal-title, .form-control, .form-select,
+.kpi-widget-card, .table-dashboard-compact {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+code, kbd, samp, pre, .font-monospace {
+    font-family: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+.iq-navbar-header h1,
+.iq-navbar-header .h1,
+.iq-navbar-header p,
+.iq-navbar-header span,
+.content-inner h1,
+.content-inner .h1,
+.content-inner h2,
+.content-inner h3,
+.content-inner h4,
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4 {
+    text-shadow: none !important;
+}

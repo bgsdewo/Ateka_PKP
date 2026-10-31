@@ -1,18 +1,25 @@
-<nav class="nav navbar navbar-expand-lg iq-navbar">
+<nav class="nav navbar navbar-expand-lg navbar-light iq-navbar">
     <div class="container-fluid navbar-inner">
-        <!-- Brand Logo di Header Kiri (Tampil saat Mobile) -->
-        <a href="{{ route('dashboard') }}" class="navbar-brand d-lg-none">
+        <a href="{{ route('dashboard') }}" class="navbar-brand">
             <div class="logo-main">
                 <div class="logo-normal">
                     <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP"
-                        width="36" height="36" style="width: 36px; height: 36px; object-fit: contain; border-radius: 6px;">
+                        width="40" height="40" style="width: 40px; height: 40px; object-fit: contain;">
                 </div>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-center">
-                <span class="logo-title fw-bold text-dark mb-0 fs-6" style="letter-spacing: -0.01em; line-height: 1.2;">Inventori ATK</span>
-                <span class="d-none d-sm-block text-muted" style="font-size: 0.72rem; font-weight: 400; line-height: 1.2;">Kementerian PKP RI</span>
+                <span class="logo-title fw-bold text-dark mb-0 fs-6" style="letter-spacing: -0.02em; line-height: 1.2;">Inventori ATK</span>
+                <span class="text-muted d-none d-sm-block" style="font-size: 0.68rem; font-weight: 500; line-height: 1;">Kementerian PKP RI</span>
             </div>
         </a>
+        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Buka tutup sidebar">
+            <i class="icon">
+                <svg width="20px" class="icon-20" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor"
+                        d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
+                </svg>
+            </i>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-label="Buka navigasi mobile">
             <span class="navbar-toggler-icon">
                 <span class="mt-2 navbar-toggler-bar bar1"></span>
@@ -22,7 +29,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
-                {{-- Dropdown Notifikasi --}}
                 @php
                     $currentUser = auth()->user();
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
@@ -30,6 +36,10 @@
                     $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
                     $isReportExaminer = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isReportExaminer();
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
+                @endphp
+
+                {{-- Dropdown Notifikasi --}}
+                @php
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
                     $rawUserNotifications = $currentUser ? $currentUser->unreadNotifications()->take(20)->get() : collect();
@@ -152,7 +162,7 @@
                         || $userNotifications->isNotEmpty();
                 @endphp
                 <li class="nav-item dropdown me-2">
-                    <a href="#" class="nav-link position-relative p-2 rounded-circle d-flex align-items-center justify-content-center"
+                    <a href="#" class="nav-link position-relative p-2 rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary border"
                         id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi Sistem" style="width: 40px; height: 40px;" title="Notifikasi Sistem">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -416,23 +426,33 @@
                 <li class="nav-item dropdown">
                     <a class="py-0 nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-label="Menu akun pengguna">
-                        <div class="avatar avatar-32 rounded-circle fw-semibold d-flex align-items-center justify-content-center">
+                        <div class="avatar avatar-40 rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center border border-primary-subtle">
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
-                        <div class="caption ms-2 d-none d-md-block text-start">
-                            <span class="caption-title d-block fw-semibold text-white" style="font-size: 0.84rem; line-height: 1.2;">{{ auth()->user()->name ?? 'Pengguna' }}</span>
-                            @php
-                                $userRole = auth()->user()->role ?? 'pegawai';
-                                $roleTitle = match ($userRole) {
-                                    'kasubag_tu', 'admin' => 'Kasubbag Tata Usaha',
-                                    'pic_distribusi' => 'PIC Distribusi',
-                                    'pegawai_gudang' => 'Petugas Gudang',
-                                    default => 'Pegawai Pemohon',
-                                };
-                            @endphp
-                            <span class="user-role-label text-white-50 d-block" style="font-size: 0.72rem; line-height: 1.1;">{{ $roleTitle }}</span>
+                        <div class="caption ms-3 d-none d-md-block text-start">
+                            <h6 class="mb-0 caption-title fw-bold text-dark">{{ auth()->user()->name ?? 'Pengguna' }}</h6>
+                            <div class="d-flex align-items-center gap-1 mt-0.5">
+                                @php
+                                    $userRole = auth()->user()->role ?? 'pegawai';
+                                    $roleBadge = match ($userRole) {
+                                        'kasubag_tu', 'admin' => 'bg-primary text-white',
+                                        'pic_distribusi' => 'bg-warning text-dark',
+                                        'pegawai_gudang' => 'bg-dark text-white',
+                                        default => 'bg-secondary text-white',
+                                    };
+                                    $roleTitle = match ($userRole) {
+                                        'kasubag_tu', 'admin' => 'Kasubbag TU',
+                                        'pic_distribusi' => 'PIC Distribusi',
+                                        'pegawai_gudang' => 'Pegawai Gudang',
+                                        default => 'Pegawai',
+                                    };
+                                @endphp
+                                <span class="badge {{ $roleBadge }}" style="font-size: 0.68rem; padding: 2px 6px;">
+                                    {{ $roleTitle }}
+                                </span>
+                            </div>
                         </div>
-                        <svg class="ms-2 dropdown-arrow-icon d-none d-md-block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: rgba(255, 255, 255, 0.65);">
+                        <svg class="ms-2 text-muted dropdown-arrow-icon d-none d-md-block" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease;">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </a>
