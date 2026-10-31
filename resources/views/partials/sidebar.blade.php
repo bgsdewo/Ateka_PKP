@@ -5,7 +5,7 @@
     $isKasubagTU = in_array($role, ['kasubag_tu', 'admin']);
     $isPicDistribusi = $role === 'pic_distribusi';
     $isPegawaiGudang = $role === 'pegawai_gudang';
-    $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'member']) || empty($role);
+    $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'subdit', 'member']) || empty($role);
 
     $pendingApprovalsCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->count() : 0;
     $pendingProcurementCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count() : 0;
@@ -14,27 +14,25 @@
     $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::where('status', 'approved')->count() : 0;
 @endphp
 
-<aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all">
+<aside class="sidebar sidebar-default sidebar-dark sidebar-base navs-rounded-all">
     <div class="sidebar-header d-flex align-items-center justify-content-start">
         <a href="{{ route('dashboard') }}" class="navbar-brand">
             <div class="logo-main">
-                <div class="logo-normal">
-                    <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP" class="img-fluid"
-                        width="50" height="50" style="width: 50px; height: 50px; object-fit: contain;">
+                <div class="logo-normal d-flex align-items-center">
+                    <img src="{{ asset('hope-ui/assets/images/auth/kemenkp.jpeg') }}" alt="Logo KemenKP" class="img-fluid rounded-2"
+                        width="44" height="44" style="width: 44px; height: 44px; object-fit: contain; background: #ffffff; padding: 2px;">
                 </div>
             </div>
             <div class="ms-2 sidebar-brand-text">
-                <h5 class="logo-title mb-0 fw-bold" style="color: #0f4c81; letter-spacing: -0.02em;">Inventori ATK</h5>
-                <small class="text-muted sidebar-subtext" style="font-size: 0.7rem; white-space: nowrap;">Kementerian PKP RI</small>
+                <h5 class="logo-title mb-0 fw-bold" style="color: #ffffff; letter-spacing: -0.02em; font-size: 1.12rem;">Inventori ATK</h5>
+                <small class="sidebar-subtext d-block" style="font-size: 0.68rem; color: #7ba597; white-space: nowrap; margin-top: 2px;">Kementerian PKP RI</small>
             </div>
         </a>
         <div class="sidebar-toggle" data-toggle="sidebar" data-active="true" role="button" tabindex="0" aria-label="Tutup sidebar">
             <i class="icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M4.25 12.2744L19.25 12.2744" stroke="currentColor" stroke-width="1.5"
-                        stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M10.2998 18.2988L4.2498 12.2748L10.2998 6.24976" stroke="currentColor" stroke-width="1.5"
-                        stroke-linecap="round" stroke-linejoin="round"></path>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M19 12H5"></path>
+                    <path d="m12 19-7-7 7-7"></path>
                 </svg>
             </i>
         </div>
@@ -47,7 +45,7 @@
 
                 <li class="nav-item static-item">
                     <a class="nav-link static-item disabled" href="#" tabindex="-1">
-                        <span class="default-icon">Menu Navigasi</span>
+                        <span class="default-icon">Navigation</span>
                         <span class="mini-icon">-</span>
                     </a>
                 </li>
@@ -56,13 +54,11 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}" title="Dashboard">
                         <i class="icon">
-                            <svg width="20" viewBox="0 0 24 24" fill="none" class="icon-20">
-                                <path opacity="0.4"
-                                    d="M16.0756 2H19.4616C20.8639 2 22.0001 3.14585 22.0001 4.55996V7.97452C22.0001 9.38864 20.8639 10.5345 19.4616 10.5345H16.0756C14.6734 10.5345 13.5371 9.38864 13.5371 7.97452V4.55996C13.5371 3.14585 14.6734 2 16.0756 2Z"
-                                    fill="currentColor"></path>
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M4.53852 2H7.92449C9.32676 2 10.463 3.14585 10.463 4.55996V7.97452C10.463 9.38864 9.32676 10.5345 7.92449 10.5345H4.53852C3.13626 10.5345 2 9.38864 2 7.97452V4.55996C2 3.14585 3.13626 2 4.53852 2ZM4.53852 13.4655H7.92449C9.32676 13.4655 10.463 14.6114 10.463 16.0255V19.44C10.463 20.8532 9.32676 22 7.92449 22H4.53852C3.13626 22 2 20.8532 2 19.44V16.0255C2 14.6114 3.13626 13.4655 4.53852 13.4655ZM19.4615 13.4655H16.0755C14.6732 13.4655 13.537 14.6114 13.537 16.0255V19.44C13.537 20.8532 14.6732 22 16.0755 22H19.4615C20.8637 22 22 20.8532 22 19.44V16.0255C22 14.6114 20.8637 13.4655 19.4615 13.4655Z"
-                                    fill="currentColor"></path>
+                            <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
                             </svg>
                         </i>
                         <span class="item-name">Dashboard</span>
@@ -81,8 +77,10 @@
                     <li class="nav-item">
                         <a class="nav-link {{ $verifikasiActive ? 'active' : '' }}" href="{{ route('persetujuan.index') }}" title="Verifikasi & Persetujuan">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4" />
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                    <rect x="9" y="2" width="6" height="4" rx="1"></rect>
+                                    <path d="m9 14 2 2 4-4"></path>
                                 </svg>
                             </i>
                             <span class="item-name">Verifikasi & Persetujuan</span>
@@ -102,9 +100,12 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('distribusi.*') ? 'active' : '' }}" href="{{ route('distribusi.index') }}" title="Distribusi Barang">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+                                    <path d="M15 18H9"></path>
+                                    <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14v10"></path>
+                                    <circle cx="17" cy="18" r="2"></circle>
+                                    <circle cx="7" cy="18" r="2"></circle>
                                 </svg>
                             </i>
                             <span class="item-name">Distribusi Barang</span>
@@ -128,15 +129,17 @@
                         <a class="nav-link {{ $transaksiActive ? 'active' : '' }}" data-bs-toggle="collapse"
                             href="#transaksi-menu" role="button" aria-expanded="{{ $transaksiActive ? 'true' : 'false' }}" title="Gudang & Stok">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
-                                    <path opacity="0.4" d="M3 7.5L12 2.5L21 7.5V16.5L12 21.5L3 16.5V7.5Z" fill="currentColor"></path>
-                                    <path d="M12 12L21 7.5L12 2.5L3 7.5L12 12Z" fill="currentColor"></path>
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m7.5 4.27 9 5.15"></path>
+                                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+                                    <path d="m3.3 7 8.7 5 8.7-5"></path>
+                                    <path d="M12 22V12"></path>
                                 </svg>
                             </i>
                             <span class="item-name">Gudang & Stok</span>
                             <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <svg class="icon-16" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
                                 </svg>
                             </i>
                         </a>
@@ -170,17 +173,16 @@
                         <a class="nav-link {{ $pengajuanActive ? 'active' : '' }}" data-bs-toggle="collapse"
                             href="#pengajuan-menu" role="button" aria-expanded="{{ $pengajuanActive ? 'true' : 'false' }}" title="Permintaan ATK">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
-                                    <path opacity="0.4"
-                                        d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z"
-                                        fill="currentColor"></path>
-                                    <path d="M12 9V15M9 12H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
                                 </svg>
                             </i>
                             <span class="item-name">Permintaan ATK</span>
                             <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <svg class="icon-16" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
                                 </svg>
                             </i>
                         </a>
@@ -194,9 +196,16 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('pengajuan.create') || request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Barang">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.create') ? 'active' : '' }}" href="{{ route('pengajuan.create') }}" title="Buat Pengajuan Barang (Tersedia di Katalog)">
                                     <i class="sidenav-mini-icon">+</i>
                                     <span class="item-name">Buat Pengajuan Barang</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('pengajuan.pengadaan.*') ? 'active' : '' }}" href="{{ route('pengajuan.pengadaan.create') }}" title="Usulan Pengadaan (Barang Belum Tersedia)">
+                                    <i class="sidenav-mini-icon">P</i>
+                                    <span class="item-name">Usulan Pengadaan</span>
                                 </a>
                             </li>
 
@@ -214,18 +223,44 @@
                 <!-- 5. MENU LAPORAN PERSEDIAAN (Kasubag TU, Pegawai Gudang) -->
                 <!-- ======================================================== -->
                 @if ($isKasubagTU || $isPegawaiGudang)
+                    @php
+                        $laporanActive = request()->routeIs('reports.*');
+                    @endphp
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}" title="Laporan Persediaan">
+                        <a class="nav-link {{ $laporanActive ? 'active' : '' }}" data-bs-toggle="collapse"
+                            href="#laporan-menu" role="button" aria-expanded="{{ $laporanActive ? 'true' : 'false' }}" title="Laporan Persediaan & Kartu Stok">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
-                                    <path opacity="0.4"
-                                        d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z"
-                                        fill="currentColor"></path>
-                                    <path d="M8 8H16M8 12H16M8 16H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <line x1="10" y1="9" x2="8" y2="9"></line>
                                 </svg>
                             </i>
                             <span class="item-name">Laporan Persediaan</span>
+                            <i class="right-icon">
+                                <svg class="icon-16" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
+                                </svg>
+                            </i>
                         </a>
+                        <ul class="sub-nav collapse {{ $laporanActive ? 'show' : '' }}" id="laporan-menu" data-bs-parent="#sidebar-menu">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('reports.index') || request()->routeIs('reports.print') ? 'active' : '' }}"
+                                    href="{{ route('reports.index') }}" title="Mutasi Persediaan ATK">
+                                    <i class="sidenav-mini-icon">M</i>
+                                    <span class="item-name">Mutasi Persediaan</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('reports.kartu-persediaan*') ? 'active' : '' }}"
+                                    href="{{ route('reports.kartu-persediaan') }}" title="Kartu Persediaan Barang">
+                                    <i class="sidenav-mini-icon">K</i>
+                                    <span class="item-name">Kartu Persediaan</span>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 @endif
 
@@ -243,19 +278,16 @@
                         <a class="nav-link {{ $masterActive ? 'active' : '' }}" data-bs-toggle="collapse"
                             href="#master-data" role="button" aria-expanded="{{ $masterActive ? 'true' : 'false' }}" title="Master Data">
                             <i class="icon">
-                                <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none">
-                                    <path opacity="0.4"
-                                        d="M16.191 2H7.81C4.77 2 3 3.78 3 6.83V17.16C3 20.26 4.77 22 7.81 22H16.191C19.28 22 21 20.26 21 17.16V6.83C21 3.78 19.28 2 16.191 2Z"
-                                        fill="currentColor"></path>
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M8.08 6.65C7.65 6.65 7.3 7 7.3 7.44C7.3 7.87 7.65 8.22 8.08 8.22H15.92C16.35 8.22 16.7 7.87 16.7 7.44C16.7 7 16.35 6.65 15.92 6.65H8.08ZM8.08 11.18C7.65 11.18 7.3 11.53 7.3 11.96C7.3 12.39 7.65 12.74 8.08 12.74H15.92C16.35 12.74 16.7 12.39 16.7 11.96C16.7 11.53 16.35 11.18 15.92 11.18H8.08ZM8.08 15.74C7.65 15.74 7.3 16.09 7.3 16.53C7.3 16.96 7.65 17.31 8.08 17.31H15.92C16.35 17.31 16.7 16.96 16.7 16.53C16.7 16.09 16.35 15.74 15.92 15.74H8.08Z"
-                                        fill="currentColor"></path>
+                                <svg class="icon-20" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                    <path d="M3 5V19A9 3 0 0 0 21 19V5"></path>
+                                    <path d="M3 12A9 3 0 0 0 21 12"></path>
                                 </svg>
                             </i>
                             <span class="item-name">Master Data</span>
                             <i class="right-icon">
-                                <svg class="icon-18" xmlns="http://www.w3.org/2000/svg" width="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <svg class="icon-16" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
                                 </svg>
                             </i>
                         </a>
@@ -264,11 +296,6 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('master-data.kategori-barang.*') ? 'active' : '' }}"
                                         href="{{ route('master-data.kategori-barang.index') }}" title="Kategori Barang">
-                                        <i class="icon">
-                                            <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                                <circle cx="12" cy="12" r="8" />
-                                            </svg>
-                                        </i>
                                         <i class="sidenav-mini-icon">K</i>
                                         <span class="item-name">Kategori Barang</span>
                                     </a>
@@ -278,11 +305,6 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('master-data.daftar-barang.*') ? 'active' : '' }}"
                                     href="{{ route('master-data.daftar-barang.index') }}" title="Daftar Barang ATK">
-                                    <i class="icon">
-                                        <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="12" r="8" />
-                                        </svg>
-                                    </i>
                                     <i class="sidenav-mini-icon">B</i>
                                     <span class="item-name">Daftar Barang ATK</span>
                                 </a>
@@ -292,11 +314,6 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('master-data.manajemen-pengguna.*') ? 'active' : '' }}"
                                         href="{{ route('master-data.manajemen-pengguna.index') }}" title="Manajemen Pengguna">
-                                        <i class="icon">
-                                            <svg class="icon-10" width="10" viewBox="0 0 24 24" fill="currentColor">
-                                                <circle cx="12" cy="12" r="8" />
-                                            </svg>
-                                        </i>
                                         <i class="sidenav-mini-icon">U</i>
                                         <span class="item-name">Manajemen Pengguna</span>
                                     </a>
@@ -309,5 +326,11 @@
             </ul>
         </div>
     </div>
-    <div class="sidebar-footer"></div>
+    
+    {{-- User Account Widget dinonaktifkan untuk semua role sesuai permintaan user --}}
+    <div class="sidebar-user-item d-none" style="display: none !important;">
+        <div class="sidebar-user-card">
+            <div class="sidebar-user-avatar"></div>
+        </div>
+    </div>
 </aside>

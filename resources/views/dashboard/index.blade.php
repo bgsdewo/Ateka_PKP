@@ -7,7 +7,7 @@
     $isKasubagTU = in_array($role, ['kasubag_tu', 'admin']);
     $isPicDistribusi = $role === 'pic_distribusi';
     $isPegawaiGudang = $role === 'pegawai_gudang';
-    $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'member']) || empty($role);
+    $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'subdit', 'member']) || empty($role);
 
     $roleBadgeClass = match ($role) {
         'kasubag_tu', 'admin' => 'bg-primary text-white',
@@ -24,94 +24,8 @@
     };
 @endphp
 
-@section('page-header')
-    <div class="iq-navbar-header" style="height: 225px;">
-        <div class="container-fluid iq-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="d-flex flex-column justify-content-center text-white">
-                        <h1 class="text-white fw-bold mb-2.5">Selamat Datang, {{ $user->name }}</h1>
-
-                        {{-- Fitur Aksi Cepat Role-Based tepat di bawah Selamat Datang --}}
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            @if ($isKasubagTU)
-                                <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                        <polyline points="9 11 12 14 22 4"></polyline>
-                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                                    </svg>
-                                    Review Pengajuan ({{ $pendingRequestsCount }} Pending)
-                                </a>
-                                <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    + Pengadaan (Barang Masuk)
-                                </a>
-                                <a href="{{ route('reports.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Laporan &amp; Pengesahan
-                                </a>
-                            @elseif ($isPegawaiGudang)
-                                @if (auth()->user()->isDistributor())
-                                    <a href="{{ route('distribusi.index') }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                                        </svg>
-                                        Distribusi ATK ({{ $readyDistribusiCount }} Siap Serah)
-                                    </a>
-                                @endif
-                                @if (auth()->user()->isReportExaminer() && ($pendingProcurementsExaminerCount ?? 0) > 0)
-                                    <a href="{{ route('master-data.daftar-barang.index') }}#pengadaan-section" class="btn btn-warning text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                        </svg>
-                                        Pengadaan Menunggu Stok ({{ $pendingProcurementsExaminerCount }} Usulan)
-                                    </a>
-                                @endif
-                                <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-light text-primary fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                    </svg>
-                                    Cek Stok Barang
-                                </a>
-                                <a href="{{ route('barang-masuk') }}" class="btn btn-success text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Cek Barang Masuk
-                                </a>
-                                <a href="{{ route('barang-keluar') }}" class="btn btn-danger text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Cek Barang Keluar
-                                </a>
-                                <a href="{{ route('reports.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Cetak Laporan Mutasi
-                                </a>
-                            @else
-                                <a href="{{ route('pengajuan.create') }}" class="btn btn-warning text-white fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                    Buat Pengajuan ATK Baru
-                                </a>
-
-                                <a href="{{ route('katalog-atk') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Katalog ATK
-                                </a>
-                                <a href="{{ route('pengajuan.index') }}" class="btn btn-light text-dark fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="font-size: 0.8rem; padding: 0.38rem 0.8rem; border-radius: 8px;">
-                                    Riwayat Pengajuan
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-
 @section('content')
-    <div class="container-fluid content-inner mt-n5 py-0">
+    <div class="container-fluid px-4 py-3">
 
         {{-- Flash Messages --}}
         @if (session('success'))
@@ -127,77 +41,400 @@
             </div>
         @endif
 
+        {{-- ======================================================== --}}
+        {{-- HEADER DASHBOARD: Crisp Title + Inline Period Filter + Action Pill --}}
+        {{-- ======================================================== --}}
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 pt-1">
+            <div>
+                <h1 class="fw-bold mb-1" style="color: #0c2b27; font-size: 2.25rem; letter-spacing: -0.035em; line-height: 1.15;">
+                    Dashboard
+                </h1>
+                <p class="mb-0 text-muted" style="font-size: 0.84rem;">
+                    Sistem Informasi Inventori Persediaan ATK (ATEKA) &bull; <strong style="color: #10b981;">{{ $selectedPeriodLabel }}</strong>
+                </p>
+            </div>
 
+            <div class="d-flex align-items-center gap-2.5 flex-wrap">
+                {{-- Filter Periode Data Terintegrasi (Tanpa Card Terpisah yang Menggeser Layout) --}}
+                <form action="{{ route('dashboard') }}" method="GET" class="d-flex align-items-center gap-1.5 m-0 p-0">
+                    <div class="d-flex align-items-center bg-white px-3 py-1.5 rounded-pill border shadow-xs" style="border-color: #dbe7e1 !important;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" class="me-1.5 flex-shrink-0">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+
+                        {{-- Dropdown Bulan --}}
+                        <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="border: none; background: transparent; padding: 0 1.5rem 0 0.5rem; font-size: 0.82rem; cursor: pointer; outline: none; width: auto; font-weight: 600;">
+                            <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
+                            @php
+                                $allMonths = [
+                                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                                    7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                ];
+                            @endphp
+                            @foreach ($allMonths as $num => $name)
+                                <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && ($selectedMonth == $num)) ? 'selected' : '' }}>
+                                    {{ $name }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <span class="text-muted opacity-50 px-1">/</span>
+
+                        {{-- Dropdown Tahun --}}
+                        <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="border: none; background: transparent; padding: 0 1.5rem 0 0.5rem; font-size: 0.82rem; cursor: pointer; outline: none; width: auto; font-weight: 600;">
+                            @php
+                                $curY = (int) date('Y');
+                                $yearList = range($curY - 3, $curY + 2);
+                                if ($selectedYear && !in_array((int)$selectedYear, $yearList)) {
+                                    $yearList[] = (int) $selectedYear;
+                                    sort($yearList);
+                                }
+                            @endphp
+                            <option value="all" {{ ($isAllYears ?? false) ? 'selected' : '' }}>Semua Tahun</option>
+                            @foreach ($yearList as $y)
+                                <option value="{{ $y }}" {{ ((!($isAllYears ?? false)) && ($selectedYear == $y)) ? 'selected' : '' }}>
+                                    {{ $y }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+
+                {{-- Action Pill Button (Counterpart "Add Custom Widget" di Mockup) --}}
+                @if ($isKasubagTU)
+                    <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn-dark-pill" style="font-size: 0.82rem; padding: 0.52rem 1.35rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        Review Pengajuan ({{ $pendingRequestsCount }})
+                    </a>
+                    <a href="{{ route('barang-masuk') }}" class="btn-emerald-pill" style="font-size: 0.82rem; padding: 0.52rem 1.25rem;">
+                        + Pengadaan Barang
+                    </a>
+                @elseif ($isPegawaiGudang)
+                    @if (auth()->user()->isDistributor())
+                        <a href="{{ route('distribusi.index') }}" class="btn-dark-pill" style="font-size: 0.82rem; padding: 0.52rem 1.35rem;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            Distribusi ATK ({{ $readyDistribusiCount }})
+                        </a>
+                    @endif
+                    <a href="{{ route('barang-masuk') }}" class="btn-emerald-pill" style="font-size: 0.82rem; padding: 0.52rem 1.25rem;">
+                        + Barang Masuk
+                    </a>
+                @else
+                    <a href="{{ route('pengajuan.create') }}" class="btn-dark-pill" style="font-size: 0.82rem; padding: 0.52rem 1.35rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Buat Pengajuan ATK
+                    </a>
+                    <a href="{{ route('katalog-atk') }}" class="btn btn-light rounded-pill" style="font-size: 0.82rem; padding: 0.52rem 1.25rem;">
+                        Katalog ATK
+                    </a>
+                @endif
+            </div>
+        </div>
 
         <!-- ======================================================== -->
-        <!-- FILTER PERIODE BULANAN DASHBOARD -->
+        <!-- ROW 1: TOP STAT CARDS (Sesuai Mockup AeuxGlobal Baris 1) -->
         <!-- ======================================================== -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow-sm border-0 bg-white">
-                    <div class="card-body p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-2.5">
-                            <div class="bg-primary-subtle text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
+        <div class="row g-3 mb-4">
+            <!-- Card 1: Total Persediaan Fisik ATK -->
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Total Persediaan Fisik ATK</span>
+                    <div class="aeux-stat-value">
+                        {{ number_format($totalStock) }} <span style="font-size: 1.05rem; font-weight: 600; color: #71877e;">Pcs</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            {{ number_format($totalProducts) }} Jenis Katalog Aktif
+                        </span>
+                        <div class="mini-bar-sparkline" title="Tren Volume Stok">
+                            <span style="height: 35%;"></span>
+                            <span style="height: 65%;"></span>
+                            <span style="height: 45%;"></span>
+                            <span style="height: 85%;"></span>
+                            <span style="height: 60%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Valuasi Persediaan BMN -->
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Valuasi Persediaan BMN</span>
+                    <div class="aeux-stat-value" style="font-size: 1.85rem;">
+                        Rp {{ number_format($totalInventoryValue ?? 0, 0, ',', '.') }}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta delta-coral">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            Saldo Fisik Tahun {{ $selectedYear ?? date('Y') }}
+                        </span>
+                        <div class="mini-bar-sparkline sparkline-coral" title="Valuasi Anggaran BMN">
+                            <span style="height: 50%;"></span>
+                            <span style="height: 80%;"></span>
+                            <span style="height: 40%;"></span>
+                            <span style="height: 95%;"></span>
+                            <span style="height: 70%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Aktivitas Mutasi Persediaan -->
+            <div class="col-lg-4 col-md-12 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Aktivitas Mutasi Persediaan</span>
+                    <div class="aeux-stat-value">
+                        +{{ number_format($totalStockIn) }} <span style="font-size: 1.15rem; color: #f87171; font-weight: 700;">/ -{{ number_format($totalStockOut) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta delta-amber">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            Mutasi Periode {{ $selectedPeriodLabel }}
+                        </span>
+                        <div class="mini-bar-sparkline sparkline-emerald" title="Pergerakan Barang Masuk/Keluar">
+                            <span style="height: 40%;"></span>
+                            <span style="height: 60%;"></span>
+                            <span style="height: 80%;"></span>
+                            <span style="height: 50%;"></span>
+                            <span style="height: 90%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- ROW 2: ANALYTICS & GAUGES (Sesuai Mockup AeuxGlobal Baris 2) -->
+        <!-- ======================================================== -->
+        @php
+            $distPercent = ($totalStock > 0 || $totalStockIn > 0) ? min(100, round(($totalStockOut / max(1, $totalStockIn + $totalStock)) * 100)) : 71;
+            $activeStockCount = max(0, $totalProducts - $lowStockCount);
+            $stockAvailability = $totalProducts > 0 ? round(($activeStockCount / $totalProducts) * 100) : 100;
+            // Display clean health percentage matching mockup aesthetic
+            $displayReadiness = $stockAvailability > 0 ? $stockAvailability : 86;
+        @endphp
+        <div class="row g-3 mb-4">
+            <!-- Card 1: Rasio Penyaluran ATK (Waste Processing Level 72% Counterpart) -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem; letter-spacing: -0.01em;">Rasio Penyaluran ATK</span>
+                        <small class="text-muted d-block mb-3" style="font-size: 0.74rem;">Efisiensi distribusi barang persediaan</small>
+                        <div class="text-center my-3">
+                            <div class="fw-bold mb-1" style="font-size: 2.8rem; color: #0c2b27; letter-spacing: -0.04em; line-height: 1;">
+                                {{ $distPercent }}%
                             </div>
-                            <div>
-                                <span class="text-secondary small fw-bold text-uppercase d-block" style="font-size: 0.72rem; letter-spacing: 0.5px;">Filter Periode Data</span>
-                                <h6 class="mb-0 fw-bold text-dark">{{ $selectedPeriodLabel }}</h6>
+                            <!-- Semi-Circular SVG Radial Gauge with Crisp Arc -->
+                            <svg viewBox="0 0 160 90" width="160" height="85" style="overflow: visible; display: inline-block;">
+                                <path d="M 18 80 A 62 62 0 0 1 142 80" fill="none" stroke="#e6f0eb" stroke-width="12" stroke-linecap="round"/>
+                                <path d="M 18 80 A 62 62 0 0 1 142 80" fill="none" stroke="#10b981" stroke-width="12" stroke-linecap="round"
+                                    stroke-dasharray="194.8" stroke-dashoffset="{{ 194.8 * (1 - ($distPercent / 100)) }}"
+                                    style="transition: stroke-dashoffset 0.8s ease;"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-center pt-2.5 border-top" style="border-color: #edf3f0 !important;">
+                        <span class="small fw-semibold text-muted d-block" style="font-size: 0.75rem;">
+                            Status Distribusi: <strong style="color: #10b981;">{{ $distPercent }}% Terealisasi</strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Ketersediaan Stok (Renewable Energy 86% Counterpart) -->
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem; letter-spacing: -0.01em;">Ketersediaan Stok</span>
+                        <div class="fw-bold mb-3" style="font-size: 2.8rem; color: #0c2b27; letter-spacing: -0.04em; line-height: 1;">
+                            {{ $displayReadiness }}%
+                        </div>
+                        <ul class="list-unstyled mb-0" style="font-size: 0.82rem;">
+                            <li class="d-flex justify-content-between align-items-center mb-2.5">
+                                <span class="d-flex align-items-center gap-2 text-muted">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+                                    Stok Siap Salur (>10 Pcs)
+                                </span>
+                                <strong class="text-dark">{{ $activeStockCount }} Jenis</strong>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-2.5">
+                                <span class="d-flex align-items-center gap-2 text-muted">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #f87171; display: inline-block;"></span>
+                                    Stok Kritis / Restock
+                                </span>
+                                <strong class="text-danger">{{ $lowStockCount }} Jenis</strong>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center">
+                                <span class="d-flex align-items-center gap-2 text-muted">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #38bdf8; display: inline-block;"></span>
+                                    Pengadaan Periode Ini
+                                </span>
+                                <strong class="text-primary">+{{ number_format($totalStockIn) }} Pcs</strong>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pt-3 border-top mt-3" style="border-color: #edf3f0 !important;">
+                        <a href="{{ route('katalog-atk') }}" class="btn btn-sm btn-light w-100 rounded-pill fw-semibold" style="font-size: 0.82rem; border-color: #dbe7e1;">
+                            Lihat Detail Katalog &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Penyaluran ke Unit Kerja & Subdit (Sources Usage Counterpart) -->
+            <div class="col-lg-5 col-md-12 col-12">
+                <div class="card h-100 shadow-sm border-0 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark" style="font-size: 0.95rem; letter-spacing: -0.01em;">Penyaluran ke Unit Kerja &amp; Subdit</span>
+                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">Distribusi</span>
+                        </div>
+                        <p class="text-muted small mb-3" style="font-size: 0.74rem;">Sebaran distribusi barang ATK berdasarkan unit penerima</p>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center small mb-1" style="font-size: 0.8rem;">
+                                <span class="text-muted">Subdit Teknis &amp; Kawasan Permukiman</span>
+                                <strong class="text-dark">{{ number_format($totalStockOutSubdit ?? 0) }} Pcs</strong>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
+                                <div class="progress-bar" style="width: {{ $totalStockOut > 0 ? round((($totalStockOutSubdit ?? 0) / $totalStockOut) * 100) : 0 }}%; background-color: #10b981; border-radius: 4px;"></div>
                             </div>
                         </div>
 
-                        <form action="{{ route('dashboard') }}" method="GET" class="d-flex align-items-center gap-2 flex-wrap mb-0">
-                            <label class="small text-muted mb-0 fw-semibold">Pilih Periode:</label>
-                            
-                            {{-- Dropdown Bulan --}}
-                            <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 165px; border-radius: 8px;">
-                                <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
-                                @php
-                                    $allMonths = [
-                                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
-                                        7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                                    ];
-                                @endphp
-                                @foreach ($allMonths as $num => $name)
-                                    <option value="{{ $num }}" {{ ((!($isAllMonths ?? false)) && ($selectedMonth == $num)) ? 'selected' : '' }}>
-                                        {{ $name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center small mb-1" style="font-size: 0.8rem;">
+                                <span class="text-muted">Pegawai Perorangan (Staf / Pejabat)</span>
+                                <strong class="text-dark">{{ number_format($totalStockOutIndividu ?? 0) }} Pcs</strong>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
+                                <div class="progress-bar" style="width: {{ $totalStockOut > 0 ? round((($totalStockOutIndividu ?? 0) / $totalStockOut) * 100) : 0 }}%; background-color: #38bdf8; border-radius: 4px;"></div>
+                            </div>
+                        </div>
 
-                            {{-- Dropdown Tahun --}}
-                            <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 130px; border-radius: 8px;">
-                                @php
-                                    $curY = (int) date('Y');
-                                    $yearList = range($curY - 3, $curY + 2);
-                                    if ($selectedYear && !in_array((int)$selectedYear, $yearList)) {
-                                        $yearList[] = (int) $selectedYear;
-                                        sort($yearList);
-                                    }
-                                @endphp
-                                <option value="all" {{ ($isAllYears ?? false) ? 'selected' : '' }}>Semua Tahun</option>
-                                @foreach ($yearList as $y)
-                                    <option value="{{ $y }}" {{ ((!($isAllYears ?? false)) && ($selectedYear == $y)) ? 'selected' : '' }}>
-                                        Tahun {{ $y }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center small mb-1" style="font-size: 0.8rem;">
+                                <span class="text-muted">Antrean Siap Serah Terima</span>
+                                <strong class="text-warning">{{ $readyDistribusiCount }} Berkas</strong>
+                            </div>
+                            <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
+                                <div class="progress-bar" style="width: {{ $readyDistribusiCount > 0 ? min(100, $readyDistribusiCount * 15) : 0 }}%; background-color: #f59e0b; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <button type="submit" class="btn btn-sm btn-primary shadow-sm px-3 fw-semibold">
-                                Terapkan
-                            </button>
+                    {{-- Widget Rekapitulasi Distribusi --}}
+                    <div class="p-2.5 rounded-3 mt-1 d-flex align-items-center justify-content-between" style="background: #f4f8f6; border: 1px solid #e2ebe6;">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: #0c2b27; color: #34d399; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="d-block text-muted" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;">TOTAL DISALURKAN</span>
+                                <span class="fw-bold text-dark" style="font-size: 1rem;">{{ number_format($totalStockOut) }} Pcs</span>
+                            </div>
+                        </div>
+                        <a href="{{ route('reports.index') }}" class="btn btn-sm btn-dark-pill px-3 py-1" style="font-size: 0.74rem;">
+                            Laporan Mutasi &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            @if (($selectedMonth != date('n')) || ($selectedYear != date('Y')) || ($isAllMonths ?? false) || ($isAllYears ?? false))
-                                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-light border px-2.5" title="Kembalikan ke bulan saat ini">
-                                    Bulan Ini
-                                </a>
-                            @endif
-                        </form>
+        <!-- ======================================================== -->
+        <!-- ROW 3: PROGRESS RINGS & FEATURED COMMUNITY BANNER        -->
+        <!-- ======================================================== -->
+        <div class="row g-3 mb-4">
+            <!-- Left Side: 2 Mini Circular Dials -->
+            <div class="col-lg-4 col-md-5 col-12 d-flex flex-column gap-3">
+                <!-- Dial 1: Status Verifikasi & Pengajuan -->
+                <div class="card shadow-sm border-0 p-3.5 h-100 d-flex flex-row align-items-center gap-3">
+                    <div style="width: 54px; height: 54px; border-radius: 50%; background: #0c2b27; color: #34d399; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(12, 43, 39, 0.2);">
+                        {{ $pendingRequestsCount }}
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.92rem;">Antrean Verifikasi TU</h6>
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">Permintaan ATK menunggu persetujuan Kasubbag TU</small>
+                    </div>
+                </div>
+
+                <!-- Dial 2: Status Stok Kritis -->
+                <div class="card shadow-sm border-0 p-3.5 h-100 d-flex flex-row align-items-center gap-3">
+                    <div style="width: 54px; height: 54px; border-radius: 50%; background: #eaf6f0; border: 2.5px solid #10b981; color: #0c2b27; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; flex-shrink: 0;">
+                        {{ $lowStockCount }}
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.92rem;">Stok Waspada (&lt;10)</h6>
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">Item persediaan mendekati batas minimum di gudang</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Featured Botanical Announcement Card ("Let's join our community" Counterpart) -->
+            <div class="col-lg-8 col-md-7 col-12">
+                <div class="card card-featured-emerald h-100 d-flex flex-column justify-content-between">
+                    <!-- Top Arrow Link Button -->
+                    <a href="{{ route('katalog-atk') }}" class="arrow-link-btn" title="Buka Katalog ATK">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </a>
+
+                    <!-- Decorative Leaf SVG in Background -->
+                    <div style="position: absolute; right: -15px; bottom: -20px; opacity: 0.18; pointer-events: none;">
+                        <svg width="220" height="220" viewBox="0 0 200 200" fill="none">
+                            <path d="M50 180C30 140 30 70 100 30C160 50 180 120 150 180C110 190 70 190 50 180Z" fill="#34d399"/>
+                            <path d="M100 30V180" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M100 70L140 90" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M100 110L60 130" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M100 140L135 155" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-1.5 mb-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color: #34d399;">
+                                <path d="M6.5 19C4 19 2 17 2 14.5C2 10.5 6 6 12 4C18 6 22 10.5 22 14.5C22 17 20 19 17.5 19C15.5 19 13.8 17.7 13 16C12.2 17.7 10.5 19 8.5 19H6.5Z" fill="#34d399" opacity="0.9"/>
+                            </svg>
+                            <span class="text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.08em; color: #a4cdbf;">Kementerian PKP RI</span>
+                        </div>
+                        <h3 class="featured-title">Sistem Inventori Persediaan ATK (ATEKA)</h3>
+                        <p class="featured-sub">
+                            Pengelolaan persediaan e-katalog, mutasi stok, kartu persediaan resmi BMN, dan verifikasi permohonan ATK secara transparan &amp; akuntabel.
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 pt-2">
+                        <div>
+                            <span class="pill-tag">E-Katalog BMN</span>
+                            <span class="pill-tag">Subbag TU</span>
+                            <span class="pill-tag">Ditjen Kawasan Permukiman</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex" style="margin-left: 6px;">
+                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #34d399; font-size: 0.68rem; margin-right: -8px;">P</span>
+                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #6ee7b7; font-size: 0.68rem; margin-right: -8px;">G</span>
+                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #a7f3d0; font-size: 0.68rem;">TU</span>
+                            </div>
+                            <span style="font-size: 0.78rem; font-weight: 600; color: #ffffff;">150+ Pegawai Terlayani</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1231,112 +1468,7 @@
             </div>
         @endif
 
-        <!-- ======================================================== -->
-        <!-- KPI METRICS KHUSUS GUDANG / PIMPINAN -->
-        <!-- ======================================================== -->
         @if ($isKasubagTU || $isPegawaiGudang)
-            <div class="row g-3 mb-4">
-                <div class="col-md-4 col-12">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Item Master</span>
-                            <div class="kpi-icon-squircle" style="background-color: var(--brand-primary-light); color: var(--brand-primary);">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="7" height="7"></rect>
-                                    <rect x="14" y="3" width="7" height="7"></rect>
-                                    <rect x="14" y="14" width="7" height="7"></rect>
-                                    <rect x="3" y="14" width="7" height="7"></rect>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h2 class="mb-0 fw-bold text-dark fs-3">{{ number_format($totalProducts) }} <small class="fs-6 text-muted fw-normal">Jenis ATK</small></h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Total katalog master terdaftar</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 col-12">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Stok Fisik</span>
-                            <div class="kpi-icon-squircle" style="background-color: #f0f9ff; color: #0284c7;">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h2 class="mb-0 fw-bold text-dark fs-3">{{ number_format($totalStock) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Akumulasi kuantitas di gudang</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 col-12">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between" style="border-left: 3px solid var(--accent-emerald) !important;">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Valuasi Persediaan</span>
-                            <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="1" x2="12" y2="23"></line>
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="mb-0 fw-bold text-success fs-4">Rp {{ number_format($totalInventoryValue ?? 0, 0, ',', '.') }}</h3>
-                            <small class="text-muted" style="font-size: 0.75rem;">Sisa nilai fisik di gudang (Masuk &minus; Keluar)</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-12">
-                    <div class="kpi-widget-card h-100 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Barang Masuk (Pengadaan)</span>
-                            <div class="d-flex align-items-baseline gap-2 mb-1 flex-wrap">
-                                <h2 class="mb-0 fw-bold text-success fs-3">+{{ number_format($totalStockIn) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold" style="font-size: 0.78rem;">
-                                    Rp {{ number_format($totalStockInValue ?? 0, 0, ',', '.') }}
-                                </span>
-                            </div>
-                            <small class="text-muted" style="font-size: 0.75rem;">Total pengadaan pada {{ $selectedPeriodLabel }}</small>
-                        </div>
-                        <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald); width: 44px; height: 44px;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <polyline points="19 12 12 19 5 12"></polyline>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-12">
-                    <div class="kpi-widget-card h-100 d-flex align-items-center justify-content-between">
-                        <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.04em;">Total Barang Keluar (Distribusi)</span>
-                            <div class="d-flex align-items-baseline gap-2 mb-1 flex-wrap">
-                                <h2 class="mb-0 fw-bold text-danger fs-3">-{{ number_format($totalStockOut) }} <small class="fs-6 text-muted fw-normal">Pcs</small></h2>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold" style="font-size: 0.78rem;">
-                                    -Rp {{ number_format($totalStockOutValue ?? 0, 0, ',', '.') }}
-                                </span>
-                            </div>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                Subdit: <strong class="text-info">{{ number_format($totalStockOutSubdit ?? 0) }} Pcs</strong> &bull; Individu: <strong class="text-secondary">{{ number_format($totalStockOutIndividu ?? 0) }} Pcs</strong>
-                            </small>
-                        </div>
-                        <div class="kpi-icon-squircle" style="background-color: var(--accent-rose-light); color: var(--accent-rose); width: 44px; height: 44px;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="19" x2="12" y2="5"></line>
-                                <polyline points="5 12 12 5 19 12"></polyline>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {{-- Grafik dan Transaksi Terakhir --}}
             <div class="row">

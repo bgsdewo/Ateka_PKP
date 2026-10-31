@@ -202,7 +202,7 @@ class DashboardController extends Controller
         // Hanya tampilkan pengajuan yang sedang berjalan (pending, approved),
         // atau yang baru diserahterimakan (distributed) namun belum mengunggah berkas fisik tanda tangan (maksimal 24 jam).
         // Begitu berkas tanda tangan diunggah atau telah lewat 24 jam, otomatis disembunyikan agar tidak menumpuk.
-        $trackedRequests = RequestItem::with('details.product')
+        $trackedRequestsQuery = RequestItem::with('details.product')
             ->where('user_id', $userId)
             ->where(function ($q) {
                 $q->whereIn('status', ['pending', 'approved'])
@@ -217,7 +217,17 @@ class DashboardController extends Controller
                                     });
                           });
                   });
-            })
+            });
+
+        if ($selectedYear) {
+            $trackedRequestsQuery->whereYear('created_at', $selectedYear);
+        }
+
+        if ($selectedMonth) {
+            $trackedRequestsQuery->whereMonth('created_at', $selectedMonth);
+        }
+
+        $trackedRequests = $trackedRequestsQuery
             ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
             ->latest()
             ->limit(5)

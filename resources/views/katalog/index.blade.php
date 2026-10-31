@@ -265,7 +265,7 @@
                             <div class="border-top pt-2.5 mt-2">
                                 {{-- Stock Indicator with Meter --}}
                                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                    <span class="small text-muted fw-semibold">Stock sisa:</span>
+                                    <span class="small text-muted fw-semibold">Sisa Stok Fisik:</span>
                                     <span class="fw-bold {{ $item->stock <= 0 ? 'text-danger' : 'text-primary' }} fs-5">
                                         {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">Stock</small>
                                     </span>

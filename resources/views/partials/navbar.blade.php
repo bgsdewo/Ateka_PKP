@@ -29,7 +29,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
-                {{-- Dropdown Notifikasi --}}
                 @php
                     $currentUser = auth()->user();
                     $isKasubagTU = $currentUser && $currentUser->isKasubagTU();
@@ -37,6 +36,10 @@
                     $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
                     $isReportExaminer = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isReportExaminer();
                     $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
+                @endphp
+
+                {{-- Dropdown Notifikasi --}}
+                @php
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
                     $rawUserNotifications = $currentUser ? $currentUser->unreadNotifications()->take(20)->get() : collect();

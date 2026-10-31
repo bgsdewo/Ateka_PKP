@@ -186,6 +186,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/laporan/berita-acara', [ReportController::class, 'beritaAcara'])
             ->name('reports.berita-acara');
+
+        Route::get('/laporan/kartu-persediaan', [ReportController::class, 'kartuPersediaan'])
+            ->name('reports.kartu-persediaan');
+
+        Route::get('/laporan/kartu-persediaan/cetak', [ReportController::class, 'cetakKartuPersediaan'])
+            ->name('reports.kartu-persediaan.cetak');
     });
 
     // Profil & Akun

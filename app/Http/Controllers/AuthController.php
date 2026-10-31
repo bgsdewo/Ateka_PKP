@@ -22,19 +22,34 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $loginInput = $request->input('email');
+        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
+
+        $rules = [
+            'email' => ['required'],
             'password' => ['required'],
-        ], [
-            'email.required' => 'Email wajib diisi.',
+        ];
+        if ($isEmail) {
+            $rules['email'][] = 'email';
+        }
+
+        $request->validate($rules, [
+            'email.required' => 'Email atau NIP wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Password wajib diisi.',
         ]);
+
+        $credentials = [
+            $isEmail ? 'email' : 'nip' => $loginInput,
+            'password' => $request->password,
+        ];
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'))->with('success', 'Login berhasil.');
         }
-        return back()->withInput($request->only('email'))->with('error', 'Email atau password salah.');
+
+        return back()->withInput($request->only('email'))->with('error', 'Email/NIP atau password salah.');
     }
     public function register()
     {

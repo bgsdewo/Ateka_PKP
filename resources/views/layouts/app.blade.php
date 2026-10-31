@@ -90,6 +90,34 @@
             z-index: 1000 !important;
         }
 
+        /* 2. Profil Avatar Pengguna */
+        .sidebar.sidebar-mini .sidebar-user-item {
+            padding: 0.6rem 0 !important;
+            margin: 0 auto 0.25rem auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+        .sidebar.sidebar-mini .sidebar-user-card {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            justify-content: center !important;
+            width: auto !important;
+            gap: 0 !important;
+            box-shadow: none !important;
+        }
+        .sidebar.sidebar-mini .sidebar-user-avatar {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            margin: 0 auto !important;
+            background-color: #13463a !important;
+            border: 1.5px solid #34d399 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+        }
 
         /* 3. Garis Pemisah / Static Item Dash (-) */
         .sidebar.sidebar-mini .nav-item.static-item {
@@ -158,18 +186,18 @@
             transition: all 0.2s ease-in-out !important;
         }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link:not(.active) {
-            color: #64748b !important;
+            color: #8faea2 !important;
             background-color: transparent !important;
         }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link:not(.active):hover {
-            color: var(--bs-primary) !important;
-            background-color: rgba(58, 87, 232, 0.1) !important;
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
         }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link.active,
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link[aria-expanded="true"] {
-            background-color: var(--bs-primary) !important;
+            background-color: rgba(255, 255, 255, 0.16) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 10px rgba(58, 87, 232, 0.35) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
         }
         .sidebar.sidebar-mini .iq-main-menu > .nav-item > .nav-link .icon {
             margin: 0 auto !important;
@@ -254,22 +282,22 @@
             align-items: center !important;
             justify-content: center !important;
             border-radius: 8px !important;
-            background-color: #f1f5f9 !important;
-            color: #475569 !important;
-            border: 1px solid #e2e8f0 !important;
+            background-color: rgba(255, 255, 255, 0.06) !important;
+            color: #8faea2 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             box-shadow: none !important;
             transition: all 0.2s ease-in-out !important;
         }
         .sidebar.sidebar-mini .sub-nav .nav-link:hover {
-            background-color: rgba(58, 87, 232, 0.12) !important;
-            color: var(--bs-primary) !important;
-            border-color: rgba(58, 87, 232, 0.25) !important;
+            background-color: rgba(255, 255, 255, 0.12) !important;
+            color: #ffffff !important;
+            border-color: rgba(52, 211, 153, 0.3) !important;
         }
         .sidebar.sidebar-mini .sub-nav .nav-link.active {
-            background-color: var(--bs-primary) !important;
+            background-color: #10b981 !important;
             color: #ffffff !important;
-            border-color: var(--bs-primary) !important;
-            box-shadow: 0 2px 6px rgba(58, 87, 232, 0.35) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35) !important;
         }
         .sidebar.sidebar-mini .sub-nav .nav-link i.sidenav-mini-icon {
             display: flex !important;
