@@ -214,7 +214,7 @@ class RequestItem extends Model
             return $summary;
         }
 
-        $summary = \Illuminate\Support\Facades\Cache::store('file')->remember('requests_pending_summary', 30, function () {
+        $summary = \Illuminate\Support\Facades\Cache::store('file')->remember('requests_pending_summary', 300, function () {
             $res = DB::table('requests')
                 ->where('status', 'pending')
                 ->selectRaw("
@@ -244,7 +244,7 @@ class RequestItem extends Model
             return $count;
         }
 
-        $count = (int) \Illuminate\Support\Facades\Cache::store('file')->remember('requests_ready_distribusi_count', 30, function () {
+        $count = (int) \Illuminate\Support\Facades\Cache::store('file')->remember('requests_ready_distribusi_count', 300, function () {
             return (int) DB::table('requests')
                 ->where('status', 'approved')
                 ->where(function ($q) {

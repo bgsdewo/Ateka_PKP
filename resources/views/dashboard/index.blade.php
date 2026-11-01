@@ -1417,8 +1417,10 @@
                                 Perbandingan volume barang masuk dan barang keluar pada periode {{ $selectedPeriodLabel }}
                             </small>
                         </div>
-                        <div class="card-body p-4">
-                            <canvas id="stockChart" height="120"></canvas>
+                        <div class="card-body p-4" style="min-height: 240px;">
+                            <div style="position: relative; width: 100%; height: 200px;">
+                                <canvas id="stockChart" style="display: block; width: 100%; height: 200px;"></canvas>
+                            </div>
                             @if ($chartLabels->count() == 0)
                                 <div class="text-center text-muted py-4">
                                     Belum ada transaksi pada periode {{ $selectedPeriodLabel }}.
@@ -1510,7 +1512,7 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/chart.min.js') }}"></script>
+    <script src="{{ asset('js/chart.min.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('stockChart');
@@ -1539,6 +1541,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 position: 'top',
