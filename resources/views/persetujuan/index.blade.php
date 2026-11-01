@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(request()->ajax() ? 'layouts.ajax' : 'layouts.app')
 
 @section('page-header')
     <div class="iq-navbar-header py-0" style="height: auto; min-height: 0; background: transparent; box-shadow: none; border: none; padding: 1.25rem 2rem 0.5rem 2rem; margin-bottom: 0.75rem !important;">
@@ -202,7 +202,7 @@
                         </div>
 
                         {{-- Kategori Pills Switcher (Semua, Stok Gudang, Perlu Pengadaan) --}}
-                        <div class="d-flex align-items-center gap-2 flex-wrap mb-3 p-2 rounded-3" style="background-color: #f1f5f9;">
+                        <div id="category-filter-tabs" class="d-flex align-items-center gap-2 flex-wrap mb-3 p-2 rounded-3" style="background-color: #f1f5f9;">
                             <span class="small fw-bold text-muted me-1 d-none d-md-inline" style="font-size: 0.78rem;">Kategori Permintaan:</span>
                             <a href="{{ route('persetujuan.index', request()->except(['category', 'page'])) }}"
                                 class="btn btn-sm {{ empty($category) ? 'btn-primary text-white shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
@@ -1536,6 +1536,12 @@
                             currentTabs.innerHTML = newTabs.innerHTML;
                         }
 
+                        const newCatTabs = doc.getElementById('category-filter-tabs');
+                        const currentCatTabs = document.getElementById('category-filter-tabs');
+                        if (newCatTabs && currentCatTabs) {
+                            currentCatTabs.innerHTML = newCatTabs.innerHTML;
+                        }
+
                         const newMetrics = doc.getElementById('approval-metrics');
                         const currentMetrics = document.getElementById('approval-metrics');
                         if (newMetrics && currentMetrics) {
@@ -1636,6 +1642,18 @@
                     if (pageLink && pageLink.href) {
                         e.preventDefault();
                         performServerSearch(pageLink.href);
+                    }
+                });
+            }
+
+            // Intercept category filter tab clicks
+            const catTabsContainer = document.getElementById('category-filter-tabs');
+            if (catTabsContainer) {
+                catTabsContainer.addEventListener('click', function(e) {
+                    const catLink = e.target.closest('a');
+                    if (catLink && catLink.href) {
+                        e.preventDefault();
+                        performServerSearch(catLink.href);
                     }
                 });
             }
