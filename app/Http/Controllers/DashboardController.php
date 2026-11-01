@@ -35,7 +35,7 @@ class DashboardController extends Controller
         }
 
         // 1. Optimasi Statistik Produk (Cached 20s via local file store untuk akselerasi reload instan)
-        $productStats = Cache::store('file')->remember('dashboard_product_stats', 20, function () {
+        $productStats = Cache::store('file')->remember('dashboard_product_stats', 300, function () {
             return DB::table('products')
                 ->selectRaw('
                     COUNT(*) as total_products,
@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
         // 2. Optimasi Transaksi Persediaan berdasarkan Periode (Cached 20s via local file store)
         $cacheKeyTx = "dashboard_tx_stats_{$selectedYear}_{$selectedMonth}";
-        $txStats = Cache::store('file')->remember($cacheKeyTx, 20, function () use ($selectedYear, $selectedMonth) {
+        $txStats = Cache::store('file')->remember($cacheKeyTx, 300, function () use ($selectedYear, $selectedMonth) {
             $txQuery = DB::table('stock_transactions');
             if ($selectedYear) {
                 $txQuery->whereYear('transaction_date', $selectedYear);
@@ -78,7 +78,7 @@ class DashboardController extends Controller
         $totalStockOutValue = 0;
 
         // 3. Stok Kritis & Top Products (Cached 30s)
-        $lowStockProducts = Cache::store('file')->remember('dashboard_low_stock_products', 30, function () {
+        $lowStockProducts = Cache::store('file')->remember('dashboard_low_stock_products', 300, function () {
             return Product::with('category')
                 ->where('stock', '<', 10)
                 ->orderBy('stock', 'asc')
@@ -91,7 +91,7 @@ class DashboardController extends Controller
 
         // 4. Transaksi Terakhir (Cached 30s)
         $cacheKeyLatestTx = "dashboard_latest_tx_{$selectedYear}_{$selectedMonth}";
-        $latestTransactions = Cache::store('file')->remember($cacheKeyLatestTx, 30, function () use ($selectedYear, $selectedMonth) {
+        $latestTransactions = Cache::store('file')->remember($cacheKeyLatestTx, 300, function () use ($selectedYear, $selectedMonth) {
             return StockTransaction::with(['product.category', 'user'])
                 ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
                 ->when($selectedMonth, fn($q) => $q->whereMonth('transaction_date', $selectedMonth))
@@ -103,7 +103,7 @@ class DashboardController extends Controller
 
         // 5. Grafik Transaksi (Cached 20s via local file store)
         $cacheKeyMonthly = "dashboard_monthly_tx_{$selectedYear}_{$selectedMonth}";
-        $monthlyTransactions = Cache::store('file')->remember($cacheKeyMonthly, 20, function () use ($selectedYear, $selectedMonth) {
+        $monthlyTransactions = Cache::store('file')->remember($cacheKeyMonthly, 300, function () use ($selectedYear, $selectedMonth) {
             if ($selectedMonth) {
                 return StockTransaction::select(
                     DB::raw('DATE(transaction_date) as date'),

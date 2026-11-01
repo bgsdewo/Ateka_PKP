@@ -42,7 +42,7 @@
                 @php
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Cached 30s)
-                    $rawUserNotifications = $currentUser ? \Illuminate\Support\Facades\Cache::store('file')->remember("user_{$currentUser->id}_unread_notifs", 30, function() use ($currentUser) {
+                    $rawUserNotifications = $currentUser ? \Illuminate\Support\Facades\Cache::store('file')->remember("user_{$currentUser->id}_unread_notifs", 300, function() use ($currentUser) {
                         return $currentUser->unreadNotifications()->take(20)->get();
                     }) : collect();
                     $unreadNotifCount = $rawUserNotifications->count();
@@ -67,7 +67,7 @@
                         $pendingStockCount = $pendingSummary['stock'];
                         $totalPendingVerifikasi = $pendingSummary['total'];
 
-                        $pendingItems = \Illuminate\Support\Facades\Cache::store('file')->remember('navbar_pending_items_preview', 30, function() {
+                        $pendingItems = \Illuminate\Support\Facades\Cache::store('file')->remember('navbar_pending_items_preview', 300, function() {
                             return \App\Models\RequestItem::where('status', 'pending')
                                 ->with(['user', 'details'])
                                 ->latest()
