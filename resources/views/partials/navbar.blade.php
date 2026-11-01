@@ -41,8 +41,10 @@
                 {{-- Dropdown Notifikasi --}}
                 @php
                     
-                    // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
-                    $rawUserNotifications = $currentUser ? $currentUser->unreadNotifications()->take(20)->get() : collect();
+                    // Grouping & Deduplication Notifikasi Pengguna (Cached 30s)
+                    $rawUserNotifications = $currentUser ? \Illuminate\Support\Facades\Cache::store('file')->remember("user_{$currentUser->id}_unread_notifs", 30, function() use ($currentUser) {
+                        return $currentUser->unreadNotifications()->take(20)->get();
+                    }) : collect();
                     $unreadNotifCount = $rawUserNotifications->count();
                     $userNotifications = $rawUserNotifications->groupBy(function($item) {
                         return $item->type . '_' . ($item->product_id ?? '') . '_' . $item->message;
@@ -65,11 +67,13 @@
                         $pendingStockCount = $pendingSummary['stock'];
                         $totalPendingVerifikasi = $pendingSummary['total'];
 
-                        $pendingItems = \App\Models\RequestItem::where('status', 'pending')
-                            ->with(['user', 'details'])
-                            ->latest()
-                            ->take(3)
-                            ->get();
+                        $pendingItems = \Illuminate\Support\Facades\Cache::store('file')->remember('navbar_pending_items_preview', 30, function() {
+                            return \App\Models\RequestItem::where('status', 'pending')
+                                ->with(['user', 'details'])
+                                ->latest()
+                                ->take(3)
+                                ->get();
+                        });
 
                         foreach ($pendingItems as $pi) {
                             $pemohonName = $pi->user ? ($pi->user->name_with_title ?: $pi->user->name) : 'Pegawai';

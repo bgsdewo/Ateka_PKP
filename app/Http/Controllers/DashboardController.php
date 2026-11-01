@@ -77,24 +77,29 @@ class DashboardController extends Controller
         $totalStockInValue = 0;
         $totalStockOutValue = 0;
 
-        // 3. Stok Kritis & Top Products (Cukup 1 query relasional dengan limit 5)
-        $lowStockProducts = Product::with('category')
-            ->where('stock', '<', 10)
-            ->orderBy('stock', 'asc')
-            ->limit(5)
-            ->get();
+        // 3. Stok Kritis & Top Products (Cached 30s)
+        $lowStockProducts = Cache::store('file')->remember('dashboard_low_stock_products', 30, function () {
+            return Product::with('category')
+                ->where('stock', '<', 10)
+                ->orderBy('stock', 'asc')
+                ->limit(5)
+                ->get();
+        });
 
         $topMinProducts = $lowStockProducts;
         $topMaxProducts = collect();
 
-        // 4. Transaksi Terakhir (6 entri terbaru)
-        $latestTransactions = StockTransaction::with(['product.category', 'user'])
-            ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
-            ->when($selectedMonth, fn($q) => $q->whereMonth('transaction_date', $selectedMonth))
-            ->latest('transaction_date')
-            ->latest('id')
-            ->limit(6)
-            ->get();
+        // 4. Transaksi Terakhir (Cached 30s)
+        $cacheKeyLatestTx = "dashboard_latest_tx_{$selectedYear}_{$selectedMonth}";
+        $latestTransactions = Cache::store('file')->remember($cacheKeyLatestTx, 30, function () use ($selectedYear, $selectedMonth) {
+            return StockTransaction::with(['product.category', 'user'])
+                ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
+                ->when($selectedMonth, fn($q) => $q->whereMonth('transaction_date', $selectedMonth))
+                ->latest('transaction_date')
+                ->latest('id')
+                ->limit(6)
+                ->get();
+        });
 
         // 5. Grafik Transaksi (Cached 20s via local file store)
         $cacheKeyMonthly = "dashboard_monthly_tx_{$selectedYear}_{$selectedMonth}";

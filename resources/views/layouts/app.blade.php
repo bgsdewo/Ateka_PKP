@@ -10,10 +10,15 @@
     <title>@yield('title', 'Pencatatan Stok Barang')</title>
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
 
-    <!-- Google Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Fonts Preconnect & DNS Prefetch -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+    </noscript>
 
     <!-- Core Styles -->
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
@@ -365,11 +370,7 @@
 </head>
 
 <body class=" ">
-    <div id="loading">
-        <div class="loader simple-loader">
-            <div class="loader-body"></div>
-        </div>
-    </div>
+    {{-- Full-screen overlay removed for instant Largest Contentful Paint (LCP) --}}
     @include('partials.sidebar')
     <main class="main-content" role="main" aria-label="Konten Utama">
         <div class="position-relative iq-banner">
