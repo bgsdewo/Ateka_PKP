@@ -214,20 +214,22 @@ class RequestItem extends Model
             return $summary;
         }
 
-        $res = DB::table('requests')
-            ->where('status', 'pending')
-            ->selectRaw("
-                COUNT(*) as total,
-                COALESCE(SUM(CASE WHEN is_procurement = 1 THEN 1 ELSE 0 END), 0) as procurement,
-                COALESCE(SUM(CASE WHEN is_procurement = 0 OR is_procurement IS NULL THEN 1 ELSE 0 END), 0) as stock
-            ")
-            ->first();
+        $summary = \Illuminate\Support\Facades\Cache::store('file')->remember('requests_pending_summary', 30, function () {
+            $res = DB::table('requests')
+                ->where('status', 'pending')
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COALESCE(SUM(CASE WHEN is_procurement = 1 THEN 1 ELSE 0 END), 0) as procurement,
+                    COALESCE(SUM(CASE WHEN is_procurement = 0 OR is_procurement IS NULL THEN 1 ELSE 0 END), 0) as stock
+                ")
+                ->first();
 
-        $summary = [
-            'total' => (int) ($res->total ?? 0),
-            'procurement' => (int) ($res->procurement ?? 0),
-            'stock' => (int) ($res->stock ?? 0),
-        ];
+            return [
+                'total' => (int) ($res->total ?? 0),
+                'procurement' => (int) ($res->procurement ?? 0),
+                'stock' => (int) ($res->stock ?? 0),
+            ];
+        });
 
         return $summary;
     }
@@ -242,12 +244,14 @@ class RequestItem extends Model
             return $count;
         }
 
-        $count = (int) DB::table('requests')
-            ->where('status', 'approved')
-            ->where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            })
-            ->count();
+        $count = (int) \Illuminate\Support\Facades\Cache::store('file')->remember('requests_ready_distribusi_count', 30, function () {
+            return (int) DB::table('requests')
+                ->where('status', 'approved')
+                ->where(function ($q) {
+                    $q->where('is_procurement', false)->orWhereNull('is_procurement');
+                })
+                ->count();
+        });
 
         return $count;
     }
