@@ -112,9 +112,6 @@
                         </svg>
                         Review Pengajuan ({{ $pendingRequestsCount }})
                     </a>
-                    <a href="{{ route('barang-masuk') }}" class="btn-emerald-pill" style="font-size: 0.82rem; padding: 0.52rem 1.25rem;">
-                        + Pengadaan Barang
-                    </a>
                 @elseif ($isPegawaiGudang)
                     @if (auth()->user()->isDistributor())
                         <a href="{{ route('distribusi.index') }}" class="btn-dark-pill" style="font-size: 0.82rem; padding: 0.52rem 1.35rem;">
@@ -200,11 +197,7 @@
                     <div class="aeux-stat-value">
                         +{{ number_format($totalStockIn) }} <span style="font-size: 1.15rem; color: #f87171; font-weight: 700;">/ -{{ number_format($totalStockOut) }}</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
-                        <span class="aeux-stat-delta delta-amber">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            Mutasi Periode {{ $selectedPeriodLabel }}
-                        </span>
+                    <div class="d-flex justify-content-end align-items-end mt-auto pt-2">
                         <div class="mini-bar-sparkline sparkline-emerald" title="Pergerakan Barang Masuk/Keluar">
                             <span style="height: 40%;"></span>
                             <span style="height: 60%;"></span>
@@ -307,7 +300,7 @@
                         
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center small mb-1" style="font-size: 0.8rem;">
-                                <span class="text-muted">Subdit Teknis &amp; Kawasan Permukiman</span>
+                                <span class="text-muted">Perwakilan Subdirektorat</span>
                                 <strong class="text-dark">{{ number_format($totalStockOutSubdit ?? 0) }} Pcs</strong>
                             </div>
                             <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
@@ -322,16 +315,6 @@
                             </div>
                             <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
                                 <div class="progress-bar" style="width: {{ $totalStockOut > 0 ? round((($totalStockOutIndividu ?? 0) / $totalStockOut) * 100) : 0 }}%; background-color: #38bdf8; border-radius: 4px;"></div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center small mb-1" style="font-size: 0.8rem;">
-                                <span class="text-muted">Antrean Siap Serah Terima</span>
-                                <strong class="text-warning">{{ $readyDistribusiCount }} Berkas</strong>
-                            </div>
-                            <div class="progress" style="height: 6px; background-color: #e2ebe6; border-radius: 4px;">
-                                <div class="progress-bar" style="width: {{ $readyDistribusiCount > 0 ? min(100, $readyDistribusiCount * 15) : 0 }}%; background-color: #f59e0b; border-radius: 4px;"></div>
                             </div>
                         </div>
                     </div>
@@ -361,34 +344,23 @@
         <!-- ROW 3: PROGRESS RINGS & FEATURED COMMUNITY BANNER        -->
         <!-- ======================================================== -->
         <div class="row g-3 mb-4">
-            <!-- Left Side: 2 Mini Circular Dials -->
-            <div class="col-lg-4 col-md-5 col-12 d-flex flex-column gap-3">
+            <!-- Left Side: Mini Circular Dial -->
+            <div class="col-lg-4 col-md-5 col-12 d-flex flex-column">
                 <!-- Dial 1: Status Verifikasi & Pengajuan -->
-                <div class="card shadow-sm border-0 p-3.5 h-100 d-flex flex-row align-items-center gap-3">
-                    <div style="width: 54px; height: 54px; border-radius: 50%; background: #0c2b27; color: #34d399; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(12, 43, 39, 0.2);">
+                <div class="card shadow-sm border-0 p-4 h-100 d-flex flex-row align-items-center gap-3.5" style="border-radius: 16px;">
+                    <div style="width: 58px; height: 58px; border-radius: 50%; background: #0c2b27; color: #34d399; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; flex-shrink: 0; box-shadow: 0 4px 14px rgba(12, 43, 39, 0.2);">
                         {{ $pendingRequestsCount }}
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.92rem;">Antrean Verifikasi TU</h6>
-                        <small class="text-muted d-block" style="font-size: 0.75rem;">Permintaan ATK menunggu persetujuan Kasubbag TU</small>
-                    </div>
-                </div>
-
-                <!-- Dial 2: Status Stok Kritis -->
-                <div class="card shadow-sm border-0 p-3.5 h-100 d-flex flex-row align-items-center gap-3">
-                    <div style="width: 54px; height: 54px; border-radius: 50%; background: #eaf6f0; border: 2.5px solid #10b981; color: #0c2b27; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; flex-shrink: 0;">
-                        {{ $lowStockCount }}
-                    </div>
-                    <div>
-                        <h6 class="fw-bold mb-0.5 text-dark" style="font-size: 0.92rem;">Stok Waspada (&lt;10)</h6>
-                        <small class="text-muted d-block" style="font-size: 0.75rem;">Item persediaan mendekati batas minimum di gudang</small>
+                        <h6 class="fw-bold mb-1 text-dark" style="font-size: 1rem; letter-spacing: -0.01em;">Antrean Verifikasi TU</h6>
+                        <small class="text-muted d-block" style="font-size: 0.8rem; line-height: 1.4;">Permintaan ATK menunggu persetujuan Kasubbag TU</small>
                     </div>
                 </div>
             </div>
 
             <!-- Right Side: Featured Botanical Announcement Card ("Let's join our community" Counterpart) -->
             <div class="col-lg-8 col-md-7 col-12">
-                <div class="card card-featured-emerald h-100 d-flex flex-column justify-content-between">
+                <div class="card card-featured-emerald h-100 d-flex flex-column justify-content-between p-4" style="border-radius: 16px;">
                     <!-- Top Arrow Link Button -->
                     <a href="{{ route('katalog-atk') }}" class="arrow-link-btn" title="Buka Katalog ATK">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -416,25 +388,9 @@
                             <span class="text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.08em; color: #a4cdbf;">Kementerian PKP RI</span>
                         </div>
                         <h3 class="featured-title">Sistem Inventori Persediaan ATK (ATEKA)</h3>
-                        <p class="featured-sub">
+                        <p class="featured-sub mb-0">
                             Pengelolaan persediaan e-katalog, mutasi stok, kartu persediaan resmi BMN, dan verifikasi permohonan ATK secara transparan &amp; akuntabel.
                         </p>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 pt-2">
-                        <div>
-                            <span class="pill-tag">E-Katalog BMN</span>
-                            <span class="pill-tag">Subbag TU</span>
-                            <span class="pill-tag">Ditjen Kawasan Permukiman</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex" style="margin-left: 6px;">
-                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #34d399; font-size: 0.68rem; margin-right: -8px;">P</span>
-                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #6ee7b7; font-size: 0.68rem; margin-right: -8px;">G</span>
-                                <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-dark fw-bold border border-2 border-white" style="width: 28px; height: 28px; background: #a7f3d0; font-size: 0.68rem;">TU</span>
-                            </div>
-                            <span style="font-size: 0.78rem; font-weight: 600; color: #ffffff;">150+ Pegawai Terlayani</span>
-                        </div>
                     </div>
                 </div>
             </div>
