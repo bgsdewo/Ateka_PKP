@@ -161,6 +161,7 @@ class DashboardController extends Controller
 
         $userRequests = collect();
         $trackedRequests = collect();
+        $userTotalCount = 0;
         $userPendingCount = 0;
         $userApprovedCount = 0;
         $userDistributedCount = 0;
@@ -169,10 +170,21 @@ class DashboardController extends Controller
         $recentProcurementNotifications = collect();
 
         if ($currentUser && $isRequester && !$isKasubagTU) {
-            $userId = $currentUser->id;
+            $baseUserQuery = function ($q) use ($currentUser) {
+                if ($currentUser->isPicDistribusi()) {
+                    $q->where(function ($sub) use ($currentUser) {
+                        $sub->where('user_id', $currentUser->id)
+                            ->orWhere(function ($forPic) use ($currentUser) {
+                                $forPic->forPic($currentUser);
+                            });
+                    });
+                } else {
+                    $q->where('user_id', $currentUser->id);
+                }
+            };
 
             $userRequests = RequestItem::with('details.product')
-                ->where('user_id', $userId)
+                ->where($baseUserQuery)
                 ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
                 ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
                 ->latest()
@@ -180,7 +192,7 @@ class DashboardController extends Controller
                 ->get();
 
             $trackedRequests = RequestItem::with('details.product')
-                ->where('user_id', $userId)
+                ->where($baseUserQuery)
                 ->where(function ($q) {
                     $q->whereIn('status', ['pending', 'approved'])
                       ->orWhere(function ($sub) {
@@ -203,10 +215,11 @@ class DashboardController extends Controller
                 ->get();
 
             // Optimasi penghitungan status requester dalam 1 query agregat
-            $userCounts = RequestItem::where('user_id', $userId)
+            $userCounts = RequestItem::where($baseUserQuery)
                 ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
                 ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
                 ->selectRaw("
+                    COUNT(*) as total_c,
                     COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending_c,
                     COALESCE(SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END), 0) as approved_c,
                     COALESCE(SUM(CASE WHEN status = 'distributed' THEN 1 ELSE 0 END), 0) as distributed_c,
@@ -215,6 +228,7 @@ class DashboardController extends Controller
                 ")
                 ->first();
 
+            $userTotalCount = (int) ($userCounts->total_c ?? 0);
             $userPendingCount = (int) ($userCounts->pending_c ?? 0);
             $userApprovedCount = (int) ($userCounts->approved_c ?? 0);
             $userDistributedCount = (int) ($userCounts->distributed_c ?? 0);
@@ -269,6 +283,7 @@ class DashboardController extends Controller
             'totalDistributedCount',
             'userRequests',
             'trackedRequests',
+            'userTotalCount',
             'userPendingCount',
             'userApprovedCount',
             'userDistributedCount',

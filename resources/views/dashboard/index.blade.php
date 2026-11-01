@@ -140,6 +140,11 @@
             </div>
         </div>
 
+
+        <!-- ======================================================== -->
+        <!-- VIEW PIMPINAN & OPERASIONAL GUDANG (Kasubbag TU & Gudang) -->
+        <!-- ======================================================== -->
+        @if ($isKasubagTU || $isPegawaiGudang)
         <!-- ======================================================== -->
         <!-- ROW 1: TOP STAT CARDS (Sesuai Mockup AeuxGlobal Baris 1) -->
         <!-- ======================================================== -->
@@ -377,11 +382,208 @@
             </div>
         </div>
 
+            {{-- Grafik dan Transaksi Terakhir --}}
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header border-bottom py-3">
+                            <h5 class="card-title mb-1 fw-bold">Grafik Transaksi Keluar-Masuk ({{ $selectedPeriodLabel }})</h5>
+                            <small class="text-secondary">
+                                Perbandingan volume barang masuk dan barang keluar pada periode {{ $selectedPeriodLabel }}
+                            </small>
+                        </div>
+                        <div class="card-body p-4" style="min-height: 240px;">
+                            <div style="position: relative; width: 100%; height: 200px;">
+                                <canvas id="stockChart" style="display: block; width: 100%; height: 200px;"></canvas>
+                            </div>
+                            @if ($chartLabels->count() == 0)
+                                <div class="text-center text-muted py-4">
+                                    Belum ada transaksi pada periode {{ $selectedPeriodLabel }}.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header border-bottom py-3">
+                            <h5 class="card-title mb-1 fw-bold">Mutasi Transaksi Terkini</h5>
+                            <small class="text-secondary">5 transaksi persediaan terakhir di gudang</small>
+                        </div>
+                        <div class="card-body p-3">
+                            @forelse ($latestTransactions as $transaction)
+                                <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
+                                    <div>
+                                        <strong class="text-dark small d-block">{{ $transaction->product->name ?? '-' }}</strong>
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            {{ $transaction->transaction_date ? $transaction->transaction_date->format('d/m/Y') : '-' }} &bull; {{ $transaction->uraian ?? ($transaction->user->name ?? '-') }}
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        @if ($transaction->type === 'masuk')
+                                            <span class="badge bg-success-subtle text-success border" style="font-size: 0.7rem;">+{{ number_format($transaction->quantity) }} Pcs</span>
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger border" style="font-size: 0.7rem;">-{{ number_format($transaction->quantity) }} Pcs</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center text-muted py-4">
+                                    Belum ada transaksi mutasi pada periode {{ $selectedPeriodLabel }}.
+                                </div>
+                            @endforelse
+
+                            <a href="{{ route('reports.index') }}" class="btn btn-outline-primary btn-sm w-100 mt-2">
+                                Buka Seluruh Laporan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Peringatan Stok Menipis --}}
+            @if ($lowStockProducts->count() > 0)
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0 border-start border-warning border-4 rounded-3 overflow-hidden">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle p-1.5 rounded-circle d-flex align-items-center justify-content-center">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                        </span>
+                                        <div>
+                                            <strong class="text-warning d-block" style="font-size: 0.95rem;">Peringatan Stok Menipis (&lt; 10 Pcs)</strong>
+                                            <small class="text-muted">Terdapat <strong>{{ $lowStockCount }}</strong> jenis barang dengan stok menipis di gudang</small>
+                                        </div>
+                                    </div>
+                                    @if(auth()->user()->role === 'kasubag_tu' || auth()->user()->role === 'admin' || auth()->user()->role === 'pegawai_gudang')
+                                        <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-xs btn-outline-warning text-dark fw-semibold px-2.5 py-1 rounded-pill">
+                                            Kelola Master Barang &rarr;
+                                        </a>
+                                    @endif
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 pt-1">
+                                    @foreach ($lowStockProducts->take(4) as $lp)
+                                        <span class="badge bg-light text-dark border py-1.5 px-2.5 d-inline-flex align-items-center gap-1 shadow-none" style="font-weight: 500; font-size: 0.78rem; max-width: 100%;">
+                                            <span class="text-truncate" style="max-width: 250px;" title="{{ $lp->name }}">{{ $lp->name }}:</span>
+                                            <strong class="text-danger flex-shrink-0">{{ $lp->stock }} Pcs</strong>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+        @else
         <!-- ======================================================== -->
-        <!-- KHUSUS PEGAWAI / PIC (REQUESTER VIEW) -->
+        <!-- VIEW KHUSUS PEGAWAI & PIC DISTRIBUSI (REQUESTER VIEW)   -->
         <!-- ======================================================== -->
-        @if ($isRequester && !$isKasubagTU)
-            {{-- Widget Pelacakan Status Pengajuan ATK (Horizontal Stepper) --}}
+
+        <!-- ROW 1: TOP STAT CARDS (Requester View)                  -->
+        <div class="row g-3 mb-4">
+            <!-- Card 1: Total Pengajuan Saya / Unit -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">{{ $isPicDistribusi ? 'Total Pengajuan Unit' : 'Total Pengajuan Saya' }}</span>
+                    <div class="aeux-stat-value">
+                        {{ number_format($userTotalCount) }} <span style="font-size: 1.05rem; font-weight: 600; color: #71877e;">Tiket</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            {{ $selectedPeriodLabel }}
+                        </span>
+                        <div class="mini-bar-sparkline" title="Aktivitas Pengajuan">
+                            <span style="height: 35%;"></span>
+                            <span style="height: 65%;"></span>
+                            <span style="height: 45%;"></span>
+                            <span style="height: 85%;"></span>
+                            <span style="height: 60%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Menunggu Verifikasi TU -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Menunggu Verifikasi TU</span>
+                    <div class="aeux-stat-value" style="color: #b45309;">
+                        {{ number_format($userPendingCount) }} <span style="font-size: 1.05rem; font-weight: 600; color: #71877e;">Tiket</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta delta-coral">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Sedang Ditinjau TU
+                        </span>
+                        <div class="mini-bar-sparkline sparkline-coral" title="Menunggu Persetujuan">
+                            <span style="height: 50%;"></span>
+                            <span style="height: 80%;"></span>
+                            <span style="height: 40%;"></span>
+                            <span style="height: 95%;"></span>
+                            <span style="height: 70%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Disetujui Kasubbag TU -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Disetujui Kasubbag TU</span>
+                    <div class="aeux-stat-value" style="color: #0369a1;">
+                        {{ number_format($userApprovedCount) }} <span style="font-size: 1.05rem; font-weight: 600; color: #71877e;">Tiket</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta" style="color: #0369a1;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            {{ isset($userProcurementBoughtCount) && $userProcurementBoughtCount > 0 ? $userProcurementBoughtCount . ' Siap Diserahkan' : 'Siap Diambil di Gudang' }}
+                        </span>
+                        <div class="mini-bar-sparkline" title="Disetujui TU">
+                            <span style="height: 40%; background: #38bdf8;"></span>
+                            <span style="height: 70%; background: #38bdf8;"></span>
+                            <span style="height: 55%; background: #38bdf8;"></span>
+                            <span style="height: 85%; background: #38bdf8;"></span>
+                            <span style="height: 65%; background: #38bdf8;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Selesai Diserahterimakan -->
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
+                    <span class="aeux-stat-label">Selesai Diserahkan</span>
+                    <div class="aeux-stat-value" style="color: #15803d;">
+                        {{ number_format($userDistributedCount) }} <span style="font-size: 1.05rem; font-weight: 600; color: #71877e;">Tiket</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-auto pt-2">
+                        <span class="aeux-stat-delta">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Barang Telah Diterima
+                        </span>
+                        <div class="mini-bar-sparkline" title="Telah Diserahterimakan">
+                            <span style="height: 45%;"></span>
+                            <span style="height: 75%;"></span>
+                            <span style="height: 60%;"></span>
+                            <span style="height: 90%;"></span>
+                            <span style="height: 80%;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: PELACAKAN STATUS PENGAJUAN ATK (Horizontal Stepper) -->
+        @if(isset($trackedRequests) && $trackedRequests->isNotEmpty())
             @if(isset($trackedRequests) && $trackedRequests->isNotEmpty())
                 <style>
                     .atk-stepper-wrapper {
@@ -1149,97 +1351,128 @@
             @endif
 
 
-
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Menunggu Review</span>
-                            <div class="kpi-icon-squircle" style="background-color: var(--accent-amber-light); color: var(--accent-amber);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                            </div>
+        @else
+            <div class="card border-0 shadow-sm mb-4 rounded-3 p-4" style="background: #ffffff; border-left: 4px solid #10b981 !important;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: #e6f7f0; color: #10b981; flex-shrink: 0;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
                         </div>
                         <div>
-                            <h2 class="fw-bold text-dark mb-0 fs-3">{{ $userPendingCount }}</h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Menunggu Kasubbag TU</small>
+                            <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.98rem;">Tidak Ada Pengajuan yang Sedang Diproses</h6>
+                            <p class="text-muted small mb-0" style="font-size: 0.8rem;">
+                                Seluruh permohonan ATK Anda telah selesai atau Anda belum membuat pengajuan baru pada periode {{ $selectedPeriodLabel }}.
+                            </p>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            @if(isset($userProcurementBoughtCount) && $userProcurementBoughtCount > 0)
-                                <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Pengadaan Siap</span>
-                                <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                    </svg>
-                                </div>
-                            @else
-                                <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Disetujui TU</span>
-                                <div class="kpi-icon-squircle" style="background-color: #f0f9ff; color: #0284c7;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                    </svg>
-                                </div>
-                            @endif
-                        </div>
-                        <div>
-                            @if(isset($userProcurementBoughtCount) && $userProcurementBoughtCount > 0)
-                                <h2 class="fw-bold text-success mb-0 fs-3">{{ $userProcurementBoughtCount }}</h2>
-                                <small class="text-success fw-semibold" style="font-size: 0.75rem;">Sudah dibeli &amp; tersedia</small>
-                            @else
-                                <h2 class="fw-bold text-primary mb-0 fs-3">{{ $userApprovedCount }}</h2>
-                                <small class="text-muted" style="font-size: 0.75rem;">Akan dibeli Subbag TU</small>
-                            @endif
-                        </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ route('pengajuan.create') }}" class="btn btn-emerald-pill text-nowrap" style="font-size: 0.8rem; padding: 0.48rem 1.25rem;">
+                            + Buat Pengajuan ATK
+                        </a>
+                        <a href="{{ route('katalog-atk') }}" class="btn btn-outline-secondary rounded-pill text-nowrap" style="font-size: 0.8rem; padding: 0.48rem 1.25rem;">
+                            Katalog Persediaan &rarr;
+                        </a>
                     </div>
                 </div>
+            </div>
+        @endif
 
-                <div class="col-6 col-md-3">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Selesai Diterima</span>
-                            <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                            </div>
-                        </div>
-                        <div>
-                            <h2 class="fw-bold text-dark mb-0 fs-3">{{ $userDistributedCount }}</h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Telah diserahterimakan</small>
-                        </div>
+        <!-- ROW 3: BANNER FITUR & PANDUAN ALUR PENGAJUAN -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-8 col-12">
+                <div class="card card-featured-emerald h-100 d-flex flex-column justify-content-between p-4" style="border-radius: 16px;">
+                    <!-- Top Arrow Link Button -->
+                    <a href="{{ route('katalog-atk') }}" class="arrow-link-btn" title="Buka Katalog ATK">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </a>
+
+                    <!-- Decorative Leaf SVG in Background -->
+                    <div style="position: absolute; right: -15px; bottom: -20px; opacity: 0.18; pointer-events: none;">
+                        <svg width="220" height="220" viewBox="0 0 200 200" fill="none">
+                            <path d="M50 180C30 140 30 70 100 30C160 50 180 120 150 180C110 190 70 190 50 180Z" fill="#34d399"/>
+                            <path d="M100 30V180" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M100 70L140 90" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M100 110L60 130" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                            <path d="M100 140L135 155" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
                     </div>
-                </div>
 
-                <div class="col-6 col-md-3">
-                    <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Ditolak</span>
-                            <div class="kpi-icon-squircle" style="background-color: var(--accent-rose-light); color: var(--accent-rose);">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                                </svg>
-                            </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-1.5 mb-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color: #34d399;">
+                                <path d="M6.5 19C4 19 2 17 2 14.5C2 10.5 6 6 12 4C18 6 22 10.5 22 14.5C22 17 20 19 17.5 19C15.5 19 13.8 17.7 13 16C12.2 17.7 10.5 19 8.5 19H6.5Z" fill="#34d399" opacity="0.9"/>
+                            </svg>
+                            <span class="text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.08em; color: #a4cdbf;">Kementerian PKP RI</span>
                         </div>
-                        <div>
-                            <h2 class="fw-bold text-danger mb-0 fs-3">{{ $userRejectedCount }}</h2>
-                            <small class="text-muted" style="font-size: 0.75rem;">Belum disetujui TU</small>
+                        <h3 class="featured-title">Sistem Inventori Persediaan ATK (ATEKA)</h3>
+                        <p class="featured-sub mb-3">
+                            Layanan permohonan kebutuhan alat tulis kantor untuk menunjang tugas kedinasan secara praktis, transparan, dan terpantau langsung proses persetujuannya.
+                        </p>
+                        <div class="d-flex align-items-center gap-2 flex-wrap pt-1">
+                            <a href="{{ route('katalog-atk') }}" class="btn btn-emerald-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
+                                Buka Katalog ATK &rarr;
+                            </a>
+                            <a href="{{ route('pengajuan.create') }}" class="btn btn-outline-light rounded-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
+                                + Buat Pengajuan Barang
+                            </a>
+                            <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-outline-light rounded-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
+                                + Usulan Pengadaan Baru
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="col-lg-4 col-12">
+                <div class="card h-100 shadow-sm border-0 p-4 d-flex flex-column justify-content-between" style="border-radius: 16px; background: #ffffff;">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-light text-primary border" style="font-size: 0.72rem;">Panduan Alur</span>
+                            <span class="fw-bold text-dark" style="font-size: 0.95rem;">Alur Permintaan ATK</span>
+                        </div>
+                        <p class="text-muted small mb-3" style="font-size: 0.76rem;">Tahapan pemenuhan permohonan ATK Anda:</p>
+                        
+                        <div class="d-flex flex-column gap-2.5">
+                            <div class="d-flex align-items-start gap-2.5">
+                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">1</span>
+                                <div style="font-size: 0.78rem;">
+                                    <strong class="text-dark d-block">Pilih di Katalog ATK</strong>
+                                    <span class="text-muted">Cek stok persediaan yang tersedia di gudang.</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2.5">
+                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">2</span>
+                                <div style="font-size: 0.78rem;">
+                                    <strong class="text-dark d-block">Ajukan Permintaan</strong>
+                                    <span class="text-muted">Tentukan jumlah dan keperluan penggunaan kerja.</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2.5">
+                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">3</span>
+                                <div style="font-size: 0.78rem;">
+                                    <strong class="text-dark d-block">Verifikasi Kasubbag TU</strong>
+                                    <span class="text-muted">Ditinjau dan disetujui secara digital oleh pimpinan.</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2.5">
+                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #10b981; font-size: 0.72rem; flex-shrink: 0;">4</span>
+                                <div style="font-size: 0.78rem;">
+                                    <strong class="text-dark d-block">Serah Terima Fisik</strong>
+                                    <span class="text-muted">Ambil barang di gudang & ttd berita acara serah terima.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 4: TABEL RIWAYAT PERMINTAAN TERAKHIR PEMOHON -->
             {{-- Tabel Permintaan Terbaru Milik User --}}
             <div class="row mb-4">
                 <div class="col-12">
@@ -1403,109 +1636,7 @@
                     </div>
                 </div>
             </div>
-        @endif
 
-        @if ($isKasubagTU || $isPegawaiGudang)
-
-            {{-- Grafik dan Transaksi Terakhir --}}
-            <div class="row">
-                <div class="col-lg-8 mb-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-header border-bottom py-3">
-                            <h5 class="card-title mb-1 fw-bold">Grafik Transaksi Keluar-Masuk ({{ $selectedPeriodLabel }})</h5>
-                            <small class="text-secondary">
-                                Perbandingan volume barang masuk dan barang keluar pada periode {{ $selectedPeriodLabel }}
-                            </small>
-                        </div>
-                        <div class="card-body p-4" style="min-height: 240px;">
-                            <div style="position: relative; width: 100%; height: 200px;">
-                                <canvas id="stockChart" style="display: block; width: 100%; height: 200px;"></canvas>
-                            </div>
-                            @if ($chartLabels->count() == 0)
-                                <div class="text-center text-muted py-4">
-                                    Belum ada transaksi pada periode {{ $selectedPeriodLabel }}.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-header border-bottom py-3">
-                            <h5 class="card-title mb-1 fw-bold">Mutasi Transaksi Terkini</h5>
-                            <small class="text-secondary">5 transaksi persediaan terakhir di gudang</small>
-                        </div>
-                        <div class="card-body p-3">
-                            @forelse ($latestTransactions as $transaction)
-                                <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-2">
-                                    <div>
-                                        <strong class="text-dark small d-block">{{ $transaction->product->name ?? '-' }}</strong>
-                                        <small class="text-muted" style="font-size: 0.75rem;">
-                                            {{ $transaction->transaction_date ? $transaction->transaction_date->format('d/m/Y') : '-' }} &bull; {{ $transaction->uraian ?? ($transaction->user->name ?? '-') }}
-                                        </small>
-                                    </div>
-                                    <div class="text-end">
-                                        @if ($transaction->type === 'masuk')
-                                            <span class="badge bg-success-subtle text-success border" style="font-size: 0.7rem;">+{{ number_format($transaction->quantity) }} Pcs</span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger border" style="font-size: 0.7rem;">-{{ number_format($transaction->quantity) }} Pcs</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="text-center text-muted py-4">
-                                    Belum ada transaksi mutasi pada periode {{ $selectedPeriodLabel }}.
-                                </div>
-                            @endforelse
-
-                            <a href="{{ route('reports.index') }}" class="btn btn-outline-primary btn-sm w-100 mt-2">
-                                Buka Seluruh Laporan
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Peringatan Stok Menipis --}}
-            @if ($lowStockProducts->count() > 0)
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm border-0 border-start border-warning border-4 rounded-3 overflow-hidden">
-                            <div class="card-body p-3">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle p-1.5 rounded-circle d-flex align-items-center justify-content-center">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                                            </svg>
-                                        </span>
-                                        <div>
-                                            <strong class="text-warning d-block" style="font-size: 0.95rem;">Peringatan Stok Menipis (&lt; 10 Pcs)</strong>
-                                            <small class="text-muted">Terdapat <strong>{{ $lowStockCount }}</strong> jenis barang dengan stok menipis di gudang</small>
-                                        </div>
-                                    </div>
-                                    @if(auth()->user()->role === 'kasubag_tu' || auth()->user()->role === 'admin' || auth()->user()->role === 'pegawai_gudang')
-                                        <a href="{{ route('master-data.daftar-barang.index') }}" class="btn btn-xs btn-outline-warning text-dark fw-semibold px-2.5 py-1 rounded-pill">
-                                            Kelola Master Barang &rarr;
-                                        </a>
-                                    @endif
-                                </div>
-                                <div class="d-flex flex-wrap gap-2 pt-1">
-                                    @foreach ($lowStockProducts->take(4) as $lp)
-                                        <span class="badge bg-light text-dark border py-1.5 px-2.5 d-inline-flex align-items-center gap-1 shadow-none" style="font-weight: 500; font-size: 0.78rem; max-width: 100%;">
-                                            <span class="text-truncate" style="max-width: 250px;" title="{{ $lp->name }}">{{ $lp->name }}:</span>
-                                            <strong class="text-danger flex-shrink-0">{{ $lp->stock }} Pcs</strong>
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
         @endif
 
     </div>
