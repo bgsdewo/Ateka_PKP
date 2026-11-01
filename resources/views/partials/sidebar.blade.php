@@ -7,11 +7,18 @@
     $isPegawaiGudang = $role === 'pegawai_gudang';
     $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'subdit', 'member']) || empty($role);
 
-    $pendingApprovalsCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->count() : 0;
-    $pendingProcurementCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count() : 0;
-    $pendingStockCount = $isKasubagTU ? \App\Models\RequestItem::where('status', 'pending')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count() : 0;
+    if ($isKasubagTU) {
+        $pendingSummary = \App\Models\RequestItem::getPendingSummary();
+        $pendingApprovalsCount = $pendingSummary['total'];
+        $pendingProcurementCount = $pendingSummary['procurement'];
+        $pendingStockCount = $pendingSummary['stock'];
+    } else {
+        $pendingApprovalsCount = 0;
+        $pendingProcurementCount = 0;
+        $pendingStockCount = 0;
+    }
     $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
-    $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::where('status', 'approved')->count() : 0;
+    $readyDistribusiCount = $isPegawaiGudang ? \App\Models\RequestItem::getReadyDistribusiCount() : 0;
 @endphp
 
 <aside class="sidebar sidebar-default sidebar-dark sidebar-base navs-rounded-all">

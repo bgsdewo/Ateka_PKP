@@ -35,7 +35,7 @@
                     $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
                     $isPicDistribusi = $currentUser && $currentUser->isPicDistribusi();
                     $isReportExaminer = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isReportExaminer();
-                    $unreadNotifCount = $currentUser ? $currentUser->unread_notifications_count : 0;
+                    $unreadNotifCount = 0; // calculated below
                 @endphp
 
                 {{-- Dropdown Notifikasi --}}
@@ -43,6 +43,7 @@
                     
                     // Grouping & Deduplication Notifikasi Pengguna (Requesters / Users)
                     $rawUserNotifications = $currentUser ? $currentUser->unreadNotifications()->take(20)->get() : collect();
+                    $unreadNotifCount = $rawUserNotifications->count();
                     $userNotifications = $rawUserNotifications->groupBy(function($item) {
                         return $item->type . '_' . ($item->product_id ?? '') . '_' . $item->message;
                     })->map(function($group) {
@@ -59,9 +60,10 @@
                     $pendingStockCount = 0;
 
                     if ($isKasubagTU) {
-                        $pendingProcurementCount = \App\Models\RequestItem::where('status', 'pending')->where('is_procurement', true)->count();
-                        $pendingStockCount = \App\Models\RequestItem::where('status', 'pending')->where(function($q) { $q->where('is_procurement', false)->orWhereNull('is_procurement'); })->count();
-                        $totalPendingVerifikasi = $pendingProcurementCount + $pendingStockCount;
+                        $pendingSummary = \App\Models\RequestItem::getPendingSummary();
+                        $pendingProcurementCount = $pendingSummary['procurement'];
+                        $pendingStockCount = $pendingSummary['stock'];
+                        $totalPendingVerifikasi = $pendingSummary['total'];
 
                         $pendingItems = \App\Models\RequestItem::where('status', 'pending')
                             ->with(['user', 'details'])
