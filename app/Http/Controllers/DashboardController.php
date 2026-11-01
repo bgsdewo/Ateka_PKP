@@ -7,6 +7,7 @@ use App\Models\StockTransaction;
 use App\Models\RequestItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -33,80 +34,60 @@ class DashboardController extends Controller
             $selectedMonth = (int) date('n'); // default current month (1-12)
         }
 
-        $totalProducts = Product::count();
-        $totalStock = Product::sum('stock');
-
-        // Nilai saldo seluruh persediaan (Stok * Harga Beli)
-        $totalInventoryValue = Product::all()->sum(function ($product) {
-            return $product->stock * ($product->purchase_price ?? 0);
+        // 1. Optimasi Statistik Produk (Cached 20s via local file store untuk akselerasi reload instan)
+        $productStats = Cache::store('file')->remember('dashboard_product_stats', 20, function () {
+            return DB::table('products')
+                ->selectRaw('
+                    COUNT(*) as total_products,
+                    COALESCE(SUM(stock), 0) as total_stock,
+                    COALESCE(SUM(stock * COALESCE(purchase_price, 0)), 0) as total_inventory_value,
+                    COALESCE(SUM(CASE WHEN stock < 10 THEN 1 ELSE 0 END), 0) as low_stock_count
+                ')
+                ->first();
         });
 
-        // Transaksi Persediaan berdasarkan Periode yang dipilih
-        $periodTransactionsQuery = StockTransaction::query();
-        if ($selectedYear) {
-            $periodTransactionsQuery->whereYear('transaction_date', $selectedYear);
-        }
-        if ($selectedMonth) {
-            $periodTransactionsQuery->whereMonth('transaction_date', $selectedMonth);
-        }
+        $totalProducts = (int) ($productStats->total_products ?? 0);
+        $totalStock = (int) ($productStats->total_stock ?? 0);
+        $totalInventoryValue = (float) ($productStats->total_inventory_value ?? 0);
+        $lowStockCount = (int) ($productStats->low_stock_count ?? 0);
 
-        $totalStockIn = (clone $periodTransactionsQuery)->where('type', 'masuk')->sum('quantity');
-        $totalStockOut = (clone $periodTransactionsQuery)->where('type', 'keluar')->sum('quantity');
+        // 2. Optimasi Transaksi Persediaan berdasarkan Periode (Cached 20s via local file store)
+        $cacheKeyTx = "dashboard_tx_stats_{$selectedYear}_{$selectedMonth}";
+        $txStats = Cache::store('file')->remember($cacheKeyTx, 20, function () use ($selectedYear, $selectedMonth) {
+            $txQuery = DB::table('stock_transactions');
+            if ($selectedYear) {
+                $txQuery->whereYear('transaction_date', $selectedYear);
+            }
+            if ($selectedMonth) {
+                $txQuery->whereMonth('transaction_date', $selectedMonth);
+            }
 
-        $totalStockInValue = (clone $periodTransactionsQuery)
-            ->where('type', 'masuk')
-            ->with('product')
-            ->get()
-            ->sum(function ($tx) {
-                $price = $tx->harga_perolehan > 0 ? $tx->harga_perolehan : ($tx->product->purchase_price ?? 0);
-                return (float) ($tx->quantity * $price);
-            });
+            return $txQuery->selectRaw("
+                COALESCE(SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END), 0) as total_stock_in,
+                COALESCE(SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END), 0) as total_stock_out,
+                COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'subdit' OR note LIKE '%Subdit%') THEN quantity ELSE 0 END), 0) as total_stock_out_subdit,
+                COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'individu' OR (recipient_type != 'subdit' AND (note NOT LIKE '%Subdit%' OR note IS NULL))) THEN quantity ELSE 0 END), 0) as total_stock_out_individu
+            ")->first();
+        });
 
-        $totalStockOutValue = (clone $periodTransactionsQuery)
-            ->where('type', 'keluar')
-            ->with('product')
-            ->get()
-            ->sum(function ($tx) {
-                $price = $tx->harga_perolehan > 0 ? $tx->harga_perolehan : ($tx->product->purchase_price ?? 0);
-                return (float) ($tx->quantity * $price);
-            });
+        $totalStockIn = (int) ($txStats->total_stock_in ?? 0);
+        $totalStockOut = (int) ($txStats->total_stock_out ?? 0);
+        $totalStockOutSubdit = (int) ($txStats->total_stock_out_subdit ?? 0);
+        $totalStockOutIndividu = (int) ($txStats->total_stock_out_individu ?? 0);
+        $totalStockInValue = 0;
+        $totalStockOutValue = 0;
 
-        $totalStockOutSubdit = (clone $periodTransactionsQuery)
-            ->where('type', 'keluar')
-            ->where(function ($q) {
-                $q->where('recipient_type', 'subdit')
-                  ->orWhere('note', 'like', '%Subdit%');
-            })
-            ->sum('quantity');
-
-        $totalStockOutIndividu = (clone $periodTransactionsQuery)
-            ->where('type', 'keluar')
-            ->where(function ($q) {
-                $q->where('recipient_type', 'individu')
-                  ->orWhere('note', 'not like', '%Subdit%');
-            })
-            ->sum('quantity');
-
-        $lowStockCount = Product::where('stock', '<', 10)->count();
-
+        // 3. Stok Kritis & Top Products (Cukup 1 query relasional dengan limit 5)
         $lowStockProducts = Product::with('category')
             ->where('stock', '<', 10)
             ->orderBy('stock', 'asc')
             ->limit(5)
             ->get();
 
-        $topMinProducts = Product::with('category')
-            ->where('stock', '<', 10)
-            ->orderBy('stock', 'asc')
-            ->limit(5)
-            ->get();
+        $topMinProducts = $lowStockProducts;
+        $topMaxProducts = collect();
 
-        $topMaxProducts = Product::with('category')
-            ->where('stock', '>=', 10)
-            ->orderBy('stock', 'desc')
-            ->limit(5)
-            ->get();
-
+        // 4. Transaksi Terakhir (6 entri terbaru)
         $latestTransactions = StockTransaction::with(['product.category', 'user'])
             ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
             ->when($selectedMonth, fn($q) => $q->whereMonth('transaction_date', $selectedMonth))
@@ -115,33 +96,38 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        // Grafik Transaksi: Jika bulan dipilih -> per tanggal. Jika 'all' -> per bulan.
-        if ($selectedMonth) {
-            $monthlyTransactions = StockTransaction::select(
-                DB::raw('DATE(transaction_date) as date'),
-                DB::raw("SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END) as total_in"),
-                DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
-            )
-                ->whereMonth('transaction_date', $selectedMonth)
-                ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
-                ->groupBy(DB::raw('DATE(transaction_date)'))
-                ->orderBy('date')
-                ->get();
+        // 5. Grafik Transaksi (Cached 20s via local file store)
+        $cacheKeyMonthly = "dashboard_monthly_tx_{$selectedYear}_{$selectedMonth}";
+        $monthlyTransactions = Cache::store('file')->remember($cacheKeyMonthly, 20, function () use ($selectedYear, $selectedMonth) {
+            if ($selectedMonth) {
+                return StockTransaction::select(
+                    DB::raw('DATE(transaction_date) as date'),
+                    DB::raw("SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END) as total_in"),
+                    DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
+                )
+                    ->whereMonth('transaction_date', $selectedMonth)
+                    ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
+                    ->groupBy(DB::raw('DATE(transaction_date)'))
+                    ->orderBy('date')
+                    ->get();
+            } else {
+                return StockTransaction::select(
+                    DB::raw('MONTH(transaction_date) as month_num'),
+                    DB::raw("SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END) as total_in"),
+                    DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
+                )
+                    ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
+                    ->groupBy(DB::raw('MONTH(transaction_date)'))
+                    ->orderBy('month_num')
+                    ->get();
+            }
+        });
 
+        if ($selectedMonth) {
             $chartLabels = $monthlyTransactions->pluck('date')->map(function ($date) {
                 return date('d M', strtotime($date));
             })->values();
         } else {
-            $monthlyTransactions = StockTransaction::select(
-                DB::raw('MONTH(transaction_date) as month_num'),
-                DB::raw("SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END) as total_in"),
-                DB::raw("SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END) as total_out")
-            )
-                ->when($selectedYear, fn($q) => $q->whereYear('transaction_date', $selectedYear))
-                ->groupBy(DB::raw('MONTH(transaction_date)'))
-                ->orderBy('month_num')
-                ->get();
-
             $monthNames = [
                 1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
                 7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
@@ -152,113 +138,94 @@ class DashboardController extends Controller
             })->values();
         }
 
-        $chartIn = $monthlyTransactions->pluck('total_in')->map(function ($value) {
-            return (int) $value;
-        })->values();
+        $chartIn = $monthlyTransactions->pluck('total_in')->map(fn($v) => (int)$v)->values();
+        $chartOut = $monthlyTransactions->pluck('total_out')->map(fn($v) => (int)$v)->values();
 
-        $chartOut = $monthlyTransactions->pluck('total_out')->map(function ($value) {
-            return (int) $value;
-        })->values();
+        // 6. Ringkasan Antrean & Distribusi (Menggunakan Request-Scoped Cache di Model RequestItem)
+        $pendingSummary = RequestItem::getPendingSummary();
+        $pendingRequestsCount = $pendingSummary['total'];
+        $readyDistribusiCount = RequestItem::getReadyDistribusiCount();
+        $totalDistributedCount = 0;
+        $pendingProcurementsExaminerCount = 0;
 
-        $pendingRequestsCount = RequestItem::where('status', 'pending')->count();
+        // 7. Data Khusus Pengguna / Requester (Hanya dijalankan jika user login memang berstatus requester)
+        $currentUser = auth()->user();
+        $role = $currentUser->role ?? 'pegawai';
+        $isKasubagTU = in_array($role, ['kasubag_tu', 'admin']);
+        $isRequester = in_array($role, ['pegawai', 'pic_distribusi', 'subdit', 'member']) || empty($role);
 
-        $readyDistribusiQuery = RequestItem::where('status', 'approved')
-            ->where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            });
+        $userRequests = collect();
+        $trackedRequests = collect();
+        $userPendingCount = 0;
+        $userApprovedCount = 0;
+        $userDistributedCount = 0;
+        $userRejectedCount = 0;
+        $userProcurementBoughtCount = 0;
+        $recentProcurementNotifications = collect();
 
-        $totalDistributedQuery = RequestItem::where('status', 'distributed')
-            ->where(function ($q) {
-                $q->where('is_procurement', false)->orWhereNull('is_procurement');
-            });
+        if ($currentUser && $isRequester && !$isKasubagTU) {
+            $userId = $currentUser->id;
 
-        $readyDistribusiCount = $readyDistribusiQuery->count();
-        $totalDistributedCount = $totalDistributedQuery->count();
-        $pendingProcurementsExaminerCount = RequestItem::where('status', 'approved')
-            ->where('is_procurement', true)
-            ->whereHas('details', function ($q) {
-                $q->where('is_fulfilled', false);
-            })->count();
+            $userRequests = RequestItem::with('details.product')
+                ->where('user_id', $userId)
+                ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
+                ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
+                ->latest()
+                ->limit(10)
+                ->get();
 
-        // Data khusus user requester yang sedang login (Subdit / Pegawai)
-        $userId = auth()->id();
-        $userRequestsQuery = RequestItem::with('details.product')
-            ->where('user_id', $userId);
+            $trackedRequests = RequestItem::with('details.product')
+                ->where('user_id', $userId)
+                ->where(function ($q) {
+                    $q->whereIn('status', ['pending', 'approved'])
+                      ->orWhere(function ($sub) {
+                          $sub->where('status', 'distributed')
+                              ->whereNull('signed_proof')
+                              ->where(function ($timeQ) {
+                                  $timeQ->where('distributed_at', '>=', now()->subHours(24))
+                                        ->orWhere(function ($fallbackQ) {
+                                            $fallbackQ->whereNull('distributed_at')
+                                                      ->where('updated_at', '>=', now()->subHours(24));
+                                        });
+                              });
+                      });
+                })
+                ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
+                ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
+                ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
+                ->latest()
+                ->limit(5)
+                ->get();
 
-        if ($selectedYear) {
-            $userRequestsQuery->whereYear('created_at', $selectedYear);
+            // Optimasi penghitungan status requester dalam 1 query agregat
+            $userCounts = RequestItem::where('user_id', $userId)
+                ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
+                ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
+                ->selectRaw("
+                    COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending_c,
+                    COALESCE(SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END), 0) as approved_c,
+                    COALESCE(SUM(CASE WHEN status = 'distributed' THEN 1 ELSE 0 END), 0) as distributed_c,
+                    COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) as rejected_c,
+                    COALESCE(SUM(CASE WHEN is_procurement = 1 AND status = 'approved' AND (purchase_invoice IS NOT NULL OR purchase_date IS NOT NULL) THEN 1 ELSE 0 END), 0) as procurement_bought_c
+                ")
+                ->first();
+
+            $userPendingCount = (int) ($userCounts->pending_c ?? 0);
+            $userApprovedCount = (int) ($userCounts->approved_c ?? 0);
+            $userDistributedCount = (int) ($userCounts->distributed_c ?? 0);
+            $userRejectedCount = (int) ($userCounts->rejected_c ?? 0);
+            $userProcurementBoughtCount = (int) ($userCounts->procurement_bought_c ?? 0);
+
+            $recentProcurementNotifications = $currentUser->notifications()
+                ->whereIn('type', ['procurement_ready_distribution', 'procurement_available'])
+                ->where('is_read', false)
+                ->with('product')
+                ->latest()
+                ->take(15)
+                ->get();
         }
 
-        if ($selectedMonth) {
-            $userRequestsQuery->whereMonth('created_at', $selectedMonth);
-        }
-
-        $userRequests = (clone $userRequestsQuery)
-            ->latest()
-            ->limit(10)
-            ->get();
-
-        // Daftar pengajuan untuk widget Pelacakan Status:
-        // Hanya tampilkan pengajuan yang sedang berjalan (pending, approved),
-        // atau yang baru diserahterimakan (distributed) namun belum mengunggah berkas fisik tanda tangan (maksimal 24 jam).
-        // Begitu berkas tanda tangan diunggah atau telah lewat 24 jam, otomatis disembunyikan agar tidak menumpuk.
-        $trackedRequestsQuery = RequestItem::with('details.product')
-            ->where('user_id', $userId)
-            ->where(function ($q) {
-                $q->whereIn('status', ['pending', 'approved'])
-                  ->orWhere(function ($sub) {
-                      $sub->where('status', 'distributed')
-                          ->whereNull('signed_proof')
-                          ->where(function ($timeQ) {
-                              $timeQ->where('distributed_at', '>=', now()->subHours(24))
-                                    ->orWhere(function ($fallbackQ) {
-                                        $fallbackQ->whereNull('distributed_at')
-                                                  ->where('updated_at', '>=', now()->subHours(24));
-                                    });
-                          });
-                  });
-            });
-
-        if ($selectedYear) {
-            $trackedRequestsQuery->whereYear('created_at', $selectedYear);
-        }
-
-        if ($selectedMonth) {
-            $trackedRequestsQuery->whereMonth('created_at', $selectedMonth);
-        }
-
-        $trackedRequests = $trackedRequestsQuery
-            ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
-            ->latest()
-            ->limit(5)
-            ->get();
-
-        $userPendingCount = (clone $userRequestsQuery)->where('status', 'pending')->count();
-        $userApprovedCount = (clone $userRequestsQuery)->where('status', 'approved')->count();
-        $userDistributedCount = (clone $userRequestsQuery)->where('status', 'distributed')->count();
-        $userRejectedCount = (clone $userRequestsQuery)->where('status', 'rejected')->count();
-
-        $userProcurementBoughtCount = (clone $userRequestsQuery)
-            ->where('is_procurement', true)
-            ->where('status', 'approved')
-            ->where(function ($q) {
-                $q->whereNotNull('purchase_invoice')
-                  ->orWhereNotNull('purchase_date')
-                  ->orWhereHas('details', function ($dq) {
-                      $dq->where('is_fulfilled', true);
-                  });
-            })
-            ->count();
-
-        $recentProcurementNotifications = auth()->user()->notifications()
-            ->whereIn('type', ['procurement_ready_distribution', 'procurement_available'])
-            ->where('is_read', false)
-            ->with('product')
-            ->latest()
-            ->take(15)
-            ->get();
-
-        // Periode text label
+        // 8. Label Periode
         $monthNamesFull = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
             7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'

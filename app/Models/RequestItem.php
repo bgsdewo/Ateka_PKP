@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class RequestItem extends Model
 {
@@ -201,5 +202,53 @@ class RequestItem extends Model
             return false;
         }
         return strtolower(pathinfo($this->signed_proof, PATHINFO_EXTENSION)) === 'pdf';
+    }
+
+    /**
+     * Cache request-level pending summary to avoid duplicate queries across Controller, Sidebar, and Navbar.
+     */
+    public static function getPendingSummary(): array
+    {
+        static $summary = null;
+        if ($summary !== null) {
+            return $summary;
+        }
+
+        $res = DB::table('requests')
+            ->where('status', 'pending')
+            ->selectRaw("
+                COUNT(*) as total,
+                COALESCE(SUM(CASE WHEN is_procurement = 1 THEN 1 ELSE 0 END), 0) as procurement,
+                COALESCE(SUM(CASE WHEN is_procurement = 0 OR is_procurement IS NULL THEN 1 ELSE 0 END), 0) as stock
+            ")
+            ->first();
+
+        $summary = [
+            'total' => (int) ($res->total ?? 0),
+            'procurement' => (int) ($res->procurement ?? 0),
+            'stock' => (int) ($res->stock ?? 0),
+        ];
+
+        return $summary;
+    }
+
+    /**
+     * Cache request-level ready distribution count.
+     */
+    public static function getReadyDistribusiCount(): int
+    {
+        static $count = null;
+        if ($count !== null) {
+            return $count;
+        }
+
+        $count = (int) DB::table('requests')
+            ->where('status', 'approved')
+            ->where(function ($q) {
+                $q->where('is_procurement', false)->orWhereNull('is_procurement');
+            })
+            ->count();
+
+        return $count;
     }
 }

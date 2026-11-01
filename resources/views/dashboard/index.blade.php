@@ -145,7 +145,7 @@
         <!-- ======================================================== -->
         <div class="row g-3 mb-4">
             <!-- Card 1: Total Persediaan Fisik ATK -->
-            <div class="col-lg-4 col-md-6 col-12">
+            <div class="col-lg-6 col-md-6 col-12">
                 <div class="card h-100 shadow-sm border-0 aeux-stat-card">
                     <span class="aeux-stat-label">Total Persediaan Fisik ATK</span>
                     <div class="aeux-stat-value">
@@ -168,7 +168,7 @@
             </div>
 
             <!-- Card 2: Valuasi Persediaan BMN -->
-            <div class="col-lg-4 col-md-6 col-12">
+            <div class="col-lg-6 col-md-6 col-12">
                 <div class="card h-100 shadow-sm border-0 aeux-stat-card">
                     <span class="aeux-stat-label">Valuasi Persediaan BMN</span>
                     <div class="aeux-stat-value" style="font-size: 1.85rem;">
@@ -185,25 +185,6 @@
                             <span style="height: 40%;"></span>
                             <span style="height: 95%;"></span>
                             <span style="height: 70%;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3: Aktivitas Mutasi Persediaan -->
-            <div class="col-lg-4 col-md-12 col-12">
-                <div class="card h-100 shadow-sm border-0 aeux-stat-card">
-                    <span class="aeux-stat-label">Aktivitas Mutasi Persediaan</span>
-                    <div class="aeux-stat-value">
-                        +{{ number_format($totalStockIn) }} <span style="font-size: 1.15rem; color: #f87171; font-weight: 700;">/ -{{ number_format($totalStockOut) }}</span>
-                    </div>
-                    <div class="d-flex justify-content-end align-items-end mt-auto pt-2">
-                        <div class="mini-bar-sparkline sparkline-emerald" title="Pergerakan Barang Masuk/Keluar">
-                            <span style="height: 40%;"></span>
-                            <span style="height: 60%;"></span>
-                            <span style="height: 80%;"></span>
-                            <span style="height: 50%;"></span>
-                            <span style="height: 90%;"></span>
                         </div>
                     </div>
                 </div>
@@ -1529,7 +1510,7 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/chart.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('stockChart');

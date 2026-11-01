@@ -19,9 +19,6 @@
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/dark.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/customizer.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/rtl.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.4' }}" />
     @stack('styles')
     <style>
