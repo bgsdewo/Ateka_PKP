@@ -6,12 +6,12 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\RequestItem;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ProcurementSidebarMenuTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_pegawai_and_pic_see_usulan_pengadaan_menu_and_can_submit_unstocked_goods(): void
     {
