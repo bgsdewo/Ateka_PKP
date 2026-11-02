@@ -39,7 +39,7 @@ class RequestController extends Controller
     public function create(Request $request)
     {
         $products = Product::with('category')->orderBy('name', 'asc')->get();
-        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get()->unique('name');
         $selectedProductId = $request->get('product_id');
         $selectedQuantity = $request->get('quantity');
         $fromRequestId = $request->get('from_request');
@@ -173,7 +173,7 @@ class RequestController extends Controller
     public function createProcurement(Request $request)
     {
         $existingProducts = Product::with('category')->orderBy('name', 'asc')->get();
-        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get()->unique('name');
         return view('pengajuan.pengadaan', compact('existingProducts', 'categories'));
     }
 

@@ -267,6 +267,9 @@ class ApprovalController extends Controller
 
                     $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubbag TU / Pegawai Gudang.';
                 } else {
+                    // Kirim notifikasi ke seluruh staf Pegawai Gudang bahwa barang telah disetujui TU dan siap diserahkan
+                    UserNotification::sendStockApprovedToWarehouse($item);
+
                     $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
                 }
             } else {
@@ -290,6 +293,8 @@ class ApprovalController extends Controller
             }
 
             DB::commit();
+            RequestItem::flushRequestCaches();
+            \Illuminate\Support\Facades\Cache::store('file')->flush();
 
             $redirectParams = $request->filled('category') ? ['category' => $request->input('category')] : [];
             return redirect()->route('persetujuan.index', $redirectParams)->with('success', $pesan);
@@ -421,6 +426,8 @@ class ApprovalController extends Controller
             UserNotification::sendProcurementApprovedToExaminers($item);
 
             DB::commit();
+            RequestItem::flushRequestCaches();
+            \Illuminate\Support\Facades\Cache::store('file')->flush();
 
             return redirect()->route('persetujuan.index')
                 ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Notifikasi telah dikirimkan ke Petugas Gudang Distribusi.');

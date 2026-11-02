@@ -12,105 +12,60 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
 
-    <!-- Google Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
-
-    <!-- Core Styles -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
-
+    <!-- Inlined Critical CSS - Zero External Dependencies for Instant LCP (< 100ms) -->
     <style>
         :root {
-            --bg-deep-green: #142e23;
-            --card-dark-green: #18382a;
-            --input-dark-green: #0f241a;
-            --teal-btn: #478c80;
-            --teal-btn-hover: #539d91;
-            --accent-teal: #5eead4;
-            --text-muted-green: #83a998;
+            --bg-deep: #0e261d;
+            --card-dark: #15382a;
+            --input-dark: #0d241a;
+            --input-border: rgba(255, 255, 255, 0.12);
+            --primary-emerald: #10b981;
+            --btn-teal: #429485;
+            --accent-mint: #5eead4;
+            --text-muted: #8aa99a;
+            --brand-navy: #133e38;
+            --brand-gold: #b45309;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         html, body {
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-deep-green);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 35%),
-                radial-gradient(circle at 50% 85%, rgba(71, 140, 128, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 90% 85%, rgba(255, 255, 255, 0.04) 0%, transparent 30%);
+                radial-gradient(circle at 50% 12%, rgba(16, 185, 129, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 85% 85%, rgba(66, 148, 133, 0.1) 0%, transparent 45%),
+                radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
             padding: 24px 16px;
-            box-sizing: border-box;
         }
 
-        /* Ambient Bokeh / Floating Soft Circles (Persis sesuai tema Login) */
-        .bokeh-orb {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bokeh-1 {
-            width: 280px;
-            height: 280px;
-            top: 4%;
-            left: 3%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 80%);
-        }
-
-        .bokeh-2 {
-            width: 220px;
-            height: 220px;
-            bottom: 6%;
-            right: 4%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 75%);
-        }
-
-        .bokeh-3 {
-            width: 90px;
-            height: 90px;
-            top: 18%;
-            right: 12%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, transparent 70%);
-        }
-
-        .bokeh-4 {
-            width: 140px;
-            height: 140px;
-            bottom: 12%;
-            left: 10%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-        }
-
-        /* Master Card Container */
-        .register-master-card {
+        /* Master Authentication Card */
+        .auth-master-card {
             width: 100%;
             max-width: 1140px;
-            margin: auto;
-            background-color: var(--card-dark-green);
-            border-radius: 36px;
+            background-color: var(--card-dark);
+            border-radius: 32px;
             box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
             overflow: hidden;
             position: relative;
-            z-index: 10;
             display: flex;
-            min-height: 640px;
+            min-height: 630px;
         }
 
-        /* Sisi Kiri: Panel Putih dengan Lengkungan Halus (Wave Curve) */
+        /* Sisi Kiri: Panel Putih Bersih */
         .panel-brand-left {
             background-color: #ffffff;
-            color: #0f172a;
+            color: #1e293b;
             flex: 0.95;
             padding: 2.5rem 2.8rem;
             display: flex;
@@ -120,23 +75,109 @@
             z-index: 2;
         }
 
-        /* Lengkungan Organik (Wavy Curve) ke Sisi Kanan */
+        /* Lengkungan Halus SVG */
         .wave-curve-border {
             position: absolute;
             top: 0;
-            right: -75px;
-            width: 78px;
+            right: -72px;
+            width: 75px;
             height: 100%;
             pointer-events: none;
             z-index: 5;
         }
 
-        /* Sisi Kanan: Panel Form Registrasi Hijau Tua */
+        /* Header Brand Institusi */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo {
+            max-height: 52px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-navy);
+            letter-spacing: 0.3px;
+            line-height: 1.28;
+        }
+
+        .brand-text .country {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-gold);
+            letter-spacing: 0.6px;
+            margin-top: 1px;
+        }
+
+        .brand-text .satker {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Visual Illustration Centerpiece */
+        .brand-illustration-wrapper {
+            text-align: center;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-illustration-svg {
+            max-width: 280px;
+            height: auto;
+            filter: drop-shadow(0 12px 24px rgba(19, 62, 56, 0.08));
+        }
+
+        .brand-caption h2 {
+            color: var(--brand-navy);
+            font-size: 1.22rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .brand-caption p {
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        /* Footer Sisi Kiri */
+        .brand-footer {
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.73rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .brand-footer strong {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Sisi Kanan: Panel Form Registrasi */
         .panel-form-right {
-            background-color: var(--card-dark-green);
+            background-color: var(--card-dark);
             color: #ffffff;
-            flex: 1.35;
-            padding: 2.8rem 3.2rem;
+            flex: 1.15;
+            padding: 3rem 3rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -144,140 +185,192 @@
             z-index: 4;
         }
 
-        /* Form Controls Sesuai Tema */
-        .form-label-custom {
-            font-size: 0.84rem;
-            font-weight: 600;
-            color: #d1e7dd;
-            margin-bottom: 5px;
+        .form-header {
+            margin-bottom: 1.4rem;
+        }
+
+        .form-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            line-height: 1.4;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 14px;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
             display: block;
-            letter-spacing: 0.2px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #d1fae5;
+            margin-bottom: 5px;
+            letter-spacing: 0.15px;
         }
 
-        .input-pill-dark {
-            background-color: var(--input-dark-green) !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 20px !important;
-            color: #ffffff !important;
-            padding: 0.65rem 1.15rem !important;
-            font-size: 0.88rem !important;
-            transition: all 0.2s ease !important;
-            width: 100% !important;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+        .form-label .req {
+            color: #f87171;
+            font-weight: bold;
         }
 
-        .input-pill-dark::placeholder {
-            color: #5c7e6f !important;
-            font-size: 0.82rem !important;
+        .input-pill {
+            width: 100%;
+            background-color: var(--input-dark);
+            border: 1.5px solid var(--input-border);
+            border-radius: 22px;
+            color: #ffffff;
+            padding: 0.68rem 1.2rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            transition: all 0.22s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+            outline: none;
         }
 
-        .input-pill-dark:focus {
-            background-color: #0b1c14 !important;
-            border-color: #4db6ac !important;
-            box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-            outline: none !important;
+        .input-pill.font-mono {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            letter-spacing: 0.5px;
         }
 
-        .password-input-group {
+        .input-pill::placeholder {
+            color: #587c6c;
+            font-size: 0.82rem;
+        }
+
+        .input-pill:focus {
+            border-color: var(--accent-mint);
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.22), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            background-color: #081711;
+        }
+
+        .password-wrap {
             position: relative;
             display: flex;
             align-items: center;
         }
 
-        .password-toggle-btn {
+        .password-wrap .input-pill {
+            padding-right: 44px;
+        }
+
+        .password-toggle {
             position: absolute;
-            right: 14px;
-            background: transparent;
+            right: 12px;
+            background: none;
             border: none;
-            color: #719987;
-            padding: 4px;
+            color: #6e9482;
             cursor: pointer;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: color 0.2s ease;
         }
 
-        .password-toggle-btn:hover {
+        .password-toggle:hover {
             color: #ffffff;
         }
 
-        /* Tombol Pill Sesuai Tema */
-        .btn-pill-teal {
-            background: linear-gradient(135deg, #4fa395 0%, #3e8175 100%) !important;
-            border: none !important;
-            border-radius: 25px !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            font-size: 0.95rem !important;
-            padding: 0.78rem 1.5rem !important;
-            width: 100% !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #449586 0%, #327568 100%);
+            border: none;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 0.96rem;
+            font-weight: 600;
+            font-family: inherit;
+            padding: 0.82rem 1.5rem;
             cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            display: block;
             letter-spacing: 0.2px;
         }
 
-        .btn-pill-teal:hover {
-            background: linear-gradient(135deg, #59b5a7 0%, #469285 100%) !important;
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #4fa998 0%, #3a8778 100%);
             transform: translateY(-1.5px);
-            box-shadow: 0 8px 20px rgba(62, 129, 117, 0.4) !important;
-            color: #ffffff !important;
+            box-shadow: 0 10px 24px rgba(50, 117, 104, 0.45);
         }
 
-        .btn-pill-teal:active {
-            transform: scale(0.98);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .register-now-link {
-            color: #5eead4;
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .login-callout {
+            text-align: center;
+            margin-top: 1.3rem;
+            font-size: 0.86rem;
+            color: #9cbdb0;
+        }
+
+        .link-login {
+            color: var(--accent-mint);
             font-weight: 600;
             text-decoration: none;
+            margin-left: 6px;
             transition: all 0.2s ease;
         }
 
-        .register-now-link:hover {
+        .link-login:hover {
             color: #ffffff;
             text-decoration: underline;
         }
 
-        .footer-terms-link {
-            color: #729686;
-            font-size: 0.75rem;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-terms-link:hover {
-            color: #c0ded1;
-        }
-
-        /* Alert Styling Gelap & Elegan */
-        .alert-dark-custom {
+        /* Alerts */
+        .alert-box {
             border-radius: 14px;
             font-size: 0.82rem;
-            padding: 0.65rem 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.16);
             border: 1px solid rgba(239, 68, 68, 0.35);
-            background: rgba(239, 68, 68, 0.18);
             color: #fecaca;
-            margin-bottom: 1rem;
         }
 
-        .alert-dark-success {
-            border-radius: 14px;
-            font-size: 0.82rem;
-            padding: 0.65rem 1rem;
+        .alert-error ul {
+            padding-left: 1.2rem;
+            margin-top: 4px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.16);
             border: 1px solid rgba(16, 185, 129, 0.35);
-            background: rgba(16, 185, 129, 0.18);
             color: #a7f3d0;
-            margin-bottom: 1rem;
         }
 
-        /* Responsif untuk Layar Tablet dan Mobile */
-        @media (max-width: 991.98px) {
-            .register-master-card {
+        /* Responsive Breakpoints */
+        @media (max-width: 960px) {
+            .auth-master-card {
                 flex-direction: column;
-                border-radius: 28px;
+                max-width: 540px;
+                border-radius: 24px;
             }
 
             .wave-curve-border {
@@ -285,154 +378,121 @@
             }
 
             .panel-brand-left {
-                padding: 2rem 1.8rem;
+                padding: 2.2rem 2rem;
                 flex: none;
             }
 
             .panel-form-right {
-                padding: 2.2rem 1.8rem;
+                padding: 2.2rem 2rem;
                 flex: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Floating Ambient Orbs (Persis sesuai tema Login) -->
-    <div class="bokeh-orb bokeh-1"></div>
-    <div class="bokeh-orb bokeh-2"></div>
-    <div class="bokeh-orb bokeh-3"></div>
-    <div class="bokeh-orb bokeh-4"></div>
-
-    <!-- Master Register Card -->
-    <div class="register-master-card">
+    <!-- Main Master Register Card -->
+    <div class="auth-master-card">
         <!-- ============================================================= -->
-        <!-- SISI KIRI: PANEL PUTIH (LOGO KEMENTERIAN, ILUSTRASI REGISTRASI)-->
+        <!-- SISI KIRI: IDENTITAS RESMI & ILUSTRASI ID CARD ASN           -->
         <!-- ============================================================= -->
         <div class="panel-brand-left">
-            <!-- Header Brand: Logo Kementerian PKP & Identitas Satker -->
-            <div class="d-flex align-items-center gap-3">
-                <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP"
-                    style="max-height: 52px; width: auto; object-fit: contain;">
-                <div>
-                    <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 0.82rem; color: #144B59; letter-spacing: 0.3px; line-height: 1.25;">
-                        Kementerian Perumahan dan Kawasan Permukiman
-                    </h6>
-                    <span class="d-block fw-bold text-uppercase" style="font-size: 0.72rem; color: #b8860b; letter-spacing: 0.5px;">
-                        Republik Indonesia
-                    </span>
-                    <small class="text-muted" style="font-size: 0.7rem;">Direktorat Jenderal Kawasan Permukiman</small>
+            <!-- Header Brand: Logo & Identitas Satker -->
+            <div class="brand-header">
+                <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP RI" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Kementerian Perumahan dan Kawasan Permukiman</h1>
+                    <span class="country">Republik Indonesia</span>
+                    <span class="satker">Direktorat Jenderal Kawasan Permukiman</span>
                 </div>
             </div>
 
-            <!-- Bagian Tengah: Ilustrasi Artistik Pendaftaran Akun Pegawai ASN -->
-            <div class="text-center my-3 my-lg-2 position-relative d-flex flex-column align-items-center justify-content-center">
-                <svg width="340" height="260" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-                    <!-- Latar Belakang Blob Organik Halus Mint & Gelembung Mengambang -->
-                    <path d="M70 140C50 80 110 30 180 35C260 40 330 70 345 130C360 190 320 250 250 265C170 280 85 240 70 180Z" fill="#e3f3ec"/>
-                    
-                    <!-- Gelembung / Bubbles Melayang Halus -->
-                    <circle cx="85" cy="70" r="14" fill="#cfece1" opacity="0.6"/>
-                    <circle cx="310" cy="80" r="18" fill="#cfece1" opacity="0.5"/>
-                    <circle cx="330" cy="190" r="10" fill="#cfece1" opacity="0.6"/>
-                    <circle cx="95" cy="220" r="16" fill="#cfece1" opacity="0.5"/>
-
-                    <!-- Meja Kerja / Podium Kantor -->
-                    <rect x="110" y="245" width="180" height="10" rx="5" fill="#144b59" opacity="0.85"/>
-                    <rect x="130" y="255" width="140" height="5" rx="2.5" fill="#94a3b8" opacity="0.4"/>
-
-                    <!-- Dokumen Pendaftaran / Berkas Pengajuan Akun di Belakang ID Card -->
-                    <rect x="130" y="145" width="85" height="100" rx="8" fill="#1b4d3e"/>
-                    <rect x="140" y="158" width="65" height="6" rx="3" fill="#ffffff" opacity="0.9"/>
-                    <rect x="140" y="172" width="45" height="5" rx="2.5" fill="#5eead4" opacity="0.8"/>
-                    <rect x="140" y="185" width="55" height="5" rx="2.5" fill="#ffffff" opacity="0.6"/>
+            <!-- Bagian Tengah: Visual ID Card ASN Kementerian PKP RI -->
+            <div class="brand-illustration-wrapper">
+                <svg class="brand-illustration-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Podium / Landasan Halus -->
+                    <ellipse cx="180" cy="225" rx="140" ry="20" fill="#e8f4f0" />
+                    <ellipse cx="180" cy="223" rx="110" ry="14" fill="#d3ebe2" />
 
                     <!-- Tali Lanyard ID Card Pegawai -->
-                    <path d="M225 60C225 95 240 115 240 125" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M255 60C255 95 240 115 240 125" stroke="#0284c7" stroke-width="4" stroke-linecap="round"/>
-                    <rect x="233" y="123" width="14" height="10" rx="2" fill="#94a3b8"/>
+                    <path d="M165 40C165 80 180 100 180 110" stroke="#0ea5e9" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M195 40C195 80 180 100 180 110" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round"/>
+                    <rect x="173" y="108" width="14" height="10" rx="3" fill="#64748b"/>
 
-                    <!-- Kartu Tanda Pengenal Pegawai (ID Card ASN Kementerian PKP) -->
-                    <rect x="200" y="130" width="80" height="115" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.5"/>
+                    <!-- Kartu Tanda Pengenal Pegawai ASN -->
+                    <rect x="135" y="115" width="90" height="118" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.5"/>
                     <!-- Header Kartu ID -->
-                    <rect x="200" y="130" width="80" height="24" rx="8" fill="#144b59"/>
-                    <circle cx="215" cy="142" r="5" fill="#b8860b"/>
-                    <rect x="225" y="139" width="45" height="6" rx="2" fill="#ffffff" opacity="0.9"/>
-                    
-                    <!-- Foto Profil Pegawai -->
-                    <circle cx="240" cy="172" r="14" fill="#e2e8f0"/>
-                    <circle cx="240" cy="169" r="6" fill="#64748b"/>
-                    <path d="M231 182C231 177 235 175 240 175C245 175 249 177 249 182" fill="#64748b"/>
+                    <rect x="135" y="115" width="90" height="26" rx="10" fill="#144b59"/>
+                    <circle cx="152" cy="128" r="5" fill="#b8860b"/>
+                    <rect x="162" y="125" width="50" height="6" rx="2" fill="#ffffff" opacity="0.9"/>
 
-                    <!-- Garis Teks Nama & NIP Pegawai -->
-                    <line x1="215" y1="195" x2="265" y2="195" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="220" y1="203" x2="260" y2="203" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Foto Profil Siluet ASN -->
+                    <circle cx="180" cy="158" r="15" fill="#e2e8f0"/>
+                    <circle cx="180" cy="154" r="6.5" fill="#64748b"/>
+                    <path d="M170 168C170 163 174 161 180 161C186 161 190 163 190 168" fill="#64748b"/>
+
+                    <!-- Baris Teks Nama & NIP Pegawai -->
+                    <line x1="150" y1="182" x2="210" y2="182" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="156" y1="190" x2="204" y2="190" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
 
                     <!-- Badge Verifikasi Akun Centang Hijau -->
-                    <circle cx="265" cy="225" r="10" fill="#10b981"/>
-                    <path d="M261 225L264 228L270 222" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="212" cy="214" r="11" fill="#10b981"/>
+                    <path d="M207 214L211 218L218 211" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
 
-                    <!-- Pulpen Tanda Tangan -->
-                    <rect x="120" y="200" width="8" height="45" rx="3" transform="rotate(-35 120 200)" fill="#f59e0b"/>
-                    <path d="M133 191L137 184L141 195Z" fill="#1e293b"/>
+                    <!-- Pulpen Tanda Tangan Kedinasan -->
+                    <rect x="85" y="170" width="8" height="48" rx="3" transform="rotate(-35 85 170)" fill="#f59e0b"/>
+                    <path d="M99 161L103 154L107 165Z" fill="#1e293b"/>
                 </svg>
 
-                <div class="mt-1">
-                    <h5 class="fw-bold mb-1" style="color: #144b59; font-size: 1.15rem; letter-spacing: -0.3px;">
-                        Pendaftaran Akun Pegawai
-                    </h5>
-                    <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.35;">
-                        Registrasi mandiri untuk pegawai guna mempermudah permohonan ATK.
-                    </p>
+                <div class="brand-caption">
+                    <h2>Pendaftaran Akun Pegawai</h2>
+                    <p>Registrasi mandiri untuk pegawai guna mempermudah permohonan ATK dan pemantauan distribusi persediaan.</p>
                 </div>
             </div>
 
-            <!-- Footer Sisi Kiri: Hak Cipta & Satker -->
-            <div class="pt-2 border-top" style="border-color: #f1f5f9 !important;">
-                <p class="mb-0 text-muted small" style="font-size: 0.72rem; line-height: 1.3;">
-                    &copy; 2026 Kementerian Perumahan dan Kawasan Permukiman RI<br>
-                    <span style="color: #64748b;">Biro Umum &amp; Pengadaan Barang &bull; Subbagian Tata Usaha</span>
-                </p>
+            <!-- Footer Sisi Kiri -->
+            <div class="brand-footer">
+                <strong>&copy; 2026 Kementerian Perumahan dan Kawasan Permukiman RI</strong><br>
+                Biro Umum &amp; Pengadaan Barang &bull; Subbagian Tata Usaha
             </div>
 
-            <!-- Lengkungan SVG Organik Halus (Wave Divider Sesuai Tema) -->
+            <!-- Lengkungan Halus SVG -->
             <svg class="wave-curve-border" viewBox="0 0 100 600" preserveAspectRatio="none">
                 <path d="M 0 0 L 25 0 C 10 120, 95 240, 95 360 C 95 490, 15 540, 0 600 Z" fill="#ffffff" />
             </svg>
         </div>
 
         <!-- ============================================================= -->
-        <!-- SISI KANAN: PANEL FORM REGISTRASI HIJAU TUA                  -->
+        <!-- SISI KANAN: PANEL FORM REGISTRASI                            -->
         <!-- ============================================================= -->
         <div class="panel-form-right">
-            <!-- Judul Form Registrasi -->
-            <div class="mb-3">
-                <h1 class="fw-bold mb-1" style="font-size: 2.1rem; letter-spacing: -0.5px; color: #ffffff;">
-                    <i>Register</i>
-                </h1>
-                <p class="mb-0" style="color: #8faea0; font-size: 0.86rem;">
-                    Pendaftaran Akun Baru &bull; Sistem Inventori ATK (ATEKA)
-                </p>
+            <div class="form-header">
+                <h2 class="form-title">Register</h2>
+                <p class="form-subtitle">Pendaftaran Akun Baru &bull; Sistem Inventori ATK (ATEKA)</p>
             </div>
 
-            <!-- Alert Notifikasi Sesi & Kesalahan -->
+            <!-- Feedback Alerts -->
             @if (session('success'))
-                <div class="alert alert-dark-success d-flex align-items-center justify-content-between" role="alert">
-                    <span>{{ session('success') }}</span>
-                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                <div class="alert-box alert-success" role="alert">
+                    {{ session('success') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="alert alert-dark-custom d-flex align-items-center justify-content-between" role="alert">
-                    <span>{{ session('error') }}</span>
-                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                <div class="alert-box alert-error" role="alert">
+                    {{ session('error') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="alert alert-dark-custom" role="alert">
-                    <ul class="mb-0 ps-3">
+                <div class="alert-box alert-error" role="alert">
+                    <strong>Terdapat kendala pendaftaran:</strong>
+                    <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -443,123 +503,85 @@
             <!-- Form Registrasi -->
             <form action="{{ route('register.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="role" value="pegawai">
 
-                <div class="row g-2 mb-2">
-                    <!-- Baris 1: Nama Lengkap & Email -->
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="name" class="form-label-custom">
-                                Nama Lengkap <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" id="name" name="name" class="input-pill-dark"
-                                value="{{ old('name') }}" placeholder="Budi Prasetyo" required autofocus autocomplete="name">
+                <div class="form-grid">
+                    <!-- Nama Lengkap -->
+                    <div class="form-group">
+                        <label for="name" class="form-label">Nama Lengkap <span class="req">*</span></label>
+                        <input type="text" id="name" name="name" class="input-pill"
+                            value="{{ old('name') }}" placeholder="Budi Prasetyo" required autofocus autocomplete="name">
+                    </div>
+
+                    <!-- Email Dinas -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Alamat Email <span class="req">*</span></label>
+                        <input type="email" id="email" name="email" class="input-pill"
+                            value="{{ old('email') }}" placeholder="nama@pkp.go.id" required autocomplete="email">
+                    </div>
+
+                    <!-- Nomor Induk Pegawai (NIP) -->
+                    <div class="form-group">
+                        <label for="nip" class="form-label">Nomor Induk Pegawai (NIP) <span class="req">*</span></label>
+                        <input type="text" id="nip" name="nip" class="input-pill font-mono"
+                            value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required>
+                    </div>
+
+                    <!-- Gelar Akademik -->
+                    <div class="form-group">
+                        <label for="title" class="form-label">Gelar Akademik</label>
+                        <input type="text" id="title" name="title" class="input-pill"
+                            value="{{ old('title', old('gelar')) }}" placeholder="S.T. / M.Si. / S.Kom.">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" id="password" name="password" class="input-pill"
+                                placeholder="Minimal 6 karakter" required autocomplete="new-password">
+                            <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Lihat atau sembunyikan password">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="togglePasswordIcon">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="email" class="form-label-custom">
-                                Alamat <i>Email</i> <span class="text-danger">*</span>
-                            </label>
-                            <input type="email" id="email" name="email" class="input-pill-dark"
-                                value="{{ old('email') }}" placeholder="nama@pkp.go.id" required autocomplete="email">
-                        </div>
-                    </div>
-
-                    <!-- Baris 2: NIP & Gelar Akademik -->
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="nip" class="form-label-custom">
-                                Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
-                            </label>
-                            <input type="text" id="nip" name="nip" class="input-pill-dark font-monospace"
-                                value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="title" class="form-label-custom">
-                                Gelar Akademik
-                            </label>
-                            <input type="text" id="title" name="title" class="input-pill-dark"
-                                value="{{ old('title', old('gelar')) }}" placeholder="S.T. / M.Si. / S.Kom.">
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="role" value="pegawai">
-
-                    <!-- Baris 4: Password & Konfirmasi Password -->
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="password" class="form-label-custom">
-                                <i>Password</i> <span class="text-danger">*</span>
-                            </label>
-                            <div class="password-input-group">
-                                <input type="password" id="password" name="password" class="input-pill-dark"
-                                    placeholder="Minimal 6 karakter" required autocomplete="new-password" style="padding-right: 42px !important;">
-                                <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Lihat atau sembunyikan password">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="togglePasswordIcon">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
-                        <div class="mb-2">
-                            <label for="password_confirmation" class="form-label-custom">
-                                Ulangi <i>Password</i> <span class="text-danger">*</span>
-                            </label>
-                            <div class="password-input-group">
-                                <input type="password" id="password_confirmation" name="password_confirmation" class="input-pill-dark"
-                                    placeholder="Ketik ulang password" required autocomplete="new-password" style="padding-right: 42px !important;">
-                                <button type="button" class="password-toggle-btn" id="toggleConfirmPasswordBtn" aria-label="Lihat atau sembunyikan konfirmasi password">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="toggleConfirmPasswordIcon">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                            </div>
+                    <!-- Konfirmasi Password -->
+                    <div class="form-group">
+                        <label for="password_confirmation" class="form-label">Ulangi Password <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="input-pill"
+                                placeholder="Ketik ulang password" required autocomplete="new-password">
+                            <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn" aria-label="Lihat atau sembunyikan konfirmasi password">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="toggleConfirmPasswordIcon">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tombol Submit Register -->
-                <div class="mt-3 mb-3">
-                    <button type="submit" class="btn-pill-teal" id="submitRegisterBtn">
-                        Daftarkan Akun (<i>Register</i>)
-                    </button>
-                </div>
+                <!-- Tombol Submit -->
+                <button type="submit" class="btn-submit" id="submitRegisterBtn">
+                    Daftarkan Akun (Register)
+                </button>
 
-                <!-- Tautan Kembali ke Login -->
-                <div class="text-center pt-1 mb-3">
-                    <span style="color: #a4c4b5; font-size: 0.85rem;">Sudah memiliki akun terdaftar?</span>
-                    <a href="{{ route('login') }}" class="register-now-link ms-1" style="font-size: 0.85rem;">
-                        <i>Login</i> di Sini
-                    </a>
-                </div>
-
-                <!-- Footer Tautan Bawah -->
-                <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important;">
-                    <a href="#" class="footer-terms-link" onclick="alert('Sistem Informasi Inventori ATK dipergunakan khusus untuk pegawai dan unit kerja di lingkungan Direktorat Jenderal Kawasan Permukiman Kementerian PKP RI.'); return false;">
-                        <i>Terms and Services</i>
-                    </a>
-                    <span style="font-size: 0.73rem; color: #729686;">
-                        <i>Have a problem? Contact at</i> <a href="mailto:tu@perumahan.go.id" class="text-decoration-none" style="color: #4db6ac;">Subbag TU</a>
-                    </span>
+                <!-- Callout Kembali ke Login -->
+                <div class="login-callout">
+                    Sudah memiliki akun terdaftar?
+                    <a href="{{ route('login') }}" class="link-login">Login di Sini</a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Scripts Bundle -->
-    <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}" defer></script>
+    <!-- Minimal Native Password Visibility Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Password Show/Hide Toggle
             function setupPasswordToggle(btnId, inputId, iconId) {
                 const btn = document.getElementById(btnId);
                 const input = document.getElementById(inputId);
@@ -574,7 +596,7 @@
                             btn.style.color = '#5eead4';
                         } else {
                             icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-                            btn.style.color = '#719987';
+                            btn.style.color = '#6e9482';
                         }
                     });
                 }
@@ -583,22 +605,17 @@
             setupPasswordToggle('togglePasswordBtn', 'password', 'togglePasswordIcon');
             setupPasswordToggle('toggleConfirmPasswordBtn', 'password_confirmation', 'toggleConfirmPasswordIcon');
 
-            // Form Submit Loading State
-            const form = document.querySelector('form');
+            // Form Submit Instant Feedback State
+            const registerForm = document.querySelector('form');
             const submitBtn = document.getElementById('submitRegisterBtn');
-            if (form && submitBtn) {
-                form.addEventListener('submit', function() {
+            if (registerForm && submitBtn) {
+                registerForm.addEventListener('submit', function() {
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mendaftarkan Akun...';
+                    submitBtn.style.opacity = '0.85';
+                    submitBtn.style.pointerEvents = 'none';
+                    submitBtn.innerHTML = '<span style="display:inline-block;width:15px;height:15px;border:2px solid #ffffff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle;"></span>Mendaftarkan Akun...';
                 });
             }
-
-            // BFCache handling
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted) {
-                    window.location.reload();
-                }
-            });
         });
     </script>
 </body>

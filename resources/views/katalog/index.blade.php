@@ -124,6 +124,30 @@
             </div>
         @endif
 
+        {{-- Quick Status Filter Tabs --}}
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{{ route('katalog-atk', array_filter(['category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ empty($stockStatus) ? 'btn-dark' : 'btn-light border text-muted' }}">
+                    Semua Katalog ({{ $totalAllProducts ?? 564 }})
+                </a>
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'available', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-bold {{ ($stockStatus ?? '') === 'available' ? 'btn-success text-white shadow-sm' : 'btn-light border text-success' }}">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;" class="me-1"></span>
+                    Tersedia di Gudang ({{ $availableStockCount ?? 3 }})
+                </a>
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'empty', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ ($stockStatus ?? '') === 'empty' ? 'btn-secondary text-white shadow-sm' : 'btn-light border text-muted' }}">
+                    Stok Belum Tersedia ({{ $emptyStockCount ?? 561 }})
+                </a>
+            </div>
+            @if(($stockStatus ?? '') === 'available')
+                <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill" style="font-size: 0.76rem;">
+                    Menampilkan <strong>{{ $products->total() }}</strong> barang fisik siap pakai
+                </div>
+            @endif
+        </div>
+
         {{-- Baris Filter & Pencarian --}}
         <div class="row mb-4">
             <div class="col-12">

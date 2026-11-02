@@ -126,9 +126,11 @@ class Lembar2AtkCatalogSeeder extends Seeder
             ];
         }
 
-        // Insert in chunks of 100 for high-speed network execution
-        foreach (array_chunk($productRows, 100) as $chunk) {
-            DB::table('products')->insert($chunk);
+        // Insert in chunks of 100 for high-speed network execution if table is empty
+        if (DB::table('products')->count() === 0) {
+            foreach (array_chunk($productRows, 100) as $chunk) {
+                DB::table('products')->insert($chunk);
+            }
         }
     }
 }

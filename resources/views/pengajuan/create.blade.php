@@ -53,13 +53,58 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
+        .product-select-menu {
+            min-width: 500px !important;
+            max-width: 95vw !important;
+            width: 100% !important;
+        }
+        .product-select-option {
+            transition: all 0.12s ease;
+            white-space: normal !important;
+        }
+        .product-item-title {
+            white-space: normal !important;
+            word-break: break-word !important;
+            font-size: 0.9rem !important;
+        }
+        .product-btn-text {
+            white-space: normal !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            line-height: 1.3 !important;
+            text-align: left !important;
+        }
+        .product-select-trigger-btn {
+            min-height: 38px;
+            height: auto !important;
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+        .item-unit-select {
+            min-width: 105px !important;
+            border-color: #cbd5e1;
+            background-color: #ffffff;
+            color: #1e293b;
+            font-weight: 600;
+            padding-left: 0.65rem !important;
+            padding-right: 1.85rem !important;
+            background-position: right 0.65rem center !important;
+            cursor: pointer;
+        }
+        .item-unit-select:focus,
+        .quantity-input:focus {
+            border-color: #059669 !important;
+            box-shadow: 0 0 0 0.2rem rgba(5, 150, 105, 0.15) !important;
+        }
     </style>
 @endpush
 
 @section('content')
     <div class="container-fluid content-inner mt-n5 py-0">
         <div class="row justify-content-center">
-            <div class="col-lg-10 col-12">
+            <div class="col-12">
                 <div class="card shadow-sm border-0">
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -133,24 +178,24 @@
                                 <div class="product-row mb-3 p-3 rounded-3 border bg-white shadow-xs">
                                     <div class="row g-2 align-items-start">
                                         {{-- 1. Saring Kategori ATK --}}
-                                        <div class="col-xl-3 col-lg-3 col-md-3 col-12">
+                                        <div class="col-xl-3 col-lg-3 col-md-6 col-12">
                                             <label class="form-label fw-bold small text-secondary mb-1 d-flex align-items-end" style="min-height: 2rem;">
                                                 Saring Kategori (Opsional)
                                             </label>
                                             <div class="category-combobox-wrapper position-relative">
                                                 <div class="input-group flex-nowrap" style="height: 38px;">
                                                     <input type="text" 
-                                                           class="form-control category-search-input bg-white text-truncate" 
+                                                           class="form-control category-search-input bg-white ps-2.5 pe-1" 
                                                            placeholder="Saring kategori..." 
                                                            autocomplete="off"
                                                            style="height: 38px; font-size: 0.875rem;">
-                                                    <button type="button" class="btn btn-outline-secondary btn-clear-category d-none px-2 d-flex align-items-center justify-content-center" title="Hapus filter kategori" style="height: 38px;">
+                                                    <button type="button" class="btn btn-outline-secondary btn-clear-category d-none px-1.5 d-flex align-items-center justify-content-center" title="Hapus filter kategori" style="height: 38px; width: 30px;">
                                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                                         </svg>
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split btn-toggle-category-menu px-2 d-flex align-items-center justify-content-center" title="Buka daftar pilihan kategori" style="height: 38px;">
+                                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split btn-toggle-category-menu px-1.5 d-flex align-items-center justify-content-center" title="Buka daftar pilihan kategori" style="height: 38px; width: 32px;">
                                                         <span class="visually-hidden">Toggle</span>
                                                     </button>
                                                 </div>
@@ -160,7 +205,7 @@
 
                                                 {{-- Floating dropdown menu --}}
                                                 <div class="category-dropdown-menu shadow-lg rounded-3 border bg-white position-absolute start-0 w-100 mt-1 d-none" 
-                                                     style="z-index: 1060; max-height: 220px; min-width: 240px; overflow-y: auto;">
+                                                     style="z-index: 1060; max-height: 240px; min-width: 280px; overflow-y: auto;">
                                                     <div class="p-1 category-items-list">
                                                         <div class="category-item-option py-1.5 px-2 rounded-2 small d-flex justify-content-between align-items-center active" 
                                                              data-id="" data-name="-- Semua Kategori ATK --">
@@ -188,7 +233,7 @@
                                         </div>
 
                                         {{-- 2. Pilih Barang ATK (Dropdown dengan Scrollbar & Quick Search) --}}
-                                        <div class="col-xl-5 col-lg-4 col-md-4 col-12">
+                                        <div class="col-xl-4 col-lg-4 col-md-6 col-12">
                                             <label class="form-label fw-bold small text-dark mb-1 d-flex align-items-end justify-content-between" style="min-height: 2rem;">
                                                 <span>Pilih Barang ATK <span class="text-danger ms-1">*</span></span>
                                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle product-count-badge" style="font-size: 0.68rem;">{{ $products->count() }} barang</span>
@@ -196,12 +241,12 @@
                                             <div class="product-select-dropdown-wrapper dropdown">
                                                 {{-- Tombol Dropdown yang tampil persis seperti select --}}
                                                 <button type="button" 
-                                                        class="form-select product-select-trigger-btn dropdown-toggle w-100" 
+                                                        class="form-select product-select-trigger-btn dropdown-toggle w-100 text-start d-flex justify-content-between align-items-center" 
                                                         data-bs-toggle="dropdown" 
                                                         data-bs-auto-close="outside"
                                                         aria-expanded="false">
-                                                    <span class="product-btn-text text-truncate me-2">-- Pilih Barang dari Daftar ATK ({{ $products->count() }} Item) --</span>
-                                                    <span class="product-select-arrow">
+                                                    <span class="product-btn-text me-2 text-muted">-- Pilih Barang dari Daftar ATK ({{ $products->count() }} Item) --</span>
+                                                    <span class="product-select-arrow flex-shrink-0">
                                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                     </span>
                                                 </button>
@@ -210,7 +255,7 @@
                                                 <input type="hidden" name="product_id[]" class="product-select" required value="">
 
                                                 {{-- Dropdown menu dengan Quick Search di atas & List Barang Ber-scrollbar --}}
-                                                <div class="dropdown-menu product-select-menu shadow-lg border rounded-3 mt-1">
+                                                <div class="dropdown-menu product-select-menu shadow-lg border rounded-3 mt-1" style="min-width: 480px; max-width: 95vw;">
                                                     <div class="p-2 border-bottom bg-light">
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text bg-white border-end-0 text-muted px-2">
@@ -218,7 +263,7 @@
                                                             </span>
                                                             <input type="text" 
                                                                    class="form-control border-start-0 product-quick-search" 
-                                                                   placeholder="Cari nama / kode barang..." 
+                                                                   placeholder="Cari nama / merk / tipe barang..." 
                                                                    autocomplete="off" 
                                                                    style="font-size: 0.82rem;">
                                                             <button type="button" class="btn btn-outline-secondary btn-clear-quick-search d-none px-2" title="Hapus pencarian">
@@ -241,20 +286,39 @@
                                             <small class="text-muted stock-info d-block mt-1">Pilih barang atau saring kategori di samping.</small>
                                         </div>
 
-                                        {{-- 3. Jumlah Permintaan Stock --}}
-                                        <div class="col-xl-2 col-lg-3 col-md-3 col-6">
+                                        {{-- 3. Jumlah Permintaan & Satuan --}}
+                                        <div class="col-xl-3 col-lg-3 col-md-6 col-7">
                                             <label class="form-label fw-bold small text-dark mb-1 d-flex align-items-end" style="min-height: 2rem;">
-                                                Jumlah Permintaan Stock <span class="text-danger ms-1">*</span>
+                                                Jumlah & Satuan <span class="text-danger ms-1">*</span>
                                             </label>
-                                            <input type="number" name="quantity[]" class="form-control quantity-input text-center fw-bold" min="1"
-                                                value="{{ $selectedQuantity ?? 1 }}" required style="height: 38px;">
-                                            <input type="hidden" name="custom_unit[]" class="item-unit-input" value="">
+                                            <div class="input-group">
+                                                <input type="number" name="quantity[]" 
+                                                    class="form-control quantity-input text-center fw-bold" 
+                                                    min="1" 
+                                                    value="{{ $selectedQuantity ?? 1 }}" 
+                                                    required 
+                                                    style="height: 38px; width: 68px; flex: 0 0 68px; font-size: 0.95rem;" 
+                                                    placeholder="1">
+                                                <select name="custom_unit[]" 
+                                                    class="form-select item-unit-select fw-semibold text-dark bg-white" 
+                                                    style="height: 38px; font-size: 0.88rem; padding-left: 0.75rem; padding-right: 2rem; background-position: right 0.75rem center; cursor: pointer; min-width: 110px;" 
+                                                    title="Pilih satuan permintaan">
+                                                    <option value="Buah" selected>-- Satuan --</option>
+                                                </select>
+                                            </div>
                                         </div>
 
                                         {{-- 4. Tombol Hapus --}}
-                                        <div class="col-xl-2 col-lg-2 col-md-2 col-6">
-                                            <label class="form-label fw-bold small mb-1 d-none d-md-flex align-items-end" style="min-height: 2rem;">&nbsp;</label>
+                                        <div class="col-xl-2 col-lg-2 col-md-6 col-5">
+                                            <label class="form-label fw-bold small mb-1 d-none d-lg-flex align-items-end" style="min-height: 2rem;">&nbsp;</label>
                                             <button type="button" class="btn btn-outline-danger remove-row w-100 d-inline-flex align-items-center justify-content-center" title="Hapus atau reset baris barang ini" style="height: 38px;">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                                Hapus
+                                            </button>
+                                        </div>
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
                                                     <polyline points="3 6 5 6 21 6"></polyline>
                                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -318,7 +382,7 @@
 
                 function initRow(row) {
                     const qtyInput = row.querySelector('.quantity-input');
-                    const unitInput = row.querySelector('.item-unit-input');
+                    const unitSelect = row.querySelector('.item-unit-select');
                     const stockInfo = row.querySelector('.stock-info');
 
                     // 1. Elemen Kategori Combobox
@@ -369,22 +433,28 @@
                         matched.forEach(p => {
                             const itemDiv = document.createElement('div');
                             const isActive = (p.id === currentId);
-                            itemDiv.className = `product-select-option py-2 px-2.5 rounded-2 d-flex flex-column gap-1 ${isActive ? 'active' : ''}`;
+                            itemDiv.className = `product-select-option p-2.5 rounded-2 d-flex flex-column gap-1 border-bottom ${isActive ? 'active' : ''}`;
+                            itemDiv.style.borderBottom = '1px solid #f1f5f9';
                             itemDiv.dataset.id = p.id;
                             itemDiv.dataset.name = p.name;
 
                             const stockBadge = p.stock > 0
-                                ? `<span class="badge bg-success-subtle text-success border border-success-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: ${p.stock} Stock</span>`
-                                : `<span class="badge bg-warning-subtle text-dark border border-warning-subtle flex-shrink-0" style="font-size: 0.68rem;">Stok: 0 Stock (Pengadaan TU)</span>`;
+                                ? `<span class="badge bg-success-subtle text-success border border-success-subtle flex-shrink-0" style="font-size: 0.7rem;">Stok: ${p.stock} Stock</span>`
+                                : `<span class="badge bg-warning-subtle text-dark border border-warning-subtle flex-shrink-0" style="font-size: 0.7rem;">Stok: 0 Stock (Pengadaan TU)</span>`;
+
+                            const unitBadge = p.available_units
+                                ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle flex-shrink-0" style="font-size: 0.7rem;">Satuan: ${p.available_units.replace(/,/g, ' / ')}</span>`
+                                : '';
 
                             itemDiv.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-start gap-2">
-                                    <span class="product-item-title fw-semibold text-dark text-truncate" style="font-size: 0.85rem;" title="${p.name}">${p.name}</span>
-                                    ${stockBadge}
+                                <div class="product-item-title fw-bold text-dark" style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">
+                                    ${p.name}
                                 </div>
-                                <div class="d-flex align-items-center gap-2 small text-muted" style="font-size: 0.74rem;">
-                                    <span class="badge bg-light text-secondary border font-monospace">[${p.code || '-'}]</span>
-                                    <span class="text-truncate">${p.category_name}</span>
+                                <div class="d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
+                                    <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.7rem;">[${p.code || '-'}]</span>
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.7rem;">${p.category_name}</span>
+                                    ${stockBadge}
+                                    ${unitBadge}
                                 </div>
                             `;
 
@@ -402,16 +472,49 @@
                         if (p) {
                             if (prodHidden) prodHidden.value = p.id;
                             if (prodBtnText) {
-                                prodBtnText.textContent = `[${p.code ? p.code + ' - ' : ''}${p.category_name}] ${p.name} — (Stok: ${p.stock} Stock)`;
-                                prodBtnText.title = p.name;
+                                prodBtnText.textContent = p.name;
+                                prodBtnText.title = `${p.name} [${p.code}] (${p.category_name})`;
+                                prodBtnText.classList.remove('text-muted');
+                                prodBtnText.classList.add('fw-semibold', 'text-dark');
                             }
-                            if (unitInput) unitInput.value = p.unit;
+
+                            // Tampilkan hanya pilihan satuan yang valid untuk barang ini sesuai data Lembar 3
+                            if (unitSelect) {
+                                unitSelect.innerHTML = '';
+                                const rawUnits = (p.available_units ? p.available_units.split(',') : [p.unit || 'Buah'])
+                                    .map(u => u.trim())
+                                    .filter(Boolean);
+
+                                const uniqueUnits = [];
+                                const seen = new Set();
+                                rawUnits.forEach(u => {
+                                    const lower = u.toLowerCase();
+                                    if (!seen.has(lower)) {
+                                        seen.add(lower);
+                                        uniqueUnits.push(u);
+                                    }
+                                });
+
+                                if (uniqueUnits.length === 0) {
+                                    uniqueUnits.push(p.unit || 'Buah');
+                                }
+
+                                uniqueUnits.forEach((u, idx) => {
+                                    const opt = document.createElement('option');
+                                    opt.value = u;
+                                    opt.textContent = u;
+                                    if (idx === 0) opt.selected = true;
+                                    unitSelect.appendChild(opt);
+                                });
+                            }
+
                             if (qtyInput) qtyInput.removeAttribute('max');
 
+                            const unitText = p.available_units ? ` • Satuan: <strong>${p.available_units.replace(/,/g, ' / ')}</strong>` : '';
                             if (p.stock > 0) {
-                                stockInfo.innerHTML = `<span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> Jika jumlah melebihi stok, kekurangan otomatis diproses pengadaan dan diserahkan kepada Anda saat tiba.`;
+                                stockInfo.innerHTML = `<span class="badge bg-light text-secondary border font-monospace me-1">[${p.code || '-'}]</span> <span class="badge bg-light text-dark border me-1">${p.category_name}</span> <span class="text-success fw-semibold">Sisa stok gudang: ${p.stock} Stock.</span> <span class="text-muted">${unitText}</span>`;
                             } else {
-                                stockInfo.innerHTML = `<span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> Permintaan ini otomatis diproses pengadaan oleh Subbag TU dan langsung diserahkan kepada Anda setelah barang tiba (tanpa perlu pengajuan ulang).`;
+                                stockInfo.innerHTML = `<span class="badge bg-light text-secondary border font-monospace me-1">[${p.code || '-'}]</span> <span class="badge bg-light text-dark border me-1">${p.category_name}</span> <span class="text-warning fw-semibold">Stok belum tersedia (0 Stock).</span> <span class="text-muted">Kekurangan diproses pengadaan Subbag TU.${unitText}</span>`;
                             }
                         } else {
                             if (prodHidden) prodHidden.value = '';
@@ -420,8 +523,12 @@
                             if (prodBtnText) {
                                 prodBtnText.textContent = `-- Pilih Barang dari Daftar ATK (${matchedCount} Item) --`;
                                 prodBtnText.title = '';
+                                prodBtnText.classList.remove('fw-semibold', 'text-dark');
+                                prodBtnText.classList.add('text-muted');
                             }
-                            if (unitInput) unitInput.value = '';
+                            if (unitSelect) {
+                                unitSelect.innerHTML = '<option value="Buah" selected>-- Satuan --</option>';
+                            }
                             if (qtyInput) qtyInput.removeAttribute('max');
                             stockInfo.textContent = 'Pilih barang atau saring kategori di samping.';
                         }
@@ -697,8 +804,8 @@
                         qty.removeAttribute('max');
                     }
 
-                    const unitInput = newRow.querySelector('.item-unit-input');
-                    if (unitInput) unitInput.value = '';
+                    const unitSelect = newRow.querySelector('.item-unit-select');
+                    if (unitSelect) unitSelect.innerHTML = '<option value="Buah" selected>-- Satuan --</option>';
 
                     const stockInfo = newRow.querySelector('.stock-info');
                     if (stockInfo) stockInfo.textContent = 'Pilih barang atau saring kategori di samping.';
@@ -729,6 +836,8 @@
                         }
                         const qty = row.querySelector('.quantity-input');
                         if (qty) qty.value = '1';
+                        const unitSelect = row.querySelector('.item-unit-select');
+                        if (unitSelect) unitSelect.innerHTML = '<option value="Buah" selected>-- Satuan --</option>';
                     }
                 });
             });

@@ -221,15 +221,8 @@ class UserNotification extends Model
      */
     public static function sendProcurementApprovedToExaminers(RequestItem $requestItem): void
     {
-        // Cari pegawai gudang yang ditugaskan memeriksa laporan persediaan
-        $examiners = User::where('role', 'pegawai_gudang')
-            ->where('is_report_examiner', true)
-            ->get();
-
-        // Jika belum ada yang ditugaskan secara spesifik, kirimkan ke semua pegawai gudang
-        if ($examiners->isEmpty()) {
-            $examiners = User::where('role', 'pegawai_gudang')->get();
-        }
+        // Kirimkan ke seluruh staf pegawai gudang yang memeriksa barang
+        $examiners = User::where('role', 'pegawai_gudang')->get();
 
         if ($examiners->isEmpty()) {
             return;
@@ -304,6 +297,68 @@ class UserNotification extends Model
                     ],
                 ]);
             }
+        }
+    }
+
+    /**
+     * Kirim notifikasi ke seluruh staf Pegawai Gudang saat permintaan stok persediaan disetujui oleh Kasubbag TU
+     */
+    public static function sendStockApprovedToWarehouse(RequestItem $requestItem): void
+    {
+        $warehouseUsers = User::where('role', 'pegawai_gudang')->get();
+        if ($warehouseUsers->isEmpty()) {
+            return;
+        }
+
+        $pemohonName = $requestItem->user 
+            ? ($requestItem->user->name_with_title ?: $requestItem->user->name) 
+            : 'Pegawai';
+        $unitKerja = $requestItem->user 
+            ? ($requestItem->user->position ?? ($requestItem->type === 'subdit' ? 'Subdirektorat' : 'Pegawai')) 
+            : 'Pegawai';
+
+        $approvedDetails = $requestItem->details->filter(function ($d) {
+            return $d->approved_quantity > 0 || (is_null($d->approved_quantity) && $d->quantity > 0);
+        });
+
+        $itemNames = $approvedDetails->map(function ($d) {
+            $name = $d->product ? $d->product->name : ($d->custom_product_name ?: 'Barang');
+            $qty = $d->approved_quantity ?: $d->quantity;
+            $unit = $d->product ? ($d->product->unit ?: 'Stock') : ($d->custom_unit ?: 'Stock');
+            return "{$name} ({$qty} {$unit})";
+        })->values();
+
+        $itemSummary = $itemNames->take(2)->join(', ');
+        if ($itemNames->count() > 2) {
+            $itemSummary .= ' (+' . ($itemNames->count() - 2) . ' barang lainnya)';
+        } elseif ($itemNames->isEmpty()) {
+            $itemSummary = 'Barang ATK';
+        }
+
+        $title = 'Permintaan Barang Disetujui Kasubbag TU';
+        $message = "Kasubbag TU telah menyetujui permintaan ATK #{$requestItem->request_code} dari {$pemohonName} ({$itemSummary}). Barang siap disiapkan dan diserahkan ke pemohon.";
+        $link = route('distribusi.index');
+
+        foreach ($warehouseUsers as $user) {
+            self::updateOrCreate([
+                'user_id' => $user->id,
+                'request_id' => $requestItem->id,
+                'type' => 'stock_approved_warehouse',
+            ], [
+                'title' => $title,
+                'message' => $message,
+                'icon' => 'truck',
+                'link' => $link,
+                'product_id' => $approvedDetails->first()->product_id ?? null,
+                'is_read' => false,
+                'data' => [
+                    'request_code' => $requestItem->request_code,
+                    'requester' => $pemohonName,
+                    'unit_name' => $unitKerja,
+                    'item_summary' => $itemSummary,
+                    'total_items' => $approvedDetails->count(),
+                ],
+            ]);
         }
     }
 }

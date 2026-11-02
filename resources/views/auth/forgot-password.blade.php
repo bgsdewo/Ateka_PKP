@@ -12,107 +12,62 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
 
-    <!-- Google Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
-
-    <!-- Core Styles -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
-
+    <!-- Inlined Critical CSS - Zero External Dependencies for Instant LCP (< 100ms) -->
     <style>
         :root {
-            --bg-deep-green: #142e23;
-            --card-dark-green: #18382a;
-            --input-dark-green: #0f241a;
-            --teal-btn: #478c80;
-            --teal-btn-hover: #539d91;
-            --accent-teal: #5eead4;
-            --text-muted-green: #83a998;
+            --bg-deep: #0e261d;
+            --card-dark: #15382a;
+            --input-dark: #0d241a;
+            --input-border: rgba(255, 255, 255, 0.12);
+            --primary-emerald: #10b981;
+            --btn-teal: #429485;
+            --accent-mint: #5eead4;
+            --text-muted: #8aa99a;
+            --brand-navy: #133e38;
+            --brand-gold: #b45309;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         html, body {
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-deep-green);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 35%),
-                radial-gradient(circle at 50% 85%, rgba(71, 140, 128, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 90% 85%, rgba(255, 255, 255, 0.04) 0%, transparent 30%);
+                radial-gradient(circle at 50% 12%, rgba(16, 185, 129, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 85% 85%, rgba(66, 148, 133, 0.1) 0%, transparent 45%),
+                radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
             padding: 24px 16px;
-            box-sizing: border-box;
         }
 
-        /* Ambient Bokeh / Floating Soft Circles (Persis sesuai tema Login & Register) */
-        .bokeh-orb {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bokeh-1 {
-            width: 280px;
-            height: 280px;
-            top: 4%;
-            left: 3%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 80%);
-        }
-
-        .bokeh-2 {
-            width: 220px;
-            height: 220px;
-            bottom: 6%;
-            right: 4%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 75%);
-        }
-
-        .bokeh-3 {
-            width: 90px;
-            height: 90px;
-            top: 18%;
-            right: 12%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.07) 0%, transparent 70%);
-        }
-
-        .bokeh-4 {
-            width: 140px;
-            height: 140px;
-            bottom: 12%;
-            left: 10%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-        }
-
-        /* Master Card Container */
-        .forgot-master-card {
+        /* Master Authentication Card */
+        .auth-master-card {
             width: 100%;
             max-width: 1040px;
-            margin: auto;
-            background-color: var(--card-dark-green);
-            border-radius: 36px;
+            background-color: var(--card-dark);
+            border-radius: 32px;
             box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
             overflow: hidden;
             position: relative;
-            z-index: 10;
             display: flex;
-            min-height: 610px;
+            min-height: 590px;
         }
 
-        /* Sisi Kiri: Panel Putih dengan Lengkungan Halus (Wave Curve) */
+        /* Sisi Kiri: Panel Putih Bersih */
         .panel-brand-left {
             background-color: #ffffff;
-            color: #0f172a;
+            color: #1e293b;
             flex: 1.05;
-            padding: 2.6rem 2.8rem;
+            padding: 2.5rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -120,23 +75,109 @@
             z-index: 2;
         }
 
-        /* Lengkungan Organik (Wavy Curve) ke Sisi Kanan */
+        /* Lengkungan Halus SVG */
         .wave-curve-border {
             position: absolute;
             top: 0;
-            right: -75px;
-            width: 78px;
+            right: -72px;
+            width: 75px;
             height: 100%;
             pointer-events: none;
             z-index: 5;
         }
 
-        /* Sisi Kanan: Panel Form Reset Kata Sandi Hijau Tua */
+        /* Header Brand Institusi */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo {
+            max-height: 52px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-navy);
+            letter-spacing: 0.3px;
+            line-height: 1.28;
+        }
+
+        .brand-text .country {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-gold);
+            letter-spacing: 0.6px;
+            margin-top: 1px;
+        }
+
+        .brand-text .satker {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Visual Illustration Centerpiece */
+        .brand-illustration-wrapper {
+            text-align: center;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-illustration-svg {
+            max-width: 280px;
+            height: auto;
+            filter: drop-shadow(0 12px 24px rgba(19, 62, 56, 0.08));
+        }
+
+        .brand-caption h2 {
+            color: var(--brand-navy);
+            font-size: 1.22rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .brand-caption p {
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        /* Footer Sisi Kiri */
+        .brand-footer {
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.73rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .brand-footer strong {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Sisi Kanan: Panel Form Reset Password */
         .panel-form-right {
-            background-color: var(--card-dark-green);
+            background-color: var(--card-dark);
             color: #ffffff;
             flex: 1.05;
-            padding: 2.8rem 3.2rem;
+            padding: 3rem 3rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -144,149 +185,193 @@
             z-index: 4;
         }
 
-        /* Form Controls Sesuai Tema */
-        .form-label-custom {
+        .form-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            line-height: 1.4;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 14px;
+            margin-bottom: 1.15rem;
+        }
+
+        .form-label {
+            display: block;
             font-size: 0.82rem;
             font-weight: 600;
-            color: #d1e7dd;
+            color: #d1fae5;
             margin-bottom: 5px;
-            display: block;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.15px;
         }
 
-        .input-pill-dark {
-            background-color: var(--input-dark-green) !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 20px !important;
-            color: #ffffff !important;
-            padding: 0.68rem 1.2rem !important;
-            font-size: 0.88rem !important;
-            transition: all 0.2s ease !important;
-            width: 100% !important;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+        .form-label .req {
+            color: #f87171;
+            font-weight: bold;
         }
 
-        .input-pill-dark::placeholder {
-            color: #5c7e6f !important;
-            font-size: 0.84rem !important;
+        .input-pill {
+            width: 100%;
+            background-color: var(--input-dark);
+            border: 1.5px solid var(--input-border);
+            border-radius: 22px;
+            color: #ffffff;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            transition: all 0.22s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+            outline: none;
         }
 
-        .input-pill-dark:focus {
-            background-color: #0b1c14 !important;
-            border-color: #4db6ac !important;
-            box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-            outline: none !important;
+        .input-pill.font-mono {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            letter-spacing: 0.5px;
         }
 
-        .password-input-group {
+        .input-pill::placeholder {
+            color: #587c6c;
+            font-size: 0.83rem;
+        }
+
+        .input-pill:focus {
+            border-color: var(--accent-mint);
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.22), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            background-color: #081711;
+        }
+
+        .password-wrap {
             position: relative;
             display: flex;
             align-items: center;
         }
 
-        .password-toggle-btn {
+        .password-wrap .input-pill {
+            padding-right: 44px;
+        }
+
+        .password-toggle {
             position: absolute;
-            right: 14px;
-            background: transparent;
+            right: 12px;
+            background: none;
             border: none;
-            color: #719987;
-            padding: 4px;
+            color: #6e9482;
             cursor: pointer;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: color 0.2s ease;
         }
 
-        .password-toggle-btn:hover {
+        .password-toggle:hover {
             color: #ffffff;
         }
 
-        /* Tombol Pill Sesuai Tema */
-        .btn-pill-teal {
-            background: linear-gradient(135deg, #4fa395 0%, #3e8175 100%) !important;
-            border: none !important;
-            border-radius: 25px !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            font-size: 0.95rem !important;
-            padding: 0.76rem 1.5rem !important;
-            width: 100% !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #449586 0%, #327568 100%);
+            border: none;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 0.96rem;
+            font-weight: 600;
+            font-family: inherit;
+            padding: 0.82rem 1.5rem;
             cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            display: block;
+            margin-top: 0.4rem;
             letter-spacing: 0.2px;
         }
 
-        .btn-pill-teal:hover {
-            background: linear-gradient(135deg, #59b5a7 0%, #469285 100%) !important;
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #4fa998 0%, #3a8778 100%);
             transform: translateY(-1.5px);
-            box-shadow: 0 8px 20px rgba(62, 129, 117, 0.4) !important;
-            color: #ffffff !important;
+            box-shadow: 0 10px 24px rgba(50, 117, 104, 0.45);
         }
 
-        .btn-pill-teal:active {
-            transform: scale(0.98);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .forgot-password-link {
-            color: #4db6ac;
-            font-size: 0.82rem;
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .back-callout {
+            text-align: center;
+            margin-top: 1.4rem;
+            font-size: 0.85rem;
+        }
+
+        .link-back {
+            color: var(--accent-mint);
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
             transition: color 0.2s ease;
         }
 
-        .forgot-password-link:hover {
-            color: #5eead4;
+        .link-back:hover {
+            color: #ffffff;
             text-decoration: underline;
         }
 
-        .footer-terms-link {
-            color: #729686;
-            font-size: 0.75rem;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-terms-link:hover {
-            color: #c0ded1;
-        }
-
-        /* Alert Styling Gelap & Elegan */
-        .alert-dark-custom {
+        /* Alerts */
+        .alert-box {
             border-radius: 14px;
             font-size: 0.82rem;
-            padding: 0.65rem 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.16);
             border: 1px solid rgba(239, 68, 68, 0.35);
-            background: rgba(239, 68, 68, 0.18);
             color: #fecaca;
-            margin-bottom: 1rem;
         }
 
-        .alert-dark-success {
-            border-radius: 14px;
-            font-size: 0.82rem;
-            padding: 0.65rem 1rem;
+        .alert-error ul {
+            padding-left: 1.2rem;
+            margin-top: 4px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.16);
             border: 1px solid rgba(16, 185, 129, 0.35);
-            background: rgba(16, 185, 129, 0.18);
             color: #a7f3d0;
-            margin-bottom: 1rem;
         }
 
-        .info-pill-dark {
-            background: rgba(77, 182, 172, 0.08);
-            border: 1px solid rgba(77, 182, 172, 0.22);
-            border-radius: 14px;
-            padding: 0.65rem 0.95rem;
-            margin: 0.85rem 0;
-        }
-
-        /* Responsif Layar Tablet dan Mobile */
-        @media (max-width: 991.98px) {
-            .forgot-master-card {
+        /* Responsive Breakpoints */
+        @media (max-width: 960px) {
+            .auth-master-card {
                 flex-direction: column;
-                margin: 16px;
-                border-radius: 28px;
+                max-width: 520px;
+                border-radius: 24px;
             }
 
             .wave-curve-border {
@@ -294,142 +379,108 @@
             }
 
             .panel-brand-left {
-                padding: 2rem 1.8rem;
+                padding: 2.2rem 2rem;
                 flex: none;
             }
 
             .panel-form-right {
-                padding: 2.2rem 1.8rem;
+                padding: 2.2rem 2rem;
                 flex: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Floating Ambient Orbs (Sesuai Tema Login & Register) -->
-    <div class="bokeh-orb bokeh-1"></div>
-    <div class="bokeh-orb bokeh-2"></div>
-    <div class="bokeh-orb bokeh-3"></div>
-    <div class="bokeh-orb bokeh-4"></div>
-
-    <!-- Main Master Forgot Password Card -->
-    <div class="forgot-master-card">
+    <!-- Main Master Reset Password Card -->
+    <div class="auth-master-card">
         <!-- ============================================================= -->
-        <!-- SISI KIRI: PANEL PUTIH (LOGO KEMENTERIAN, ILUSTRASI ATK, WAVE) -->
+        <!-- SISI KIRI: IDENTITAS RESMI & ILUSTRASI KEAMANAN AKUN          -->
         <!-- ============================================================= -->
         <div class="panel-brand-left">
-            <!-- Header Brand: Logo Kementerian PKP & Identitas Satker -->
-            <div class="d-flex align-items-center gap-3">
-                <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP"
-                    style="max-height: 52px; width: auto; object-fit: contain;">
-                <div>
-                    <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 0.82rem; color: #144B59; letter-spacing: 0.3px; line-height: 1.25;">
-                        Kementerian Perumahan dan Kawasan Permukiman
-                    </h6>
-                    <span class="d-block fw-bold text-uppercase" style="font-size: 0.72rem; color: #b8860b; letter-spacing: 0.5px;">
-                        Republik Indonesia
-                    </span>
-                    <small class="text-muted" style="font-size: 0.7rem;">Direktorat Jenderal Kawasan Permukiman</small>
+            <!-- Header Brand: Logo & Identitas Satker -->
+            <div class="brand-header">
+                <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP RI" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Kementerian Perumahan dan Kawasan Permukiman</h1>
+                    <span class="country">Republik Indonesia</span>
+                    <span class="satker">Direktorat Jenderal Kawasan Permukiman</span>
                 </div>
             </div>
 
-            <!-- Bagian Tengah: Ilustrasi Artistik Inventori ATK & Keamanan Akun -->
-            <div class="text-center my-3 my-lg-2 position-relative d-flex flex-column align-items-center justify-content-center">
-                <svg width="340" height="250" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
-                    <!-- Latar Belakang Blob Mint Organik -->
-                    <path d="M70 140C50 80 110 30 180 35C260 40 330 70 345 130C360 190 320 250 250 265C170 280 85 240 70 180Z" fill="#e3f3ec"/>
-                    
-                    <!-- Gelembung / Bubbles Melayang Halus -->
-                    <circle cx="85" cy="70" r="14" fill="#cfece1" opacity="0.6"/>
-                    <circle cx="310" cy="80" r="18" fill="#cfece1" opacity="0.5"/>
-                    <circle cx="330" cy="190" r="10" fill="#cfece1" opacity="0.6"/>
-                    <circle cx="95" cy="220" r="16" fill="#cfece1" opacity="0.5"/>
+            <!-- Bagian Tengah: Visual Keamanan & Pemulihan Akun -->
+            <div class="brand-illustration-wrapper">
+                <svg class="brand-illustration-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Podium / Landasan Halus -->
+                    <ellipse cx="180" cy="225" rx="140" ry="20" fill="#e8f4f0" />
+                    <ellipse cx="180" cy="223" rx="110" ry="14" fill="#d3ebe2" />
 
-                    <!-- Meja & Rak Persediaan -->
-                    <rect x="110" y="240" width="180" height="12" rx="6" fill="#144b59" opacity="0.85"/>
-                    <rect x="130" y="252" width="140" height="6" rx="3" fill="#94a3b8" opacity="0.4"/>
+                    <!-- Perisai Perlindungan Akun / Security Shield -->
+                    <path d="M180 50L245 78V140C245 185 180 215 180 215C180 215 115 185 115 140V78L180 50Z" fill="#144b59"/>
+                    <path d="M180 62L233 85V138C233 175 180 201 180 201C180 201 127 175 127 138V85L180 62Z" fill="#185666"/>
+                    <path d="M180 62V201C180 201 233 175 233 138V85L180 62Z" fill="#ffffff" opacity="0.08"/>
 
-                    <!-- Simbol Perisai Keamanan Akun & Kunci Sandi -->
-                    <path d="M200 70L250 90V140C250 180 200 215 200 215C200 215 150 180 150 140V90L200 70Z" fill="#1b4d3e"/>
-                    <path d="M200 80L240 96V138C240 172 200 202 200 202C200 202 160 172 160 138V96L200 80Z" fill="#144b59"/>
-                    
-                    <!-- Ikon Gembok di Dalam Perisai -->
-                    <rect x="187" y="132" width="26" height="22" rx="4" fill="#5eead4"/>
-                    <path d="M193 132V124C193 120.134 196.134 117 200 117C203.866 117 207 120.134 207 124V132" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="200" cy="141" r="2.5" fill="#0f241a"/>
-                    <line x1="200" y1="143.5" x2="200" y2="148" stroke="#0f241a" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Gembok / Padlock Emas Terverifikasi di Tengah Perisai -->
+                    <rect x="160" y="125" width="40" height="32" rx="7" fill="#f59e0b"/>
+                    <path d="M168 125V112C168 105.373 173.373 100 180 100C186.627 100 192 105.373 192 112V125" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+                    <circle cx="180" cy="138" r="4" fill="#78350f"/>
+                    <path d="M180 142V148" stroke="#78350f" stroke-width="2.5" stroke-linecap="round"/>
 
-                    <!-- Elemen Berkas Dokumen & Verifikasi NIP -->
-                    <rect x="120" y="160" width="50" height="70" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-                    <line x1="128" y1="175" x2="158" y2="175" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="128" y1="187" x2="152" y2="187" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="145" cy="207" r="7" fill="#10b981"/>
-                    <path d="M142 207L144.5 209.5L149 204.5" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-
-                    <!-- Tumpukan Box File & Perlengkapan Kantor -->
-                    <rect x="235" y="165" width="55" height="65" rx="5" fill="#d97706"/>
-                    <rect x="242" y="175" width="41" height="12" rx="2" fill="#ffffff" opacity="0.9"/>
-                    <rect x="242" y="195" width="22" height="5" rx="2" fill="#fef3c7"/>
-                    <circle cx="262.5" cy="216" r="6" fill="#f8fafc" opacity="0.9"/>
+                    <!-- Badge Centang Hijau Pemulihan Sukses -->
+                    <circle cx="218" cy="182" r="14" fill="#10b981"/>
+                    <circle cx="218" cy="182" r="11" fill="#059669"/>
+                    <path d="M212 182L216 186L224 178" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
 
-                <div class="mt-1">
-                    <h5 class="fw-bold mb-1" style="color: #144b59; font-size: 1.15rem; letter-spacing: -0.3px;">
-                        Verifikasi Mandiri Pegawai
-                    </h5>
-                    <p class="text-muted small mb-0" style="font-size: 0.8rem; line-height: 1.35;">
-                        Pemulihan akses kata sandi instan berbasis NIP dan email kedinasan terdaftar yang terintegrasi.
-                    </p>
+                <div class="brand-caption">
+                    <h2>Pemulihan Kata Sandi Akun</h2>
+                    <p>Layanan mandiri pembaruan kata sandi bagi pegawai Kementerian PKP RI secara aman dan terverifikasi.</p>
                 </div>
             </div>
 
-            <!-- Footer Sisi Kiri: Hak Cipta & Satker -->
-            <div class="pt-2 border-top" style="border-color: #f1f5f9 !important;">
-                <p class="mb-0 text-muted small" style="font-size: 0.72rem; line-height: 1.3;">
-                    &copy; 2026 Kementerian Perumahan dan Kawasan Permukiman RI<br>
-                    <span style="color: #64748b;">Biro Umum &amp; Pengadaan Barang &bull; Subbagian Tata Usaha</span>
-                </p>
+            <!-- Footer Sisi Kiri -->
+            <div class="brand-footer">
+                <strong>&copy; 2026 Kementerian Perumahan dan Kawasan Permukiman RI</strong><br>
+                Biro Umum &amp; Pengadaan Barang &bull; Subbagian Tata Usaha
             </div>
 
-            <!-- Lengkungan SVG Organik Halus (Wave Divider Sesuai Tema) -->
+            <!-- Lengkungan Halus SVG -->
             <svg class="wave-curve-border" viewBox="0 0 100 600" preserveAspectRatio="none">
                 <path d="M 0 0 L 25 0 C 10 120, 95 240, 95 360 C 95 490, 15 540, 0 600 Z" fill="#ffffff" />
             </svg>
         </div>
 
         <!-- ============================================================= -->
-        <!-- SISI KANAN: PANEL FORM RESET KATA SANDI HIJAU TUA            -->
+        <!-- SISI KANAN: PANEL FORM RESET PASSWORD                         -->
         <!-- ============================================================= -->
         <div class="panel-form-right">
-            <!-- Judul Form Reset Kata Sandi -->
-            <div class="mb-3">
-                <h1 class="fw-bold mb-1" style="font-size: 2.1rem; letter-spacing: -0.5px; color: #ffffff;">
-                    <i>Reset Kata Sandi</i>
-                </h1>
-                <p class="mb-0" style="color: #8faea0; font-size: 0.88rem;">
-                    Sistem Pencatatan Persediaan &amp; Pengajuan ATK
-                </p>
+            <div class="form-header">
+                <h2 class="form-title">Reset Password</h2>
+                <p class="form-subtitle">Pembaruan Kata Sandi &bull; Sistem Inventori ATK (ATEKA)</p>
             </div>
 
-            <!-- Alert Notifikasi Feedback -->
+            <!-- Feedback Alerts -->
             @if (session('success'))
-                <div class="alert alert-dark-success d-flex align-items-center justify-content-between" role="alert">
-                    <span>{{ session('success') }}</span>
-                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                <div class="alert-box alert-success" role="alert">
+                    {{ session('success') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="alert alert-dark-custom d-flex align-items-center justify-content-between" role="alert">
-                    <span>{{ session('error') }}</span>
-                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                <div class="alert-box alert-error" role="alert">
+                    {{ session('error') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="alert alert-dark-custom" role="alert">
-                    <ul class="mb-0 ps-3">
+                <div class="alert-box alert-error" role="alert">
+                    <strong>Terdapat kendala:</strong>
+                    <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -442,38 +493,28 @@
                 @csrf
 
                 <!-- Input NIP -->
-                <div class="mb-2.5">
-                    <label for="nip" class="form-label-custom">
-                        NOMOR INDUK PEGAWAI (NIP) <span style="color: #f87171;">*</span>
-                    </label>
-                    <input type="text" name="nip" id="nip" class="form-control input-pill-dark font-monospace"
+                <div class="form-group">
+                    <label for="nip" class="form-label">Nomor Induk Pegawai (NIP) <span class="req">*</span></label>
+                    <input type="text" name="nip" id="nip" class="input-pill font-mono"
                         value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required autofocus>
                 </div>
 
                 <!-- Input Email Dinas -->
-                <div class="mb-2.5">
-                    <label for="email" class="form-label-custom">
-                        EMAIL DINAS TERDAFTAR <span style="color: #f87171;">*</span>
-                    </label>
-                    <input type="email" name="email" id="email" class="form-control input-pill-dark"
-                        value="{{ old('email') }}" placeholder="nama.pegawai@pupr.go.id" required autocomplete="email">
-                    <small class="d-block mt-1" style="color: #729686; font-size: 0.74rem;">
-                        Verifikasi memerlukan kecocokan NIP &amp; Email dinas aktif Anda.
-                    </small>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Dinas Terdaftar <span class="req">*</span></label>
+                    <input type="email" name="email" id="email" class="input-pill"
+                        value="{{ old('email') }}" placeholder="nama.pegawai@pkp.go.id" required autocomplete="email">
                 </div>
 
-                <!-- Input Password Baru & Konfirmasi (Side by Side di Desktop) -->
-                <div class="row g-2 mb-2">
-                    <div class="col-12 col-md-6">
-                        <label for="password" class="form-label-custom">
-                            PASSWORD BARU <span style="color: #f87171;">*</span>
-                        </label>
-                        <div class="password-input-group">
-                            <input type="password" name="password" id="password" class="form-control input-pill-dark pe-5"
+                <!-- Password Baru & Konfirmasi (Side by Side di Desktop) -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password Baru <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" name="password" id="password" class="input-pill"
                                 placeholder="Minimal 6 karakter" required minlength="6" autocomplete="new-password">
-                            <button type="button" class="password-toggle-btn" id="togglePasswordBtn"
-                                aria-label="Lihat atau sembunyikan password baru" tabindex="-1">
-                                <svg id="togglePasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Lihat atau sembunyikan password baru" tabindex="-1">
+                                <svg id="togglePasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
@@ -481,16 +522,13 @@
                         </div>
                     </div>
 
-                    <div class="col-12 col-md-6">
-                        <label for="password_confirmation" class="form-label-custom">
-                            ULANGI PASSWORD BARU <span style="color: #f87171;">*</span>
-                        </label>
-                        <div class="password-input-group">
-                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control input-pill-dark pe-5"
+                    <div class="form-group">
+                        <label for="password_confirmation" class="form-label">Ulangi Password <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" name="password_confirmation" id="password_confirmation" class="input-pill"
                                 placeholder="Ketik ulang password baru" required minlength="6" autocomplete="new-password">
-                            <button type="button" class="password-toggle-btn" id="toggleConfirmPasswordBtn"
-                                aria-label="Lihat atau sembunyikan konfirmasi password" tabindex="-1">
-                                <svg id="toggleConfirmPasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn" aria-label="Lihat atau sembunyikan konfirmasi password" tabindex="-1">
+                                <svg id="toggleConfirmPasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
@@ -499,52 +537,24 @@
                     </div>
                 </div>
 
-                <!-- Bantuan NIP Info Pill (Elegan Gelap) -->
-                <div class="info-pill-dark">
-                    <div class="d-flex align-items-center gap-2">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2" class="flex-shrink-0" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                        <span style="font-size: 0.77rem; color: #a4c4b5; line-height: 1.4;">
-                            Verifikasi NIP otomatis mereset kata sandi akun Anda secara langsung tanpa perlu tautan email.
-                        </span>
-                    </div>
-                </div>
+                <!-- Tombol Submit -->
+                <button type="submit" class="btn-submit" id="submitResetBtn">
+                    Simpan &amp; Perbarui Password
+                </button>
 
-                <!-- Tombol Submit Reset Password -->
-                <div class="mt-3 mb-2.5">
-                    <button type="submit" class="btn-pill-teal" id="submitResetBtn">
-                        Simpan &amp; Perbarui Password
-                    </button>
-                </div>
-
-                <!-- Tautan Kembali ke Login -->
-                <div class="text-center pt-1 mb-2">
-                    <a href="{{ route('login') }}" class="forgot-password-link" style="font-size: 0.84rem; color: #5eead4;">
-                        &larr; Kembali ke Halaman <i>Login</i>
+                <!-- Callout Kembali ke Login -->
+                <div class="back-callout">
+                    <a href="{{ route('login') }}" class="link-back">
+                        &larr; Kembali ke Halaman Login
                     </a>
-                </div>
-
-                <!-- Footer Tautan Bawah -->
-                <div class="d-flex justify-content-between align-items-center pt-2.5 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important;">
-                    <a href="#" class="footer-terms-link" onclick="alert('Sistem Informasi Inventori ATK dipergunakan khusus untuk pegawai dan unit kerja di lingkungan Direktorat Jenderal Kawasan Permukiman Kementerian PKP RI.'); return false;">
-                        <i>Terms and Services</i>
-                    </a>
-                    <span style="font-size: 0.73rem; color: #729686;">
-                        <i>Have a problem? Contact at</i> <a href="mailto:tu@perumahan.go.id" class="text-decoration-none" style="color: #4db6ac;">Subbag TU</a>
-                    </span>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Scripts Bundle -->
-    <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}" defer></script>
+    <!-- Minimal Native Password Visibility Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Password Show/Hide Toggle
             function setupPasswordToggle(btnId, inputId, iconId) {
                 const btn = document.getElementById(btnId);
                 const input = document.getElementById(inputId);
@@ -558,8 +568,9 @@
                             icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
                             btn.style.color = '#5eead4';
                         } else {
+                            icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
                             icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-                            btn.style.color = '#719987';
+                            btn.style.color = '#6e9482';
                         }
                     });
                 }
@@ -568,22 +579,17 @@
             setupPasswordToggle('togglePasswordBtn', 'password', 'togglePasswordIcon');
             setupPasswordToggle('toggleConfirmPasswordBtn', 'password_confirmation', 'toggleConfirmPasswordIcon');
 
-            // Form Submit Loading State
-            const form = document.querySelector('form');
+            // Form Submit Instant Feedback State
+            const resetForm = document.querySelector('form');
             const submitBtn = document.getElementById('submitResetBtn');
-            if (form && submitBtn) {
-                form.addEventListener('submit', function() {
+            if (resetForm && submitBtn) {
+                resetForm.addEventListener('submit', function() {
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses Reset Kata Sandi...';
+                    submitBtn.style.opacity = '0.85';
+                    submitBtn.style.pointerEvents = 'none';
+                    submitBtn.innerHTML = '<span style="display:inline-block;width:15px;height:15px;border:2px solid #ffffff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle;"></span>Memproses...';
                 });
             }
-
-            // BFCache handling
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted) {
-                    window.location.reload();
-                }
-            });
         });
     </script>
 </body>
