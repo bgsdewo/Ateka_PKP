@@ -184,7 +184,7 @@
         {{-- Filter Tab & Tabel Persetujuan --}}
         <div class="row">
             <div class="col-sm-12">
-                <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px;">
+                <div class="card shadow-sm border-0 mb-4 filter-card" style="border-radius: 14px; overflow: visible !important;">
                     <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.5rem 1.75rem 1.6rem 1.75rem !important;">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                             <div>
@@ -261,16 +261,16 @@
 
                             {{-- Filter Tipe --}}
                             <div style="min-width: 145px;">
-                                <select name="type" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit</option>
-                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu</option>
+                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
                                 </select>
                             </div>
 
                             {{-- Filter Bulan --}}
                             <div style="min-width: 180px;">
-                                <select name="month" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="all" {{ $isAllMonths ?? false ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                                     @php
                                         $allMonths = [
@@ -299,7 +299,7 @@
 
                             {{-- Filter Tahun --}}
                             <div style="min-width: 135px;">
-                                <select name="year" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
                                         <option value="{{ $y }}"

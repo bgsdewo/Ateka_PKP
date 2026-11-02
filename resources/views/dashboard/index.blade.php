@@ -38,7 +38,7 @@
 
         'kasubag_tu', 'admin' => 'Kasubbag TU (Approver / Pimpinan)',
 
-        'pic_distribusi' => 'PIC Distribusi',
+        'pic_distribusi' => auth()->user()->pic_role_title ?? 'PIC ( SDK )',
 
         'pegawai_gudang' => 'Pegawai Gudang',
 
@@ -366,15 +366,6 @@
 
                     </div>
 
-                    <div class="pt-3 mt-3 border-top" style="border-color: #edf3f0 !important;">
-
-                        <a href="{{ route('persetujuan.index', ['status' => 'pending']) }}" class="btn btn-sm btn-dark-pill w-100 fw-bold py-1.5" style="font-size: 0.82rem;">
-
-                            Tinjau Pengajuan &rarr;
-
-                        </a>
-
-                    </div>
 
                 </div>
 
@@ -464,15 +455,6 @@
 
                     </div>
 
-                    <div class="pt-3 mt-3 border-top" style="border-color: #edf3f0 !important;">
-
-                        <a href="{{ route('katalog-atk', ['stock_status' => 'available']) }}" class="btn btn-sm btn-dark-pill w-100 fw-bold py-1.5" style="font-size: 0.82rem;">
-
-                            Lihat {{ $activeStockCount }} Barang Tersedia &rarr;
-
-                        </a>
-
-                    </div>
 
                 </div>
 
@@ -540,15 +522,6 @@
 
                     </div>
 
-                    <div class="pt-3 mt-3 border-top" style="border-color: #edf3f0 !important;">
-
-                        <a href="{{ route('reports.index') }}" class="btn btn-sm btn-light w-100 rounded-pill fw-semibold py-1.5" style="font-size: 0.82rem; border-color: #dbe7e1;">
-
-                            Laporan Persediaan &rarr;
-
-                        </a>
-
-                    </div>
 
                 </div>
 
@@ -1370,7 +1343,7 @@
 
                             <div style="position: relative; width: 100%; height: 200px;">
 
-                                <canvas id="stockChart" style="display: block; width: 100%; height: 200px;"></canvas>
+                                <canvas id="stockChart" width="600" height="200" style="display: block; width: 100%; height: 200px; aspect-ratio: 3 / 1;"></canvas>
 
                             </div>
 
@@ -1560,7 +1533,7 @@
 
                                                             <div class="rounded-3 p-1.5 d-flex align-items-center justify-content-center border" style="width: 38px; height: 38px; background: #f8fafc;">
 
-                                                                <img src="{{ asset($prod->image_url) }}" alt="{{ $prod->name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                                                <img src="{{ asset($prod->image_url) }}" alt="{{ $prod->name }}" width="26" height="26" loading="lazy" decoding="async" style="width: 26px; height: 26px; object-fit: contain;">
 
                                                             </div>
 
@@ -3435,21 +3408,7 @@
 
                     </div>
 
-                    <div class="d-flex gap-2 flex-wrap">
-
-                        <a href="{{ route('pengajuan.create') }}" class="btn btn-emerald-pill text-nowrap" style="font-size: 0.8rem; padding: 0.48rem 1.25rem;">
-
-                            + Buat Pengajuan ATK
-
-                        </a>
-
-                        <a href="{{ route('katalog-atk') }}" class="btn btn-outline-secondary rounded-pill text-nowrap" style="font-size: 0.8rem; padding: 0.48rem 1.25rem;">
-
-                            Katalog Persediaan &rarr;
-
-                        </a>
-
-                    </div>
+                    
 
                 </div>
 
@@ -3459,191 +3418,44 @@
 
 
 
-        <!-- ROW 3: BANNER FITUR & PANDUAN ALUR PENGAJUAN -->
-
+        <!-- ROW 3: BANNER FITUR -->
         <div class="row g-3 mb-4">
-
-            <div class="col-lg-8 col-12">
-
+            <div class="col-12">
                 <div class="card card-featured-emerald h-100 d-flex flex-column justify-content-between p-4" style="border-radius: 16px;">
-
                     <!-- Top Arrow Link Button -->
-
                     <a href="{{ route('katalog-atk') }}" class="arrow-link-btn" title="Buka Katalog ATK">
-
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-
                             <line x1="7" y1="17" x2="17" y2="7"></line>
-
                             <polyline points="7 7 17 7 17 17"></polyline>
-
                         </svg>
-
                     </a>
 
-
-
                     <!-- Decorative Leaf SVG in Background -->
-
                     <div style="position: absolute; right: -15px; bottom: -20px; opacity: 0.18; pointer-events: none;">
-
                         <svg width="220" height="220" viewBox="0 0 200 200" fill="none">
-
                             <path d="M50 180C30 140 30 70 100 30C160 50 180 120 150 180C110 190 70 190 50 180Z" fill="#34d399"/>
-
                             <path d="M100 30V180" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-
                             <path d="M100 70L140 90" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-
                             <path d="M100 110L60 130" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-
                             <path d="M100 140L135 155" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-
                         </svg>
-
                     </div>
 
-
-
                     <div>
-
                         <div class="d-flex align-items-center gap-1.5 mb-2">
-
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color: #34d399;">
-
                                 <path d="M6.5 19C4 19 2 17 2 14.5C2 10.5 6 6 12 4C18 6 22 10.5 22 14.5C22 17 20 19 17.5 19C15.5 19 13.8 17.7 13 16C12.2 17.7 10.5 19 8.5 19H6.5Z" fill="#34d399" opacity="0.9"/>
-
                             </svg>
-
                             <span class="text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.08em; color: #a4cdbf;">Kementerian PKP RI</span>
-
                         </div>
-
                         <h3 class="featured-title">Sistem Inventori Persediaan ATK (ATEKA)</h3>
-
-                        <p class="featured-sub mb-3">
-
+                        <p class="featured-sub mb-0">
                             Layanan permohonan kebutuhan alat tulis kantor untuk menunjang tugas kedinasan secara praktis, transparan, dan terpantau langsung proses persetujuannya.
-
                         </p>
-
-                        <div class="d-flex align-items-center gap-2 flex-wrap pt-1">
-
-                            <a href="{{ route('katalog-atk') }}" class="btn btn-emerald-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
-
-                                Buka Katalog ATK &rarr;
-
-                            </a>
-
-                            <a href="{{ route('pengajuan.create') }}" class="btn btn-outline-light rounded-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
-
-                                + Buat Pengajuan Barang
-
-                            </a>
-
-                            <a href="{{ route('pengajuan.pengadaan.create') }}" class="btn btn-outline-light rounded-pill" style="font-size: 0.8rem; padding: 0.45rem 1.15rem;">
-
-                                + Usulan Pengadaan Baru
-
-                            </a>
-
-                        </div>
-
                     </div>
-
                 </div>
-
             </div>
-
-
-
-            <div class="col-lg-4 col-12">
-
-                <div class="card h-100 shadow-sm border-0 p-4 d-flex flex-column justify-content-between" style="border-radius: 16px; background: #ffffff;">
-
-                    <div>
-
-                        <div class="d-flex align-items-center gap-2 mb-2">
-
-                            <span class="badge bg-light text-primary border" style="font-size: 0.72rem;">Panduan Alur</span>
-
-                            <span class="fw-bold text-dark" style="font-size: 0.95rem;">Alur Permintaan ATK</span>
-
-                        </div>
-
-                        <p class="text-muted small mb-3" style="font-size: 0.76rem;">Tahapan pemenuhan permohonan ATK Anda:</p>
-
-                        
-
-                        <div class="d-flex flex-column gap-2.5">
-
-                            <div class="d-flex align-items-start gap-2.5">
-
-                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">1</span>
-
-                                <div style="font-size: 0.78rem;">
-
-                                    <strong class="text-dark d-block">Pilih di Katalog ATK</strong>
-
-                                    <span class="text-muted">Cek stok persediaan yang tersedia di gudang.</span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="d-flex align-items-start gap-2.5">
-
-                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">2</span>
-
-                                <div style="font-size: 0.78rem;">
-
-                                    <strong class="text-dark d-block">Ajukan Permintaan</strong>
-
-                                    <span class="text-muted">Tentukan jumlah dan keperluan penggunaan kerja.</span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="d-flex align-items-start gap-2.5">
-
-                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #0c2b27; font-size: 0.72rem; flex-shrink: 0;">3</span>
-
-                                <div style="font-size: 0.78rem;">
-
-                                    <strong class="text-dark d-block">Verifikasi Kasubbag TU</strong>
-
-                                    <span class="text-muted">Ditinjau dan disetujui secara digital oleh pimpinan.</span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="d-flex align-items-start gap-2.5">
-
-                                <span class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 22px; height: 22px; background: #10b981; font-size: 0.72rem; flex-shrink: 0;">4</span>
-
-                                <div style="font-size: 0.78rem;">
-
-                                    <strong class="text-dark d-block">Serah Terima Fisik</strong>
-
-                                    <span class="text-muted">Ambil barang di gudang & ttd berita acara serah terima.</span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
-
-
 
         <!-- ROW 4: TABEL RIWAYAT PERMINTAAN TERAKHIR PEMOHON -->
 

@@ -81,7 +81,7 @@
                                             };
                                             $roleLabel = match ($user->role) {
                                                 'kasubag_tu', 'admin' => 'Kasubbag TU (Approver)',
-                                                'pic_distribusi' => 'PIC Subdirektorat (Pemohon)',
+                                                'pic_distribusi' => $user->pic_role_title ? $user->pic_role_title . ' (Pemohon)' : 'PIC Subdirektorat (Pemohon)',
                                                 'pegawai_gudang' => 'Pegawai Gudang',
                                                 default => 'Pegawai (Individu)',
                                             };

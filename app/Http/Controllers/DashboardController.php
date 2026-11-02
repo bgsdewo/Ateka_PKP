@@ -86,27 +86,18 @@ class DashboardController extends Controller
 
         if ($isKasubagTU || $isPegawaiGudang) {
 
-            // 1. Statistik Produk (Realtime - Langsung dari database tanpa stale cache)
-
-            $productStats = DB::table('products')
-
-                ->selectRaw('
-
-                    COUNT(*) as total_products,
-
-                    COALESCE(SUM(stock), 0) as total_stock,
-
-                    COALESCE(SUM(stock * COALESCE(purchase_price, 0)), 0) as total_inventory_value,
-
-                    COALESCE(SUM(CASE WHEN stock > 0 THEN 1 ELSE 0 END), 0) as available_products_count,
-
-                    COALESCE(SUM(CASE WHEN stock <= 0 THEN 1 ELSE 0 END), 0) as out_of_stock_count,
-
-                    COALESCE(SUM(CASE WHEN stock > 0 AND stock < 10 THEN 1 ELSE 0 END), 0) as low_stock_count
-
-                ')
-
-                ->first();
+            // 1. Statistik Produk (Cached 60s untuk TTFB & LCP kilat)
+            $productStats = Cache::store('file')->remember('dashboard_product_stats', 60, function () {                 return DB::table('products')
+                    ->selectRaw('
+                        COUNT(*) as total_products,
+                        COALESCE(SUM(stock), 0) as total_stock,
+                        COALESCE(SUM(stock * COALESCE(purchase_price, 0)), 0) as total_inventory_value,
+                        COALESCE(SUM(CASE WHEN stock > 0 THEN 1 ELSE 0 END), 0) as available_products_count,
+                        COALESCE(SUM(CASE WHEN stock <= 0 THEN 1 ELSE 0 END), 0) as out_of_stock_count,
+                        COALESCE(SUM(CASE WHEN stock > 0 AND stock < 10 THEN 1 ELSE 0 END), 0) as low_stock_count
+                    ')
+                    ->first();
+            });
 
 
 
@@ -124,35 +115,24 @@ class DashboardController extends Controller
 
 
 
-            // 2. Transaksi Persediaan berdasarkan Periode (Realtime)
+            // 2. Transaksi Persediaan berdasarkan Periode (Cached 60s)
+            $cacheKeyTxStats = "dashboard_tx_stats_{$selectedYear}_{$selectedMonth}";
+            $txStats = Cache::store('file')->remember($cacheKeyTxStats, 60, function () use ($selectedYear, $selectedMonth) {
+                $txQuery = DB::table('stock_transactions');
+                if ($selectedYear) {
+                    $txQuery->whereYear('transaction_date', $selectedYear);
+                }
+                if ($selectedMonth) {
+                    $txQuery->whereMonth('transaction_date', $selectedMonth);
+                }
 
-            $txQuery = DB::table('stock_transactions');
-
-            if ($selectedYear) {
-
-                $txQuery->whereYear('transaction_date', $selectedYear);
-
-            }
-
-            if ($selectedMonth) {
-
-                $txQuery->whereMonth('transaction_date', $selectedMonth);
-
-            }
-
-
-
-            $txStats = $txQuery->selectRaw("
-
-                COALESCE(SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END), 0) as total_stock_in,
-
-                COALESCE(SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END), 0) as total_stock_out,
-
-                COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'subdit' OR note LIKE '%Subdit%') THEN quantity ELSE 0 END), 0) as total_stock_out_subdit,
-
-                COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'individu' OR (recipient_type != 'subdit' AND (note NOT LIKE '%Subdit%' OR note IS NULL))) THEN quantity ELSE 0 END), 0) as total_stock_out_individu
-
-            ")->first();
+                return $txQuery->selectRaw("
+                    COALESCE(SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END), 0) as total_stock_in,
+                    COALESCE(SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END), 0) as total_stock_out,
+                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'subdit' OR note LIKE '%Subdit%') THEN quantity ELSE 0 END), 0) as total_stock_out_subdit,
+                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'individu' OR (recipient_type != 'subdit' AND (note NOT LIKE '%Subdit%' OR note IS NULL))) THEN quantity ELSE 0 END), 0) as total_stock_out_individu
+                ")->first();
+            });
 
 
 
@@ -170,45 +150,34 @@ class DashboardController extends Controller
 
 
 
-            // 2b. Daftar Barang yang Memiliki Stok Fisik Tersedia di Gudang
-
-            $availableProductsList = Product::with('category')
-
+            // 2b. Daftar Barang yang Memiliki Stok Fisik Tersedia di Gudang (Eager load efisien)
+            $availableProductsList = Product::select('id', 'name', 'code', 'bmn_code', 'stock', 'unit', 'purchase_price', 'category_id', 'image')
+                ->with('category:id,name')
                 ->where('stock', '>', 0)
-
                 ->orderBy('stock', 'desc')
                 ->paginate(5)
                 ->withQueryString();
 
-
-
-            // 3. Stok Kritis & Top Products (Realtime)
-
-            $lowStockProducts = Product::with('category')
-
-                ->where('stock', '>', 0)
-
-                ->where('stock', '<', 10)
-
-                ->orderBy('stock', 'asc')
-
-                ->limit(5)
-
-                ->get();
-
-            if ($lowStockProducts->isEmpty()) {
-
-                $lowStockProducts = Product::with('category')
-
-                    ->where('stock', '<=', 0)
-
-                    ->orderBy('id', 'asc')
-
+            // 3. Stok Kritis & Top Products (Cached 60s)
+            $cacheKeyLowStock = 'dashboard_low_stock_products';
+            $lowStockProducts = Cache::store('file')->remember($cacheKeyLowStock, 60, function () {
+                $items = Product::select('id', 'name', 'code', 'bmn_code', 'stock', 'unit', 'category_id', 'image')
+                    ->with('category:id,name')
+                    ->where('stock', '>', 0)
+                    ->where('stock', '<', 10)
+                    ->orderBy('stock', 'asc')
                     ->limit(5)
-
                     ->get();
-
-            }
+                if ($items->isEmpty()) {
+                    $items = Product::select('id', 'name', 'code', 'bmn_code', 'stock', 'unit', 'category_id', 'image')
+                        ->with('category:id,name')
+                        ->where('stock', '<=', 0)
+                        ->orderBy('id', 'asc')
+                        ->limit(5)
+                        ->get();
+                }
+                return $items;
+            });
 
 
 
@@ -332,47 +301,38 @@ class DashboardController extends Controller
 
 
 
-            // 6. Ringkasan Antrean & Distribusi
-
-            $pendingSummary = RequestItem::getPendingSummary();
+            // 6. Ringkasan Antrean & Distribusi (Cached 30s)
+            $pendingSummary = Cache::store('file')->remember('dashboard_pending_summary', 30, function () {
+                return RequestItem::getPendingSummary();
+            });
 
             $pendingRequestsCount = $pendingSummary['total'];
-
             $kasubagPendingProcurementCount = $pendingSummary['procurement'];
-
             $kasubagPendingStockCount = $pendingSummary['stock'];
-
-
 
             $isDistributorGudang = $currentUser && $currentUser->isPegawaiGudang() && $currentUser->isDistributor();
 
-            $readyDistribusiCount = ($isPegawaiGudang && !$isDistributorGudang) ? 0 : RequestItem::getReadyDistribusiCount();
+            $readyDistribusiCount = ($isPegawaiGudang && !$isDistributorGudang) 
+                ? 0 
+                : Cache::store('file')->remember('dashboard_ready_distribusi_count', 30, function () {
+                    return RequestItem::getReadyDistribusiCount();
+                });
 
             $totalDistributedCount = 0;
 
-
-
-            // Hitung pengadaan disetujui TU yang menunggu stok masuk ke gudang
-
-            $pendingPengadaanGudangCount = DB::table('requests')
-
-                ->where('status', 'approved')
-
-                ->where('is_procurement', true)
-
-                ->whereExists(function ($q) {
-
-                    $q->select(DB::raw(1))
-
-                        ->from('request_details')
-
-                        ->whereColumn('request_details.request_id', 'requests.id')
-
-                        ->where('request_details.is_fulfilled', false);
-
-                })
-
-                ->count();
+            // Hitung pengadaan disetujui TU yang menunggu stok masuk ke gudang (Cached 30s)
+            $pendingPengadaanGudangCount = Cache::store('file')->remember('dashboard_pending_pengadaan_gudang_count', 30, function () {
+                return DB::table('requests')
+                    ->where('status', 'approved')
+                    ->where('is_procurement', true)
+                    ->whereExists(function ($q) {
+                        $q->select(DB::raw(1))
+                            ->from('request_details')
+                            ->whereColumn('request_details.request_id', 'requests.id')
+                            ->where('request_details.is_fulfilled', false);
+                    })
+                    ->count();
+            });
 
             $pendingProcurementsExaminerCount = $pendingPengadaanGudangCount;
 

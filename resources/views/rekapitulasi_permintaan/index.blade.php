@@ -133,7 +133,7 @@
 
                     {{-- Filter Tipe --}}
                     <div style="min-width: 145px;">
-                        <select name="type" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                        <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                             <option value="">Semua Tipe</option>
                             <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>🏢 Subdit</option>
                             <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>👤 Individu</option>
@@ -142,7 +142,7 @@
 
                     {{-- Filter Status --}}
                     <div style="min-width: 175px;">
-                        <select name="status" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                             <option value="all" {{ empty($statusFilter) || $statusFilter === 'all' ? 'selected' : '' }}>Semua Status</option>
                             <option value="pending" {{ ($statusFilter ?? '') === 'pending' ? 'selected' : '' }}>Menunggu Verifikasi</option>
                             <option value="approved" {{ ($statusFilter ?? '') === 'approved' ? 'selected' : '' }}>Disetujui TU</option>
@@ -153,7 +153,7 @@
 
                     {{-- Filter Bulan --}}
                     <div style="min-width: 180px;">
-                        <select name="month" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                        <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                             <option value="all" {{ ($isAllMonths ?? false) ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                             @php
                                 $monthsList = [
@@ -172,7 +172,7 @@
 
                     {{-- Filter Tahun --}}
                     <div style="min-width: 135px;">
-                        <select name="year" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                        <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                             <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
                             @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
                                 <option value="{{ $y }}" {{ ($selectedYear ?? null) == $y ? 'selected' : '' }}>

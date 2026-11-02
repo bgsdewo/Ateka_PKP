@@ -98,20 +98,31 @@ class DistributionController extends Controller
                 });
             });
 
-        // Rekap statistik untuk Distribusi Barang
-        $totalReady = (clone $baseQuery)->where('status', 'approved')->count();
-        $totalDistributed = (clone $baseQuery)->where('status', 'distributed')->count();
-        $totalSubditReady = (clone $baseQuery)->where('status', 'approved')->where('type', 'subdit')->count();
-        $totalIndividuReady = (clone $baseQuery)->where('status', 'approved')->where('type', 'individu')->count();
+        // Rekap statistik untuk Distribusi Barang via 1 single aggregated query
+        $stats = (clone $baseQuery)
+            ->selectRaw("
+                COUNT(CASE WHEN status = 'approved' THEN 1 END) as total_ready,
+                COUNT(CASE WHEN status = 'distributed' THEN 1 END) as total_distributed,
+                COUNT(CASE WHEN status = 'approved' AND type = 'subdit' THEN 1 END) as total_subdit_ready,
+                COUNT(CASE WHEN status = 'approved' AND (type = 'individu' OR type IS NULL) THEN 1 END) as total_individu_ready
+            ")
+            ->first();
 
-        // Rekapitulasi kolektif per Subdirektorat
-        $subditGroups = (clone $baseQuery)
-            ->where('status', 'approved')
-            ->where('type', 'subdit')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->user->position ?? ($item->user->name ?? 'Subdit Umum');
-            });
+        $totalReady = (int) ($stats->total_ready ?? 0);
+        $totalDistributed = (int) ($stats->total_distributed ?? 0);
+        $totalSubditReady = (int) ($stats->total_subdit_ready ?? 0);
+        $totalIndividuReady = (int) ($stats->total_individu_ready ?? 0);
+
+        // Rekapitulasi kolektif per Subdirektorat (hanya dijalankan jika ada item subdit yang siap)
+        $subditGroups = $totalSubditReady > 0
+            ? (clone $baseQuery)
+                ->where('status', 'approved')
+                ->where('type', 'subdit')
+                ->get()
+                ->groupBy(function ($item) {
+                    return $item->user->position ?? ($item->user->name ?? 'Subdit Umum');
+                })
+            : collect();
 
         $query = (clone $baseQuery)->latest('updated_at')->latest('id');
 
@@ -124,21 +135,24 @@ class DistributionController extends Controller
         $requests = $query->paginate(15)->withQueryString();
 
         // Akun Pegawai Gudang yang ditunjuk Kasubbag TU sebagai Petugas Distribusi resmi
-        $defaultDistributor = \App\Models\User::where('role', 'pegawai_gudang')
-            ->where('is_distributor', true)
-            ->where('name', '!=', 'tes')
-            ->latest('id')
-            ->first()
-            ?? \App\Models\User::where('role', 'pegawai_gudang')
-            ->where('name', '!=', 'tes')
-            ->latest('id')
-            ->first()
-            ?? auth()->user();
+        $defaultDistributor = \Illuminate\Support\Facades\Cache::remember('distribusi_default_distributor', 300, function () {
+            return \App\Models\User::where('role', 'pegawai_gudang')
+                ->where('is_distributor', true)
+                ->where('name', '!=', 'tes')
+                ->latest('id')
+                ->first()
+                ?? \App\Models\User::where('role', 'pegawai_gudang')
+                ->where('name', '!=', 'tes')
+                ->latest('id')
+                ->first();
+        }) ?? auth()->user();
 
-        $gudangUsers = \App\Models\User::where('role', 'pegawai_gudang')
-            ->orderByDesc('is_distributor')
-            ->orderBy('name')
-            ->get();
+        $gudangUsers = \Illuminate\Support\Facades\Cache::remember('distribusi_gudang_users', 300, function () {
+            return \App\Models\User::where('role', 'pegawai_gudang')
+                ->orderByDesc('is_distributor')
+                ->orderBy('name')
+                ->get();
+        });
 
         return view('distribusi.index', compact(
             'requests',

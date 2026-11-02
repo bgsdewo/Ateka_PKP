@@ -151,7 +151,7 @@
         {{-- Baris Filter & Pencarian --}}
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 katalog-filter-card" style="overflow: visible !important; position: relative; z-index: 25;">
                     <div class="card-body p-3.5">
                         <form id="katalog-filter-form" action="{{ route('katalog-atk') }}" method="GET" class="row g-2 align-items-center">
                             <div class="col-12 col-md-6 col-lg-4">

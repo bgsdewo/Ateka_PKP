@@ -1,15 +1,16 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <div class="iq-navbar-header" style="height: 220px;">
-        <div class="container-fluid iq-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
-                        <div>
-                            <h1 class="text-white fw-bold mb-1">Transaksi Barang Keluar</h1>
-                        </div>
-                    </div>
+    <div class="iq-navbar-header py-0" style="height: auto; min-height: 0; background: transparent; box-shadow: none; border: none; padding: 1.25rem 2rem 0.5rem 2rem; margin-bottom: 0.75rem !important;">
+        <div class="container-fluid iq-container p-0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-2 pt-1">
+                <div>
+                    <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
+                        Transaksi Barang Keluar
+                    </h1>
+                    <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">
+                        Catatan dan riwayat pengeluaran barang persediaan ATK ke pemohon unit kerja &amp; perorangan
+                    </p>
                 </div>
             </div>
         </div>
@@ -17,7 +18,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid content-inner mt-n5 py-0">
+    <div class="container-fluid content-inner py-0" style="margin-top: 0 !important; padding-top: 1.25rem !important;">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -45,7 +46,7 @@
         {{-- Card Filter Periode Transaksi --}}
         <div class="row mb-4">
             <div class="col-sm-12">
-                <div class="card shadow-sm border-0" style="border-radius: 14px;">
+                <div class="card shadow-sm border-0 filter-card" style="border-radius: 14px; overflow: visible !important; position: relative; z-index: 20;">
                     <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px;">
                         <div class="d-flex align-items-center gap-2.5">
                             <span class="badge bg-danger-subtle text-danger p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
@@ -143,7 +144,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <div class="card shadow-sm border-0" style="border-radius: 14px;">
+                <div class="card shadow-sm border-0 filter-card" style="border-radius: 14px; overflow: visible !important; position: relative; z-index: 20;">
                     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3 border-bottom py-3 bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px;">
                         <div class="header-title">
                             <h5 class="card-title mb-0 fw-bold text-dark">Data Persediaan Barang Keluar</h5>

@@ -2642,11 +2642,42 @@ body:not(.auth-page) {
     border-radius: var(--theme-radius-card) !important;
     box-shadow: 0 2px 8px rgba(12, 43, 39, 0.03) !important;
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    overflow: hidden !important;
+    overflow: visible;
 }
 
 .card:hover {
     box-shadow: 0 8px 24px rgba(12, 43, 39, 0.07) !important;
+}
+
+/* Pastikan filter cards, form, dan kontainer dropdown tidak memotong popup menu */
+.card-filter,
+.filter-card,
+.katalog-filter-card,
+.card-body,
+#katalog-filter-form,
+#persetujuan-filter-form,
+#distribusi-filter-form,
+.ateka-scroll-select-wrapper {
+    overflow: visible !important;
+}
+
+/* Stacking context dinamis untuk dropdown agar selalu di atas elemen lain */
+.ateka-scroll-select-wrapper {
+    position: relative;
+    z-index: 20;
+}
+
+.dropdown.show,
+.ateka-scroll-select-wrapper.show,
+.card:has(.dropdown.show),
+.card:has(.ateka-scroll-select-wrapper.show) {
+    z-index: 1055 !important;
+    position: relative;
+}
+
+.dropdown-menu,
+.ateka-scroll-select-menu {
+    z-index: 1065 !important;
 }
 
 .card-header {
@@ -2863,6 +2894,30 @@ body:not(.auth-page) {
     outline: none !important;
 }
 
+.form-control.form-control-sm,
+.form-select.form-select-sm,
+.form-select-sm,
+.form-control-sm {
+    padding-top: 0.28rem !important;
+    padding-bottom: 0.28rem !important;
+    padding-left: 0.85rem !important;
+    padding-right: 2.2rem !important;
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+    border-radius: 10px !important;
+    min-height: 38px !important;
+}
+
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm > .btn {
+    padding-top: 0.28rem !important;
+    padding-bottom: 0.28rem !important;
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+    min-height: 38px !important;
+}
+
 /* ------------------------------------------------------------------------------
  * BADGES: Modern Soft Pills
  * ------------------------------------------------------------------------------ */
@@ -2958,4 +3013,30 @@ code, kbd, samp, pre, .font-monospace {
 .card-header h3,
 .card-header h4 {
     text-shadow: none !important;
+}
+
+/* ======================================================== */
+/* LCP & CLS PERFORMANCE OPTIMIZATIONS (Core Web Vitals)     */
+/* ======================================================== */
+
+/* Sembunyikan total dropdown menu sebelum dibuka agar Chrome tidak menghitungnya sebagai LCP */
+.dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+}
+
+/* Dimensi stabil untuk card statistik dashboard untuk mencegah Cumulative Layout Shift (CLS) */
+.aeux-stat-card {
+    min-height: 165px;
+    contain: layout;
+}
+
+/* Canvas grafik stabil */
+#stockChart {
+    width: 100% !important;
+    height: 200px !important;
+    aspect-ratio: 3 / 1;
 }
