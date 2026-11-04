@@ -208,7 +208,7 @@
                                                                                 @endforeach
                                                                             </ul>
                                                                             @if ($subItem->verification_notes)
-                                                                                <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $subItem->verification_notes }}</small>
+                                                                                <small class="text-primary d-block fst-italic mt-1 ateka-note-clamp" title="{{ $subItem->verification_notes }}">Catatan TU: {{ $subItem->verification_notes }}</small>
                                                                             @endif
                                                                         </td>
                                                                         <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
@@ -417,7 +417,7 @@
                                                             $req->verification_notes
                                                         );
                                                     @endphp
-                                                    <small class="text-primary d-block fst-italic mt-1">Catatan TU: {{ $cleanedDistNote }}</small>
+                                                    <small class="text-primary d-block fst-italic mt-1 ateka-note-clamp" title="{{ $cleanedDistNote }}">Catatan TU: {{ $cleanedDistNote }}</small>
                                                 @endif
                                             </td>
                                             <td>

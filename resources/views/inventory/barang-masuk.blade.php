@@ -172,7 +172,7 @@
 
                     <!-- TABEL DATA -->
                     <div class="card-body">
-                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100 ateka-fit-table"
                             data-toggle="data-table">
                                 <thead>
                                     <tr>

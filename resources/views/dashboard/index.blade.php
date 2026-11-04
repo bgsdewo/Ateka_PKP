@@ -711,7 +711,7 @@
 
                             <div class="aeux-stat-value mb-1" style="font-size: 2.1rem; color: #0c2b27; line-height: 1.1;">
 
-                                {{ number_format($totalStockOutSubdit) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Item</span>
+                                {{ number_format($distribSubditTickets) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Permohonan</span>
 
                             </div>
 
@@ -761,7 +761,7 @@
 
                             <div class="aeux-stat-value mb-1" style="font-size: 2.1rem; color: #0c2b27; line-height: 1.1;">
 
-                                {{ number_format($totalStockOutIndividu) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Item</span>
+                                {{ number_format($distribIndividuTickets) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Permohonan</span>
 
                             </div>
 
@@ -811,13 +811,13 @@
 
                             <div class="aeux-stat-value mb-1" style="font-size: 2.1rem; color: #0c2b27; line-height: 1.1;">
 
-                                {{ number_format($totalStockOut) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Item</span>
+                                {{ number_format($distribTotalTickets) }} <span style="font-size: 0.85rem; font-weight: 600; color: #71877e;">Permohonan</span>
 
                             </div>
 
                             <small class="text-muted d-block" style="font-size: 0.74rem; line-height: 1.35;">
 
-                                {{ number_format($totalStockOutSubdit) }} Subdit &bull; {{ number_format($totalStockOutIndividu) }} Pegawai
+                                {{ number_format($distribSubditTickets) }} Subdit &bull; {{ number_format($distribIndividuTickets) }} Pegawai
 
                             </small>
 
@@ -2126,9 +2126,10 @@
 
                                     $fulfilledCount = $tReq->details->where('is_fulfilled', true)->count();
 
-                                    $hasAnyFulfilled = $fulfilledCount > 0 || $tReq->is_purchased;
+                                    $isProcDone = ($status === 'distributed');
+$hasAnyFulfilled = $fulfilledCount > 0 || $tReq->is_purchased || $isProcDone;
 
-                                    $hasAllFulfilled = ($itemCount > 0 && $fulfilledCount >= $itemCount) || $tReq->is_purchased;
+                                    $hasAllFulfilled = ($itemCount > 0 && $fulfilledCount >= $itemCount) || $tReq->is_purchased || $isProcDone;
 
 
 
@@ -2160,7 +2161,7 @@
 
                                     // Step 3: Proses Pembelian Supplier
 
-                                    if ($status === 'approved') {
+                                    if (in_array($status, ['approved', 'distributed'])) {
 
                                         $s3Class = $hasAnyFulfilled ? 'step-done line-completed' : 'step-current';
 
@@ -2174,9 +2175,9 @@
 
                                     // Step 4: Tersedia di Katalog Persediaan
 
-                                    if ($status === 'approved' && $hasAnyFulfilled) {
+                                    if (in_array($status, ['approved', 'distributed']) && $hasAnyFulfilled) {
 
-                                        $s4Class = $hasAllFulfilled ? 'step-done' : 'step-current';
+                                        $s4Class = $isProcDone ? 'step-current' : ($hasAllFulfilled ? 'step-done' : 'step-current');
 
                                     } else {
 
@@ -2336,7 +2337,7 @@
 
                                         $dQty = ($dItem->approved_quantity ?: $dItem->quantity) . ' ' . ($dItem->unit ?? 'Buah');
 
-                                        $dFulfilled = (bool) $dItem->is_fulfilled;
+                                        $dFulfilled = (bool) $dItem->is_fulfilled || ($tReq->is_procurement && $status === 'distributed');
 
                                         $dFulfilledAt = $dItem->fulfilled_at ?? ($dFulfilled ? $tReq->updated_at : null);
 
@@ -2372,7 +2373,7 @@
 
                                             // Step 3: Pembelian Supplier
 
-                                            if ($status === 'approved') {
+                                            if (in_array($status, ['approved', 'distributed'])) {
 
                                                 $itemS3Class = $dFulfilled ? 'step-done line-completed' : 'step-current';
 
@@ -2386,9 +2387,9 @@
 
                                             // Step 4: Tersedia di Katalog
 
-                                            if ($status === 'approved' && $dFulfilled) {
+                                            if (in_array($status, ['approved', 'distributed']) && $dFulfilled) {
 
-                                                $itemS4Class = 'step-done';
+                                                $itemS4Class = ($status === 'distributed') ? 'step-current' : 'step-done';
 
                                             } else {
 
@@ -2718,7 +2719,7 @@
 
                                                     @if($tReq->is_procurement)
 
-                                                        @if($status === 'approved')
+                                                        @if(in_array($status, ['approved', 'distributed']))
 
                                                             {{ $dFulfilled ? '(Telah Dibeli Subbag TU)' : '(Sedang Dibeli Kasubbag TU)' }}
 
@@ -2824,7 +2825,7 @@
 
                                                     @if($tReq->is_procurement)
 
-                                                        @if($status === 'approved' && $dFulfilled)
+                                                        @if(in_array($status, ['approved', 'distributed']) && $dFulfilled)
 
                                                             (Stok Masuk &amp; Siap Diminta)
 
@@ -2862,7 +2863,7 @@
 
                                                     @if($tReq->is_procurement)
 
-                                                        @if($status === 'approved' && $dFulfilled)
+                                                        @if(in_array($status, ['approved', 'distributed']) && $dFulfilled)
 
                                                             {{ ($dFulfilledAt ?? $tReq->updated_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
 
@@ -3168,7 +3169,7 @@
 
                                                     @if($tReq->is_procurement)
 
-                                                        @if($status === 'approved')
+                                                        @if(in_array($status, ['approved', 'distributed']))
 
                                                             @if($hasAllFulfilled)
 

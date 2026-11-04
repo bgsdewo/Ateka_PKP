@@ -202,7 +202,7 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
 }
 
 /* Sub-menu sidebar: label panjang boleh turun baris, jangan dipotong "…" */
-.sidebar:not(.sidebar-mini) .sub-nav .nav-link .item-name {
+.sidebar:not(.sidebar-mini) .nav-item .sub-nav .nav-item .nav-link .item-name {
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
@@ -290,4 +290,34 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
     .ateka-queue .ateka-q-who small:not(.d-block) { flex: 0 0 100%; text-align: right; margin-top: -.1rem; }
     .ateka-queue .ateka-q-who .d-block { flex: 1 1 0; }
     .ateka-queue .ateka-q-code small.d-block { flex: 0 0 100%; }
+}
+
+/* Catatan panjang (mis. Catatan TU) dipangkas 2 baris; teks penuh ada di tooltip */
+.ateka-note-clamp {
+    display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; max-width: 22rem;
+}
+
+/* ------------------------------------------------------------------
+ * 11. Tabel data lebar (Daftar Barang, Barang Masuk/Keluar):
+ *     di layar >= 992px muat tanpa scroll samping
+ * ------------------------------------------------------------------ */
+@media (min-width: 992px) {
+    .table-responsive > .table.ateka-fit-table { min-width: 0 !important; width: 100% !important; table-layout: auto; font-size: .74rem; }
+    .ateka-fit-table > :not(caption) > * > * { padding: .45rem .35rem !important; }
+    .ateka-fit-table thead th { white-space: normal !important; font-size: .66rem !important; line-height: 1.2; letter-spacing: .02em; padding-right: .9rem !important; }
+    .ateka-fit-table thead th.sorting::before, .ateka-fit-table thead th.sorting::after,
+    .ateka-fit-table thead th.sorting_asc::before, .ateka-fit-table thead th.sorting_asc::after,
+    .ateka-fit-table thead th.sorting_desc::before, .ateka-fit-table thead th.sorting_desc::after { right: .25rem !important; font-size: .6rem; }
+    .ateka-fit-table td, .ateka-fit-table td.text-nowrap, .ateka-fit-table th.text-nowrap { white-space: normal !important; overflow-wrap: anywhere; }
+    .ateka-fit-table td .btn { font-size: .66rem !important; padding: .2rem .45rem !important; white-space: nowrap; }
+    .ateka-fit-table td .badge { font-size: .64rem !important; padding: .22rem .45rem !important; white-space: normal !important; line-height: 1.2; }
+    .ateka-fit-table td:last-child .d-flex, .ateka-fit-table td:last-child .btn-group { flex-wrap: wrap; gap: .2rem; }
+    .ateka-fit-table td form { display: inline-flex; }
+    .ateka-fit-table td img { max-width: 30px; height: auto; }
+    .card-body:has(> .dataTables_wrapper), .card-body:has(.ateka-fit-table) { padding-left: .6rem !important; padding-right: .6rem !important; }
+}
+@media (min-width: 992px) {
+    .ateka-fit-table td:last-child .flex-nowrap { flex-wrap: wrap !important; }
+    .ateka-fit-table td.text-end { white-space: nowrap !important; }
 }

@@ -717,7 +717,7 @@ class ProductController extends Controller
                     $updateData['purchase_invoice']   = $noFaktur ?: ($reqItem->purchase_invoice ?: '-');
                     $updateData['purchase_date']      = $transactionDate ?: ($reqItem->purchase_date ?: now());
                     $updateData['purchase_notes']     = $uraian ?: ($reqItem->purchase_notes ?: 'Barang telah diisi stoknya oleh Petugas Gudang');
-                    $updateData['verification_notes'] = 'Barang telah tersedia di gudang dan dialokasikan untuk pemohon. Siap diserahterimakan oleh Petugas Distribusi.';
+                    $updateData['verification_notes'] = 'Barang tersedia di gudang, siap diserahkan.';
                 } else {
                     if ($noFaktur && !$reqItem->purchase_notes) {
                         $updateData['purchase_notes'] = 'Sebagian barang telah ditambahkan (' . $product->name . ')';

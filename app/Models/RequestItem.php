@@ -144,6 +144,16 @@ class RequestItem extends Model
         return $this->scopeForPic($query, $picUser);
     }
 
+    /**
+     * Catatan verifikasi: ringkas teks bawaan sistem yang lama (terlalu panjang) saat ditampilkan.
+     * Data di database tidak diubah.
+     */
+    public function getVerificationNotesAttribute($value)
+    {
+        $legacy = 'Barang telah tersedia di gudang dan dialokasikan untuk pemohon. Siap diserahterimakan oleh Petugas Distribusi.';
+        return $value === $legacy ? 'Barang tersedia di gudang, siap diserahkan.' : $value;
+    }
+
     public function getIsPurchasedAttribute(): bool
     {
         if (!$this->is_procurement) {

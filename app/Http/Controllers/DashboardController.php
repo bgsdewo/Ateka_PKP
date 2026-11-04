@@ -144,6 +144,27 @@ class DashboardController extends Controller
 
             $totalStockOutIndividu = (int) ($txStats->total_stock_out_individu ?? 0);
 
+            // Distribusi per permohonan (tiket) yang telah diserahterimakan pada periode terpilih.
+            // Dihitung dari tabel requests agar permohonan perorangan (pegawai) & kolektif (subdit)
+            // terhitung benar, tidak bergantung pada catatan teks mutasi stok.
+            $cacheKeyDistrib = "dashboard_distrib_tickets_{$selectedYear}_{$selectedMonth}";
+            $distribStats = Cache::store('file')->remember($cacheKeyDistrib, 60, function () use ($selectedYear, $selectedMonth) {
+                $dq = DB::table('requests')->where('status', 'distributed');
+                if ($selectedYear) {
+                    $dq->whereYear('distributed_at', $selectedYear);
+                }
+                if ($selectedMonth) {
+                    $dq->whereMonth('distributed_at', $selectedMonth);
+                }
+                return $dq->selectRaw("
+                    COUNT(*) as total_tickets,
+                    COALESCE(SUM(CASE WHEN type = 'subdit' THEN 1 ELSE 0 END), 0) as subdit_tickets
+                ")->first();
+            });
+            $distribTotalTickets = (int) ($distribStats->total_tickets ?? 0);
+            $distribSubditTickets = (int) ($distribStats->subdit_tickets ?? 0);
+            $distribIndividuTickets = $distribTotalTickets - $distribSubditTickets;
+
             $totalStockInValue = 0;
 
             $totalStockOutValue = 0;
@@ -475,6 +496,9 @@ class DashboardController extends Controller
             $totalStockOutSubdit = 0;
 
             $totalStockOutIndividu = 0;
+            $distribTotalTickets = 0;
+            $distribSubditTickets = 0;
+            $distribIndividuTickets = 0;
 
             $totalStockInValue = 0;
 
@@ -757,6 +781,9 @@ class DashboardController extends Controller
             'totalStockOutSubdit',
 
             'totalStockOutIndividu',
+            'distribTotalTickets',
+            'distribSubditTickets',
+            'distribIndividuTickets',
 
             'lowStockCount',
 

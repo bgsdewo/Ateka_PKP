@@ -141,8 +141,9 @@
 
                                 if ($tReq->is_procurement) {
                                     $fulfilledCount = $tReq->details->where('is_fulfilled', true)->count();
-                                    $hasAnyFulfilled = $fulfilledCount > 0 || $tReq->is_purchased;
-                                    $hasAllFulfilled = ($itemCount > 0 && $fulfilledCount >= $itemCount) || $tReq->is_purchased;
+                                    $isProcDone = ($status === 'distributed');
+                                    $hasAnyFulfilled = $fulfilledCount > 0 || $tReq->is_purchased || $isProcDone;
+                                    $hasAllFulfilled = ($itemCount > 0 && $fulfilledCount >= $itemCount) || $tReq->is_purchased || $isProcDone;
 
                                     // WORKFLOW PENGADAAN BARANG BARU (RESTOCK)
                                     // Step 1: Usulan Diajukan
@@ -158,15 +159,15 @@
                                     }
 
                                     // Step 3: Proses Pembelian Supplier
-                                    if ($status === 'approved') {
-                                        $s3Class = $hasAnyFulfilled ? 'step-done line-completed' : 'step-current';
+                                    if (in_array($status, ['approved', 'distributed'])) {
+\1$s3Class = $hasAnyFulfilled ? 'step-done line-completed' : 'step-current';
                                     } else {
                                         $s3Class = 'step-upcoming';
                                     }
 
                                     // Step 4: Tersedia di Katalog Persediaan
-                                    if ($status === 'approved' && $hasAnyFulfilled) {
-                                        $s4Class = $hasAllFulfilled ? 'step-done' : 'step-current';
+                                    if (in_array($status, ['approved', 'distributed']) && $hasAnyFulfilled) {
+\1$s4Class = $isProcDone ? 'step-current' : ($hasAllFulfilled ? 'step-done' : 'step-current');
                                     } else {
                                         $s4Class = 'step-upcoming';
                                     }
@@ -246,7 +247,7 @@
                                     @php
                                         $dName = $dItem->custom_product_name ?? ($dItem->product->name ?? 'Barang ATK');
                                         $dQty = ($dItem->approved_quantity ?: $dItem->quantity) . ' ' . ($dItem->unit ?? 'Buah');
-                                        $dFulfilled = (bool) $dItem->is_fulfilled;
+                                        $dFulfilled = (bool) $dItem->is_fulfilled || ($tReq->is_procurement && $status === 'distributed');
                                         $dFulfilledAt = $dItem->fulfilled_at ?? ($dFulfilled ? $tReq->updated_at : null);
 
                                         if ($tReq->is_procurement) {
@@ -264,15 +265,15 @@
                                             }
 
                                             // Step 3: Pembelian Supplier
-                                            if ($status === 'approved') {
-                                                $itemS3Class = $dFulfilled ? 'step-done line-completed' : 'step-current';
+                                            if (in_array($status, ['approved', 'distributed'])) {
+\1$itemS3Class = $dFulfilled ? 'step-done line-completed' : 'step-current';
                                             } else {
                                                 $itemS3Class = 'step-upcoming';
                                             }
 
                                             // Step 4: Tersedia di Katalog
-                                            if ($status === 'approved' && $dFulfilled) {
-                                                $itemS4Class = 'step-done';
+                                            if (in_array($status, ['approved', 'distributed']) && $dFulfilled) {
+\1$itemS4Class = ($status === 'distributed') ? 'step-current' : 'step-done';
                                             } else {
                                                 $itemS4Class = 'step-upcoming';
                                             }
@@ -437,7 +438,7 @@
                                                 </div>
                                                 <div class="atk-step-subtitle">
                                                     @if($tReq->is_procurement)
-                                                        @if($status === 'approved')
+                                                        @if(in_array($status, ['approved', 'distributed']))
                                                             {{ $dFulfilled ? '(Telah Dibeli Subbag TU)' : '(Sedang Dibeli Kasubbag TU)' }}
                                                         @else
                                                             (Menunggu Persetujuan)
@@ -490,7 +491,7 @@
                                                 </div>
                                                 <div class="atk-step-subtitle">
                                                     @if($tReq->is_procurement)
-                                                        @if($status === 'approved' && $dFulfilled)
+                                                        @if(in_array($status, ['approved', 'distributed']) && $dFulfilled)
                                                             (Stok Masuk &amp; Siap Diminta)
                                                         @else
                                                             (Menunggu Barang Tiba)
@@ -509,7 +510,7 @@
                                                 </div>
                                                 <div class="atk-step-time">
                                                     @if($tReq->is_procurement)
-                                                        @if($status === 'approved' && $dFulfilled)
+                                                        @if(in_array($status, ['approved', 'distributed']) && $dFulfilled)
                                                             {{ ($dFulfilledAt ?? $tReq->updated_at)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }} WIB
                                                         @else
                                                             -
@@ -662,7 +663,7 @@
                                                 </div>
                                                 <div class="atk-step-subtitle">
                                                     @if($tReq->is_procurement)
-                                                        @if($status === 'approved')
+                                                        @if(in_array($status, ['approved', 'distributed']))
                                                             @if($hasAllFulfilled)
                                                                 (Telah Dibeli Subbag TU)
                                                             @elseif($hasAnyFulfilled)

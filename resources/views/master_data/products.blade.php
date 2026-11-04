@@ -546,7 +546,7 @@
                         </div>
                     </div>
                     <div class="card-body px-2 px-md-3 py-3">
-                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100"
+                        <table id="datatable" class="table table-striped table-hover align-middle word-wrap w-100 ateka-fit-table"
                             data-toggle="data-table">
                                 <thead>
                                     <tr>
