@@ -654,6 +654,15 @@
 
                         {{-- Tombol Ekspor Rapi di Header Kartu --}}
                         <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <a href="{{ route('reports.kartu-persediaan') }}"
+                                class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold"
+                                title="Buka Halaman Kartu Persediaan Barang Resmi (Format UAKPB)">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                </svg>
+                                Kartu Persediaan
+                            </a>
                             <button type="button" id="btnExportExcel"
                                 class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"

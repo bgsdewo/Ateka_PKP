@@ -1,15 +1,16 @@
 @extends('layouts.app')
 
 @section('page-header')
-    <div class="iq-navbar-header" style="height: 220px;">
-        <div class="container-fluid iq-container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="flex-wrap d-flex justify-content-between align-items-center text-white">
-                        <div>
-                            <h1 class="text-white fw-bold mb-1">Koordinasi &amp; Distribusi Barang ATK</h1>
-                        </div>
-                    </div>
+    <div class="iq-navbar-header py-0" style="height: auto; min-height: 0; background: transparent; box-shadow: none; border: none; padding: 1.25rem 2rem 0.5rem 2rem; margin-bottom: 0.75rem !important;">
+        <div class="container-fluid iq-container p-0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-2 pt-1">
+                <div>
+                    <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
+                        Koordinasi &amp; Distribusi Barang ATK
+                    </h1>
+                    <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">
+                        Kelola dan konfirmasi serah terima barang persediaan ATK ke pemohon unit kerja &amp; perorangan
+                    </p>
                 </div>
             </div>
         </div>
@@ -22,7 +23,7 @@
         $isKasubagTU = $user && $user->isKasubagTU();
         $canDistribute = $isKasubagTU || ($user && $user->isPegawaiGudang() && $user->isDistributor());
     @endphp
-    <div class="container-fluid content-inner mt-n5 py-0">
+    <div class="container-fluid content-inner py-0" style="margin-top: 0 !important; padding-top: 1.25rem !important;">
         {{-- Flash Messages --}}
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2" role="alert">
@@ -250,7 +251,7 @@
         {{-- Tabel Utama Distribusi Barang --}}
         <div class="row">
             <div class="col-12">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 filter-card" style="overflow: visible !important;">
                     <form id="distribusi-filter-form" action="{{ route('distribusi.index') }}" method="GET">
                         {{-- 1. Card Header: Judul di Kiri, Kotak Pencarian di Kanan --}}
                         <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -660,10 +661,13 @@
                                                                 Foto Bukti Penyerahan (Dokumentasi)
                                                             </label>
                                                             <input type="file" name="distribution_proof" class="form-control form-control-sm" accept="image/jpeg,image/png,image/jpg,image/webp"
-                                                                onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}')" style="font-size: 0.8125rem;">
-                                                            <small class="text-muted d-block mt-0.5" style="font-size: 0.72rem;">
-                                                                Unggah foto serah terima barang (JPG, JPEG, PNG, WEBP, maks 5MB).
-                                                            </small>
+                                                                onchange="previewProofImage(this, 'proofPreview{{ $req->id }}', 'proofPreviewWrap{{ $req->id }}', 'proofSizeInfo{{ $req->id }}')" style="font-size: 0.8125rem;">
+                                                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                                                <small class="text-muted" style="font-size: 0.72rem;">
+                                                                    Unggah foto serah terima barang (JPG, PNG, WEBP).
+                                                                </small>
+                                                                <span id="proofSizeInfo{{ $req->id }}" class="badge bg-light text-secondary border small fw-normal d-none" style="font-size: 0.7rem;"></span>
+                                                            </div>
                                                             <div id="proofPreviewWrap{{ $req->id }}" class="mt-2 text-center p-2 border rounded bg-light d-none">
                                                                 <img id="proofPreview{{ $req->id }}" src="" alt="Pratinjau Foto Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 140px; object-fit: contain;">
                                                             </div>
@@ -867,33 +871,125 @@
 
 @push('scripts')
 <script>
-function previewProofImage(input, previewImgId, previewWrapId) {
+// Pratinjau instan (0ms) & kompresi cerdas di sisi client sebelum upload
+const proofObjectUrls = new Map();
+
+function previewProofImage(input, previewImgId, previewWrapId, sizeInfoId) {
     const wrap = document.getElementById(previewWrapId);
     const img = document.getElementById(previewImgId);
+    const sizeBadge = sizeInfoId ? document.getElementById(sizeInfoId) : null;
     if (!wrap || !img) return;
 
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 5 MB.');
-            input.value = '';
-            wrap.classList.add('d-none');
-            img.src = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            img.src = e.target.result;
-            wrap.classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-    } else {
+    if (!input.files || !input.files[0]) {
         wrap.classList.add('d-none');
         img.src = '';
+        if (sizeBadge) sizeBadge.classList.add('d-none');
+        return;
+    }
+
+    const file = input.files[0];
+    if (file.size > 20 * 1024 * 1024) {
+        alert('Ukuran file foto terlalu besar! Maksimal 20 MB.');
+        input.value = '';
+        wrap.classList.add('d-none');
+        img.src = '';
+        if (sizeBadge) sizeBadge.classList.add('d-none');
+        return;
+    }
+
+    // 1. Instant 0ms Preview via ObjectURL (tanpa main thread base64 memory freeze)
+    if (proofObjectUrls.has(previewImgId)) {
+        URL.revokeObjectURL(proofObjectUrls.get(previewImgId));
+    }
+    const objectUrl = URL.createObjectURL(file);
+    proofObjectUrls.set(previewImgId, objectUrl);
+    img.src = objectUrl;
+    wrap.classList.remove('d-none');
+
+    const origSizeKB = Math.round(file.size / 1024);
+    if (sizeBadge) {
+        sizeBadge.classList.remove('d-none');
+        sizeBadge.className = 'badge bg-light text-secondary border small fw-normal';
+        sizeBadge.textContent = 'Ukuran: ' + (origSizeKB > 1024 ? (origSizeKB/1024).toFixed(1) + ' MB' : origSizeKB + ' KB');
+    }
+
+    // 2. Otomatis kompresi gambar jika > 300 KB menggunakan HTML5 Canvas
+    if (file.size > 300 * 1024 && file.type.startsWith('image/')) {
+        compressImageClientSide(file, function(compressedBlob) {
+            if (compressedBlob && compressedBlob.size < file.size) {
+                const newFile = new File([compressedBlob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                    type: "image/jpeg",
+                    lastModified: Date.now()
+                });
+                try {
+                    const dt = new DataTransfer();
+                    dt.items.add(newFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    // Fallback for older browsers
+                }
+
+                if (sizeBadge) {
+                    const compSizeKB = Math.round(newFile.size / 1024);
+                    sizeBadge.className = 'badge bg-success-subtle text-success border border-success-subtle small fw-bold';
+                    sizeBadge.textContent = 'Diringankan: ' + compSizeKB + ' KB';
+                }
+            }
+        });
     }
 }
+
+function compressImageClientSide(file, callback) {
+    const tempImg = new Image();
+    const tempUrl = URL.createObjectURL(file);
+    tempImg.onload = function() {
+        URL.revokeObjectURL(tempUrl);
+        const maxDimension = 1600;
+        let width = tempImg.width;
+        let height = tempImg.height;
+
+        if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+            } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+            }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(tempImg, 0, 0, width, height);
+
+        canvas.toBlob(function(blob) {
+            callback(blob);
+        }, 'image/jpeg', 0.82);
+    };
+    tempImg.onerror = function() {
+        URL.revokeObjectURL(tempUrl);
+        callback(null);
+    };
+    tempImg.src = tempUrl;
+}
+
+function handleHandoverSubmit(form) {
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn && !btn.disabled) {
+        btn.disabled = true;
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menyimpan...';
+        window.addEventListener('pageshow', function() {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }, { once: true });
+    }
+}
+
 window.previewProofImage = previewProofImage;
+window.handleHandoverSubmit = handleHandoverSubmit;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Pastikan posisi popup modal selalu tepat di tengah layar viewport saat dibuka

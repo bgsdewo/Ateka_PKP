@@ -1,27 +1,29 @@
-@extends('layouts.app')
+@extends(request()->ajax() ? 'layouts.ajax' : 'layouts.app')
 
 @section('page-header')
-    <div class="iq-navbar-header" style="height: 220px;">
-        <div class="container-fluid iq-container">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <h1 class="text-white fw-bold mb-1">
+    <div class="iq-navbar-header py-0" style="height: auto; min-height: 0; background: transparent; box-shadow: none; border: none; padding: 1.25rem 2rem 0.5rem 2rem; margin-bottom: 0.75rem !important;">
+        <div class="container-fluid iq-container p-0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-2 pt-1">
+                <div>
+                    <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
                         @if (($category ?? null) === 'persediaan')
                             Verifikasi Permintaan Stok (Persediaan)
                         @elseif (($category ?? null) === 'pengadaan')
                             Verifikasi Usulan Pengadaan (Beli Baru)
                         @else
-                            Verifikasi & Persetujuan Permintaan ATK
+                            Verifikasi &amp; Persetujuan Permintaan ATK
                         @endif
                     </h1>
-                    <p class="text-white-50 mb-0" style="font-size: 0.9rem;">
-                        @if (($category ?? null) === 'persediaan')
-                            Pemeriksaan dan persetujuan pengeluaran barang dari persediaan fisik gudang.
-                        @elseif (($category ?? null) === 'pengadaan')
-                            Pemeriksaan dan persetujuan usulan pengadaan belanja baru ATK.
-                        @else
-                            Pusat kendali Kasubbag TU untuk verifikasi seluruh permohonan persediaan stok dan pengadaan ATK.
-                        @endif
+                    <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">
+                        Sistem Informasi Inventori Persediaan ATK (ATEKA) &bull; <strong style="color: #10b981;">
+                            @if (($category ?? null) === 'persediaan')
+                                Verifikasi Permintaan Stok
+                            @elseif (($category ?? null) === 'pengadaan')
+                                Verifikasi Usulan Pengadaan
+                            @else
+                                Verifikasi &amp; Persetujuan Permintaan
+                            @endif
+                        </strong>
                     </p>
                 </div>
             </div>
@@ -30,7 +32,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid content-inner mt-n5 py-0">
+    <div class="container-fluid content-inner py-0" style="margin-top: 0 !important; padding-top: 0.75rem !important;">
         {{-- Flash Notification Modern Floating Toast --}}
         @if (session('success'))
             <div id="modern-toast-notification" class="modern-floating-toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -117,15 +119,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-warning mb-0 fs-3">{{ $pendingCount }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                            @if (($category ?? null) === 'persediaan')
-                                Permintaan dari stok gudang
-                            @elseif (($category ?? null) === 'pengadaan')
-                                Usulan beli baru perlu persetujuan
-                            @else
-                                Seluruh antrean permohonan baru
-                            @endif
-                        </small>
+                        
                     </div>
                 </div>
             </div>
@@ -142,15 +136,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-success mb-0 fs-3">{{ $approvedCount }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                            @if (($category ?? null) === 'persediaan')
-                                Siap diserahkan oleh PIC Distribusi
-                            @elseif (($category ?? null) === 'pengadaan')
-                                Disetujui dalam proses pengadaan
-                            @else
-                                Telah diverifikasi &amp; disetujui
-                            @endif
-                        </small>
+                        
                     </div>
                 </div>
             </div>
@@ -169,7 +155,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-danger mb-0 fs-3">{{ $rejectedCount }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Tidak disetujui pimpinan</small>
+                        
                     </div>
                 </div>
             </div>
@@ -189,15 +175,7 @@
                     </div>
                     <div>
                         <h2 class="fw-bold text-dark mb-0 fs-3">{{ $totalCount }}</h2>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                            @if (($category ?? null) === 'persediaan')
-                                Arsip permintaan stok gudang
-                            @elseif (($category ?? null) === 'pengadaan')
-                                Arsip usulan pengadaan barang baru
-                            @else
-                                Seluruh arsip permohonan ATK
-                            @endif
-                        </small>
+                        
                     </div>
                 </div>
             </div>
@@ -206,43 +184,43 @@
         {{-- Filter Tab & Tabel Persetujuan --}}
         <div class="row">
             <div class="col-sm-12">
-                <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px;">
+                <div class="card shadow-sm border-0 mb-4 filter-card" style="border-radius: 14px; overflow: visible !important;">
                     <div class="card-header border-bottom bg-white" style="border-top-left-radius: 14px; border-top-right-radius: 14px; padding: 1.5rem 1.75rem 1.6rem 1.75rem !important;">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                             <div>
                                 @if (($category ?? null) === 'persediaan')
-                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
-                                    <p class="text-muted mb-0 small">Verifikasi permohonan pengeluaran barang dari stok fisik gudang.</p>
+                                    <h4 class="card-title mb-1 fw-bold" style="color: #0c2b27 !important; font-size: 1.2rem !important; letter-spacing: -0.025em !important;">Daftar Antrean Permintaan Barang Stok (Persediaan)</h4>
+                                    <p class="text-muted mb-0" style="font-size: 0.84rem !important; color: #64748b !important;">Verifikasi permohonan pengeluaran barang dari stok fisik gudang.</p>
                                 @elseif (($category ?? null) === 'pengadaan')
-                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
-                                    <p class="text-muted mb-0 small">Verifikasi usulan belanja/pengadaan baru ATK.</p>
+                                    <h4 class="card-title mb-1 fw-bold" style="color: #0c2b27 !important; font-size: 1.2rem !important; letter-spacing: -0.025em !important;">Daftar Antrean Usulan Pengadaan (Beli Baru)</h4>
+                                    <p class="text-muted mb-0" style="font-size: 0.84rem !important; color: #64748b !important;">Verifikasi usulan belanja/pengadaan baru ATK.</p>
                                 @else
-                                    <h4 class="card-title mb-1 fw-bold text-dark">Daftar Antrean Verifikasi &amp; Persetujuan Permintaan ATK</h4>
-                                    <p class="text-muted mb-0 small">Pusat kendali Kasubbag TU untuk verifikasi permohonan persediaan stok dan usulan pengadaan.</p>
+                                    <h4 class="card-title mb-1 fw-bold" style="color: #0c2b27 !important; font-size: 1.2rem !important; letter-spacing: -0.025em !important;">Daftar Permintaan ATK</h4>
+                                    <p class="text-muted mb-0" style="font-size: 0.84rem !important; color: #64748b !important;">Daftar permohonan persediaan stok dan usulan pengadaan barang.</p>
                                 @endif
                             </div>
                         </div>
 
                         {{-- Kategori Pills Switcher (Semua, Stok Gudang, Perlu Pengadaan) --}}
-                        <div class="d-flex align-items-center gap-2 flex-wrap mb-3 p-2 rounded-3" style="background-color: #f1f5f9;">
+                        <div id="category-filter-tabs" class="d-flex align-items-center gap-2 flex-wrap mb-3 p-2 rounded-3" style="background-color: #f1f5f9;">
                             <span class="small fw-bold text-muted me-1 d-none d-md-inline" style="font-size: 0.78rem;">Kategori Permintaan:</span>
                             <a href="{{ route('persetujuan.index', request()->except(['category', 'page'])) }}"
                                 class="btn btn-sm {{ empty($category) ? 'btn-primary text-white shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
-                                📋 Semua Permintaan ({{ $totalAllCategoryCount ?? $totalCount }})
+                                Semua Permintaan ({{ $totalAllCategoryCount ?? $totalCount }})
                                 @if(($pendingAllCount ?? 0) > 0)
                                     <span class="badge {{ empty($category) ? 'bg-white text-primary' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingAllCount }}</span>
                                 @endif
                             </a>
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'persediaan'])) }}"
                                 class="btn btn-sm {{ ($category ?? '') === 'persediaan' ? 'btn-success text-white shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
-                                📦 Stok Gudang (Persediaan) ({{ $totalStockCategoryCount ?? 0 }})
+                                Stok Gudang (Persediaan) ({{ $totalStockCategoryCount ?? 0 }})
                                 @if(($pendingStockCount ?? 0) > 0)
                                     <span class="badge {{ ($category ?? '') === 'persediaan' ? 'bg-white text-success' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingStockCount }}</span>
                                 @endif
                             </a>
                             <a href="{{ route('persetujuan.index', array_merge(request()->except(['category', 'page']), ['category' => 'pengadaan'])) }}"
                                 class="btn btn-sm {{ ($category ?? '') === 'pengadaan' ? 'btn-warning text-dark shadow-sm' : 'btn-light border text-dark' }} rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.8rem;">
-                                🛒 Perlu Pengadaan (Beli Baru) ({{ $totalProcurementCategoryCount ?? 0 }})
+                                Usulan Pengadaan (Beli Baru) ({{ $totalProcurementCategoryCount ?? 0 }})
                                 @if(($pendingProcurementCount ?? 0) > 0)
                                     <span class="badge {{ ($category ?? '') === 'pengadaan' ? 'bg-dark text-warning' : 'bg-danger text-white' }} rounded-pill ms-1" style="font-size: 0.7rem;">{{ $pendingProcurementCount }}</span>
                                 @endif
@@ -283,16 +261,16 @@
 
                             {{-- Filter Tipe --}}
                             <div style="min-width: 145px;">
-                                <select name="type" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="">Semua Tipe</option>
-                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>🏢 Subdit</option>
-                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>👤 Individu</option>
+                                    <option value="subdit" {{ ($typeFilter ?? '') === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                    <option value="individu" {{ ($typeFilter ?? '') === 'individu' ? 'selected' : '' }}>Individu (Pegawai)</option>
                                 </select>
                             </div>
 
                             {{-- Filter Bulan --}}
                             <div style="min-width: 180px;">
-                                <select name="month" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="all" {{ $isAllMonths ?? false ? 'selected' : '' }}>Semua Bulan (Setahun)</option>
                                     @php
                                         $allMonths = [
@@ -321,7 +299,7 @@
 
                             {{-- Filter Tahun --}}
                             <div style="min-width: 135px;">
-                                <select name="year" class="form-select form-select-modern form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1;">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.84rem; height: 38px; border-color: #cbd5e1; padding-top: 0.28rem !important; padding-bottom: 0.28rem !important; line-height: 1.45 !important;">
                                     <option value="all" {{ empty($selectedYear) ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
                                         <option value="{{ $y }}"
@@ -402,10 +380,10 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Kode & Tipe</th>
-                                        <th>Pemohon / Unit Kerja</th>
-                                        <th>Rincian Barang & Keperluan</th>
+                                        <th>Pemohon</th>
+                                        <th>Rincian Barang</th>
                                         <th>Status</th>
-                                        <th class="text-end">Aksi Kasubbag TU</th>
+                                        <th class="text-end">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="persetujuan-table-body">
@@ -482,11 +460,11 @@
                                                     </span>
                                                     @if ($req->is_procurement)
                                                         <span class="badge bg-warning text-dark fw-semibold" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">
-                                                            🛒 Pengadaan (Beli Baru)
+                                                            Pengadaan (Beli Baru)
                                                         </span>
                                                     @else
                                                         <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">
-                                                            📦 Stok Gudang
+                                                            Stok Gudang
                                                         </span>
                                                     @endif
                                                 </div>
@@ -517,7 +495,7 @@
                                                             <circle cx="12" cy="12" r="10"></circle>
                                                             <polyline points="12 6 12 12 16 14"></polyline>
                                                         </svg>
-                                                        Riwayat Pemohon
+                                                        Riwayat Akun Pemohon
                                                     </button>
 
                                                         @if ($hasRepeatedItemsSameMonth)
@@ -1305,6 +1283,7 @@
                                                                     </div>
                                                                 </div>
 
+                                                                @if (($category ?? null) !== 'persediaan')
                                                                 {{-- Seksi 2: Tabel Arsip Seluruh Riwayat Pengadaan Pemohon --}}
                                                                 <div class="card border mb-0">
                                                                     <div class="card-header bg-light py-2.5 d-flex justify-content-between align-items-center">
@@ -1395,6 +1374,7 @@
                                                                         @endif
                                                                     </div>
                                                                 </div>
+                                                                @endif
                                                             </div>
                                                             <div class="modal-footer flex-shrink-0 bg-white border-top">
                                                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup Riwayat</button>
@@ -1416,8 +1396,7 @@
                         </div>
                     </div>
 
-                    @if ($requests->total() > 0)
-                        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                    <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
                             <div class="text-muted small">
                                 Menampilkan <strong>{{ $requests->firstItem() ?? 0 }}</strong> -
                                 <strong>{{ $requests->lastItem() ?? 0 }}</strong> dari
@@ -1429,7 +1408,6 @@
                                 </div>
                             @endif
                         </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -1558,6 +1536,12 @@
                             currentTabs.innerHTML = newTabs.innerHTML;
                         }
 
+                        const newCatTabs = doc.getElementById('category-filter-tabs');
+                        const currentCatTabs = document.getElementById('category-filter-tabs');
+                        if (newCatTabs && currentCatTabs) {
+                            currentCatTabs.innerHTML = newCatTabs.innerHTML;
+                        }
+
                         const newMetrics = doc.getElementById('approval-metrics');
                         const currentMetrics = document.getElementById('approval-metrics');
                         if (newMetrics && currentMetrics) {
@@ -1658,6 +1642,18 @@
                     if (pageLink && pageLink.href) {
                         e.preventDefault();
                         performServerSearch(pageLink.href);
+                    }
+                });
+            }
+
+            // Intercept category filter tab clicks
+            const catTabsContainer = document.getElementById('category-filter-tabs');
+            if (catTabsContainer) {
+                catTabsContainer.addEventListener('click', function(e) {
+                    const catLink = e.target.closest('a');
+                    if (catLink && catLink.href) {
+                        e.preventDefault();
+                        performServerSearch(catLink.href);
                     }
                 });
             }

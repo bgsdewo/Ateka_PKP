@@ -33,19 +33,24 @@ class ApprovalController extends Controller
         $selectedMonth = ($isAllMonths || $monthInput === null || $monthInput === '') ? null : (int) $monthInput;
         $selectedYear = ($yearInput === 'all' || $yearInput === null || $yearInput === '') ? null : (int) $yearInput;
 
-        // Hitung pending tiket masing-masing kategori untuk tab switcher
-        $pendingProcurementCount = RequestItem::where('status', 'pending')->where('is_procurement', true)->count();
-        $pendingStockCount = RequestItem::where('status', 'pending')->where(function ($q) {
-            $q->where('is_procurement', false)->orWhereNull('is_procurement');
-        })->count();
-        $pendingAllCount = RequestItem::where('status', 'pending')->count();
+        // Optimasi: Hitung statistik kategori dalam 1 query tunggal dengan cache 30 detik
+        $catStats = \Illuminate\Support\Facades\Cache::store('file')->remember('approval_category_stats', 30, function () {
+            return DB::table('requests')->selectRaw("
+                COUNT(*) as total_all,
+                COALESCE(SUM(CASE WHEN is_procurement = 1 THEN 1 ELSE 0 END), 0) as total_procurement,
+                COALESCE(SUM(CASE WHEN is_procurement = 0 OR is_procurement IS NULL THEN 1 ELSE 0 END), 0) as total_stock,
+                COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending_all,
+                COALESCE(SUM(CASE WHEN status = 'pending' AND is_procurement = 1 THEN 1 ELSE 0 END), 0) as pending_procurement,
+                COALESCE(SUM(CASE WHEN status = 'pending' AND (is_procurement = 0 OR is_procurement IS NULL) THEN 1 ELSE 0 END), 0) as pending_stock
+            ")->first();
+        });
 
-        // Hitung total tiket masing-masing kategori
-        $totalAllCategoryCount = RequestItem::count();
-        $totalStockCategoryCount = RequestItem::where(function ($q) {
-            $q->where('is_procurement', false)->orWhereNull('is_procurement');
-        })->count();
-        $totalProcurementCategoryCount = RequestItem::where('is_procurement', true)->count();
+        $totalAllCategoryCount = (int) ($catStats->total_all ?? 0);
+        $totalProcurementCategoryCount = (int) ($catStats->total_procurement ?? 0);
+        $totalStockCategoryCount = (int) ($catStats->total_stock ?? 0);
+        $pendingAllCount = (int) ($catStats->pending_all ?? 0);
+        $pendingProcurementCount = (int) ($catStats->pending_procurement ?? 0);
+        $pendingStockCount = (int) ($catStats->pending_stock ?? 0);
 
         $baseQuery = RequestItem::query()
             ->when($category === 'pengadaan', function ($q) {
@@ -79,14 +84,24 @@ class ApprovalController extends Controller
             ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate));
 
-        $pendingCount = (clone $baseQuery)->where('status', 'pending')->count();
-        $approvedCount = (clone $baseQuery)->whereIn('status', ['approved', 'distributed'])->count();
-        $rejectedCount = (clone $baseQuery)->where('status', 'rejected')->count();
-        $totalCount = (clone $baseQuery)->count();
+        // Optimasi: Hitung seluruh status filter dalam 1 query agregat selectRaw
+        $statusCounts = (clone $baseQuery)->selectRaw("
+            COUNT(*) as total,
+            COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending_c,
+            COALESCE(SUM(CASE WHEN status IN ('approved', 'distributed') THEN 1 ELSE 0 END), 0) as approved_c,
+            COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) as rejected_c
+        ")->first();
+
+        $totalCount = (int) ($statusCounts->total ?? 0);
+        $pendingCount = (int) ($statusCounts->pending_c ?? 0);
+        $approvedCount = (int) ($statusCounts->approved_c ?? 0);
+        $rejectedCount = (int) ($statusCounts->rejected_c ?? 0);
 
         $query = (clone $baseQuery)->with([
-            'user.requests' => function ($rq) {
-                $rq->with(['details.product'])->latest('created_at');
+            'user' => function ($uq) {
+                $uq->with(['requests' => function ($rq) {
+                    $rq->with(['details.product'])->latest('created_at')->limit(5);
+                }]);
             },
             'details.product'
         ])->latest('created_at')->latest('id');
@@ -252,6 +267,9 @@ class ApprovalController extends Controller
 
                     $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubbag TU / Pegawai Gudang.';
                 } else {
+                    // Kirim notifikasi ke seluruh staf Pegawai Gudang bahwa barang telah disetujui TU dan siap diserahkan
+                    UserNotification::sendStockApprovedToWarehouse($item);
+
                     $pesan = 'Permintaan barang persediaan (' . $item->request_code . ') berhasil disetujui! Stok telah dipotong dan tercatat di Barang Keluar secara real-time.';
                 }
             } else {
@@ -275,6 +293,8 @@ class ApprovalController extends Controller
             }
 
             DB::commit();
+            RequestItem::flushRequestCaches();
+            \Illuminate\Support\Facades\Cache::store('file')->flush();
 
             $redirectParams = $request->filled('category') ? ['category' => $request->input('category')] : [];
             return redirect()->route('persetujuan.index', $redirectParams)->with('success', $pesan);
@@ -406,6 +426,8 @@ class ApprovalController extends Controller
             UserNotification::sendProcurementApprovedToExaminers($item);
 
             DB::commit();
+            RequestItem::flushRequestCaches();
+            \Illuminate\Support\Facades\Cache::store('file')->flush();
 
             return redirect()->route('persetujuan.index')
                 ->with('success', 'Barang berhasil dibeli dan dicatat di Barang Masuk! Notifikasi telah dikirimkan ke Petugas Gudang Distribusi.');

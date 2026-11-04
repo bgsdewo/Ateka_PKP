@@ -39,7 +39,7 @@ class RequestController extends Controller
     public function create(Request $request)
     {
         $products = Product::with('category')->orderBy('name', 'asc')->get();
-        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get()->unique('name');
         $selectedProductId = $request->get('product_id');
         $selectedQuantity = $request->get('quantity');
         $fromRequestId = $request->get('from_request');
@@ -121,7 +121,7 @@ class RequestController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'type' => 'nullable|in:individu',
+            'type' => 'nullable|in:individu,subdit',
             'quantity' => 'required|integer|min:1',
             'custom_unit' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:1000',
@@ -173,7 +173,7 @@ class RequestController extends Controller
     public function createProcurement(Request $request)
     {
         $existingProducts = Product::with('category')->orderBy('name', 'asc')->get();
-        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+        $categories = \App\Models\Category::orderBy('name', 'asc')->get()->unique('name');
         return view('pengajuan.pengadaan', compact('existingProducts', 'categories'));
     }
 
@@ -181,7 +181,7 @@ class RequestController extends Controller
     public function storeProcurement(Request $request)
     {
         $request->validate([
-            'type' => 'nullable|in:individu',
+            'type' => 'nullable|in:individu,subdit',
             'notes' => 'nullable|string',
             'item_name' => 'required|array|min:1',
             'item_name.*' => 'required|string|max:255',

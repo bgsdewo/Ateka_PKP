@@ -557,7 +557,11 @@ class ProductController extends Controller
         $products = $query->orderBy('name', 'asc')->paginate(8)->withQueryString();
         $categories = Category::orderBy('name', 'asc')->get();
 
-        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search', 'stockStatus'));
+                $availableStockCount = Product::where('stock', '>', 0)->count();
+        $emptyStockCount = Product::where('stock', '<=', 0)->count();
+        $totalAllProducts = $availableStockCount + $emptyStockCount;
+
+        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search', 'stockStatus', 'availableStockCount', 'emptyStockCount', 'totalAllProducts'));
     }
 
     /**

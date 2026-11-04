@@ -205,11 +205,67 @@ class User extends Authenticatable
         return $this->unreadNotifications()->count();
     }
 
+    /**
+     * Dapatkan kode unit kerja singkat untuk akun PIC (SDK, PJF, KBR, TU, dll.)
+     */
+    public function getPicUnitCodeAttribute(): ?string
+    {
+        $text = strtolower(($this->subdit_name ?? '') . ' ' . ($this->position ?? '') . ' ' . ($this->name ?? ''));
+        if (str_contains($text, 'sdk') || str_contains($text, 'sumber daya')) {
+            return 'SDK';
+        }
+        if (str_contains($text, 'pjf') || str_contains($text, 'fungsional')) {
+            return 'PJF';
+        }
+        if (str_contains($text, 'kbr') || str_contains($text, 'kendala')) {
+            return 'KBR';
+        }
+        if (str_contains($text, 'tata usaha') || preg_match('/\btu\b/i', $text)) {
+            return 'TU';
+        }
+
+        // Cek jika terdapat singkatan unit lain dalam position atau subdit_name
+        $pos = $this->position ?? '';
+        if ($pos && preg_match('/\b(?:Subdirektorat|Subbagian|PIC(?:\s+Distribusi)?)\s+([A-Za-z0-9_-]+)/i', $pos, $m)) {
+            $code = strtoupper(trim($m[1]));
+            if (!in_array($code, ['DISTRIBUSI', 'SUBDIREKTORAT', 'SUBBAGIAN', 'UNIT'])) {
+                return $code;
+            }
+        }
+
+        $sub = $this->subdit_name ?? '';
+        if ($sub && preg_match('/\b(?:Subdirektorat|Subbagian)\s+([A-Za-z0-9_-]+)/i', $sub, $m)) {
+            $code = strtoupper(trim($m[1]));
+            if (!in_array($code, ['DISTRIBUSI', 'SUBDIREKTORAT', 'SUBBAGIAN', 'UNIT'])) {
+                return $code;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Dapatkan label tampilan role untuk PIC secara dinamis
+     * Format: PIC ( SDK ), PIC ( PJF ), PIC ( KBR ), PIC ( TU )
+     */
+    public function getPicRoleTitleAttribute(): string
+    {
+        $unitCode = $this->pic_unit_code;
+        if ($unitCode) {
+            return "PIC ( {$unitCode} )";
+        }
+
+        return 'PIC Distribusi';
+    }
+
     public function getRoleTitleAttribute(): string
     {
+        if ($this->role === 'pic_distribusi') {
+            return $this->pic_role_title;
+        }
+
         return match ($this->role) {
             'kasubag_tu', 'admin' => 'Kasubbag TU (Approver / Pimpinan)',
-            'pic_distribusi' => 'PIC Unit / Subdirektorat',
             'pegawai_gudang' => 'Pegawai Gudang',
             'pegawai' => 'Pegawai',
             default => 'Pegawai',

@@ -186,6 +186,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/laporan/berita-acara', [ReportController::class, 'beritaAcara'])
             ->name('reports.berita-acara');
+
+        Route::get('/laporan/kartu-persediaan', [ReportController::class, 'kartuPersediaan'])
+            ->name('reports.kartu-persediaan');
+
+        Route::get('/laporan/kartu-persediaan/cetak', [ReportController::class, 'cetakKartuPersediaan'])
+            ->name('reports.kartu-persediaan.cetak');
     });
 
     // Profil & Akun
@@ -203,11 +209,11 @@ Route::middleware('auth')->group(function () {
 });
 
 // ==========================================
-// 5. ROUTE SINKRONISASI BMN & DATABASE MAINTENANCE (HOSTING)
+// ROUTE SINKRONISASI BMN & DATABASE MAINTENANCE (HOSTING & LOCAL)
 // ==========================================
 Route::get('/system/sync-bmn-database', function (\Illuminate\Http\Request $request) {
     $secret = 'ateka_sync_2026';
-    $isAuthorized = (auth()->check() && in_array(auth()->user()->role, ['kasubag_tu', 'pegawai_gudang']))
+    $isAuthorized = (auth()->check() && in_array(auth()->user()->role, ['kasubag_tu', 'pegawai_gudang', 'admin']))
                     || ($request->query('token') === $secret);
 
     if (!$isAuthorized) {
@@ -221,14 +227,18 @@ Route::get('/system/sync-bmn-database', function (\Illuminate\Http\Request $requ
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
 
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Lembar2AtkCatalogSeeder', '--force' => true]);
+        $seedOutput = \Illuminate\Support\Facades\Artisan::output();
+
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         $clearOutput = \Illuminate\Support\Facades\Artisan::output();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Sinkronisasi database BMN, Kategori Barang, dan Daftar Barang berhasil di server hosting!',
+            'message' => 'Sinkronisasi database BMN, Kategori Barang, dan Daftar Barang berhasil!',
             'details' => [
                 'migration' => trim($migrateOutput),
+                'seeder' => trim($seedOutput),
                 'cache' => trim($clearOutput),
             ],
             'timestamp' => now()->toDateTimeString(),

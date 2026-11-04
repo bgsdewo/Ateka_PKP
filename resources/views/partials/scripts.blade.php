@@ -1,13 +1,13 @@
 <!-- Library Bundle Script -->
 <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
 <!-- External Library Bundle Script -->
-<script src="{{ asset('hope-ui/assets/js/core/external.min.js') }}"></script>
+<script src="{{ asset('hope-ui/assets/js/core/external.min.js') }}" defer></script>
 <!-- Settings Script -->
-<script src="{{ asset('hope-ui/assets/js/plugins/setting.js') }}"></script>
+<script src="{{ asset('hope-ui/assets/js/plugins/setting.js') }}" defer></script>
 <!-- Slider-tab Script -->
-<script src="{{ asset('hope-ui/assets/js/plugins/slider-tabs.js') }}"></script>
+<script src="{{ asset('hope-ui/assets/js/plugins/slider-tabs.js') }}" defer></script>
 <!-- SweetAlert2 Plugin -->
-<script src="{{ asset('hope-ui/assets/js/plugins/sweetalert2.all.min.js') }}"></script>
+<script src="{{ asset('hope-ui/assets/js/plugins/sweetalert2.all.min.js') }}" defer></script>
 
 <!-- Global DataTables Default Configuration (Indonesian Language) -->
 <script>
@@ -55,10 +55,10 @@
 </script>
 
 <!-- App Script -->
-<script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}?v={{ file_exists(public_path('hope-ui/assets/js/hope-ui.js')) ? filemtime(public_path('hope-ui/assets/js/hope-ui.js')) : '2.1' }}"></script>
+<script src="{{ asset('hope-ui/assets/js/hope-ui.js') }}?v={{ file_exists(public_path('hope-ui/assets/js/hope-ui.js')) ? filemtime(public_path('hope-ui/assets/js/hope-ui.js')) : '2.1' }}" defer></script>
 <!-- Global Alert Dismiss & Auto-Dismiss System -->
-<script src="{{ asset('js/ateka-alerts.js') }}?v=1.0"></script>
+<script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
 <!-- Global Scrollable Period Select System -->
-<script src="{{ asset('js/ateka-select-scrollable.js') }}?v={{ file_exists(public_path('js/ateka-select-scrollable.js')) ? filemtime(public_path('js/ateka-select-scrollable.js')) : '1.0' }}"></script>
+<script defer src="{{ asset('js/ateka-select-scrollable.js') }}?v={{ file_exists(public_path('js/ateka-select-scrollable.js')) ? filemtime(public_path('js/ateka-select-scrollable.js')) : '1.0' }}"></script>
 
 

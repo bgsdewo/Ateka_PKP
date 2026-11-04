@@ -4,339 +4,594 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Reset Kata Sandi | Sistem Inventori ATK - Kementerian PKP RI</title>
+    <!-- Nonaktifkan Pengindeksan Mesin Pencari (Aplikasi Internal Kementerian PKP RI) -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="description" content="Reset Kata Sandi Sistem Informasi Inventori Persediaan ATK (ATEKA) Kementerian PKP RI">
+    <title>Reset Kata Sandi | Inventori ATK Kementerian PKP RI</title>
+
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}" />
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Library / Plugin Css Build -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/core/libs.min.css') }}" />
-    <!-- Hope Ui Design System Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/hope-ui.min.css?v=2.0.0') }}" />
-    <!-- Custom Css -->
-    <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
-    <!-- Modern Ateka Enhancement CSS -->
-    <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}" />
 
+    <!-- Inlined Critical CSS - Zero External Dependencies for Instant LCP (< 100ms) -->
     <style>
-        body {
-            background-color: #061224;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(2, 132, 199, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, #061224 100%);
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        :root {
+            --bg-deep: #0e261d;
+            --card-dark: #15382a;
+            --input-dark: #0d241a;
+            --input-border: rgba(255, 255, 255, 0.12);
+            --primary-emerald: #10b981;
+            --btn-teal: #429485;
+            --accent-mint: #5eead4;
+            --text-muted: #8aa99a;
+            --brand-navy: #133e38;
+            --brand-gold: #b45309;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
             min-height: 100vh;
-            color: #0f172a;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 50% 12%, rgba(16, 185, 129, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 85% 85%, rgba(66, 148, 133, 0.1) 0%, transparent 45%),
+                radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        /* Master Authentication Card */
+        .auth-master-card {
+            width: 100%;
+            max-width: 1040px;
+            background-color: var(--card-dark);
+            border-radius: 32px;
+            box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            min-height: 590px;
+        }
+
+        /* Sisi Kiri: Panel Putih Bersih */
+        .panel-brand-left {
+            background-color: #ffffff;
+            color: #1e293b;
+            flex: 1.05;
+            padding: 2.5rem 2.8rem;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
         }
 
-        .auth-content {
-            width: 100%;
-            margin: auto;
+        /* Lengkungan Halus SVG */
+        .wave-curve-border {
+            position: absolute;
+            top: 0;
+            right: -72px;
+            width: 75px;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Header Brand Institusi */
+        .brand-header {
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 2rem 1rem;
-            box-sizing: border-box;
+            gap: 16px;
         }
 
-        @keyframes authCardEnter {
-            from {
-                opacity: 0;
-                transform: translateY(16px) scale(0.985);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .auth-card {
-            width: 100% !important;
-            padding: 0 !important;
-            border-radius: 1rem;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
-            animation: authCardEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        .form-control {
-            border-radius: 0.55rem;
-            padding: 0.52rem 0.8rem;
-            font-size: 0.875rem;
-            border: 1.5px solid #e2e8f0;
-            background-color: #f8fafc;
-            color: #0f172a;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .form-control:focus {
-            background-color: #ffffff;
-            border-color: #0284c7;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-            outline: none;
-        }
-
-        .form-label {
-            font-weight: 700;
-            font-size: 0.72rem;
-            letter-spacing: 0.04em;
-            color: #0a213e;
-            margin-bottom: 0.25rem;
-        }
-
-        .btn-primary {
-            border-radius: 0.55rem !important;
-            padding: 0.58rem 1rem !important;
-            font-weight: 700 !important;
-            font-size: 0.9rem;
-            letter-spacing: 0.01em;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
-            border: none !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .btn-primary:hover,
-        .btn-primary:focus-visible {
-            background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.38);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .brand-logo-img {
-            max-height: 48px;
+        .brand-logo {
+            max-height: 52px;
             width: auto;
             object-fit: contain;
         }
 
-        .info-pill {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 0.55rem;
-            padding: 0.6rem 0.85rem;
+        .brand-text h1 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-navy);
+            letter-spacing: 0.3px;
+            line-height: 1.28;
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .btn-primary, .form-control {
-                transition: none !important;
-                transform: none !important;
+        .brand-text .country {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-gold);
+            letter-spacing: 0.6px;
+            margin-top: 1px;
+        }
+
+        .brand-text .satker {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Visual Illustration Centerpiece */
+        .brand-illustration-wrapper {
+            text-align: center;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-illustration-svg {
+            max-width: 280px;
+            height: auto;
+            filter: drop-shadow(0 12px 24px rgba(19, 62, 56, 0.08));
+        }
+
+        .brand-caption h2 {
+            color: var(--brand-navy);
+            font-size: 1.22rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .brand-caption p {
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        /* Footer Sisi Kiri */
+        .brand-footer {
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.73rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .brand-footer strong {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Sisi Kanan: Panel Form Reset Password */
+        .panel-form-right {
+            background-color: var(--card-dark);
+            color: #ffffff;
+            flex: 1.05;
+            padding: 3rem 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 4;
+        }
+
+        .form-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            line-height: 1.4;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 14px;
+            margin-bottom: 1.15rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #d1fae5;
+            margin-bottom: 5px;
+            letter-spacing: 0.15px;
+        }
+
+        .form-label .req {
+            color: #f87171;
+            font-weight: bold;
+        }
+
+        .input-pill {
+            width: 100%;
+            background-color: var(--input-dark);
+            border: 1.5px solid var(--input-border);
+            border-radius: 22px;
+            color: #ffffff;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            transition: all 0.22s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+            outline: none;
+        }
+
+        .input-pill.font-mono {
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .input-pill::placeholder {
+            color: #587c6c;
+            font-size: 0.83rem;
+        }
+
+        .input-pill:focus {
+            border-color: var(--accent-mint);
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.22), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            background-color: #081711;
+        }
+
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrap .input-pill {
+            padding-right: 44px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #6e9482;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #ffffff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #449586 0%, #327568 100%);
+            border: none;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 0.96rem;
+            font-weight: 600;
+            font-family: inherit;
+            padding: 0.82rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            display: block;
+            margin-top: 0.4rem;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #4fa998 0%, #3a8778 100%);
+            transform: translateY(-1.5px);
+            box-shadow: 0 10px 24px rgba(50, 117, 104, 0.45);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .back-callout {
+            text-align: center;
+            margin-top: 1.4rem;
+            font-size: 0.85rem;
+        }
+
+        .link-back {
+            color: var(--accent-mint);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .link-back:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* Alerts */
+        .alert-box {
+            border-radius: 14px;
+            font-size: 0.82rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.16);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fecaca;
+        }
+
+        .alert-error ul {
+            padding-left: 1.2rem;
+            margin-top: 4px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.16);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #a7f3d0;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 960px) {
+            .auth-master-card {
+                flex-direction: column;
+                max-width: 520px;
+                border-radius: 24px;
+            }
+
+            .wave-curve-border {
+                display: none;
+            }
+
+            .panel-brand-left {
+                padding: 2.2rem 2rem;
+                flex: none;
+            }
+
+            .panel-form-right {
+                padding: 2.2rem 2rem;
+                flex: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="wrapper w-100">
-        <section class="auth-content">
-            <div class="container px-3">
-                <div class="row justify-content-center">
-                    <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4" style="max-width: 440px;">
-                        <div class="card auth-card mb-0">
-                            <div class="card-body p-3.5 p-sm-4">
-                                <!-- Logo & Header -->
-                                <div class="text-center mb-3">
-                                    <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}"
-                                        class="brand-logo-img mb-2" alt="Logo Kementerian PKP RI" width="48" height="48">
-                                    <h4 class="fw-bold text-dark mb-0.5" style="color: #0a213e !important; letter-spacing: -0.02em; font-size: 1.25rem;">
-                                        Reset Kata Sandi
-                                    </h4>
-                                    <p class="text-muted small mb-0" style="font-size: 0.78rem;">
-                                        Sistem Pencatatan Persediaan &amp; Pengajuan ATK
-                                    </p>
-                                </div>
+    <!-- Main Master Reset Password Card -->
+    <div class="auth-master-card">
+        <!-- ============================================================= -->
+        <!-- SISI KIRI: IDENTITAS RESMI & ILUSTRASI KEAMANAN AKUN          -->
+        <!-- ============================================================= -->
+        <div class="panel-brand-left">
+            <!-- Header Brand: Logo & Identitas Satker -->
+            <div class="brand-header">
+                <img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP RI" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Kementerian Perumahan dan Kawasan Permukiman</h1>
+                    <span class="country">Republik Indonesia</span>
+                    <span class="satker">Direktorat Jenderal Kawasan Permukiman</span>
+                </div>
+            </div>
 
-                                <!-- Alert Notifikasi Sesi & Kesalahan -->
-                                @if (session('error'))
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
-                                        <div class="d-flex align-items-center">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2 flex-shrink-0" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                            </svg>
-                                            <div>{{ session('error') }}</div>
-                                        </div>
-                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                                    </div>
-                                @endif
+            <!-- Bagian Tengah: Visual Keamanan & Pemulihan Akun -->
+            <div class="brand-illustration-wrapper">
+                <svg class="brand-illustration-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Podium / Landasan Halus -->
+                    <ellipse cx="180" cy="225" rx="140" ry="20" fill="#e8f4f0" />
+                    <ellipse cx="180" cy="223" rx="110" ry="14" fill="#d3ebe2" />
 
-                                @if ($errors->any())
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm py-2 px-3 mb-2.5" role="alert" style="font-size: 0.82rem;">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <strong class="me-2">Mohon perbaiki data berikut:</strong>
-                                        </div>
-                                        <ul class="mb-0 ps-3 small">
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                                    </div>
-                                @endif
+                    <!-- Perisai Perlindungan Akun / Security Shield -->
+                    <path d="M180 50L245 78V140C245 185 180 215 180 215C180 215 115 185 115 140V78L180 50Z" fill="#144b59"/>
+                    <path d="M180 62L233 85V138C233 175 180 201 180 201C180 201 127 175 127 138V85L180 62Z" fill="#185666"/>
+                    <path d="M180 62V201C180 201 233 175 233 138V85L180 62Z" fill="#ffffff" opacity="0.08"/>
 
-                                <!-- Form Reset Password -->
-                                <form action="{{ route('password.reset.nip') }}" method="POST">
-                                    @csrf
+                    <!-- Gembok / Padlock Emas Terverifikasi di Tengah Perisai -->
+                    <rect x="160" y="125" width="40" height="32" rx="7" fill="#f59e0b"/>
+                    <path d="M168 125V112C168 105.373 173.373 100 180 100C186.627 100 192 105.373 192 112V125" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+                    <circle cx="180" cy="138" r="4" fill="#78350f"/>
+                    <path d="M180 142V148" stroke="#78350f" stroke-width="2.5" stroke-linecap="round"/>
 
-                                    <div class="row g-2">
-                                        <!-- Nomor Induk Pegawai -->
-                                        <div class="col-12">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label text-uppercase">
-                                                    Nomor Induk Pegawai (NIP) <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" name="nip" id="nip" class="form-control font-monospace"
-                                                    value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required autofocus>
-                                            </div>
-                                        </div>
+                    <!-- Badge Centang Hijau Pemulihan Sukses -->
+                    <circle cx="218" cy="182" r="14" fill="#10b981"/>
+                    <circle cx="218" cy="182" r="11" fill="#059669"/>
+                    <path d="M212 182L216 186L224 178" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
 
-                                        <!-- Email Dinas Terdaftar -->
-                                        <div class="col-12">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label text-uppercase">
-                                                    Email Dinas Terdaftar <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="email" name="email" id="email" class="form-control"
-                                                    value="{{ old('email') }}" placeholder="nama.pegawai@pupr.go.id" required autocomplete="email">
-                                                <small class="text-muted" style="font-size: 0.72rem;">Verifikasi memerlukan kecocokan NIP &amp; Email dinas aktif Anda.</small>
-                                            </div>
-                                        </div>
+                <div class="brand-caption">
+                    <h2>Pemulihan Kata Sandi Akun</h2>
+                    <p>Layanan mandiri pembaruan kata sandi bagi pegawai Kementerian PKP RI secara aman dan terverifikasi.</p>
+                </div>
+            </div>
 
-                                        <!-- Password Baru -->
-                                        <div class="col-12">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label text-uppercase">
-                                                    Password Baru <span class="text-danger">*</span>
-                                                </label>
-                                                <div class="position-relative">
-                                                    <input type="password" name="password" id="password" class="form-control pe-5"
-                                                        placeholder="Minimal 6 karakter" required minlength="6" autocomplete="new-password">
-                                                    <button type="button" class="btn btn-sm btn-link position-absolute end-0 top-50 translate-middle-y text-muted text-decoration-none pe-2 toggle-password"
-                                                        data-target="#password" title="Lihat/Sembunyikan password" aria-label="Lihat atau sembunyikan password" style="z-index: 5;">
-                                                        <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                            <circle cx="12" cy="12" r="3"></circle>
-                                                        </svg>
-                                                        <svg class="eye-closed d-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+            <!-- Footer Sisi Kiri -->
+            <div class="brand-footer">
+                <strong>&copy; 2026 Kementerian Perumahan dan Kawasan Permukiman RI</strong><br>
+                Biro Umum &amp; Pengadaan Barang &bull; Subbagian Tata Usaha
+            </div>
 
-                                        <!-- Konfirmasi Password Baru -->
-                                        <div class="col-12">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label text-uppercase">
-                                                    Ulangi Password Baru <span class="text-danger">*</span>
-                                                </label>
-                                                <div class="position-relative">
-                                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control pe-5"
-                                                        placeholder="Ketik ulang password baru" required minlength="6" autocomplete="new-password">
-                                                    <button type="button" class="btn btn-sm btn-link position-absolute end-0 top-50 translate-middle-y text-muted text-decoration-none pe-2 toggle-password"
-                                                        data-target="#password_confirmation" title="Lihat/Sembunyikan password" aria-label="Lihat atau sembunyikan password" style="z-index: 5;">
-                                                        <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                            <circle cx="12" cy="12" r="3"></circle>
-                                                        </svg>
-                                                        <svg class="eye-closed d-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                                            <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+            <!-- Lengkungan Halus SVG -->
+            <svg class="wave-curve-border" viewBox="0 0 100 600" preserveAspectRatio="none">
+                <path d="M 0 0 L 25 0 C 10 120, 95 240, 95 360 C 95 490, 15 540, 0 600 Z" fill="#ffffff" />
+            </svg>
+        </div>
 
-                                    <!-- Bantuan NIP Info -->
-                                    <div class="info-pill my-2">
-                                        <div class="d-flex align-items-start gap-2">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" class="flex-shrink-0 mt-0.5" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                            </svg>
-                                            <p class="text-success small mb-0" style="font-size: 0.75rem; line-height: 1.4;">
-                                                Verifikasi NIP otomatis mereset kata sandi akun Anda secara langsung tanpa perlu tautan email.
-                                            </p>
-                                        </div>
-                                    </div>
+        <!-- ============================================================= -->
+        <!-- SISI KANAN: PANEL FORM RESET PASSWORD                         -->
+        <!-- ============================================================= -->
+        <div class="panel-form-right">
+            <div class="form-header">
+                <h2 class="form-title">Reset Password</h2>
+                <p class="form-subtitle">Pembaruan Kata Sandi &bull; Sistem Inventori ATK (ATEKA)</p>
+            </div>
 
-                                    <div class="d-grid mt-3 mb-2">
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            Simpan & Perbarui Password
-                                        </button>
-                                    </div>
+            <!-- Feedback Alerts -->
+            @if (session('success'))
+                <div class="alert-box alert-success" role="alert">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                                    <div class="text-center pt-1">
-                                        <a href="{{ route('login') }}" class="small fw-bold text-decoration-none" style="color: #0284c7; font-size: 0.8rem;">
-                                            &larr; Kembali ke Halaman Login
-                                        </a>
-                                    </div>
-                                </form>
-                            </div>
+            @if (session('error'))
+                <div class="alert-box alert-error" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert-box alert-error" role="alert">
+                    <strong>Terdapat kendala:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Form Reset Password -->
+            <form action="{{ route('password.reset.nip') }}" method="POST">
+                @csrf
+
+                <!-- Input NIP -->
+                <div class="form-group">
+                    <label for="nip" class="form-label">Nomor Induk Pegawai (NIP) <span class="req">*</span></label>
+                    <input type="text" name="nip" id="nip" class="input-pill font-mono"
+                        value="{{ old('nip') }}" placeholder="19950510 202012 1 002" required autofocus>
+                </div>
+
+                <!-- Input Email Dinas -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Dinas Terdaftar <span class="req">*</span></label>
+                    <input type="email" name="email" id="email" class="input-pill"
+                        value="{{ old('email') }}" placeholder="nama.pegawai@pkp.go.id" required autocomplete="email">
+                </div>
+
+                <!-- Password Baru & Konfirmasi (Side by Side di Desktop) -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password Baru <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" name="password" id="password" class="input-pill"
+                                placeholder="Minimal 6 karakter" required minlength="6" autocomplete="new-password">
+                            <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Lihat atau sembunyikan password baru" tabindex="-1">
+                                <svg id="togglePasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmation" class="form-label">Ulangi Password <span class="req">*</span></label>
+                        <div class="password-wrap">
+                            <input type="password" name="password_confirmation" id="password_confirmation" class="input-pill"
+                                placeholder="Ketik ulang password baru" required minlength="6" autocomplete="new-password">
+                            <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn" aria-label="Lihat atau sembunyikan konfirmasi password" tabindex="-1">
+                                <svg id="toggleConfirmPasswordIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+
+                <!-- Tombol Submit -->
+                <button type="submit" class="btn-submit" id="submitResetBtn">
+                    Simpan &amp; Perbarui Password
+                </button>
+
+                <!-- Callout Kembali ke Login -->
+                <div class="back-callout">
+                    <a href="{{ route('login') }}" class="link-back">
+                        &larr; Kembali ke Halaman Login
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Script Library -->
-    <script src="{{ asset('hope-ui/assets/js/core/libs.min.js') }}"></script>
-    <!-- Global Alert Dismiss & Auto-Dismiss System -->
-    <script src="{{ asset('js/ateka-alerts.js') }}?v=1.0" defer></script>
+    <!-- Minimal Native Password Visibility Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Password toggle functionality
-            document.querySelectorAll('.toggle-password').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetSelector = this.getAttribute('data-target');
-                    const input = document.querySelector(targetSelector);
-                    const eyeOpen = this.querySelector('.eye-open');
-                    const eyeClosed = this.querySelector('.eye-closed');
+            function setupPasswordToggle(btnId, inputId, iconId) {
+                const btn = document.getElementById(btnId);
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
 
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        eyeOpen.classList.add('d-none');
-                        eyeClosed.classList.remove('d-none');
-                    } else {
-                        input.type = 'password';
-                        eyeOpen.classList.remove('d-none');
-                        eyeClosed.classList.add('d-none');
-                    }
-                });
-            });
+                if (btn && input && icon) {
+                    btn.addEventListener('click', function() {
+                        const isPassword = input.getAttribute('type') === 'password';
+                        input.setAttribute('type', isPassword ? 'text' : 'password');
+                        if (isPassword) {
+                            icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                            btn.style.color = '#5eead4';
+                        } else {
+                            icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                            icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                            btn.style.color = '#6e9482';
+                        }
+                    });
+                }
+            }
 
-            // Prevent double form submission
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function() {
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses...';
-                    }
+            setupPasswordToggle('togglePasswordBtn', 'password', 'togglePasswordIcon');
+            setupPasswordToggle('toggleConfirmPasswordBtn', 'password_confirmation', 'toggleConfirmPasswordIcon');
+
+            // Form Submit Instant Feedback State
+            const resetForm = document.querySelector('form');
+            const submitBtn = document.getElementById('submitResetBtn');
+            if (resetForm && submitBtn) {
+                resetForm.addEventListener('submit', function() {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.85';
+                    submitBtn.style.pointerEvents = 'none';
+                    submitBtn.innerHTML = '<span style="display:inline-block;width:15px;height:15px;border:2px solid #ffffff;border-top-color:transparent;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle;"></span>Memproses...';
                 });
             }
         });
     </script>
 </body>
+
 </html>

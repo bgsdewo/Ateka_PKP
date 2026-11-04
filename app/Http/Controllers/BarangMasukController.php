@@ -48,18 +48,21 @@ class BarangMasukController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        // Ambil daftar tahun dinamis dari data transaksi untuk penggunaan jangka panjang
-        $dbYears = StockTransaction::where('type', 'masuk')
-            ->whereNotNull('transaction_date')
-            ->selectRaw('YEAR(transaction_date) as year')
-            ->distinct()
-            ->pluck('year')
-            ->toArray();
+        // Ambil daftar tahun dinamis dari data transaksi (Cache 5 menit)
+        $availableYears = \Illuminate\Support\Facades\Cache::remember('barang_masuk_available_years', 300, function () {
+            $dbYears = StockTransaction::where('type', 'masuk')
+                ->whereNotNull('transaction_date')
+                ->selectRaw('YEAR(transaction_date) as year')
+                ->distinct()
+                ->pluck('year')
+                ->toArray();
 
-        $currentYear = (int) date('Y');
-        $defaultYears = range($currentYear - 3, $currentYear + 3);
-        $availableYears = array_unique(array_merge($dbYears, $defaultYears));
-        rsort($availableYears);
+            $currentYear = (int) date('Y');
+            $defaultYears = range($currentYear - 3, $currentYear + 3);
+            $years = array_unique(array_merge($dbYears, $defaultYears));
+            rsort($years);
+            return $years;
+        });
 
         $totalQuantity = $transactions->sum('quantity');
         $totalTransactions = $transactions->count();

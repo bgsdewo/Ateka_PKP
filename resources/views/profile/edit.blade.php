@@ -69,7 +69,7 @@
             $role = $user->role ?? 'pegawai';
             $roleLabel = match ($role) {
                 'kasubag_tu', 'admin' => 'Kasubbag TU',
-                'pic_distribusi' => 'PIC Distribusi',
+                'pic_distribusi' => $user->pic_role_title ?? 'PIC ( SDK )',
                 'pegawai_gudang' => 'Pegawai Gudang',
                 default => 'Pegawai',
             };

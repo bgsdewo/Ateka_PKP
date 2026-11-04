@@ -124,10 +124,34 @@
             </div>
         @endif
 
+        {{-- Quick Status Filter Tabs --}}
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{{ route('katalog-atk', array_filter(['category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ empty($stockStatus) ? 'btn-dark' : 'btn-light border text-muted' }}">
+                    Semua Katalog ({{ $totalAllProducts ?? 564 }})
+                </a>
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'available', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-bold {{ ($stockStatus ?? '') === 'available' ? 'btn-success text-white shadow-sm' : 'btn-light border text-success' }}">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;" class="me-1"></span>
+                    Tersedia di Gudang ({{ $availableStockCount ?? 3 }})
+                </a>
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'empty', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ ($stockStatus ?? '') === 'empty' ? 'btn-secondary text-white shadow-sm' : 'btn-light border text-muted' }}">
+                    Stok Belum Tersedia ({{ $emptyStockCount ?? 561 }})
+                </a>
+            </div>
+            @if(($stockStatus ?? '') === 'available')
+                <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill" style="font-size: 0.76rem;">
+                    Menampilkan <strong>{{ $products->total() }}</strong> barang fisik siap pakai
+                </div>
+            @endif
+        </div>
+
         {{-- Baris Filter & Pencarian --}}
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 katalog-filter-card" style="overflow: visible !important; position: relative; z-index: 25;">
                     <div class="card-body p-3.5">
                         <form id="katalog-filter-form" action="{{ route('katalog-atk') }}" method="GET" class="row g-2 align-items-center">
                             <div class="col-12 col-md-6 col-lg-4">
@@ -265,7 +289,7 @@
                             <div class="border-top pt-2.5 mt-2">
                                 {{-- Stock Indicator with Meter --}}
                                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                    <span class="small text-muted fw-semibold">Stock sisa:</span>
+                                    <span class="small text-muted fw-semibold">Sisa Stok Fisik:</span>
                                     <span class="fw-bold {{ $item->stock <= 0 ? 'text-danger' : 'text-primary' }} fs-5">
                                         {{ number_format($item->stock) }} <small class="fs-6 fw-normal text-muted">Stock</small>
                                     </span>

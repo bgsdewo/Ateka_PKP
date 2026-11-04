@@ -148,6 +148,24 @@
         wrapper.appendChild(btn);
         wrapper.appendChild(menu);
 
+        // Elevasi z-index dan overflow saat dropdown dibuka agar tidak terpotong oleh card/tabel di bawahnya
+        btn.addEventListener('show.bs.dropdown', function () {
+            wrapper.style.zIndex = '1060';
+            const parentCard = wrapper.closest('.card');
+            if (parentCard) {
+                parentCard.style.zIndex = '1055';
+                parentCard.style.overflow = 'visible';
+            }
+            const parentRow = wrapper.closest('.row');
+            if (parentRow) parentRow.style.overflow = 'visible';
+        });
+
+        btn.addEventListener('hidden.bs.dropdown', function () {
+            wrapper.style.zIndex = '';
+            const parentCard = wrapper.closest('.card');
+            if (parentCard) parentCard.style.zIndex = '';
+        });
+
         // Auto-scroll ke opsi aktif saat menu dropdown dibuka
         btn.addEventListener('shown.bs.dropdown', function () {
             syncFromSelect();
