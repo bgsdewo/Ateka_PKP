@@ -235,6 +235,15 @@ class UserManagementController extends Controller
                 ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
         }
 
+        // Riwayat permohonan harus tetap tercatat untuk laporan bulanan. Karena tiket terhubung ke akun
+        // pemohon (hapus berantai), akun yang masih memiliki riwayat permohonan tidak boleh dihapus.
+        $jumlahRiwayat = \App\Models\RequestItem::where('user_id', $manajemen_pengguna->id)->count();
+        if ($jumlahRiwayat > 0) {
+            return redirect()
+                ->route('master-data.manajemen-pengguna.index')
+                ->with('error', 'Pengguna tidak dapat dihapus karena memiliki ' . $jumlahRiwayat . ' riwayat permohonan yang masih dibutuhkan untuk laporan.');
+        }
+
         $manajemen_pengguna->delete();
 
         return redirect()
