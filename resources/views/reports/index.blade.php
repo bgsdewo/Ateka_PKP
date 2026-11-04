@@ -654,15 +654,6 @@
 
                         {{-- Tombol Ekspor Rapi di Header Kartu --}}
                         <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <a href="{{ route('reports.kartu-persediaan') }}"
-                                class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold"
-                                title="Buka Halaman Kartu Persediaan Barang Resmi (Format UAKPB)">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                                </svg>
-                                Kartu Persediaan
-                            </a>
                             <button type="button" id="btnExportExcel"
                                 class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -674,18 +665,6 @@
                                 </svg>
                                 Export Excel
                             </button>
-                            <a href="{{ route('reports.print', request()->query()) }}" target="_blank" id="btnExportPrint"
-                                class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1.5 fw-semibold"
-                                title="Cetak Dokumen Resmi Laporan Persediaan">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
-                                    </path>
-                                    <rect x="6" y="14" width="12" height="8"></rect>
-                                </svg>
-                                Cetak Laporan
-                            </a>
                         </div>
                     </div>
 
@@ -1473,14 +1452,6 @@
                 // Sambungkan tombol ekspor di Header Kartu
                 $('#btnExportExcel').on('click', function() {
                     dataTableInstance.button('.buttons-excel').trigger();
-                });
-                $('#btnExportPrint').on('click', function(e) {
-                    var filterForm = document.getElementById('filterReportForm');
-                    if (filterForm) {
-                        var formData = new FormData(filterForm);
-                        var params = new URLSearchParams(formData).toString();
-                        $(this).attr('href', "{{ route('reports.print') }}" + (params ? ('?' + params) : ''));
-                    }
                 });
             }
 
