@@ -195,3 +195,39 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
     .aeux-stat-card .aeux-stat-value,
     .aeux-stat-card [class*="stat-value"] { font-size: 1.6rem; }
 }
+
+/* Cegah geser horizontal halaman penuh di HP (tabel tetap bisa digeser di dalam kartunya) */
+@media (max-width: 767.98px) {
+    html, body { overflow-x: hidden; max-width: 100%; }
+}
+
+/* Sub-menu sidebar: label panjang boleh turun baris, jangan dipotong "…" */
+.sidebar:not(.sidebar-mini) .sub-nav .nav-link .item-name {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.25;
+}
+/* Tabel DataTables di HP: beri lebar minimum agar kolom tidak menyempit */
+@media (max-width: 767.98px) {
+    .dataTables_wrapper .table-responsive > .table { min-width: 760px; }
+}
+
+/* Judul dengan style inline (mis. Persetujuan) — pakai !important agar ikut skala responsif */
+@media (min-width: 1200px) and (max-width: 1599.98px) {
+    .iq-navbar-header h1[style] { font-size: 1.9rem !important; }
+}
+@media (max-width: 991.98px) {
+    .iq-navbar-header h1[style] { font-size: 1.7rem !important; }
+}
+@media (max-width: 575.98px) {
+    .iq-navbar-header h1[style] { font-size: 1.35rem !important; line-height: 1.2 !important; }
+    .iq-navbar-header[style] { padding: .9rem .75rem .4rem !important; }
+}
+
+/* Kartu KPI/ringkasan: tinggi menyesuaikan isi di HP */
+@media (max-width: 767.98px) {
+    .kpi-card .card-body,
+    .kpi-widget-card { padding: .9rem 1rem !important; min-height: 0 !important; }
+    .kpi-card .card-body .mb-3 { margin-bottom: .5rem !important; }
+}

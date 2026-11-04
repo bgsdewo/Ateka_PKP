@@ -41,6 +41,11 @@
         // Pastikan placeholder konsisten jika DataTables di-init otomatis
         $(document).on('init.dt', function(e, settings) {
             var $api = new $.fn.dataTable.Api(settings);
+            // Responsif: bungkus tabel agar bisa digeser horizontal di layar sempit
+            var $tbl = $($api.table().node());
+            if (!$tbl.parent().hasClass('table-responsive')) {
+                $tbl.wrap('<div class="table-responsive"></div>');
+            }
             var $search = $($api.table().container()).find('.dataTables_filter input');
             if ($search.length && !$search.attr('placeholder')) {
                 $search.attr('placeholder', 'Ketik kata kunci pencarian...');
