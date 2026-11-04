@@ -22,6 +22,12 @@
 @media (min-width: 1600px) {
     html { font-size: 15px; }
 }
+@media (min-width: 1920px) {
+    html { font-size: 16px; }
+}
+@media (min-width: 2400px) {
+    html { font-size: 18px; }
+}
 @media (max-width: 575.98px) {
     html { font-size: 15px; }
 }
@@ -262,7 +268,7 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
 .ateka-pager button:disabled { opacity: .45; cursor: default; }
 
 /* HP: tiap baris jadi kartu bertumpuk, tanpa scroll samping */
-@media (max-width: 767.98px) {
+@media (max-width: 991.98px) {
     .ateka-queue .ateka-queue-table thead { display: none; }
     .ateka-queue .ateka-queue-table,
     .ateka-queue .ateka-queue-table tbody,
@@ -492,9 +498,9 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
  * ------------------------------------------------------------------ */
 @media (max-width: 767.98px) {
     /* Pagination DataTables: kolom penuh & rata tengah, tombol boleh turun baris */
-    .dataTables_wrapper .row > [class*="col-"],
-    .dataTables_wrapper .row > .col-auto { flex: 0 0 100%; width: 100%; max-width: 100%; margin-left: 0 !important; }
-    .dataTables_wrapper .dataTables_paginate { width: 100%; }
+    .dataTables_wrapper [class*="col-"],
+    .dataTables_wrapper .col-auto { flex: 1 1 100% !important; width: 100% !important; max-width: 100% !important; min-width: 0; margin-left: 0 !important; }
+    .dataTables_wrapper .dataTables_paginate { width: 100%; max-width: 100%; justify-content: center; }
     .dataTables_wrapper .dataTables_paginate .pagination { flex-wrap: wrap; justify-content: center; gap: .15rem; }
     .dataTables_wrapper .dataTables_paginate .page-link { padding: .3rem .6rem; font-size: .8rem; }
 
@@ -504,4 +510,47 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
     .item-tracker-selector { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
     .card-header .d-flex.align-items-center.gap-2.flex-wrap { width: 100%; }
     .card-header .d-flex.align-items-center.gap-2.flex-wrap > label { flex: 0 0 100%; }
+}
+
+/* ------------------------------------------------------------------
+ * 14. Ukuran judul halaman (h1) satu sumber: dipakai juga oleh h1 dengan style inline
+ * ------------------------------------------------------------------ */
+:root { --ateka-h1-size: 2.25rem; }
+@media (min-width: 1200px) and (max-width: 1599.98px) { :root { --ateka-h1-size: 1.9rem; } }
+@media (max-width: 991.98px) { :root { --ateka-h1-size: 1.7rem; } }
+@media (max-width: 575.98px) { :root { --ateka-h1-size: 1.35rem; } }
+.main-content h1[style*="font-size"] { font-size: var(--ateka-h1-size) !important; line-height: 1.2 !important; }
+
+/* ------------------------------------------------------------------
+ * 15. HP: kartu statistik 2 kolom & ringkas, target sentuh nyaman, teks tabel terbaca
+ * ------------------------------------------------------------------ */
+@media (max-width: 767.98px) {
+    /* kartu statistik dashboard: dua per baris, tinggi menyesuaikan isi */
+    .row > [class*="col-"]:has(> .card.aeux-stat-card) { flex: 0 0 50%; max-width: 50%; }
+    .card.aeux-stat-card { min-height: 0 !important; padding: .85rem .9rem !important; }
+    .card.aeux-stat-card .aeux-stat-label { font-size: .74rem; }
+
+    /* tombol di dalam tabel: cukup besar untuk jari */
+    .table .btn, .table .btn-sm, .table .btn-xs { min-height: 32px; padding: .3rem .7rem !important; font-size: .78rem !important; line-height: 1.2 !important; }
+    .table td .d-flex.flex-nowrap, .table td .d-flex { flex-wrap: wrap; gap: .35rem; }
+    .btn-close-toast { width: 32px !important; height: 32px !important; }
+    .pagination .page-link { min-height: 34px; min-width: 34px; display: inline-flex; align-items: center; justify-content: center; }
+}
+@media (max-width: 767.98px) {
+    .pagination .page-item { flex: 0 0 auto; }
+    .pagination .page-link { min-width: 36px; }
+}
+
+/* ------------------------------------------------------------------
+ * 16. Monitor lebar (>= 1920px): batasi lebar konten & pusatkan agar tidak melar
+ * ------------------------------------------------------------------ */
+@media (min-width: 1920px) {
+    .main-content .content-inner,
+    .main-content .iq-navbar-header > .container-fluid,
+    .main-content .iq-navbar > .container-fluid,
+    .main-content footer .container-fluid {
+        max-width: 1760px;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
 }

@@ -130,3 +130,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<!-- HP: naikkan teks yang terlalu kecil (<11px) di tabel & badge agar terbaca -->
+<script>
+(function () {
+    var mq = window.matchMedia('(max-width: 767.98px)');
+    function bump(root) {
+        if (!mq.matches) return;
+        (root || document).querySelectorAll('td, th, td *, th *, .badge, small').forEach(function (el) {
+            if (!el.textContent || !el.textContent.trim()) return;
+            if (parseFloat(getComputedStyle(el).fontSize) < 11) el.style.setProperty('font-size', '11px', 'important');
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () { bump(); setTimeout(bump, 600); });
+    if (window.jQuery) { jQuery(document).on('draw.dt init.dt', function () { bump(); }); }
+})();
+</script>

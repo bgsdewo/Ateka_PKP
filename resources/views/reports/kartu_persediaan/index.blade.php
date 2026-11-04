@@ -7,7 +7,7 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
+                            <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: var(--ateka-h1-size, 2.25rem) !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
                                 Kartu Persediaan Barang
                             </h1>
                             <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">

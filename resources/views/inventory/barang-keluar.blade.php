@@ -5,7 +5,7 @@
         <div class="container-fluid iq-container p-0">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-2 pt-1">
                 <div>
-                    <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: 2.25rem !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
+                    <h1 class="fw-bold mb-1" style="color: #0c2b27 !important; font-size: var(--ateka-h1-size, 2.25rem) !important; letter-spacing: -0.035em !important; line-height: 1.15 !important; text-shadow: none !important;">
                         Transaksi Barang Keluar
                     </h1>
                     <p class="mb-0 text-muted" style="font-size: 0.84rem !important; color: #64748b !important; text-shadow: none !important;">
