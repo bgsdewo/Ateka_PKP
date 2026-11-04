@@ -100,3 +100,33 @@
     sync();
 })();
 </script>
+
+<!-- Pagination ringan sisi-klien: <div data-page-size="3"> berisi tabel -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-page-size]').forEach(function (box) {
+        var size = parseInt(box.getAttribute('data-page-size'), 10) || 3;
+        var rows = Array.prototype.slice.call(box.querySelectorAll('tbody > tr'));
+        if (rows.length <= size) return;
+        var pages = Math.ceil(rows.length / size), cur = 1;
+        var bar = document.createElement('div');
+        bar.className = 'ateka-pager';
+        bar.innerHTML = '<span class="ateka-pager-info"></span><div class="ateka-pager-btns">' +
+            '<button type="button" data-d="-1" aria-label="Halaman sebelumnya">&lsaquo; Sebelumnya</button>' +
+            '<button type="button" data-d="1" aria-label="Halaman berikutnya">Berikutnya &rsaquo;</button></div>';
+        box.appendChild(bar);
+        var info = bar.querySelector('.ateka-pager-info'), btns = bar.querySelectorAll('button');
+        function render() {
+            rows.forEach(function (r, i) { r.style.display = (i >= (cur - 1) * size && i < cur * size) ? '' : 'none'; });
+            var a = (cur - 1) * size + 1, b = Math.min(cur * size, rows.length);
+            info.textContent = a + '-' + b + ' dari ' + rows.length + ' \u2022 Hal. ' + cur + '/' + pages;
+            btns[0].disabled = cur === 1; btns[1].disabled = cur === pages;
+        }
+        bar.addEventListener('click', function (e) {
+            var btn = e.target.closest('button'); if (!btn || btn.disabled) return;
+            cur = Math.min(pages, Math.max(1, cur + parseInt(btn.getAttribute('data-d'), 10))); render();
+        });
+        render();
+    });
+});
+</script>

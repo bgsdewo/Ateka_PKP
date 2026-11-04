@@ -1109,9 +1109,9 @@
 
                         @if($gudangTasksList->isNotEmpty())
 
-                            <div class="table-responsive">
+                            <div class="ateka-queue" data-page-size="3">
 
-                                <table class="table table-hover align-middle mb-0" style="font-size: 0.82rem;">
+                                <table class="table table-hover align-middle mb-0 ateka-queue-table">
 
                                     <thead class="table-light" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
 
@@ -1155,7 +1155,7 @@
 
                                             <tr>
 
-                                                <td class="ps-2 py-2.5 fw-semibold text-dark text-nowrap">
+                                                <td class="ps-2 py-2.5 fw-semibold text-dark ateka-q-code" data-label="Kode Tiket">
 
                                                     {{ $task->request_code }}
 
@@ -1163,7 +1163,7 @@
 
                                                 </td>
 
-                                                <td class="py-2.5">
+                                                <td class="py-2.5 ateka-q-who" data-label="Pemohon">
 
                                                     <span class="d-block fw-semibold text-dark">{{ $pemohonName }}</span>
 
@@ -1171,13 +1171,13 @@
 
                                                 </td>
 
-                                                <td class="py-2.5 text-truncate" style="max-width: 180px;" title="{{ $itemSummary }}">
+                                                <td class="py-2.5 ateka-q-item" data-label="Item" title="{{ $itemSummary }}">
 
                                                     {{ $itemSummary }}
 
                                                 </td>
 
-                                                <td class="py-2.5">
+                                                <td class="py-2.5 ateka-q-status" data-label="Status">
 
                                                     @if($isDistributor)
 
@@ -1211,11 +1211,11 @@
 
                                                 </td>
 
-                                                <td class="text-end pe-2 py-2.5 text-nowrap">
+                                                <td class="text-end pe-2 py-2.5 ateka-q-act" data-label="Aksi">
 
                                                     @if($isDistributor)
 
-                                                        <a href="{{ route('distribusi.index') }}" class="btn btn-xs btn-outline-success rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                                                        <a href="{{ route('distribusi.index') }}" class="btn btn-outline-success rounded-pill fw-bold ateka-queue-btn">
 
                                                             Serahkan &rarr;
 
@@ -1223,7 +1223,7 @@
 
                                                     @else
 
-                                                        <a href="{{ route('master-data.daftar-barang.index') }}#pengadaan-section" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                                                        <a href="{{ route('master-data.daftar-barang.index') }}#pengadaan-section" class="btn btn-outline-primary rounded-pill fw-bold ateka-queue-btn">
 
                                                             Input Stok &rarr;
 
