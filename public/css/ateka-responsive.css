@@ -321,3 +321,9 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
     .ateka-fit-table td:last-child .flex-nowrap { flex-wrap: wrap !important; }
     .ateka-fit-table td.text-end { white-space: nowrap !important; }
 }
+
+/* Sub-menu sidebar (mode lebar): tanpa ruang kosong ikon-mini, label cukup satu baris */
+.sidebar:not(.sidebar-mini) .nav-item .sub-nav .nav-item .nav-link { padding: .42rem .75rem .42rem 1rem !important; }
+.sidebar:not(.sidebar-mini) .nav-item .sub-nav .sidenav-mini-icon { display: none !important; }
+.sidebar:not(.sidebar-mini) .nav-item .sub-nav .nav-item .nav-link .item-name { margin-left: 0 !important; font-size: .84rem !important; }
+.sidebar:not(.sidebar-mini) .nav-item .sub-nav { padding-left: 0; }
