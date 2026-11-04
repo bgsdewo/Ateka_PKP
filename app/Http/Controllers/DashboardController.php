@@ -612,6 +612,7 @@ class DashboardController extends Controller
 
 
 
+            // Pelacakan menampilkan pengajuan yang MASIH AKTIF, tidak dibatasi bulan/tahun dashboard
             $trackedRequests = RequestItem::with('details.product')
 
                 ->where($baseUserQuery)
@@ -644,9 +645,7 @@ class DashboardController extends Controller
 
                 })
 
-                ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
 
-                ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
 
                 ->orderByRaw("CASE WHEN status IN ('pending', 'approved') THEN 0 ELSE 1 END")
 

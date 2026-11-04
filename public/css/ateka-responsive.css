@@ -480,3 +480,9 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
 .alert .btn-close { padding: .7rem .8rem; }
 .alert svg { width: 16px; height: 16px; }
 .alert h1, .alert h2, .alert h3, .alert h4, .alert h5, .alert h6 { font-size: .86rem; margin-bottom: .15rem; }
+
+/* Kartu ringkasan yang bisa diklik (mis. Riwayat Pengajuan) */
+.kpi-widget-card[role="link"] { transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease; }
+.kpi-widget-card[role="link"]:hover { box-shadow: 0 8px 20px -8px rgba(12, 43, 39, .25); transform: translateY(-1px); }
+.kpi-widget-card[role="link"]:focus-visible { outline: 2px solid #10b981; outline-offset: 2px; }
+.kpi-widget-card.kpi-active { border: 2px solid #10b981 !important; background: #f2faf6; }

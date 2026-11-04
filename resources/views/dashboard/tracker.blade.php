@@ -252,7 +252,7 @@
             <div>
                 <h6 class="fw-bold mb-1 text-dark" style="font-size: .98rem;">Tidak Ada Pengajuan yang Sedang Diproses</h6>
                 <p class="text-muted small mb-0" style="font-size: .8rem;">
-                    Seluruh permohonan ATK Anda telah selesai atau Anda belum membuat pengajuan baru pada periode {{ $selectedPeriodLabel ?? '' }}.
+                    Seluruh permohonan ATK Anda telah selesai, atau Anda belum membuat pengajuan baru.
                 </p>
             </div>
         </div>

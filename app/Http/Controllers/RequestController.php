@@ -13,26 +13,65 @@ use Illuminate\Support\Str;
 
 class RequestController extends Controller
 {
-    // Menampilkan daftar riwayat pengajuan milik user yang login
-    public function index()
+    // Menampilkan daftar riwayat pengajuan milik user yang login (dengan filter & pagination)
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $query = RequestItem::with(['details.product', 'signedBy', 'distributor']);
 
+        // Lingkup data: milik sendiri; PIC Distribusi juga melihat pengajuan divisinya
+        $scope = RequestItem::query();
         if ($user && $user->isPicDistribusi()) {
-            $query->where(function ($q) use ($user) {
+            $scope->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                   ->orWhere(function ($sub) use ($user) {
                       $sub->forPic($user);
                   });
             });
         } else {
-            $query->where('user_id', Auth::id());
+            $scope->where('user_id', Auth::id());
         }
 
-        $requests = $query->latest()->get();
+        // Ringkasan status (seluruh riwayat, tidak terpengaruh filter di bawah)
+        $statusCounts = (clone $scope)->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
 
-        return view('pengajuan.index', compact('requests'));
+        $search = trim((string) $request->get('search', ''));
+        $statusFilter = $request->get('status');
+        $typeFilter = $request->get('type');
+        $monthInput = $request->get('month');
+        $yearInput = $request->get('year');
+        $selectedMonth = in_array($monthInput, [null, '', 'all'], true) ? null : (int) $monthInput;
+        $selectedYear = in_array($yearInput, [null, '', 'all'], true) ? null : (int) $yearInput;
+
+        $query = (clone $scope)
+            ->with(['details.product', 'signedBy', 'distributor'])
+            ->when(in_array($statusFilter, ['pending', 'approved', 'distributed', 'rejected'], true), fn($q) => $q->where('status', $statusFilter))
+            ->when(in_array($typeFilter, ['individu', 'subdit'], true), fn($q) => $q->where('type', $typeFilter))
+            ->when($selectedYear, fn($q) => $q->whereYear('created_at', $selectedYear))
+            ->when($selectedMonth, fn($q) => $q->whereMonth('created_at', $selectedMonth))
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('request_code', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%")
+                        ->orWhere('receiver_name', 'like', "%{$search}%")
+                        ->orWhere('purchase_invoice', 'like', "%{$search}%")
+                        ->orWhereHas('details', function ($dq) use ($search) {
+                            $dq->where('custom_product_name', 'like', "%{$search}%")
+                               ->orWhere('specification', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('details.product', function ($pq) use ($search) {
+                            $pq->where('name', 'like', "%{$search}%")
+                               ->orWhere('code', 'like', "%{$search}%");
+                        });
+                });
+            });
+
+        $requests = $query->latest()->latest('id')->paginate(10)->withQueryString();
+
+        $isPic = (bool) ($user && $user->isPicDistribusi());
+
+        return view('pengajuan.index', compact(
+            'requests', 'statusCounts', 'search', 'statusFilter', 'typeFilter', 'selectedMonth', 'selectedYear', 'isPic'
+        ));
     }
 
     // Menampilkan form untuk membuat pengajuan baru

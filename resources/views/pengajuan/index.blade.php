@@ -84,14 +84,15 @@
 
         {{-- Ringkasan Status Pengajuan --}}
         @php
-            $countPending = $requests->where('status', 'pending')->count();
-            $countApproved = $requests->where('status', 'approved')->count();
-            $countDistributed = $requests->where('status', 'distributed')->count();
-            $countRejected = $requests->where('status', 'rejected')->count();
+            $countPending = (int) ($statusCounts['pending'] ?? 0);
+            $countApproved = (int) ($statusCounts['approved'] ?? 0);
+            $countDistributed = (int) ($statusCounts['distributed'] ?? 0);
+            $countRejected = (int) ($statusCounts['rejected'] ?? 0);
+            $kpiLink = fn($st) => route('pengajuan.index', array_merge(request()->except(['status', 'page']), ['status' => $st]));
         @endphp
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between {{ ($statusFilter ?? '') === 'pending' ? 'kpi-active' : '' }}" role="link" tabindex="0" style="cursor: pointer;" title="Tampilkan pengajuan dengan status ini" onclick="window.location.href='{{ $kpiLink('pending') }}'" onkeydown="if(event.key==='Enter'){window.location.href='{{ $kpiLink('pending') }}'}">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Menunggu Review</span>
                         <div class="kpi-icon-squircle" style="background-color: var(--accent-amber-light); color: var(--accent-amber);">
@@ -108,7 +109,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between {{ ($statusFilter ?? '') === 'approved' ? 'kpi-active' : '' }}" role="link" tabindex="0" style="cursor: pointer;" title="Tampilkan pengajuan dengan status ini" onclick="window.location.href='{{ $kpiLink('approved') }}'" onkeydown="if(event.key==='Enter'){window.location.href='{{ $kpiLink('approved') }}'}">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Disetujui TU</span>
                         <div class="kpi-icon-squircle" style="background-color: #f0f9ff; color: #0284c7;">
@@ -125,7 +126,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between {{ ($statusFilter ?? '') === 'distributed' ? 'kpi-active' : '' }}" role="link" tabindex="0" style="cursor: pointer;" title="Tampilkan pengajuan dengan status ini" onclick="window.location.href='{{ $kpiLink('distributed') }}'" onkeydown="if(event.key==='Enter'){window.location.href='{{ $kpiLink('distributed') }}'}">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Selesai Diterima</span>
                         <div class="kpi-icon-squircle" style="background-color: var(--accent-emerald-light); color: var(--accent-emerald);">
@@ -141,7 +142,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between">
+                <div class="kpi-widget-card h-100 d-flex flex-column justify-content-between {{ ($statusFilter ?? '') === 'rejected' ? 'kpi-active' : '' }}" role="link" tabindex="0" style="cursor: pointer;" title="Tampilkan pengajuan dengan status ini" onclick="window.location.href='{{ $kpiLink('rejected') }}'" onkeydown="if(event.key==='Enter'){window.location.href='{{ $kpiLink('rejected') }}'}">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.04em;">Ditolak</span>
                         <div class="kpi-icon-squircle" style="background-color: var(--accent-rose-light); color: var(--accent-rose);">
@@ -176,6 +177,64 @@
                                 </svg>
                                 Buat Pengajuan Barang
                             </a>
+                        </div>
+                    </div>
+
+                    {{-- Filter & Pencarian Riwayat --}}
+                    @php
+                        $monthNames = [1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'];
+                        $filterActive = $search !== '' || $statusFilter || $typeFilter || $selectedMonth || $selectedYear;
+                    @endphp
+                    <div class="px-3 px-md-4 py-3 border-bottom" style="background-color: #f8fafc;">
+                        <form id="pengajuan-filter-form" action="{{ route('pengajuan.index') }}" method="GET" class="row g-2 align-items-center">
+                            <div class="col-12 col-lg-4">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Cari kode tiket, nama barang, keperluan..." style="height: 38px; font-size: 0.84rem;" aria-label="Cari riwayat pengajuan">
+                                    <button type="submit" class="btn btn-dark px-3" style="height: 38px;">Cari</button>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 col-lg-2">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem;" aria-label="Status">
+                                    <option value="">Semua Status</option>
+                                    <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Menunggu Review</option>
+                                    <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Disetujui</option>
+                                    <option value="distributed" {{ $statusFilter === 'distributed' ? 'selected' : '' }}>Selesai Diterima</option>
+                                    <option value="rejected" {{ $statusFilter === 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                                </select>
+                            </div>
+                            @if ($isPic)
+                                <div class="col-6 col-md-3 col-lg-2">
+                                    <select name="type" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem;" aria-label="Tipe">
+                                        <option value="">Semua Tipe</option>
+                                        <option value="subdit" {{ $typeFilter === 'subdit' ? 'selected' : '' }}>Subdit (Kolektif)</option>
+                                        <option value="individu" {{ $typeFilter === 'individu' ? 'selected' : '' }}>Individu</option>
+                                    </select>
+                                </div>
+                            @endif
+                            <div class="col-6 col-md-3 col-lg-2">
+                                <select name="month" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem;" aria-label="Bulan">
+                                    <option value="all">Semua Bulan</option>
+                                    @foreach ($monthNames as $num => $name)
+                                        <option value="{{ $num }}" {{ $selectedMonth == $num ? 'selected' : '' }}>{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3 col-lg-2">
+                                <select name="year" class="form-select form-select-sm" onchange="this.form.submit()" style="height: 38px; font-size: 0.84rem;" aria-label="Tahun">
+                                    <option value="all">Semua Tahun</option>
+                                    @for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                                        <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            @if ($filterActive)
+                                <div class="col-12 col-lg-auto">
+                                    <a href="{{ route('pengajuan.index') }}" class="btn btn-outline-secondary btn-sm w-100" style="height: 38px; line-height: 1.7;">Reset Filter</a>
+                                </div>
+                            @endif
+                        </form>
+                        <div class="small text-muted mt-2" style="font-size: 0.76rem;">
+                            Menampilkan {{ $requests->total() }} pengajuan{{ $filterActive ? ' sesuai filter' : '' }}.
                         </div>
                     </div>
                     <div class="card-body p-2.5 p-md-3">
@@ -627,13 +686,18 @@
                                     @empty
                                         <tr>
                                             <td colspan="6" class="text-center text-muted py-5">
-                                                Belum ada riwayat pengajuan permintaan barang. Silakan buat pengajuan baru.
+                                                {{ $filterActive ? 'Tidak ada pengajuan yang sesuai dengan filter Anda.' : 'Belum ada riwayat pengajuan permintaan barang. Silakan buat pengajuan baru.' }}
                                             </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
+                        @if ($requests->hasPages())
+                            <div class="d-flex justify-content-center justify-content-md-end mt-3">
+                                {{ $requests->links('pagination::bootstrap-4') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
