@@ -61,4 +61,37 @@
 <!-- Global Scrollable Period Select System -->
 <script defer src="{{ asset('js/ateka-select-scrollable.js') }}?v={{ file_exists(public_path('js/ateka-select-scrollable.js')) ? filemtime(public_path('js/ateka-select-scrollable.js')) : '1.0' }}"></script>
 
-
+<!-- Sidebar mobile: backdrop, tutup saat klik di luar / pilih menu -->
+<script>
+(function () {
+    var sb = document.querySelector('.sidebar');
+    if (!sb) return;
+    var BP = 1200;
+    function sync() {
+        var open = window.innerWidth < BP && !sb.classList.contains('sidebar-mini');
+        document.body.classList.toggle('ateka-sidebar-open', open);
+    }
+    function closeIfMobile() {
+        if (window.innerWidth < BP && !sb.classList.contains('sidebar-mini')) sb.classList.add('sidebar-mini');
+    }
+    new MutationObserver(sync).observe(sb, { attributes: true, attributeFilter: ['class'] });
+    var wasMobile = window.innerWidth < BP;
+    window.addEventListener('resize', function () {
+        var isMobile = window.innerWidth < BP;
+        if (isMobile && !wasMobile) closeIfMobile();
+        wasMobile = isMobile;
+        sync();
+    });
+    document.addEventListener('click', function (e) {
+        if (window.innerWidth >= BP || sb.classList.contains('sidebar-mini')) return;
+        if (e.target.closest('.sidebar') || e.target.closest('[data-toggle="sidebar"]')) return;
+        closeIfMobile();
+    });
+    sb.addEventListener('click', function (e) {
+        var a = e.target.closest('a.nav-link');
+        if (a && !a.hasAttribute('data-bs-toggle') && a.getAttribute('href') && a.getAttribute('href') !== '#') closeIfMobile();
+    });
+    closeIfMobile();
+    sync();
+})();
+</script>

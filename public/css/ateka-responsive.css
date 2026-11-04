@@ -166,3 +166,32 @@ td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
     html { font-size: 16px; }
     .table-responsive > .table { min-width: 0; }
 }
+
+/* ------------------------------------------------------------------
+ * 8. Judul halaman (banner atas) — terlalu besar di laptop kecil & HP
+ * ------------------------------------------------------------------ */
+@media (min-width: 1200px) and (max-width: 1599.98px) {
+    .iq-navbar-header h1 { font-size: 1.9rem !important; }
+}
+@media (max-width: 991.98px) {
+    .iq-navbar-header h1 { font-size: 1.7rem !important; }
+}
+@media (max-width: 575.98px) {
+    .iq-navbar-header h1 { font-size: 1.35rem !important; line-height: 1.2 !important; letter-spacing: -0.02em !important; }
+    .iq-navbar-header .container-fluid { padding-left: .75rem; padding-right: .75rem; }
+    .iq-navbar-header .iq-header-img { display: none; }
+}
+
+/* ------------------------------------------------------------------
+ * 9. Sidebar off-canvas (< 1200px) & kartu statistik
+ * ------------------------------------------------------------------ */
+@media (max-width: 1199.98px) {
+    .sidebar:not(.sidebar-mini) { width: 17rem !important; max-width: 86vw !important; }
+    .sidebar:not(.sidebar-mini) .nav-item .nav-link .item-name { white-space: normal !important; line-height: 1.25; }
+    .sidebar:not(.sidebar-mini) .sidebar-body { padding-bottom: 5rem; overflow-y: auto; }
+}
+@media (max-width: 767.98px) {
+    .aeux-stat-card { min-height: 0 !important; padding: 1rem 1.1rem !important; gap: .4rem; }
+    .aeux-stat-card .aeux-stat-value,
+    .aeux-stat-card [class*="stat-value"] { font-size: 1.6rem; }
+}
