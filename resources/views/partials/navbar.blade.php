@@ -399,9 +399,9 @@
 
                     </a>
 
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" aria-labelledby="notificationDropdown" style="width: 375px; max-width: 92vw;">
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 ateka-notif-menu" aria-labelledby="notificationDropdown">
 
-                        <div class="p-3 bg-primary text-white rounded-top d-flex justify-content-between align-items-center">
+                        <div class="ateka-notif-head d-flex justify-content-between align-items-center">
 
                             <div>
 
@@ -595,7 +595,7 @@
 
 
 
-                        <div class="list-group list-group-flush overflow-auto" id="nav-notif-list" style="max-height: 360px;">
+                        <div class="list-group list-group-flush ateka-notif-list" id="nav-notif-list">
 
                             {{-- Item Verifikasi Pending untuk Kasubbag TU --}}
 
@@ -877,7 +877,7 @@
 
 
 
-                        <div class="p-2 border-top text-center bg-light rounded-bottom">
+                        <div class="ateka-notif-foot">
 
                             @if($isKasubagTU)
 
