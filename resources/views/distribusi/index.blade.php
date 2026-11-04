@@ -372,7 +372,7 @@
                                 </thead>
                                 <tbody id="distribusi-table-body">
                                     @forelse ($requests as $index => $req)
-                                        <tr class="distribusi-row" data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . ($req->receiver_name ?? '') . ' ' . ($req->distribution_notes ?? '') . ' ' . $req->type . ' ' . $req->status . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
+                                        <tr class="distribusi-row" data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name ?? '') . ' ' . ($req->user->position ?? '') . ' ' . ($req->receiver_name ?? '') . ' ' . ($req->distribution_notes ?? '') . ' ' . $req->type . ' ' . $req->status . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ') . ' ' . $req->details->pluck('custom_product_name')->join(' ')) }}">
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}</td>
                                             <td>
                                                 <strong class="font-monospace text-primary">{{ $req->request_code }}</strong><br>

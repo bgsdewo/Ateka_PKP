@@ -33,9 +33,52 @@ class StockTransaction extends Model
         'note',
     ];
 
+    /**
+     * Penerima kolektif (subdit)? Kolom recipient_type adalah acuan utama. Pencarian kata "Subdit"
+     * pada catatan hanya dipakai untuk data lama yang recipient_type-nya kosong, supaya mutasi
+     * perorangan yang catatannya kebetulan menyebut "Subdit" tidak salah dihitung sebagai subdit.
+     */
     public function getIsSubditAttribute(): bool
     {
-        return $this->recipient_type === 'subdit' || str_contains(strtolower($this->note ?? ''), 'subdit');
+        if (!empty($this->recipient_type)) {
+            return $this->recipient_type === 'subdit';
+        }
+        return str_contains(strtolower(($this->note ?? '') . ' ' . ($this->uraian ?? '')), 'subdit');
+    }
+
+    /**
+     * Filter penerima barang keluar: 'subdit' atau 'pegawai'/'individu'.
+     * Aturan sama dengan accessor is_subdit / is_individu agar tabel, total, cetak, dan Excel selalu konsisten.
+     */
+    public function scopeForRecipient($query, ?string $recipient)
+    {
+        if ($recipient === 'subdit') {
+            return $query->where('type', 'keluar')->where(function ($q) {
+                $q->where('recipient_type', 'subdit')
+                  ->orWhere(function ($legacy) {
+                      $legacy->whereNull('recipient_type')->where(function ($t) {
+                          $t->where('note', 'like', '%Subdit%')->orWhere('uraian', 'like', '%Subdit%');
+                      });
+                  });
+            });
+        }
+
+        if (in_array($recipient, ['pegawai', 'individu'], true)) {
+            return $query->where('type', 'keluar')->where(function ($q) {
+                $q->where('recipient_type', 'individu')
+                  ->orWhere(function ($legacy) {
+                      $legacy->whereNull('recipient_type')
+                          ->where(function ($t) {
+                              $t->whereNull('note')->orWhere('note', 'not like', '%Subdit%');
+                          })
+                          ->where(function ($t) {
+                              $t->whereNull('uraian')->orWhere('uraian', 'not like', '%Subdit%');
+                          });
+                  });
+            });
+        }
+
+        return $query;
     }
 
     public function getIsIndividuAttribute(): bool

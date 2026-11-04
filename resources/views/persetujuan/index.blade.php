@@ -449,7 +449,7 @@
                                             }
                                         @endphp
                                         <tr class="persetujuan-row"
-                                            data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name_with_title ?? ($req->user->name ?? '')) . ' ' . ($req->user->nip ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ')) }}">
+                                            data-search-text="{{ strtolower($req->request_code . ' ' . ($req->user->name_with_title ?? ($req->user->name ?? '')) . ' ' . ($req->user->nip ?? '') . ' ' . ($req->user->position ?? '') . ' ' . $req->type . ' ' . $req->notes . ' ' . $req->details->pluck('product.name')->join(' ') . ' ' . $req->details->pluck('product.code')->join(' ') . ' ' . $req->details->pluck('custom_product_name')->join(' ')) }}">
                                             <td>{{ ($requests->currentPage() - 1) * $requests->perPage() + $index + 1 }}
                                             </td>
                                             <td>

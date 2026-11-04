@@ -623,6 +623,11 @@
 
                         // Re-render list barang sesuai kategori
                         renderProducts('');
+                        // Perbarui hitungan barang pada tombol bila belum ada barang yang dipilih
+                        if (!(prodHidden && prodHidden.value) && prodBtnText) {
+                            const matchedN = masterProducts.filter(item => !catId || item.category_id === catId).length;
+                            prodBtnText.textContent = `-- Pilih Barang dari Daftar ATK (${matchedN} Item) --`;
+                        }
 
                         // Jika produk yang saat ini dipilih tidak sesuai kategori yang baru, reset pilihan produk
                         const currentProdId = prodHidden ? prodHidden.value : '';

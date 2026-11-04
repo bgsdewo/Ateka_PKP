@@ -39,28 +39,7 @@ class ReportController extends Controller
             ->when($type, function ($q) use ($type) {
                 $q->where('type', $type);
             })
-            ->when($recipientType, function ($q) use ($recipientType) {
-                if ($recipientType === 'subdit') {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'subdit')
-                              ->orWhere('note', 'like', '%Subdit%')
-                              ->orWhere('uraian', 'like', '%Subdit%');
-                      });
-                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'individu')
-                              ->orWhere('note', 'like', '%Individu%')
-                              ->orWhere('note', 'like', '%Pegawai%')
-                              ->orWhere(function ($fallback) {
-                                  $fallback->whereNull('recipient_type')
-                                           ->where('note', 'not like', '%Subdit%')
-                                           ->where('uraian', 'not like', '%Subdit%');
-                              });
-                      });
-                }
-            })
+            ->when($recipientType, fn($q) => $q->forRecipient($recipientType))
             ->when($startDate, function ($q) use ($startDate) {
                 $q->whereDate('transaction_date', '>=', $startDate);
             })
@@ -144,28 +123,7 @@ class ReportController extends Controller
             ->when($type, function ($q) use ($type) {
                 $q->where('type', $type);
             })
-            ->when($recipientType, function ($q) use ($recipientType) {
-                if ($recipientType === 'subdit') {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'subdit')
-                              ->orWhere('note', 'like', '%Subdit%')
-                              ->orWhere('uraian', 'like', '%Subdit%');
-                      });
-                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'individu')
-                              ->orWhere('note', 'like', '%Individu%')
-                              ->orWhere('note', 'like', '%Pegawai%')
-                              ->orWhere(function ($fallback) {
-                                  $fallback->whereNull('recipient_type')
-                                           ->where('note', 'not like', '%Subdit%')
-                                           ->where('uraian', 'not like', '%Subdit%');
-                              });
-                      });
-                }
-            })
+            ->when($recipientType, fn($q) => $q->forRecipient($recipientType))
             ->when($startDate, function ($q) use ($startDate) {
                 $q->whereDate('transaction_date', '>=', $startDate);
             })
@@ -238,26 +196,7 @@ class ReportController extends Controller
                 $q->where('type', $type);
             }
             if ($recipientType) {
-                if ($recipientType === 'subdit') {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'subdit')
-                              ->orWhere('note', 'like', '%Subdit%')
-                              ->orWhere('uraian', 'like', '%Subdit%');
-                      });
-                } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
-                    $q->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'individu')
-                              ->orWhere('note', 'like', '%Individu%')
-                              ->orWhere('note', 'like', '%Pegawai%')
-                              ->orWhere(function ($fallback) {
-                                  $fallback->whereNull('recipient_type')
-                                           ->where('note', 'not like', '%Subdit%')
-                                           ->where('uraian', 'not like', '%Subdit%');
-                              });
-                      });
-                }
+                $q->forRecipient($recipientType);
             }
         }])->get()->map(function ($cat) {
             $totalIn = 0;
@@ -388,26 +327,7 @@ class ReportController extends Controller
         }
 
         if ($recipientType) {
-            if ($recipientType === 'subdit') {
-                $query->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'subdit')
-                              ->orWhere('note', 'like', '%Subdit%')
-                              ->orWhere('uraian', 'like', '%Subdit%');
-                      });
-            } elseif (in_array($recipientType, ['pegawai', 'individu'])) {
-                $query->where('type', 'keluar')
-                      ->where(function ($sub) {
-                          $sub->where('recipient_type', 'individu')
-                              ->orWhere('note', 'like', '%Individu%')
-                              ->orWhere('note', 'like', '%Pegawai%')
-                              ->orWhere(function ($fallback) {
-                                  $fallback->whereNull('recipient_type')
-                                           ->where('note', 'not like', '%Subdit%')
-                                           ->where('uraian', 'not like', '%Subdit%');
-                              });
-                      });
-            }
+            $query->forRecipient($recipientType);
         }
 
         $transactions = $query->orderBy('transaction_date', 'asc')->get();

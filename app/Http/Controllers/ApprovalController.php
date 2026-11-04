@@ -76,6 +76,11 @@ class ApprovalController extends Controller
                         ->orWhereHas('details.product', function ($pq) use ($search) {
                             $pq->where('name', 'like', "%{$search}%")
                                ->orWhere('code', 'like', "%{$search}%");
+                        })
+                        // Barang pengadaan yang belum ada di Master Barang (nama diketik pemohon)
+                        ->orWhereHas('details', function ($dq) use ($search) {
+                            $dq->where('custom_product_name', 'like', "%{$search}%")
+                               ->orWhere('specification', 'like', "%{$search}%");
                         });
                 });
             })

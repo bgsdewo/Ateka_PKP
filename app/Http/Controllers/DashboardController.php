@@ -129,8 +129,8 @@ class DashboardController extends Controller
                 return $txQuery->selectRaw("
                     COALESCE(SUM(CASE WHEN type = 'masuk' THEN quantity ELSE 0 END), 0) as total_stock_in,
                     COALESCE(SUM(CASE WHEN type = 'keluar' THEN quantity ELSE 0 END), 0) as total_stock_out,
-                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'subdit' OR note LIKE '%Subdit%') THEN quantity ELSE 0 END), 0) as total_stock_out_subdit,
-                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'individu' OR (recipient_type != 'subdit' AND (note NOT LIKE '%Subdit%' OR note IS NULL))) THEN quantity ELSE 0 END), 0) as total_stock_out_individu
+                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'subdit' OR (recipient_type IS NULL AND (note LIKE '%Subdit%' OR uraian LIKE '%Subdit%'))) THEN quantity ELSE 0 END), 0) as total_stock_out_subdit,
+                    COALESCE(SUM(CASE WHEN type = 'keluar' AND (recipient_type = 'individu' OR (recipient_type IS NULL AND (note IS NULL OR note NOT LIKE '%Subdit%') AND (uraian IS NULL OR uraian NOT LIKE '%Subdit%'))) THEN quantity ELSE 0 END), 0) as total_stock_out_individu
                 ")->first();
             });
 
