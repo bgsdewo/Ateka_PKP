@@ -786,7 +786,7 @@
                                             <td class="text-center col-nowrap">
                                                 <span
                                                     class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-1.5 py-1">
-                                                    {{ $transaction->product->code ?? '-' }}
+                                                    {{ $transaction->product->kode_barang_laporan ?? '-' }}
                                                 </span>
                                             </td>
                                             {{-- 4. Kategori --}}

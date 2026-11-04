@@ -223,7 +223,7 @@
                         <td style="text-align: center;">{{ $index + 1 }}</td>
                         @if (isset($requestItem))
                             <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
-                                {{ $item->product_code ?? ($item->product->code ?? ($item->code ?? '-')) }}
+                                {{ $item->product_code ?? ($item->product->kode_barang_laporan ?? ($item->code ?? '-')) }}
                             </td>
                         @else
                             <td style="text-align: center; font-family: monospace; font-size: 9pt; font-weight: bold;">
@@ -465,7 +465,7 @@
                     @foreach ($requestItem->details as $index => $detail)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td class="text-center font-monospace">{{ $detail->product->code ?? '-' }}</td>
+                            <td class="text-center font-monospace">{{ $detail->product->kode_barang_laporan ?? '-' }}</td>
                             <td>
                                 <strong>{{ $detail->item_name }}</strong>
                                 @if ($detail->specification)

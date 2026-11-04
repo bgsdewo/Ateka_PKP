@@ -262,7 +262,7 @@
                         <td class="text-center font-monospace">
                             {{ $transaction->transaction_date ? \Carbon\Carbon::parse($transaction->transaction_date)->format('d-m-Y') : '-' }}
                         </td>
-                        <td class="text-center font-monospace">{{ $transaction->product->code ?? '-' }}</td>
+                        <td class="text-center font-monospace">{{ $transaction->product->kode_barang_laporan ?? '-' }}</td>
                         <td class="text-center">{{ $transaction->product->category->name ?? '-' }}</td>
                         <td class="fw-semibold">{{ $transaction->product->name ?? '-' }}</td>
                         <td class="text-center">

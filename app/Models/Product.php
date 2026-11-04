@@ -144,6 +144,16 @@ class Product extends Model
         return !empty($units) ? $units : ['Buah'];
     }
 
+    /**
+     * Kode Barang untuk laporan: mengikuti Kode Barang pada KATEGORI (mis. 1010302004),
+     * bukan Kode Rincian per barang. Cadangan: kode BMN barang, lalu kode barang itu sendiri.
+     */
+    public function getKodeBarangLaporanAttribute(): string
+    {
+        return $this->category?->kode_barang
+            ?: ($this->bmn_code ?: ($this->code ?: '-'));
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);

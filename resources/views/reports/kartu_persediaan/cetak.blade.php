@@ -225,7 +225,7 @@
                                 <td style="width: 110px; border: none; font-weight: normal;">KODE BARANG</td>
                                 <td style="width: 12px; border: none;">:</td>
                                 <td style="border: none; font-weight: normal; font-family: monospace;">
-                                    {{ $product->bmn_code ?: ($product->code ?: '-') }}
+                                    {{ $product->kode_barang_laporan }}
                                 </td>
                             </tr>
                             <tr>

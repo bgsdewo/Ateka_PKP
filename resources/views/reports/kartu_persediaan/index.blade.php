@@ -309,7 +309,7 @@
                                 <tr>
                                     <td class="fw-bold text-muted ps-0" style="width: 120px;">KODE BARANG</td>
                                     <td class="fw-bold" style="width: 15px;">:</td>
-                                    <td class="font-monospace fw-bold">{{ $selectedProduct->bmn_code ?: ($selectedProduct->code ?: '-') }}</td>
+                                    <td class="font-monospace fw-bold">{{ $selectedProduct->kode_barang_laporan }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold text-muted ps-0">JENIS BARANG</td>

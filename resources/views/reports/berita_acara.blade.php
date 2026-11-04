@@ -203,7 +203,7 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td class="text-center">{{ $t->transaction_date ? \Carbon\Carbon::parse($t->transaction_date)->format('d/m/Y') : '-' }}</td>
-                        <td class="text-center font-monospace">{{ $t->product->code ?? '-' }}</td>
+                        <td class="text-center font-monospace">{{ $t->product->kode_barang_laporan ?? '-' }}</td>
                         <td>{{ $t->product->name ?? '-' }}</td>
                         <td class="text-center fw-bold {{ $t->type === 'masuk' ? 'text-success' : 'text-danger' }}">
                             {{ ucfirst($t->type) }}
