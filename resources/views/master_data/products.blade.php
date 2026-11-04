@@ -534,12 +534,6 @@
                                     Filter: <strong>{{ $month ? \Carbon\Carbon::createFromDate(2026, (int)$month, 1)->translatedFormat('F') : '' }} {{ $year ?? '' }}</strong>
                                 </span>
                             @endif
-                            <a href="{{ route('system.sync-bmn-database') }}" class="btn btn-outline-primary btn-sm" onclick="return confirm('Jalankan sinkronisasi Kode Barang & Rincian BMN untuk seluruh Kategori dan Produk ATK?');">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                                </svg>
-                                Sinkronkan BMN
-                            </a>
                             <button type="button" class="btn btn-primary btn-sm btn-create-barang">
                                 + Tambah / Isi Stok Barang
                             </button>
