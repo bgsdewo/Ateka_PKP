@@ -1,0 +1,168 @@
+/**
+ * ==============================================================================
+ * ATEKA RESPONSIVE LAYER
+ * Dimuat TERAKHIR di layouts/app.blade.php supaya menimpa gaya lain.
+ * Tujuan: tampilan proporsional di laptop (layar 1280-1600px / skala 125-150%),
+ * tablet, dan HP. Tidak mengubah warna / identitas visual.
+ * ==============================================================================
+ */
+
+/* ------------------------------------------------------------------
+ * 1. SKALA DASAR — layar laptop (mis. 1920px dengan skala Windows 150%
+ *    = viewport 1280px) terasa terlalu besar. Kecilkan root rem sedikit.
+ * ------------------------------------------------------------------ */
+@media (min-width: 1200px) and (max-width: 1599.98px) {
+    html { font-size: 14px; }
+    :root { --sidebar-width: 15.5rem; }
+    .sidebar:not(.sidebar-mini) { width: 15.5rem !important; max-width: 15.5rem !important; }
+    .sidebar:not(.sidebar-mini) + .main-content { margin-left: 15.5rem !important; }
+    .sidebar:not(.sidebar-mini) ~ .main-content .modal,
+    body:not(.sidebar-mini) .modal { padding-left: 15.5rem !important; }
+}
+@media (min-width: 1600px) {
+    html { font-size: 15px; }
+}
+@media (max-width: 575.98px) {
+    html { font-size: 15px; }
+}
+
+html { -webkit-text-size-adjust: 100%; }
+img, svg, video { max-width: 100%; }
+body:not(.auth-page) { overflow-x: hidden; }
+.main-content { min-width: 0; }
+
+/* Teks panjang tidak boleh menembus kartu */
+.card, .card-body, .modal-body, td, th { overflow-wrap: anywhere; }
+td.text-nowrap, th.text-nowrap, .text-nowrap { overflow-wrap: normal; }
+
+/* ------------------------------------------------------------------
+ * 2. TABEL — selalu bisa digeser horizontal, kolom tidak hancur
+ * ------------------------------------------------------------------ */
+.table-responsive,
+.dataTables_wrapper .dataTables_scroll,
+.dataTables_wrapper {
+    -webkit-overflow-scrolling: touch;
+}
+.table-responsive { max-width: 100%; }
+.table-responsive > .table { min-width: 640px; }
+.table-responsive > .table th { white-space: nowrap; }
+.table-responsive > .table td { vertical-align: middle; }
+.table-responsive > .table td:not(.text-wrap) { min-width: 0; }
+/* kolom kode/tanggal tidak dipatah per huruf */
+.table-responsive > .table td.text-nowrap { white-space: nowrap; }
+
+/* Dashboard: tabel antrean — kolom Pemohon dan Item boleh turun baris wajar */
+.table-responsive > .table td .d-block { word-break: normal; overflow-wrap: break-word; }
+
+/* DataTables controls */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter { margin-bottom: .75rem; }
+.dataTables_wrapper .dataTables_filter input { max-width: 100%; }
+
+/* ------------------------------------------------------------------
+ * 3. TABLET & HP (< 1200px): sidebar menjadi off-canvas
+ * ------------------------------------------------------------------ */
+@media (max-width: 1199.98px) {
+    .main-content { margin-left: 0 !important; width: 100% !important; }
+    .sidebar { z-index: 1045 !important; }
+    .modal, body .modal { padding-left: 0 !important; }
+
+    /* Backdrop saat sidebar terbuka */
+    body.ateka-sidebar-open::after {
+        content: '';
+        position: fixed; inset: 0;
+        background: rgba(6, 18, 36, .5);
+        z-index: 1040;
+        backdrop-filter: blur(2px);
+    }
+    body.ateka-sidebar-open { overflow: hidden; }
+
+    .iq-navbar .navbar-inner { padding-left: .75rem; padding-right: .75rem; }
+    .iq-navbar .navbar-collapse { max-height: calc(100vh - 80px); overflow-y: auto; }
+}
+
+/* ------------------------------------------------------------------
+ * 4. TABLET (< 992px)
+ * ------------------------------------------------------------------ */
+@media (max-width: 991.98px) {
+    .content-inner,
+    .content-inner.container-fluid,
+    .container-fluid.content-inner { padding-left: 1rem !important; padding-right: 1rem !important; }
+    .card.p-4 { padding: 1.1rem !important; }
+    .modal-dialog.modal-xl,
+    .modal-dialog.modal-lg { max-width: calc(100% - 1rem); margin-left: auto; margin-right: auto; }
+}
+
+/* ------------------------------------------------------------------
+ * 5. HP (< 768px)
+ * ------------------------------------------------------------------ */
+@media (max-width: 767.98px) {
+    .container-fluid { padding-left: .75rem; padding-right: .75rem; }
+    .content-inner,
+    .content-inner.container-fluid,
+    .container-fluid.content-inner { padding-left: .75rem !important; padding-right: .75rem !important; }
+
+    .card.p-4, .card .p-4 { padding: .9rem !important; }
+    .card-body { padding: .9rem; }
+    .card-header { padding: .8rem .9rem; }
+
+    h1, .h1 { font-size: 1.45rem; }
+    h2, .h2 { font-size: 1.3rem; }
+    h3, .h3 { font-size: 1.15rem; }
+    h4, .h4, h5, .h5 { font-size: 1.05rem; }
+
+    /* Tombol aksi & header halaman: tumpuk rapi */
+    .d-flex.justify-content-between.align-items-center:not(.flex-nowrap) { flex-wrap: wrap; gap: .5rem; }
+    .btn { white-space: normal; }
+    .btn-group { flex-wrap: wrap; }
+
+    /* Input min 16px agar iOS tidak auto-zoom */
+    .form-control, .form-select, .select2-selection, input, select, textarea { font-size: 16px !important; }
+    .form-control, .form-select { min-height: 44px; }
+    .btn { min-height: 40px; }
+
+    /* Modal: nyaris layar penuh */
+    .modal-dialog { margin: .5rem; max-width: calc(100% - 1rem); }
+    .modal-dialog-scrollable .modal-content { max-height: calc(100vh - 1rem); }
+    .modal-body { padding: 1rem; }
+    .modal-footer { flex-wrap: wrap; gap: .5rem; }
+    .modal-footer > .btn { flex: 1 1 auto; }
+
+    /* DataTables */
+    .dataTables_wrapper .row > div { width: 100%; text-align: left !important; }
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length { text-align: left !important; float: none; }
+    .dataTables_wrapper .dataTables_filter label,
+    .dataTables_wrapper .dataTables_filter input { width: 100%; margin-left: 0 !important; }
+    .dataTables_wrapper .dataTables_paginate { text-align: center !important; margin-top: .5rem; }
+    .dataTables_wrapper .dataTables_info { text-align: center; padding-top: 0; }
+
+    /* Pagination Laravel / Bootstrap */
+    .pagination { flex-wrap: wrap; justify-content: center; }
+
+    /* Tabel: font lebih kecil, padding lebih rapat */
+    .table-responsive > .table { min-width: 560px; font-size: .8rem; }
+    .table > :not(caption) > * > * { padding: .55rem .6rem; }
+
+    /* Toast / alert */
+    .alert { padding: .8rem 1rem !important; font-size: .88rem; }
+
+    /* Footer */
+    footer.footer .footer-body { flex-direction: column; text-align: center; gap: .25rem; }
+}
+
+/* ------------------------------------------------------------------
+ * 6. HP kecil (< 480px)
+ * ------------------------------------------------------------------ */
+@media (max-width: 479.98px) {
+    .table-responsive > .table { min-width: 520px; }
+    .iq-navbar .logo-title { font-size: .95rem !important; }
+}
+
+/* ------------------------------------------------------------------
+ * 7. Cetak: jangan terpengaruh skala layar
+ * ------------------------------------------------------------------ */
+@media print {
+    html { font-size: 16px; }
+    .table-responsive > .table { min-width: 0; }
+}

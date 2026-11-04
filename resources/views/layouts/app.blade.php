@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('hope-ui/assets/css/custom.min.css?v=2.0.0') }}" />
     <link rel="stylesheet" href="{{ asset('css/ateka-modern.css') }}?v={{ file_exists(public_path('css/ateka-modern.css')) ? filemtime(public_path('css/ateka-modern.css')) : '2.4' }}" />
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/ateka-responsive.css') }}?v={{ file_exists(public_path('css/ateka-responsive.css')) ? filemtime(public_path('css/ateka-responsive.css')) : '1.0' }}" />
     <style>
         /* ======================================================== */
         /* STILISASI SIDEBAR KETIKA DITUTUP (MINI / COLLAPSED)      */
