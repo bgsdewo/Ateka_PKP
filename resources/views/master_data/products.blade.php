@@ -1127,14 +1127,18 @@
                     const pack = Math.max(1, parseInt($packSize.val(), 10) || 1);
                     const qty = parseInt($stock.val(), 10) || 0;
                     const price = parseFloat($purchasePrice.val()) || 0;
-                    if (pack <= 1) { $packPreview.addClass('d-none').text(''); return; }
                     const unit = $unit.val() || 'satuan';
-                    const total = qty * pack;
-                    const per = price / pack;
-                    $packPreview.removeClass('d-none').text(
-                        qty + ' ' + ($('#pack_unit').val() || 'kemasan') + ' × isi ' + pack + ' = ' + total + ' ' + unit + ' masuk stok; harga ≈ Rp ' +
-                        Math.round(per).toLocaleString('id-ID') + ' / ' + unit
-                    );
+                    const rp = (n) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+                    if (qty <= 0 && price <= 0) { $packPreview.addClass('d-none').html(''); return; }
+                    const kem = pack > 1 ? ($('#pack_unit').val() || 'kemasan') : unit;
+                    let html = 'Total bayar: ' + qty + ' ' + kem + ' × ' + rp(price) + ' = <strong>' + rp(qty * price) + '</strong>';
+                    if (pack > 1) {
+                        html += '<br>Stok masuk: ' + qty + ' ' + kem + ' × isi ' + pack + ' = <strong>' + (qty * pack) + ' ' + unit + '</strong>';
+                        html += '<br>Harga per ' + unit + ': ' + rp(price) + ' ÷ ' + pack + ' = <strong>' + rp(price / pack) + '</strong>';
+                    } else {
+                        html += '<br>Stok masuk: <strong>' + qty + ' ' + unit + '</strong>';
+                    }
+                    $packPreview.removeClass('d-none').html(html);
                 }
                 $packSize.add('#pack_unit').add($stock).add($purchasePrice).add($unit).on('input change', updatePackPreview);
                 $('#modalBarang').on('show.bs.modal shown.bs.modal', function() {
