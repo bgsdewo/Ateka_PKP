@@ -31,6 +31,23 @@ class UserNotification extends Model
         'data' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        // Notifikasi baru/dibaca harus langsung terlihat di lonceng pemiliknya.
+        $forget = function (self $n) {
+            try {
+                $u = User::find($n->user_id);
+                if ($u) {
+                    \Illuminate\Support\Facades\Cache::store('file')->forget('navbar_notif_' . $u->id . '_' . $u->role);
+                }
+            } catch (\Throwable $e) {
+                // abaikan
+            }
+        };
+        static::saved($forget);
+        static::deleted($forget);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

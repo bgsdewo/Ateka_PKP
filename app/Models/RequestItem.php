@@ -269,10 +269,21 @@ class RequestItem extends Model
     /**
      * Hapus cache ringkasan permintaan/dashboard setelah status tiket berubah.
      */
+    protected static function booted(): void
+    {
+        // Setiap tiket dibuat/diubah/dihapus, cache lonceng & ringkasan harus segar kembali.
+        static::saved(fn () => static::flushRequestCaches());
+        static::deleted(fn () => static::flushRequestCaches());
+    }
+
     public static function flushRequestCaches(): void
     {
         try {
             $store = \Illuminate\Support\Facades\Cache::store('file');
+            // Cache navbar/lonceng disimpan per pengguna.
+            foreach (User::query()->get(['id', 'role']) as $u) {
+                $store->forget('navbar_notif_' . $u->id . '_' . $u->role);
+            }
             foreach ([
                 'requests_pending_summary',
                 'requests_ready_distribusi_count',
