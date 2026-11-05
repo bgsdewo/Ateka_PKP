@@ -121,19 +121,32 @@ Prompt awal untuk sesi baru (salin):
 > Baca CLAUDE.md, lalu `git status` dan `git log --oneline -10`. Ringkas posisi pekerjaan dan sisa backlog, lalu tanyakan prioritas saya sebelum mengubah apa pun.
 
 ## 11. Status terakhir
-_Diperbarui: 2026-11-05 · branch `deploy` · semua perubahan sudah di-push._
+_Diperbarui: 2026-11-05 · branch `deploy` · semua perubahan sudah di-push (commit terakhir: satuan permintaan = satuan terkecil)._
+_Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khusus_subdit_to_products_table` dan `2026_11_06_100000_flag_baterai_khusus_subdit` (`php artisan migrate`)._
 
 **Selesai (urut waktu):**
 - UI responsif global (`ateka-responsive.css`): skala laptop, sidebar HP off-canvas, tabel, modal, notifikasi, monitor besar. Sapuan 45 halaman × 8 ukuran layar: 0 overflow.
 - Dashboard: tabel antrean gudang tanpa scroll + pagination 3 data; tracker pengajuan disusun ulang sesuai alur nyata; hitungan distribusi per permohonan.
 - Perbaikan data: FK mutasi `nullOnDelete`, penjaga hapus pengguna, perintah pemulihan mutasi keluar.
 - Laporan: kode barang dari kategori; hanya Export Excel; klasifikasi penerima konsisten.
-- Audit filter semua halaman (hasil cocok dengan hitungan DB); pencarian Persetujuan/Distribusi mencakup barang custom.
-- Riwayat Pengajuan (pegawai/PIC): pencarian, filter, pagination, kartu status bisa diklik.
-- Fitur Sinkronkan BMN dihapus.
+- Audit filter semua halaman; pencarian Persetujuan/Distribusi mencakup barang custom. Riwayat Pengajuan: pencarian, filter, pagination, tabel dirapatkan. Fitur Sinkronkan BMN dihapus.
+- **Barang Khusus Perwakilan Subdit**: kolom `khusus_subdit`, centang di Tambah/Edit Barang, label di katalog/master/dropdown pengajuan, filter di Katalog, pembatasan pengajuan (hanya PIC), kata kunci otomatis termasuk baterai (migrasi menandai barang lama).
+- **Notifikasi & lonceng**: cache lonceng dibersihkan saat tiket/notifikasi berubah (`RequestItem::flushRequestCaches` + hook model); badge pemeriksa gudang tidak dihitung ganda; pemohon dapat notifikasi disetujui (termasuk persediaan), ditolak (+catatan Kasubbag), dan diserahkan; tidak ada notifikasi "stok terisi".
+- **Tracker dashboard**: untuk pegawai & PIC; pegawai perorangan 3 langkah (tanpa bukti TTD), PIC 4 langkah; langkah "Stok Terisi" dihapus; ditolak tidak masuk tracker. Tabel "Permintaan ATK Terakhir Anda": 10 data, 5 per halaman.
+- **Pengadaan**: kartu "Menunggu Penambahan Barang" hanya memuat tiket yang sudah disetujui Kasubbag; isi stok tidak lagi menaikkan status; label "Barang Baru — belum ada di katalog" + catatan buat kategori dulu (pegawai gudang kini bisa membuka Kategori Barang, hapus tetap Kasubbag).
+- **Halaman auth** (login/register/lupa-password): kartu besar dua panel, muat satu layar tanpa scroll (`ateka-auth-fit.css`, skala mengikuti tinggi layar); gelar akademik wajib di Register dan Manajemen Pengguna.
+- Profil & Ubah Password: header seragam, warna hijau merek; dropdown pilih barang di form pengajuan diringkas.
+- **Satuan permintaan = satuan terkecil** barang (`Product::request_unit`); fitur konversi satuan sempat dibuat lalu **dibatalkan** karena alur beli per permintaan.
+
+**Keputusan pemilik terbaru (jangan dilanggar):**
+- Sistem bukan stok murni: TU membeli barang saat ada pengajuan. Pegawai/PIC meminta per satuan terkecil; barang satu satuan memakai satuan itu (data: Excel "LIST ATK 2026", sheet Lembar3).
+- **Kartu pengadaan tetap seperti sekarang** (bukan formulir pembelian/mutasi laporan); jangan diubah menjadi halaman pembelian.
 
 **Backlog / belum dikerjakan (tunggu keputusan pemilik):**
-- Pengajuan **ditolak** belum masuk daftar pelacakan dashboard (hanya pending/approved/distributed).
+- Pemilik akan **mengecek** hasil satuan terkecil di lapangan (204 barang hanya "Dus" dan 53 hanya "Set" di Excel: apakah memang diminta per Dus/Set atau ada satuan lebih kecil; "Selotip 12 mm Nachi" Set/Roll ditebak Roll).
+- Satuan di Daftar Barang (`products.unit`) belum diselaraskan dengan satuan permintaan (hanya satuan di form pengajuan/katalog yang berubah).
+- Pencatatan pembelian dari supplier (satuan beli × isi per kemasan → satuan terkecil) belum ada UI-nya: backend `inventory.transaction.store` sudah ada tetapi halaman Barang Masuk hanya tabel. Opsi dibahas (formulir di Barang Masuk, alokasi ke tiket terlama, harga terakhir vs rata-rata) — belum diputuskan.
+- Harga per tiket (bukan per barang) bila satu barang dibeli di harga berbeda — belum dikerjakan.
 - Pelacakan menyembunyikan pengajuan yang sudah diserahkan tanpa TTD setelah 24 jam (aturan lama di `DashboardController`).
 - Rute & halaman cetak `reports.print` masih ada di kode meski tombolnya dihapus.
 - Bukti Serah Terima memakai kode rincian (bukan kode kategori).
