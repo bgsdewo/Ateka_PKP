@@ -73,6 +73,7 @@ Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 - Halaman Laporan hanya punya tombol **Export Excel** (Cetak Laporan & Kartu Persediaan dilepas dari header; Kartu Persediaan tetap di menu).
 - Master Data → Kategori Barang boleh diakses `pegawai_gudang` (lihat/tambah/ubah); **hapus kategori tetap hanya Kasubbag TU**.
 - Barang **Khusus Perwakilan Subdit** (`products.khusus_subdit`): hanya PIC Distribusi yang boleh mengajukan (dicek di `RequestController`); label di katalog/master/form pengajuan; filter di Katalog (`?khusus_subdit=1`). Kata kunci nama otomatis: `Product::KHUSUS_SUBDIT_KEYWORDS` (pembolong kertas, toner, tinta Epson/Canon, baterai); barang lama ditandai lewat migrasi, selebihnya manual di Edit Barang.
+- **Satuan permintaan = satuan terkecil** barang (`Product::request_unit`, urutan ukuran di `Product::unitRank`): pegawai/PIC meminta per buah/Rim/Roll/kotak walau TU membeli per Dus/Pak; barang satu satuan memakai satuan itu. Form pengajuan tidak menawarkan pilihan satuan untuk barang katalog dan server memaksa satuan ini (`RequestController`). Data dasar: daftar ATK di Excel (172 barang multi-satuan, 400 satu satuan).
 - Menu "Rekapitulasi Permintaan" sengaja dinonaktifkan (redirect ke dashboard).
 - Bukti Serah Terima (`distribusi/bukti`) masih memakai kode rincian, bukan kode kategori (belum diminta diubah).
 

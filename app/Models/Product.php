@@ -151,6 +151,40 @@ class Product extends Model
         return null;
     }
 
+    /**
+     * Urutan ukuran satuan: makin kecil angkanya, makin kecil satuannya.
+     * Kemasan besar (Dus) > kemasan sedang (Pak/Slop/Doz/Lusin) > Kotak/Set/Box > satuan pakai (Buah, Rim, Roll, ...).
+     */
+    public static function unitRank(?string $unit): int
+    {
+        $u = mb_strtolower(trim((string) $unit));
+        return match (true) {
+            in_array($u, ['dus', 'dos', 'karton'], true) => 4,
+            in_array($u, ['pak/slop', 'slop', 'doz', 'dozen', 'lusin', 'pak', 'pack'], true) => 3,
+            in_array($u, ['kotak', 'box', 'set'], true) => 2,
+            default => 1,
+        };
+    }
+
+    /**
+     * Satuan permintaan pegawai/PIC = satuan TERKECIL barang (mis. buah, Rim, Roll, kotak),
+     * walau TU membelinya per Dus/Pak. Barang satu satuan memakai satuan itu.
+     */
+    public function getRequestUnitAttribute(): string
+    {
+        $best = null;
+        $bestRank = PHP_INT_MAX;
+        foreach ($this->unit_list as $u) {
+            $rank = self::unitRank($u);
+            if ($rank < $bestRank) {
+                $best = $u;
+                $bestRank = $rank;
+            }
+        }
+        $best = trim((string) ($best ?: ($this->unit ?: 'Buah')));
+        return mb_strtoupper(mb_substr($best, 0, 1)) . mb_substr($best, 1);
+    }
+
     public function getUnitListAttribute(): array
     {
         $units = [];

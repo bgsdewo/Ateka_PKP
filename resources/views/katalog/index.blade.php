@@ -293,7 +293,7 @@
                                     @endif
                                 </small>
                                 <small class="text-muted d-block mb-2" style="font-size: 0.74rem;">
-                                    Satuan: <span class="badge bg-light text-dark border">{{ implode(' / ', $item->unit_list) }}</span>
+                                    Satuan: <span class="badge bg-light text-dark border">{{ $item->request_unit }}</span>
                                 </small>
                             </div>
 

@@ -154,7 +154,8 @@ class RequestController extends Controller
         foreach ($request->product_id as $index => $productId) {
             $qty = $request->quantity[$index];
             $product = Product::find($productId);
-            $selectedUnit = !empty($units[$index]) ? trim($units[$index]) : ($product ? ($product->unit ?: 'Pcs') : 'Pcs');
+            // Barang katalog: satuan permintaan selalu satuan terkecil barang (abaikan kiriman form).
+            $selectedUnit = $product ? $product->request_unit : (!empty($units[$index]) ? trim($units[$index]) : 'Pcs');
             if ($qty > 0) {
                 RequestDetail::create([
                     'request_id' => $requestItem->id,
@@ -204,7 +205,7 @@ class RequestController extends Controller
             ? trim($request->notes)
             : 'Pemesanan langsung barang habis dari katalog (' . $product->name . ')';
 
-        $selectedUnit = $request->filled('custom_unit') ? trim($request->custom_unit) : ($product->unit ?: 'Pcs');
+        $selectedUnit = $product->request_unit;
 
         $currentUser = Auth::user();
         $requestType = ($currentUser && $currentUser->isPicDistribusi()) ? 'subdit' : ($request->input('type', 'individu') ?: 'individu');
