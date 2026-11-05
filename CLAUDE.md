@@ -72,6 +72,7 @@ Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 - Fitur "Sinkronkan BMN" & rute `/system/sync-bmn-database` **sudah dihapus** (celah keamanan). Data BMN datang dari seeder `Lembar2AtkCatalogSeeder`.
 - Halaman Laporan hanya punya tombol **Export Excel** (Cetak Laporan & Kartu Persediaan dilepas dari header; Kartu Persediaan tetap di menu).
 - Master Data → Kategori Barang boleh diakses `pegawai_gudang` (lihat/tambah/ubah); **hapus kategori tetap hanya Kasubbag TU**.
+- Barang **Khusus Perwakilan Subdit** (`products.khusus_subdit`): hanya PIC Distribusi yang boleh mengajukan (dicek di `RequestController`); label di katalog/master/form pengajuan; filter di Katalog (`?khusus_subdit=1`). Kata kunci nama otomatis: `Product::KHUSUS_SUBDIT_KEYWORDS` (pembolong kertas, toner, tinta Epson/Canon, baterai); barang lama ditandai lewat migrasi, selebihnya manual di Edit Barang.
 - Menu "Rekapitulasi Permintaan" sengaja dinonaktifkan (redirect ke dashboard).
 - Bukti Serah Terima (`distribusi/bukti`) masih memakai kode rincian, bukan kode kategori (belum diminta diubah).
 

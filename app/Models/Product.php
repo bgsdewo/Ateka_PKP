@@ -34,6 +34,7 @@ class Product extends Model
         'cannon blanck ink',
         'canon black ink',
         'canon blank ink',
+        'baterai',
     ];
 
     public static function nameIsKhususSubdit(?string $name): bool

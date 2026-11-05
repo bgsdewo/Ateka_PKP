@@ -539,8 +539,13 @@ class ProductController extends Controller
         $categoryId = $request->category_id;
         $search = $request->search;
         $stockStatus = $request->stock_status;
+        $khususSubdit = $request->boolean('khusus_subdit');
 
         $query = Product::with('category');
+
+        if ($khususSubdit) {
+            $query->where('khusus_subdit', true);
+        }
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -566,7 +571,9 @@ class ProductController extends Controller
         $emptyStockCount = Product::where('stock', '<=', 0)->count();
         $totalAllProducts = $availableStockCount + $emptyStockCount;
 
-        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search', 'stockStatus', 'availableStockCount', 'emptyStockCount', 'totalAllProducts'));
+        $khususCount = Product::where('khusus_subdit', true)->count();
+
+        return view('katalog.index', compact('products', 'categories', 'categoryId', 'search', 'stockStatus', 'khususSubdit', 'khususCount', 'availableStockCount', 'emptyStockCount', 'totalAllProducts'));
     }
 
     /**

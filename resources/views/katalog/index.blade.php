@@ -127,18 +127,23 @@
         {{-- Quick Status Filter Tabs --}}
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <a href="{{ route('katalog-atk', array_filter(['category_id' => $categoryId, 'search' => $search])) }}" 
+                <a href="{{ route('katalog-atk', array_filter(['category_id' => $categoryId, 'search' => $search, 'khusus_subdit' => !empty($khususSubdit) ? 1 : null])) }}" 
                    class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ empty($stockStatus) ? 'btn-dark' : 'btn-light border text-muted' }}">
                     Semua Katalog ({{ $totalAllProducts ?? 564 }})
                 </a>
-                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'available', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'available', 'category_id' => $categoryId, 'search' => $search, 'khusus_subdit' => !empty($khususSubdit) ? 1 : null])) }}" 
                    class="btn btn-sm rounded-pill px-3 py-1.5 fw-bold {{ ($stockStatus ?? '') === 'available' ? 'btn-success text-white shadow-sm' : 'btn-light border text-success' }}">
                     <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;" class="me-1"></span>
                     Tersedia di Gudang ({{ $availableStockCount ?? 3 }})
                 </a>
-                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'empty', 'category_id' => $categoryId, 'search' => $search])) }}" 
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => 'empty', 'category_id' => $categoryId, 'search' => $search, 'khusus_subdit' => !empty($khususSubdit) ? 1 : null])) }}" 
                    class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ ($stockStatus ?? '') === 'empty' ? 'btn-secondary text-white shadow-sm' : 'btn-light border text-muted' }}">
                     Stok Belum Tersedia ({{ $emptyStockCount ?? 561 }})
+                </a>
+                <a href="{{ route('katalog-atk', array_filter(['stock_status' => $stockStatus, 'category_id' => $categoryId, 'search' => $search, 'khusus_subdit' => !empty($khususSubdit) ? null : 1])) }}"
+                   class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold {{ !empty($khususSubdit) ? 'btn-warning text-dark shadow-sm' : 'btn-light border text-muted' }}"
+                   title="{{ !empty($khususSubdit) ? 'Klik untuk menampilkan semua barang' : 'Tampilkan hanya barang yang khusus diminta oleh Perwakilan Subdit' }}">
+                    Khusus Perwakilan Subdit ({{ $khususCount ?? 0 }})
                 </a>
             </div>
             @if(($stockStatus ?? '') === 'available')
@@ -154,6 +159,9 @@
                 <div class="card shadow-sm border-0 katalog-filter-card" style="overflow: visible !important; position: relative; z-index: 25;">
                     <div class="card-body p-3.5">
                         <form id="katalog-filter-form" action="{{ route('katalog-atk') }}" method="GET" class="row g-2 align-items-center">
+                            @if (!empty($khususSubdit))
+                                <input type="hidden" name="khusus_subdit" value="1">
+                            @endif
                             <div class="col-12 col-md-6 col-lg-4">
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0 text-muted">
@@ -201,7 +209,7 @@
                                     </svg>
                                     <span>Cari Barang</span>
                                 </button>
-                                @if ($search || $categoryId || !empty($stockStatus))
+                                @if ($search || $categoryId || !empty($stockStatus) || !empty($khususSubdit))
                                     <a href="{{ route('katalog-atk') }}" class="btn btn-light border text-nowrap px-3 d-inline-flex align-items-center justify-content-center gap-1" style="white-space: nowrap;" title="Reset Filter">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
