@@ -219,8 +219,6 @@ class ProductController extends Controller
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'khusus_subdit' => ['nullable', 'boolean'],
-            'unit_conversions' => ['nullable', 'array'],
-            'unit_conversions.*' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
@@ -264,9 +262,6 @@ class ProductController extends Controller
                     'description' => $request->description ?: $existingProduct->description,
                     'khusus_subdit' => $request->boolean('khusus_subdit') || $existingProduct->khusus_subdit,
                 ];
-                if ($request->has('unit_conversions_sent')) {
-                    $updateData['unit_conversions'] = $this->parseConversions($request, (string) ($request->unit ?: $existingProduct->unit));
-                }
                 if ($imagePath) {
                     if ($existingProduct->image && str_starts_with($existingProduct->image, 'storage/products/')) {
                         $oldRelative = str_replace('storage/', '', $existingProduct->image);
@@ -290,7 +285,6 @@ class ProductController extends Controller
                     'purchase_price' => $request->purchase_price,
                     'description' => $request->description,
                     'khusus_subdit' => $request->boolean('khusus_subdit') || Product::nameIsKhususSubdit($request->name),
-                    'unit_conversions' => $request->has('unit_conversions_sent') ? $this->parseConversions($request, (string) $request->unit) : null,
                     'image' => $imagePath,
                 ]);
             }
@@ -367,8 +361,6 @@ class ProductController extends Controller
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'khusus_subdit' => ['nullable', 'boolean'],
-            'unit_conversions' => ['nullable', 'array'],
-            'unit_conversions.*' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
@@ -402,9 +394,6 @@ class ProductController extends Controller
                 'description'    => $request->description,
                 'khusus_subdit'  => $request->boolean('khusus_subdit'),
             ];
-            if ($request->has('unit_conversions_sent')) {
-                $updateData['unit_conversions'] = $this->parseConversions($request, (string) $request->unit);
-            }
 
             if ($request->hasFile('image')) {
                 // Hapus foto lama jika tersimpan di disk public storage
@@ -543,23 +532,6 @@ class ProductController extends Controller
                 ->route('master-data.daftar-barang.index')
                 ->with('error', 'Gagal menghapus barang: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Ambil isi per kemasan dari form: hanya satuan selain satuan dasar dengan isi >= 2.
-     */
-    private function parseConversions(Request $request, string $baseUnit): ?array
-    {
-        $out = [];
-        foreach ((array) $request->input('unit_conversions', []) as $unit => $factor) {
-            $unit = trim((string) $unit);
-            $factor = (int) $factor;
-            if ($unit === '' || strcasecmp($unit, trim($baseUnit)) === 0 || $factor < 2) {
-                continue;
-            }
-            $out[$unit] = $factor;
-        }
-        return $out ?: null;
     }
 
     public function catalog(Request $request)

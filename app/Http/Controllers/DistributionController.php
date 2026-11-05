@@ -250,9 +250,6 @@ class DistributionController extends Controller
                 if ($detail->product_id) {
                     $product = Product::lockForUpdate()->find($detail->product_id);
                     if ($product) {
-                        // Jumlah pada tiket bisa dalam satuan kemasan (mis. Dus); stok disimpan dalam satuan dasar barang.
-                        $qtyAsRequested = $qtyToDeduct;
-                        $qtyToDeduct = $product->toBaseQuantity($qtyToDeduct, $detail->custom_unit);
                         // Cek apakah mutasi keluar untuk tiket & produk ini sudah pernah tercatat sebelumnya (idempotency)
                         $existingTx = StockTransaction::where('type', 'keluar')
                             ->where('product_id', $product->id)
@@ -260,9 +257,6 @@ class DistributionController extends Controller
                             ->first();
 
                         $noteText = 'Penyerahan ATK kepada ' . $request->receiver_name . ' (' . $requestItem->request_code . ')';
-                        if ($qtyToDeduct !== (int) $qtyAsRequested) {
-                            $noteText .= ' [' . $qtyAsRequested . ' ' . $detail->custom_unit . ' = ' . $qtyToDeduct . ' ' . $product->unit . ']';
-                        }
                         if ($request->filled('distribution_notes')) {
                             $noteText .= ' - ' . $request->distribution_notes;
                         }

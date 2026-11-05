@@ -371,7 +371,7 @@
                 'category_name' => $product->category->name ?? 'ATK',
                 'stock' => (int) $product->stock,
                 'unit' => $product->unit ?: 'Buah',
-                'available_units' => implode(',', $product->requestable_units ?: [$product->unit ?: 'Buah']),
+                'available_units' => implode(',', $product->unit_list ?? [$product->unit ?: 'Buah']),
                 'khusus_subdit' => (bool) $product->khusus_subdit,
                 'search_text' => strtolower(($product->code ?? '') . ' ' . ($product->category->name ?? '') . ' ' . $product->name),
             ];

@@ -192,9 +192,8 @@ class ApprovalController extends Controller
                     // Jika permintaan persediaan (dari stok gudang), kuantitas disetujui tidak boleh melebihi sisa stok yang ada
                     if (!$item->is_procurement && $detail->product_id) {
                         $product = Product::find($detail->product_id);
-                        $approvedBase = $product ? $product->toBaseQuantity($approvedQty, $detail->custom_unit) : $approvedQty;
-                        if ($product && $approvedBase > $product->stock) {
-                            return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $product->name . '" (' . $approvedQty . ' ' . ($detail->custom_unit ?: $product->unit) . ($approvedBase !== (int) $approvedQty ? ' = ' . $approvedBase . ' ' . $product->unit : '') . ') melebihi sisa stok gudang (' . $product->stock . ' ' . $product->unit . ').');
+                        if ($product && $approvedQty > $product->stock) {
+                            return redirect()->back()->with('error', 'Kuantitas disetujui untuk "' . $product->name . '" (' . $approvedQty . ' Stock) melebihi sisa stok gudang (' . $product->stock . ' Stock).');
                         }
                     }
                 }
