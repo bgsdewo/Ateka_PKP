@@ -3,7 +3,8 @@
 html { display: block; min-height: 0; padding: 0; }
 body { min-height: 100vh; min-height: 100dvh; padding: 16px; }
 
-@media (min-width: 961px) {
+/* Hanya saat layar pendek (<700px tinggi CSS) kartu dipadatkan; di layar lebih tinggi ukuran asli dipakai penuh. */
+@media (min-width: 961px) and (max-height: 699px) {
     .auth-master-card { min-height: 0; }
 
     .panel-brand-left { padding: clamp(1.1rem, 3.4vh, 2.5rem) 2.8rem; }
