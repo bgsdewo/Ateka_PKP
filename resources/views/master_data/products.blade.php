@@ -762,6 +762,13 @@
                                     placeholder="Nama Barang ATK" required>
                             </div>
 
+                            <div class="col-12">
+                                <div class="form-check p-2 ps-5 rounded border border-warning-subtle bg-warning-subtle">
+                                    <input class="form-check-input" type="checkbox" name="khusus_subdit" id="khusus_subdit" value="1">
+                                    <label class="form-check-label fw-semibold" for="khusus_subdit">Khusus Perwakilan Subdit <small class="text-muted fw-normal">(hanya bisa diminta oleh PIC Subdit)</small></label>
+                                </div>
+                            </div>
+
                             <!-- No. Faktur, Tgl Faktur & Uraian -->
                             <div class="col-md-4">
                                 <label class="form-label">No. Faktur / Bukti Awal</label>
@@ -852,13 +859,6 @@
                                 <label class="form-label">Deskripsi</label>
                                 <textarea name="description" id="description" class="form-control form-control-sm" rows="2"
                                     placeholder="Tulis deskripsi singkat barang"></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="khusus_subdit" id="khusus_subdit" value="1">
-                                    <label class="form-check-label" for="khusus_subdit">Khusus Perwakilan Subdit <small class="text-muted">(hanya bisa diminta oleh PIC Subdit)</small></label>
-                                </div>
                             </div>
                         </div>
                     </div>
