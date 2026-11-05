@@ -128,6 +128,7 @@
                                                         data-description="{{ e($category->description) }}">
                                                         Edit
                                                     </button>
+                                                    @if (auth()->user()->isKasubagTU())
                                                     <form
                                                         action="{{ route('master-data.kategori-barang.destroy', $category->id) }}"
                                                         method="POST"
@@ -141,6 +142,7 @@
                                                             Hapus
                                                         </button>
                                                     </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>

@@ -73,7 +73,7 @@ Route::middleware('auth')->group(function () {
     // Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {
         Route::resource('/kategori-barang', CategoryController::class)
-            ->middleware('role:kasubag_tu');
+            ->middleware('role:kasubag_tu,pegawai_gudang');
 
         Route::resource('/daftar-barang', ProductController::class)
             ->middleware('role:kasubag_tu,pegawai_gudang');

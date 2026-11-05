@@ -289,7 +289,7 @@
                             </i>
                         </a>
                         <ul class="sub-nav collapse {{ $masterActive ? 'show' : '' }}" id="master-data" data-bs-parent="#sidebar-menu">
-                            @if ($isKasubagTU)
+                            @if ($isKasubagTU || $isPegawaiGudang)
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('master-data.kategori-barang.*') ? 'active' : '' }}"
                                         href="{{ route('master-data.kategori-barang.index') }}" title="Kategori Barang">

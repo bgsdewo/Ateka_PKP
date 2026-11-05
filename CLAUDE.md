@@ -70,6 +70,7 @@ Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 - `stock_transactions.user_id` = `nullOnDelete` (dulu cascade → menghapus akun menghapus mutasi). Hapus pengguna **ditolak** bila punya riwayat permohonan.
 - Fitur "Sinkronkan BMN" & rute `/system/sync-bmn-database` **sudah dihapus** (celah keamanan). Data BMN datang dari seeder `Lembar2AtkCatalogSeeder`.
 - Halaman Laporan hanya punya tombol **Export Excel** (Cetak Laporan & Kartu Persediaan dilepas dari header; Kartu Persediaan tetap di menu).
+- Master Data → Kategori Barang boleh diakses `pegawai_gudang` (lihat/tambah/ubah); **hapus kategori tetap hanya Kasubbag TU**.
 - Menu "Rekapitulasi Permintaan" sengaja dinonaktifkan (redirect ke dashboard).
 - Bukti Serah Terima (`distribusi/bukti`) masih memakai kode rincian, bukan kode kategori (belum diminta diubah).
 

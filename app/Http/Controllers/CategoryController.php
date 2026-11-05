@@ -10,8 +10,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU.');
+        if (!(auth()->user()->isKasubagTU() || auth()->user()->isPegawaiGudang())) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $categories = Category::orderBy('name', 'asc')->get();
@@ -21,8 +21,8 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        if (!auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU.');
+        if (!(auth()->user()->isKasubagTU() || auth()->user()->isPegawaiGudang())) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
@@ -49,8 +49,8 @@ class CategoryController extends Controller
 
     public function update(Request $request, Category $kategori_barang)
     {
-        if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU.');
+        if (!auth()->user() || !(auth()->user()->isKasubagTU() || auth()->user()->isPegawaiGudang())) {
+            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU dan Pegawai Gudang.');
         }
 
         $request->validate([
@@ -79,7 +79,7 @@ class CategoryController extends Controller
     public function destroy(Category $kategori_barang)
     {
         if (!auth()->user() || !auth()->user()->isKasubagTU()) {
-            return redirect()->route('dashboard')->with('error', 'Halaman Master Data Kategori hanya dapat diakses oleh Kasubbag TU.');
+            return redirect()->route('dashboard')->with('error', 'Hanya Kasubbag TU yang dapat menghapus kategori.');
         }
 
         if ($kategori_barang->products()->exists()) {
