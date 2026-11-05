@@ -313,6 +313,26 @@ class ApprovalController extends Controller
                     'rejection_reason' => $request->rejection_reason,
                 ]);
 
+                // Kirim notifikasi ke pemohon (pegawai/PIC) beserta alasan dari Kasubbag TU
+                if ($item->user) {
+                    $jenis = $item->is_procurement ? 'Usulan pengadaan' : 'Permintaan barang';
+                    $alasan = trim((string) ($request->rejection_reason ?: $request->verification_notes));
+                    UserNotification::create([
+                        'user_id'    => $item->user_id,
+                        'title'      => $jenis . ' Ditolak',
+                        'message'    => $jenis . ' #' . $item->request_code . ' ditolak oleh Kasubbag TU.' . ($alasan !== '' ? ' Catatan: ' . $alasan : ''),
+                        'type'       => 'request_rejected',
+                        'icon'       => 'x-circle',
+                        'link'       => route('pengajuan.index'),
+                        'request_id' => $item->id,
+                        'is_read'    => false,
+                        'data'       => [
+                            'request_code' => $item->request_code,
+                            'reason'       => $alasan,
+                        ],
+                    ]);
+                }
+
                 $pesan = 'Permintaan (' . $item->request_code . ') berhasil ditolak oleh Subbag TU.';
             }
 

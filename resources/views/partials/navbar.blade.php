@@ -740,7 +740,7 @@
 
                                     <div class="d-flex align-items-start gap-2">
 
-                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ $notif->type === 'procurement_ready_distribution' ? 'bg-info-subtle text-info' : (in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']) ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary') }}" style="width: 32px; height: 32px;">
+                                        <div class="rounded-circle p-1.5 d-flex align-items-center justify-content-center flex-shrink-0 {{ $notif->type === 'request_rejected' ? 'bg-danger-subtle text-danger' : ($notif->type === 'procurement_ready_distribution' ? 'bg-info-subtle text-info' : (in_array($notif->type, ['procurement_available', 'procurement_approved', 'procurement_approved_examiner']) ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary')) }}" style="width: 32px; height: 32px;">
 
                                             @if($notif->type === 'procurement_ready_distribution')
 
@@ -804,6 +804,10 @@
 
                                                         <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill" style="font-size: 0.58rem;">Siap Distribusi</span>
 
+                                                    @elseif($notif->type === 'request_rejected')
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill" style="font-size: 0.58rem;">Ditolak</span>
+                                                    @elseif($notif->type === 'request_approved')
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size: 0.58rem;">Disetujui</span>
                                                     @endif
 
                                                     @if(($notif->duplicate_count ?? 1) > 1)

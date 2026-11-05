@@ -1,7 +1,7 @@
 {{-- ============================================================
      PELACAKAN STATUS PENGAJUAN ATK
      Alur:
-       Pengadaan  : Pengajuan -> Verifikasi TU -> Input Stok Gudang -> Penyerahan -> Selesai (bukti TTD)
+       Pengadaan  : Pengajuan -> Verifikasi TU -> Penyerahan -> Selesai (bukti TTD)
        Stok ada   : Pengajuan -> Verifikasi TU -> Penyerahan -> Selesai (bukti TTD)
      Variabel dari controller: $trackedRequests, $selectedPeriodLabel
      ============================================================ --}}
@@ -61,23 +61,7 @@
                 'subtitle' => $sub, 'time' => $trkTime($r->verified_at ?? $r->updated_at)];
         }
 
-        // 3. Input stok gudang (hanya alur pengadaan)
-        if ($isProc) {
-            if (!$approved) {
-                $steps[] = ['icon' => 'box', 'state' => 'upcoming', 'title' => 'Input Stok Gudang',
-                    'subtitle' => '(Menunggu Persetujuan)', 'time' => null];
-            } elseif (!$allFilled) {
-                $steps[] = ['icon' => 'box', 'state' => 'current', 'title' => 'Input Stok Gudang',
-                    'subtitle' => $someFilled ? "({$fulfilledCnt}/{$n} Barang Terisi)" : '(Menunggu Pemeriksa Gudang)',
-                    'time' => null];
-            } else {
-                $steps[] = ['icon' => 'box', 'state' => 'done', 'title' => 'Stok Terisi di Gudang',
-                    'subtitle' => '(Sesuai Jumlah Disetujui)',
-                    'time' => $trkTime($filledAt ?? $r->updated_at)];
-            }
-        }
-
-        // 4. Penyerahan barang
+        // 3. Penyerahan barang
         $readyToHandOver = $approved && (!$isProc || $allFilled);
         if ($distributed) {
             $steps[] = ['icon' => 'truck', 'state' => 'done', 'title' => 'Barang Diserahkan',
@@ -88,10 +72,10 @@
                 'subtitle' => '(Siap Diserahkan Petugas Distribusi)', 'time' => null];
         } else {
             $steps[] = ['icon' => 'truck', 'state' => 'upcoming', 'title' => 'Penyerahan Barang',
-                'subtitle' => $approved ? '(Menunggu Stok Terisi)' : '(Menunggu Antrean)', 'time' => null];
+                'subtitle' => $approved ? '(Menunggu Barang Tersedia)' : '(Menunggu Persetujuan)', 'time' => null];
         }
 
-        // 5. Selesai: bukti serah terima ditandatangani & diunggah
+        // 4. Selesai: bukti serah terima ditandatangani & diunggah
         if ($signed) {
             $steps[] = ['icon' => 'flag', 'state' => 'final', 'title' => 'Selesai',
                 'subtitle' => '(Bukti Serah Terima Lengkap)',
@@ -122,7 +106,7 @@
         if ($isProc) {
             $d = $r->details;
             $all = $d->count() > 0 && $d->every(fn($x) => (bool) $x->is_fulfilled);
-            return $all ? ['Stok Terisi - Siap Diserahkan', 'bg-info text-dark'] : ['Disetujui - Menunggu Input Stok', 'bg-primary-subtle text-primary border border-primary-subtle'];
+            return $all ? ['Disetujui - Siap Diserahkan', 'bg-info text-dark'] : ['Disetujui - Menunggu Barang Tersedia', 'bg-primary-subtle text-primary border border-primary-subtle'];
         }
         return ['Disetujui - Siap Diserahkan', 'bg-info text-dark'];
     };

@@ -40,13 +40,13 @@ Pegawai/PIC dialihkan ke dashboard bila membuka halaman gudang/laporan (itu norm
 
 ## 4. Alur bisnis (jangan diubah tanpa diminta)
 1. Pegawai/PIC membuat pengajuan (barang katalog; stok boleh 0) → tipe `individu` / `subdit`, bisa `is_procurement`.
-2. Kasubbag TU setujui (jumlah boleh dikurangi → `approved_quantity`) atau tolak dengan alasan (notifikasi lonceng ke pemohon).
+2. Kasubbag TU setujui (jumlah boleh dikurangi → `approved_quantity`) atau tolak dengan alasan (notifikasi lonceng ke pemohon berisi catatan). Pemohon hanya diberi notifikasi: disetujui, ditolak (+catatan), dan barang diserahkan — tidak ada notifikasi "stok terisi".
 3. Pengadaan: pemeriksa gudang mengisi stok → notifikasi ke petugas distribusi.
 4. Distribusi menyerahkan barang → **otomatis tercatat barang keluar** (`StockTransaction` type `keluar`, `no_faktur` = kode tiket).
 5. Selesai ketika `signed_proof` (bukti TTD) diunggah. Status tiket: `pending → approved → distributed` (atau `rejected`).
 
 Tracker dashboard (`resources/views/dashboard/tracker.blade.php` + `tracker_steps.blade.php`):
-pengadaan 5 langkah (Pengajuan → Verifikasi TU → Input Stok → Penyerahan → Selesai/TTD), stok-tersedia 4 langkah.
+pengadaan & stok-tersedia sama-sama 4 langkah (Pengajuan → Verifikasi TU → Penyerahan → Selesai/TTD); tracker **hanya untuk PIC Subdit** (pegawai perorangan tidak punya tracker; yang ditolak tidak masuk tracker, cukup notifikasi + catatan Kasubbag).
 Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 
 ## 5. Peta kode penting
