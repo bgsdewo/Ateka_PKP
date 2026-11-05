@@ -29,7 +29,7 @@ class UserManagementController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'title' => ['nullable', 'string', 'max:50'],
+            'title' => ['required', 'string', 'max:50'],
             'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'nip' => [$request->role === 'pegawai_gudang' ? 'nullable' : 'required', 'string', 'max:50'],
@@ -39,6 +39,7 @@ class UserManagementController extends Controller
             'pic_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Nama pengguna wajib diisi.',
+            'title.required' => 'Gelar akademik wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
@@ -133,7 +134,7 @@ class UserManagementController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'title' => ['nullable', 'string', 'max:50'],
+            'title' => ['required', 'string', 'max:50'],
             'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($manajemen_pengguna->id)],
             'nip' => [$request->role === 'pegawai_gudang' ? 'nullable' : 'required', 'string', 'max:50'],
@@ -145,6 +146,7 @@ class UserManagementController extends Controller
             'pic_unit_choice' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Nama pengguna wajib diisi.',
+            'title.required' => 'Gelar akademik wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',

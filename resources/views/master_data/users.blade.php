@@ -253,9 +253,9 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small text-uppercase">
-                                    Gelar Akademik / Titel <span class="text-muted font-normal">(Opsional)</span>
+                                    Gelar Akademik / Titel <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="title" id="userTitle" class="form-control"
+                                <input type="text" name="title" id="userTitle" class="form-control" required
                                     placeholder="S.T. / M.Si. / S.Kom.">
                             </div>
 
