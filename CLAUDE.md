@@ -61,6 +61,7 @@ Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 - Breakpoint: HP < 768, tablet < 992/1200 (sidebar off-canvas + backdrop), laptop 1200–1599 (root 14px), monitor ≥ 1920 (root 16px, ≥ 2400 18px, konten dibatasi 1760px).
 - Judul halaman h1 memakai variabel `--ateka-h1-size` (h1 dengan `style` inline **!important menang atas CSS** → pakai variabel itu, jangan angka tetap).
 - Tabel: `.table-responsive` otomatis dibungkus untuk DataTables (skrip di `partials/scripts.blade.php`); tabel lebar pakai `.ateka-fit-table`; antrean dashboard memakai `.ateka-queue` + pagination sisi-klien `data-page-size="3"`.
+- Halaman auth (login, register, lupa-password) memakai `layouts/auth.blade.php` + `public/css/ateka-auth.css` (prefiks `au-`); wajib muat satu layar tanpa scroll di laptop 1280×600 ke atas.
 - Notifikasi: dropdown `.ateka-notif-*`, toast `.modern-floating-toast`, semua diringkas di bagian 12 CSS responsif.
 - Target: layak dipakai di HP; periksa dengan sapuan 8 ukuran (§8) sebelum menyatakan selesai.
 
