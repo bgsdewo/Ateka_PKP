@@ -696,6 +696,7 @@
                     @csrf
                     <input type="hidden" name="_method" id="formMethod" value="" disabled>
                     <input type="hidden" name="request_detail_id" id="request_detail_id" value="">
+                    <input type="hidden" name="target_product_id" id="target_product_id" value="">
 
                     <div class="modal-header">
                         <h6 class="modal-title" id="modalBarangLabel">Form Barang</h6>
@@ -1188,14 +1189,11 @@
 
                     $requestDetailId.val(detailId);
                     $('#newItemNotice').toggleClass('d-none', String($btn.attr('data-new-item')) !== '1');
-                    if (productId) {
-                        const updateUrl = updateUrlTemplate.replace(':id', productId);
-                        $form.attr('action', updateUrl);
-                        $method.prop('disabled', false).val('PUT');
-                    } else {
-                        $form.attr('action', storeUrl);
-                        $method.prop('disabled', true).val('');
-                    }
+                    // Isi Stok pengadaan selalu MENAMBAH stok lewat store (bukan menimpa lewat update),
+                    // agar sisa stok lama aman, kemasan terhitung, dan harga dirata-rata.
+                    $form.attr('action', storeUrl);
+                    $method.prop('disabled', true).val('');
+                    $('#target_product_id').val(productId || '');
 
                     // Auto-detect kategori dari nama jika belum ada
                     if (!catId && name) {

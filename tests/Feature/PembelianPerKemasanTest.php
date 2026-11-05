@@ -67,4 +67,26 @@ class PembelianPerKemasanTest extends TestCase
         $this->assertEquals(18000.0, (float) $tx->harga_perolehan);
         $this->assertStringContainsString('Harga berubah', (string) $tx->note);
     }
+
+    public function test_isi_stok_barang_katalog_menambah_sisa_stok_bukan_menimpa(): void
+    {
+        $user = User::firstOrCreate(
+            ['email' => 'utami@gmail.com'],
+            ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
+        );
+        $cat = Category::firstOrCreate(['name' => 'Alat Tulis']);
+        $p = Product::create([
+            'category_id' => $cat->id, 'code' => 'RTN-SISA-T', 'name' => 'Rautan Sisa Uji',
+            'unit' => 'Buah', 'stock' => 7, 'minimum_stock' => 0, 'purchase_price' => 10000,
+        ]);
+
+        $this->actingAs($user)->post(route('master-data.daftar-barang.store'), $this->payload($cat, [
+            'code' => 'RTN-SISA-T', 'name' => 'Nama Beda Dari Katalog', 'target_product_id' => $p->id,
+            'stock' => 1, 'purchase_price' => 120000, 'pack_size' => 12, 'pack_unit' => 'Dus',
+        ]))->assertSessionHasNoErrors();
+
+        $p->refresh();
+        $this->assertSame(19, (int) $p->stock);              // 7 sisa + 12 baru
+        $this->assertEquals(10000.0, (float) $p->purchase_price); // rata-rata tetap 10.000
+    }
 }

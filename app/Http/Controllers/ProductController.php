@@ -203,7 +203,11 @@ class ProductController extends Controller
         }
 
         // Cek apakah barang dengan nama yang sama sudah ada di master data
-        $existingProduct = Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
+        // (Isi Stok pengadaan mengirim target_product_id agar barang katalog yang dipilih pasti terpakai)
+        $existingProduct = $request->filled('target_product_id')
+            ? Product::find((int) $request->target_product_id)
+            : null;
+        $existingProduct = $existingProduct ?: Product::whereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $request->name))])
             ->first();
 
         $request->validate([
