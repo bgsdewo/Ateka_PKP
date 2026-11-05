@@ -249,21 +249,29 @@ class RequestItem extends Model
      */
     public static function getReadyDistribusiCount(): int
     {
-        static $count = null;
-        if ($count !== null) {
-            return $count;
-        }
-
-        $count = (int) \Illuminate\Support\Facades\Cache::store('file')->remember('requests_ready_distribusi_count', 300, function () {
+        return (int) \Illuminate\Support\Facades\Cache::store('file')->remember('requests_ready_distribusi_count', 300, function () {
+            // Siap diserahkan = disetujui, dan (bukan pengadaan ATAU pengadaan yang semua itemnya sudah terisi stoknya).
+            // Aturan ini harus sama dengan antrean dashboard & lonceng.
             return (int) DB::table('requests')
                 ->where('status', 'approved')
                 ->where(function ($q) {
-                    $q->where('is_procurement', false)->orWhereNull('is_procurement');
+                    $q->where(function ($n) {
+                        $n->where('is_procurement', false)->orWhereNull('is_procurement');
+                    })->orWhere(function ($p) {
+                        $p->where('is_procurement', true)
+                            ->whereNotExists(function ($d) {
+                                $d->select(DB::raw(1))
+                                    ->from('request_details')
+                                    ->whereColumn('request_details.request_id', 'requests.id')
+                                    ->where(function ($u) {
+                                        $u->where('request_details.is_fulfilled', false)
+                                            ->orWhereNull('request_details.is_fulfilled');
+                                    });
+                            });
+                    });
                 })
                 ->count();
         });
-
-        return $count;
     }
 
     /**
