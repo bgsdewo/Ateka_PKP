@@ -1910,7 +1910,7 @@
 
                         </div>
 
-                        <div class="card-body p-2.5 p-md-3">
+                        <div class="card-body p-2.5 p-md-3" data-page-size="5">
 
                             <div class="table-responsive">
 
