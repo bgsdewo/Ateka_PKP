@@ -829,9 +829,11 @@
                                     <label class="form-label mb-1">Isi per Kemasan Beli <small class="text-muted fw-normal">(opsional &mdash; isi bila membeli per Dus/Pak)</small></label>
                                     <div class="row g-2">
                                         <div class="col-6">
-                                            <input type="number" name="pack_size" id="pack_size" class="form-control form-control-sm" min="1" value="1" placeholder="Isi, mis. 12">
+                                            <label class="form-label mb-0 small">Isi per kemasan (jumlah satuan terkecil)</label>
+                                            <input type="number" name="pack_size" id="pack_size" class="form-control form-control-sm" min="1" value="1" placeholder="mis. 12 (1 Dus isi 12 buah)">
                                         </div>
                                         <div class="col-6">
+                                            <label class="form-label mb-0 small">Nama kemasan</label>
                                             <select name="pack_unit" id="pack_unit" class="form-select form-select-sm">
                                                 <option value="Dus">Dus</option>
                                                 <option value="Pak">Pak</option>
