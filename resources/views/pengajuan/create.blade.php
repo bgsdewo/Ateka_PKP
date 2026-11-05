@@ -54,7 +54,7 @@
             border-radius: 10px;
         }
         .product-select-menu {
-            min-width: 500px !important;
+            min-width: 440px !important;
             max-width: 95vw !important;
             width: 100% !important;
         }
@@ -65,8 +65,20 @@
         .product-item-title {
             white-space: normal !important;
             word-break: break-word !important;
-            font-size: 0.9rem !important;
+            font-size: 0.82rem !important;
+            font-weight: 700;
+            line-height: 1.3 !important;
+            color: #14231c;
         }
+        .product-select-option { padding: 0.38rem 0.6rem !important; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .product-select-option:hover, .product-select-option.active { background: #eef6f2; }
+        .product-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+        .pm { font-size: 0.66rem; line-height: 1.35; padding: 1px 7px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-weight: 600; white-space: nowrap; }
+        .pm-code { font-family: var(--font-mono, monospace); }
+        .pm-ok { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+        .pm-warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .pm-subdit { background: #fef3c7; border-color: #fcd34d; color: #92400e; margin-left: 4px; vertical-align: 1px; }
+        .product-scroll-list { max-height: 290px; overflow-y: auto; }
         .product-btn-text {
             white-space: normal !important;
             display: -webkit-box !important;
@@ -189,7 +201,7 @@
                                                            placeholder="Saring kategori..." 
                                                            autocomplete="off"
                                                            style="height: 38px; font-size: 0.875rem;">
-                                                    <button type="button" class="btn btn-outline-secondary btn-clear-category d-none px-1.5 d-flex align-items-center justify-content-center" title="Hapus filter kategori" style="height: 38px; width: 30px;">
+                                                    <button type="button" class="btn btn-outline-secondary btn-clear-category d-none px-1.5" title="Hapus filter kategori" style="height: 38px; width: 30px;">
                                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -319,13 +331,7 @@
                                                 Hapus
                                             </button>
                                         </div>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </div>
+                                                </div>
                                     </div>
                                 </div>
                             </div>
@@ -434,29 +440,24 @@
                         matched.forEach(p => {
                             const itemDiv = document.createElement('div');
                             const isActive = (p.id === currentId);
-                            itemDiv.className = `product-select-option p-2.5 rounded-2 d-flex flex-column gap-1 border-bottom ${isActive ? 'active' : ''}`;
-                            itemDiv.style.borderBottom = '1px solid #f1f5f9';
+                            itemDiv.className = `product-select-option rounded-2 ${isActive ? 'active' : ''}`;
                             itemDiv.dataset.id = p.id;
                             itemDiv.dataset.name = p.name;
 
-                            const stockBadge = p.stock > 0
-                                ? `<span class="badge bg-success-subtle text-success border border-success-subtle flex-shrink-0" style="font-size: 0.7rem;">Stok: ${p.stock} Stock</span>`
-                                : `<span class="badge bg-warning-subtle text-dark border border-warning-subtle flex-shrink-0" style="font-size: 0.7rem;">Stok: 0 Stock (Pengadaan TU)</span>`;
-
-                            const unitBadge = p.available_units
-                                ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle flex-shrink-0" style="font-size: 0.7rem;">Satuan: ${p.available_units.replace(/,/g, ' / ')}</span>`
-                                : '';
+                            const stockText = p.stock > 0 ? `Stok ${p.stock}` : 'Stok 0 &middot; diadakan TU';
+                            const stockCls = p.stock > 0 ? 'pm-ok' : 'pm-warn';
+                            const unitText = p.available_units ? p.available_units.replace(/,/g, ' / ') : '';
 
                             itemDiv.innerHTML = `
-                                <div class="product-item-title fw-bold text-dark" style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">
+                                <div class="product-item-title">
                                     ${p.name}
-                                    ${p.khusus_subdit ? '<span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Khusus Perwakilan Subdit</span>' : ''}
+                                    ${p.khusus_subdit ? '<span class="pm pm-subdit">Khusus Subdit</span>' : ''}
                                 </div>
-                                <div class="d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
-                                    <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.7rem;">[${p.code || '-'}]</span>
-                                    <span class="badge bg-light text-dark border" style="font-size: 0.7rem;">${p.category_name}</span>
-                                    ${stockBadge}
-                                    ${unitBadge}
+                                <div class="product-meta">
+                                    <span class="pm pm-code">${p.code || '-'}</span>
+                                    <span class="pm">${p.category_name}</span>
+                                    <span class="pm ${stockCls}">${stockText}</span>
+                                    ${unitText ? `<span class="pm">${unitText}</span>` : ''}
                                 </div>
                             `;
 
