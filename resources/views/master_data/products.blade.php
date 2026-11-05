@@ -715,29 +715,6 @@
                             </div>
                         </div>
 
-                        <div id="quickCatalogRestockBox" class="alert alert-light border border-primary-subtle mb-2.5 p-2 rounded-2">
-                            <label class="form-label fw-bold text-primary mb-1 d-block" style="font-size: 0.74rem;">
-                                Pilih Cepat dari Katalog Standar LIST ATK (Opsional — Untuk Isi Stok / Input Faktur):
-                            </label>
-                            <select id="quick_existing_product" class="form-select form-select-sm bg-white" style="font-size: 0.78rem;">
-                                <option value="">-- Buat Barang Baru Manual atau Pilih Standar di Sini --</option>
-                                @foreach ($products as $pItem)
-                                    <option value="{{ $pItem->id }}"
-                                        data-category-id="{{ $pItem->category_id }}"
-                                        data-code="{{ $pItem->code }}"
-                                        data-name="{{ $pItem->name }}"
-                                        data-unit="{{ $pItem->unit }}"
-                                        data-stock="{{ $pItem->stock }}"
-                                        data-price="{{ $pItem->purchase_price ?? 0 }}"
-                                        data-faktur="{{ $pItem->initial_no_faktur }}"
-                                        data-uraian="{{ $pItem->initial_uraian }}"
-                                        data-desc="{{ $pItem->description }}"
-                                        data-image="{{ asset($pItem->image_url) }}">
-                                        [{{ $pItem->category->name ?? 'ATK' }}] {{ $pItem->code }} - {{ $pItem->name }} (Stok: {{ $pItem->stock }} {{ $pItem->unit }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
 
                         <div class="row g-2">
                             <div class="col-md-6">
