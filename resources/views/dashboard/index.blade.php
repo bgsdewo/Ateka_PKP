@@ -1839,7 +1839,10 @@
 
 
         <!-- ROW 2: PELACAKAN STATUS PENGAJUAN ATK -->
-        @include('dashboard.tracker')
+        {{-- Pelacakan hanya untuk PIC Distribusi (Subdit); Pegawai perorangan diserahkan langsung oleh petugas distribusi. --}}
+        @if ($isPicDistribusi)
+            @include('dashboard.tracker')
+        @endif
 
 
 

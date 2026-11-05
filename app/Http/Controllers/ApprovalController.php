@@ -272,6 +272,25 @@ class ApprovalController extends Controller
 
                     $pesan = 'Usulan pengadaan barang (' . $item->request_code . ') berhasil disetujui! Status masuk tahap proses pembelian sebelum dicatat ke daftar barang oleh Kasubbag TU / Pegawai Gudang.';
                 } else {
+                    // Kirim notifikasi ke pemohon (pegawai/PIC) bahwa permintaannya disetujui Kasubbag TU
+                    if ($item->user) {
+                        $approvedNames = $item->details->filter(fn ($d) => (int) $d->approved_quantity > 0)->map(function ($d) {
+                            $n = $d->product ? $d->product->name : ($d->custom_product_name ?: 'Barang');
+                            return $n . ' (' . $d->approved_quantity . ' ' . ($d->product ? ($d->product->unit ?: 'Pcs') : ($d->custom_unit ?: 'Pcs')) . ')';
+                        })->values();
+                        UserNotification::create([
+                            'user_id'    => $item->user_id,
+                            'title'      => 'Permintaan Barang Disetujui',
+                            'message'    => 'Permintaan ATK #' . $item->request_code . ' telah disetujui Kasubbag TU: ' . $approvedNames->take(3)->join(', ') . ($approvedNames->count() > 3 ? ' (+' . ($approvedNames->count() - 3) . ' lainnya)' : '') . '. Barang akan diserahkan oleh petugas distribusi.',
+                            'type'       => 'request_approved',
+                            'icon'       => 'check-circle',
+                            'link'       => route('pengajuan.index'),
+                            'request_id' => $item->id,
+                            'is_read'    => false,
+                            'data'       => ['request_code' => $item->request_code],
+                        ]);
+                    }
+
                     // Kirim notifikasi ke seluruh staf Pegawai Gudang bahwa barang telah disetujui TU dan siap diserahkan
                     UserNotification::sendStockApprovedToWarehouse($item);
 
