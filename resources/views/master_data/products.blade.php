@@ -474,6 +474,10 @@
                                                     class="btn btn-sm btn-success text-white fw-bold d-inline-flex align-items-center gap-1.5 btn-fulfill-procurement shadow-sm px-3 py-1.5"
                                                     style="font-size: 0.76rem;"
                                                     data-detail-id="{{ $upDetail->id }}"
+                                                    data-base-unit="{{ $upProd->unit ?? '' }}"
+                                                    data-units="{{ $upProd ? implode(',', $upProd->unit_list) : '' }}"
+                                                    data-conversions="{{ json_encode(($upProd->unit_conversions ?? null) ?: new \stdClass) }}"
+                                                    data-current-stock="{{ (int) ($upProd->stock ?? 0) }}"
                                                     data-new-item="{{ $upIsNew ? 1 : 0 }}"
                                                     data-product-id="{{ $upProd->id ?? '' }}"
                                                     data-category-id="{{ $upCatId }}"
@@ -655,6 +659,8 @@
                                                         data-uraian="{{ e($uraian ?? '') }}"
                                                         data-description="{{ e($product->description) }}"
                                                         data-khusus-subdit="{{ $product->khusus_subdit ? 1 : 0 }}"
+                                                        data-units="{{ implode(',', $product->unit_list) }}"
+                                                        data-conversions="{{ json_encode($product->unit_conversions ?? new \stdClass) }}"
                                                         data-image="{{ asset($product->image_url) }}">
                                                         Edit
                                                     </button>
@@ -819,6 +825,33 @@
                                     <span class="input-group-text">Rp</span>
                                     <input type="number" name="purchase_price" id="purchase_price" class="form-control form-control-sm"
                                         min="0" value="0" required>
+                                </div>
+                            </div>
+
+                            <!-- Bantuan Isi Stok pengadaan: konversi satuan permintaan -> satuan dasar & harga per satuan dasar -->
+                            <div class="col-12 d-none" id="fulfillHelper">
+                                <div class="p-2 rounded-2 border" style="background:#fffbeb; border-color:#fde68a !important;">
+                                    <div class="small fw-semibold" id="fulfillSummary"></div>
+                                    <div class="row g-2 mt-1 align-items-end">
+                                        <div class="col-md-6">
+                                            <label class="form-label mb-1" style="font-size:.74rem;">Harga faktur per <span id="fulfillUnitLabel">satuan</span> <span class="text-muted fw-normal">(opsional)</span></label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="number" id="priceReqUnit" class="form-control form-control-sm" min="0" step="any" placeholder="mis. 250000">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 small text-muted" id="fulfillPerBase"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Isi per kemasan: barang yang punya lebih dari satu satuan -->
+                            <div class="col-12 d-none" id="convBox">
+                                <input type="hidden" name="unit_conversions_sent" id="unit_conversions_sent" value="1" disabled>
+                                <div class="p-2 rounded-2 border bg-light-subtle">
+                                    <div class="small fw-semibold mb-1">Isi per Kemasan <span class="text-muted fw-normal">(satuan yang lebih besar dari satuan dasar)</span></div>
+                                    <div id="convRows" class="d-flex flex-column gap-1"></div>
+                                    <small class="text-muted d-block mt-1" style="font-size:.7rem; line-height:1.35;">Stok dan harga dihitung dalam satuan dasar (<b id="convBaseLabel">-</b>). Kosongkan satuan yang tidak dipakai atau lebih kecil dari satuan dasar; satuan itu tidak akan ditawarkan kepada pemohon.</small>
                                 </div>
                             </div>
 
@@ -1088,9 +1121,95 @@
                     $categoryId.trigger('change');
                 }
 
+                // ===== Isi per kemasan & konversi satuan (barang dengan lebih dari satu satuan) =====
+                const $convBox = $('#convBox'), $convRows = $('#convRows'), $convSent = $('#unit_conversions_sent'), $convBase = $('#convBaseLabel');
+                const $fulfillHelper = $('#fulfillHelper'), $fulfillSummary = $('#fulfillSummary'), $priceReqUnit = $('#priceReqUnit');
+                const $fulfillPerBase = $('#fulfillPerBase'), $fulfillUnitLabel = $('#fulfillUnitLabel');
+                let convUnits = [];
+                let fulfillCtx = null;
+
+                function parseJsonAttr(v) {
+                    try { const o = JSON.parse(v || '{}'); return (o && typeof o === 'object') ? o : {}; } catch (e) { return {}; }
+                }
+                function splitUnits(v) {
+                    return String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+                }
+                function currentConvValues() {
+                    const o = {};
+                    $convRows.find('.conv-input').each(function () { o[$(this).attr('data-unit')] = $(this).val(); });
+                    return o;
+                }
+                function renderConversions(values) {
+                    const base = String($unit.val() || '').trim();
+                    if (convUnits.length < 2 || !base) {
+                        $convBox.addClass('d-none'); $convSent.prop('disabled', true); $convRows.empty();
+                        return;
+                    }
+                    values = values || currentConvValues();
+                    $convRows.empty();
+                    convUnits.filter(u => u.toLowerCase() !== base.toLowerCase()).forEach(function (u) {
+                        const row = $('<div class="d-flex align-items-center gap-2 small"></div>');
+                        row.append($('<span class="text-nowrap"></span>').text('1 ' + u + ' ='));
+                        row.append($('<input type="number" min="2" step="1" class="form-control form-control-sm conv-input" style="max-width:110px;" placeholder="isi">')
+                            .attr('name', 'unit_conversions[' + u + ']').attr('data-unit', u).val(values[u] || ''));
+                        row.append($('<span class="text-nowrap"></span>').text(base));
+                        $convRows.append(row);
+                    });
+                    $convBase.text(base);
+                    $convBox.removeClass('d-none'); $convSent.prop('disabled', false);
+                }
+                function factorFor(unit) {
+                    const base = String($unit.val() || '').trim().toLowerCase();
+                    if (!unit || unit.toLowerCase() === base) return 1;
+                    let f = 0;
+                    $convRows.find('.conv-input').each(function () {
+                        if (String($(this).attr('data-unit') || '').toLowerCase() === unit.toLowerCase()) f = parseInt($(this).val(), 10) || 0;
+                    });
+                    return f; // 0 = isi per kemasan belum diatur
+                }
+                function rupiah(n) { return 'Rp ' + Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 }); }
+                function recalcFulfill() {
+                    if (!fulfillCtx) return;
+                    const base = String($unit.val() || '').trim();
+                    const c = fulfillCtx;
+                    const sameUnit = !c.hasProduct || c.reqUnit.toLowerCase() === base.toLowerCase();
+                    if (sameUnit) {
+                        $fulfillHelper.addClass('d-none');
+                        $stock.val(c.current + c.qty);
+                        return;
+                    }
+                    const f = factorFor(c.reqUnit);
+                    $fulfillHelper.removeClass('d-none');
+                    $fulfillUnitLabel.text(c.reqUnit);
+                    if (f > 0) {
+                        const incoming = c.qty * f;
+                        $stock.val(c.current + incoming);
+                        $fulfillSummary.text('Diminta ' + c.qty + ' ' + c.reqUnit + ' = ' + incoming + ' ' + base
+                            + (c.current > 0 ? ' (stok sekarang ' + c.current + ' \u2192 ' + (c.current + incoming) + ')' : ''));
+                        const v = parseFloat($priceReqUnit.val());
+                        if (v > 0) {
+                            const perBase = Math.round((v / f) * 100) / 100;
+                            $purchasePrice.val(perBase);
+                            $fulfillPerBase.text('= ' + rupiah(perBase) + ' per ' + base);
+                        } else {
+                            $fulfillPerBase.text('Isi harga faktur per ' + c.reqUnit + ' agar harga per ' + base + ' terhitung otomatis.');
+                        }
+                    } else {
+                        $stock.val(c.current);
+                        $fulfillSummary.text('Diminta ' + c.qty + ' ' + c.reqUnit + '. Isi per kemasan ' + c.reqUnit + ' belum diatur \u2014 isi pada bagian "Isi per Kemasan" di bawah.');
+                        $fulfillPerBase.text('');
+                    }
+                }
+                $(document).on('input', '.conv-input', recalcFulfill);
+                $priceReqUnit.on('input', recalcFulfill);
+                $unit.on('change', function () { renderConversions(); recalcFulfill(); });
+
                 function resetModalBarang() {
                     $form[0].reset();
                     $('#newItemNotice').addClass('d-none');
+                    fulfillCtx = null; convUnits = [];
+                    $fulfillHelper.addClass('d-none'); $priceReqUnit.val(''); $fulfillPerBase.text('');
+                    $convBox.addClass('d-none'); $convSent.prop('disabled', true); $convRows.empty();
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $requestDetailId.val('');
@@ -1173,9 +1292,20 @@
                     if ($unit.find('option[value="' + unit + '"]').length === 0 && unit) {
                         $unit.append(new Option(unit, unit, true, true));
                     }
-                    $unit.val(unit);
+                    // Satuan dasar barang dipertahankan; permintaan dikonversi ke satuan dasar
+                    const baseUnit = $btn.attr('data-base-unit') || '';
+                    const useUnit = baseUnit || unit;
+                    if ($unit.find('option[value="' + useUnit + '"]').length === 0 && useUnit) {
+                        $unit.append(new Option(useUnit, useUnit, true, true));
+                    }
+                    $unit.val(useUnit);
                     $stock.val(qty);
                     $purchasePrice.val(price);
+                    convUnits = splitUnits($btn.attr('data-units'));
+                    if (productId && baseUnit && convUnits.map(x => x.toLowerCase()).indexOf(unit.toLowerCase()) === -1) { convUnits.push(unit); }
+                    fulfillCtx = { reqUnit: unit, qty: qty, current: parseInt($btn.attr('data-current-stock'), 10) || 0, hasProduct: !!(productId && baseUnit) };
+                    renderConversions(parseJsonAttr($btn.attr('data-conversions')));
+                    recalcFulfill();
                     $transactionDate.val(new Date().toISOString().split('T')[0]);
                     setProductImagePreview('');
                     $('#boxProductImage').addClass('d-none'); // Form isi stok tidak perlu upload gambar
@@ -1287,6 +1417,8 @@
                     $purchasePrice.val($btn.attr('data-purchase-price') || $btn.data('purchase-price') || 0);
                     $description.val($btn.attr('data-description') || $btn.data('description') || '');
                     $('#khusus_subdit').prop('checked', String($btn.attr('data-khusus-subdit')) === '1');
+                    convUnits = splitUnits($btn.attr('data-units'));
+                    renderConversions(parseJsonAttr($btn.attr('data-conversions')));
                     const img = $btn.attr('data-image') || '';
                     setProductImagePreview(img);
                     $('#boxProductImage').removeClass('d-none'); // Di Edit Barang tetap bisa upload foto

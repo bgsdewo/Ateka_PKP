@@ -14,6 +14,7 @@ class Product extends Model
         'name',
         'unit',
         'available_units',
+        'unit_conversions',
         'stock',
         'minimum_stock',
         'purchase_price',
@@ -24,6 +25,7 @@ class Product extends Model
 
     protected $casts = [
         'khusus_subdit' => 'boolean',
+        'unit_conversions' => 'array',
     ];
 
     /** Kata kunci nama barang yang otomatis ditandai "Khusus Perwakilan Subdit". */
@@ -149,6 +151,44 @@ class Product extends Model
     public function getSizeSpecAttribute(): ?array
     {
         return null;
+    }
+
+
+    /**
+     * Isi per kemasan satuan $unit dalam SATUAN DASAR (products.unit). Satuan dasar / tidak dikenal = 1.
+     */
+    public function unitFactor(?string $unit): int
+    {
+        $unit = trim((string) $unit);
+        if ($unit === '' || strcasecmp($unit, trim((string) $this->unit)) === 0) {
+            return 1;
+        }
+        foreach ((array) ($this->unit_conversions ?? []) as $u => $factor) {
+            if (strcasecmp(trim((string) $u), $unit) === 0 && (int) $factor >= 1) {
+                return (int) $factor;
+            }
+        }
+        return 1;
+    }
+
+    /** Ubah jumlah dalam satuan $unit menjadi jumlah dalam satuan dasar. */
+    public function toBaseQuantity(int|float $qty, ?string $unit): int
+    {
+        return (int) round($qty * $this->unitFactor($unit));
+    }
+
+    /**
+     * Satuan yang boleh dipilih pemohon: bila isi per kemasan sudah diatur => satuan dasar + satuan
+     * yang punya konversi (satuan lebih kecil tidak ditawarkan). Jika belum diatur => perilaku lama.
+     */
+    public function getRequestableUnitsAttribute(): array
+    {
+        $conv = array_filter((array) ($this->unit_conversions ?? []), fn ($f) => (int) $f >= 1);
+        if (empty($conv)) {
+            return $this->unit_list;
+        }
+        $base = trim((string) $this->unit) !== '' ? trim((string) $this->unit) : 'Buah';
+        return array_values(array_unique(array_merge([$base], array_keys($conv))));
     }
 
     public function getUnitListAttribute(): array

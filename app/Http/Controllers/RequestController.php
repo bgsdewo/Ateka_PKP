@@ -126,7 +126,8 @@ class RequestController extends Controller
         foreach ($request->product_id as $index => $productId) {
             $product = Product::find($productId);
             $qty = isset($request->quantity[$index]) ? (int) $request->quantity[$index] : 1;
-            if ($product && ($product->stock <= 0 || $qty > $product->stock)) {
+            $qtyBase = $product ? $product->toBaseQuantity($qty, $request->input('custom_unit.' . $index)) : $qty;
+            if ($product && ($product->stock <= 0 || $qtyBase > $product->stock)) {
                 $requiresProcurement = true;
                 break;
             }
