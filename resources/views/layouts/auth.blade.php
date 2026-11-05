@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <title>@yield('title') | ATEKA — Kementerian PKP RI</title>
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ateka-auth.css') }}">
 </head>
 <body>
@@ -20,12 +21,21 @@
         </div>
 
         <div class="au-product">
-            <h1>ATEKA</h1>
+            <h1>ATEKA<i>.</i></h1>
             <p class="au-tag">Sistem Informasi Inventori Persediaan ATK</p>
-            <ul class="au-points">
-                <li>Ajukan kebutuhan alat tulis kantor secara daring</li>
-                <li>Pantau status persetujuan hingga barang diterima</li>
-                <li>Stok, mutasi, dan laporan persediaan tercatat rapi</li>
+            <ul class="au-feats">
+                <li>
+                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg></span>
+                    <div><b>Pengajuan daring</b><span>Ajukan kebutuhan ATK tanpa formulir kertas.</span></div>
+                </li>
+                <li>
+                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></span>
+                    <div><b>Status terpantau</b><span>Lacak dari verifikasi hingga barang diterima.</span></div>
+                </li>
+                <li>
+                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
+                    <div><b>Persediaan tercatat</b><span>Stok, mutasi, dan laporan tersusun otomatis.</span></div>
+                </li>
             </ul>
         </div>
 
@@ -37,8 +47,13 @@
 
     <main class="au-main">
         <div class="au-card @yield('card_class')">
-            <h2>@yield('heading')</h2>
-            <p class="au-sub">@yield('subheading')</p>
+            <div class="au-head">
+                <span class="au-tile @yield('icon', 'au-t-shield')" aria-hidden="true"></span>
+                <div>
+                    <h2>@yield('heading')</h2>
+                    <p class="au-sub">@yield('subheading')</p>
+                </div>
+            </div>
 
             @if (session('success'))
                 <div class="au-alert au-alert-ok" role="status">{{ session('success') }}</div>
@@ -59,6 +74,7 @@
 
             @yield('content')
         </div>
+        <p class="au-help">Kendala akses akun? Hubungi Subbagian Tata Usaha.</p>
     </main>
 </div>
 
