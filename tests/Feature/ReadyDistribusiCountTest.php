@@ -37,4 +37,28 @@ class ReadyDistribusiCountTest extends TestCase
         RequestItem::flushRequestCaches();
         $this->assertSame(1, RequestItem::getReadyDistribusiCount() - $awal);
     }
+
+    public function test_tiket_pengadaan_sebagian_menunggu_stok_dan_tidak_bisa_diserahkan(): void
+    {
+        $user = User::firstOrCreate(
+            ['email' => 'utami@gmail.com'],
+            ['name' => 'Utami M', 'position' => 'Kasubbag TU', 'password' => bcrypt('password123'), 'role' => 'kasubag_tu']
+        );
+        $cat = Category::firstOrCreate(['name' => 'Alat Tulis']);
+        $prod = Product::create(['category_id' => $cat->id, 'code' => 'RDY-T2', 'name' => 'Barang Sebagian Uji', 'unit' => 'Buah', 'stock' => 10, 'minimum_stock' => 0, 'purchase_price' => 1000]);
+
+        $t = RequestItem::create(['request_code' => 'REQ-BUY-PART', 'user_id' => $user->id, 'type' => 'individu', 'status' => 'approved', 'is_procurement' => true]);
+        $d1 = RequestDetail::create(['request_id' => $t->id, 'product_id' => $prod->id, 'quantity' => 1, 'unit' => 'Buah', 'is_fulfilled' => true]);
+        $d2 = RequestDetail::create(['request_id' => $t->id, 'product_id' => $prod->id, 'quantity' => 1, 'unit' => 'Buah', 'is_fulfilled' => false]);
+
+        $this->assertTrue($t->fresh()->is_waiting_stock);
+        RequestItem::flushRequestCaches();
+
+        $this->actingAs($user)->post('/distribusi/' . $t->id . '/handover', ['receiver_name' => 'Penerima Uji'])
+            ->assertSessionHas('error');
+        $this->assertSame('approved', $t->fresh()->status);
+
+        $d2->update(['is_fulfilled' => true]);
+        $this->assertFalse($t->fresh()->is_waiting_stock);
+    }
 }

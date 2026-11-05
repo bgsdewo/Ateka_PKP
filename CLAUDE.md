@@ -139,6 +139,7 @@ _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khu
 - Profil & Ubah Password: header seragam, warna hijau merek; dropdown pilih barang di form pengajuan diringkas.
 - **Satuan permintaan = satuan terkecil** barang (`Product::request_unit`); fitur konversi satuan sempat dibuat lalu **dibatalkan** karena alur beli per permintaan.
 - **Pembelian per kemasan** di Isi Stok (kolom `pack_size` + nama kemasan): stok masuk dikonversi ke satuan terkecil, sisa jadi stok umum, harga rata-rata tertimbang, perubahan harga tercatat di Catatan laporan. Tombol "+ Isi Stok" pengadaan kini selalu lewat `store()` (menambah stok, tidak menimpa).
+- **Aturan tiket pengadaan siap diserahkan = SEMUA barangnya sudah terisi stok** (`RequestItem::is_waiting_stock`; dipakai dashboard, lonceng, halaman Distribusi, dan dijaga di server `DistributionController::confirmHandover`). Sebagian terisi = tetap "Menunggu Stok Masuk".
 - **Hitungan "Siap Diserahkan"** (dashboard/sidebar gudang) diperbaiki: ikut menghitung tiket pengadaan yang stoknya sudah terisi (`RequestItem::getReadyDistribusiCount`). Label tiket stok gudang: "Siap diserahkan Petugas Distribusi".
 
 **Keputusan pemilik terbaru (jangan dilanggar):**

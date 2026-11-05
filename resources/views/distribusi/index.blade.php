@@ -214,7 +214,7 @@
                                                                         <td><small class="text-muted">{{ $subItem->notes ?? '-' }}</small></td>
                                                                         <td class="text-end text-nowrap">
                                                                             @php
-                                                                                $isSubWaitingStock = $subItem->is_procurement && !($subItem->is_purchased || ($subItem->relationLoaded('details') ? $subItem->details->where('is_fulfilled', true)->isNotEmpty() : $subItem->details()->where('is_fulfilled', true)->exists()));
+                                                                                $isSubWaitingStock = $subItem->is_waiting_stock;
                                                                             @endphp
                                                                             @if ($isSubWaitingStock)
                                                                                 <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5" style="font-size: 0.68rem;" title="Menunggu stok diisi di Master Data">
@@ -423,7 +423,7 @@
                                             <td>
                                                 @if ($req->status === 'approved')
                                                     @php
-                                                        $isReqWaitingStock = $req->is_procurement && !($req->is_purchased || ($req->relationLoaded('details') ? $req->details->where('is_fulfilled', true)->isNotEmpty() : $req->details()->where('is_fulfilled', true)->exists()));
+                                                        $isReqWaitingStock = $req->is_waiting_stock;
                                                     @endphp
                                                     @if ($isReqWaitingStock)
                                                         <span class="badge bg-info-subtle text-info border border-info-subtle">
@@ -529,7 +529,7 @@
                                                         </span>
                                                     @elseif ($req->status === 'approved')
                                                         @php
-                                                            $isReqWaitingStock = $req->is_procurement && !($req->is_purchased || ($req->relationLoaded('details') ? $req->details->where('is_fulfilled', true)->isNotEmpty() : $req->details()->where('is_fulfilled', true)->exists()));
+                                                            $isReqWaitingStock = $req->is_waiting_stock;
                                                         @endphp
                                                         @if ($isReqWaitingStock)
                                                             <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5 small" style="font-size: 0.68rem; border-radius: 6px;" title="Menunggu Petugas Pemeriksa Gudang mengisi stok barang di Master Data">

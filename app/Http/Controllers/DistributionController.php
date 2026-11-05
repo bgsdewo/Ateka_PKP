@@ -194,6 +194,10 @@ class DistributionController extends Controller
         $requestItem = RequestItem::with(['user', 'details.product'])
             ->findOrFail($id);
 
+        if ($requestItem->is_waiting_stock) {
+            return redirect()->back()->with('error', 'Barang pengadaan belum lengkap masuk stok. Tunggu semua barang diisi stoknya oleh Pemeriksa Gudang sebelum diserahkan.');
+        }
+
         $request->validate([
             'distributed_by' => 'nullable|exists:users,id',
             'receiver_name' => 'required|string|max:255',

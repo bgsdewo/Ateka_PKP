@@ -162,14 +162,25 @@ class RequestItem extends Model
         return !empty($this->purchase_invoice) || !empty($this->purchase_date);
     }
 
+    /**
+     * Tiket pengadaan masih menunggu stok: ada barang yang belum diisi stoknya
+     * (siap diserahkan hanya jika SEMUA barang sudah terisi; sama dengan dashboard & lonceng).
+     */
+    public function getIsWaitingStockAttribute(): bool
+    {
+        if (!$this->is_procurement || $this->is_purchased) {
+            return false;
+        }
+        $details = $this->relationLoaded('details') ? $this->details : $this->details()->get();
+        return $details->contains(fn ($d) => !$d->is_fulfilled);
+    }
+
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
             'pending' => 'Menunggu Verifikasi TU',
-            'approved' => $this->is_procurement
-                ? ($this->is_purchased || ($this->relationLoaded('details') ? $this->details->where('is_fulfilled', true)->isNotEmpty() : $this->details()->where('is_fulfilled', true)->exists())
-                    ? 'Disetujui TU (Siap Diserahkan)'
-                    : 'Disetujui Kasubbag TU (Dalam Proses Pembelian)')
+            'approved' => $this->is_waiting_stock
+                ? 'Disetujui Kasubbag TU (Dalam Proses Pembelian)'
                 : 'Disetujui TU (Siap Diserahkan)',
             'distributed' => 'Selesai (Sudah Diserahkan)',
             'rejected' => 'Ditolak Subbag TU',
@@ -181,9 +192,7 @@ class RequestItem extends Model
     {
         return match ($this->status) {
             'pending' => 'bg-warning text-dark',
-            'approved' => ($this->is_procurement && !$this->is_purchased && !($this->relationLoaded('details') ? $this->details->where('is_fulfilled', true)->isNotEmpty() : $this->details()->where('is_fulfilled', true)->exists()))
-                ? 'bg-info text-white'
-                : 'bg-success text-white',
+            'approved' => $this->is_waiting_stock ? 'bg-info text-white' : 'bg-success text-white',
             'distributed' => 'bg-primary text-white',
             'rejected' => 'bg-danger text-white',
             default => 'bg-secondary text-white',
