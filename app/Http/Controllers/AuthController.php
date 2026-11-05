@@ -72,7 +72,7 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'title' => ['nullable', 'string', 'max:50'],
+            'title' => ['required', 'string', 'max:50'],
             'gelar' => ['nullable', 'string', 'max:50'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'nip' => ['required', 'string', 'max:50', 'unique:users,nip'],
@@ -84,6 +84,7 @@ class AuthController extends Controller
             'email.required' => 'Email dinas/kantor wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Alamat email ini sudah terdaftar. Silakan masuk (login) dengan akun tersebut atau gunakan email dinas lain.',
+            'title.required' => 'Gelar akademik wajib diisi.',
             'nip.required' => 'Nomor Induk Pegawai (NIP) wajib diisi untuk keamanan akun.',
             'nip.unique' => 'Nomor Induk Pegawai (NIP) ini sudah terdaftar dalam sistem.',
             'role.in' => 'Pilihan role pendaftaran hanya untuk Pegawai.',

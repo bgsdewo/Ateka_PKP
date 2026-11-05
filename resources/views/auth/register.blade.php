@@ -530,9 +530,9 @@
 
                     <!-- Gelar Akademik -->
                     <div class="form-group">
-                        <label for="title" class="form-label">Gelar Akademik</label>
+                        <label for="title" class="form-label">Gelar Akademik <span class="req">*</span></label>
                         <input type="text" id="title" name="title" class="input-pill"
-                            value="{{ old('title', old('gelar')) }}" placeholder="S.T. / M.Si. / S.Kom.">
+                            value="{{ old('title', old('gelar')) }}" placeholder="S.T. / M.Si. / S.Kom." required>
                     </div>
 
                     <!-- Password -->
