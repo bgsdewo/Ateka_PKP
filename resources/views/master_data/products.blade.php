@@ -435,13 +435,16 @@
                                             }
                                         }
 
-                                        if (!$upCatId) {
+                                        // Barang belum ada di katalog (usulan pengadaan barang baru)
+                                        $upIsNew = !$upProd;
+
+                                        if (!$upCatId && !$upIsNew) {
                                             $upCatId = $categories->first()->id ?? '';
                                         }
 
                                         if (!$upCode && $upCatId) {
                                             $matchedCat = $categories->firstWhere('id', $upCatId);
-                                            $upCode = $matchedCat->kd_rincian ?? '10.01.1';
+                                            $upCode = $matchedCat->kd_rincian ?? '';
                                         }
                                     @endphp
                                     <div class="col-12 col-md-6 col-xl-4">
@@ -457,6 +460,11 @@
                                             <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $upName }}" style="font-size: 0.88rem;">
                                                 {{ $upName }}
                                             </h6>
+                                            @if ($upIsNew)
+                                                <div class="mb-1">
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.66rem;">Barang Baru &mdash; belum ada di katalog</span>
+                                                </div>
+                                            @endif
                                             <div class="text-secondary small mb-3" style="font-size: 0.76rem;">
                                                 Pemohon: <span class="text-dark fw-semibold">{{ $upReq->user->name ?? 'Pegawai' }}</span> &bull; 
                                                 Kebutuhan: <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">{{ $upQty }} {{ $upUnit }}</span>
@@ -466,6 +474,7 @@
                                                     class="btn btn-sm btn-success text-white fw-bold d-inline-flex align-items-center gap-1.5 btn-fulfill-procurement shadow-sm px-3 py-1.5"
                                                     style="font-size: 0.76rem;"
                                                     data-detail-id="{{ $upDetail->id }}"
+                                                    data-new-item="{{ $upIsNew ? 1 : 0 }}"
                                                     data-product-id="{{ $upProd->id ?? '' }}"
                                                     data-category-id="{{ $upCatId }}"
                                                     data-code="{{ $upCode }}"
@@ -694,6 +703,13 @@
                     </div>
 
                     <div class="modal-body">
+                        <div id="newItemNotice" class="alert alert-warning d-none mb-2.5 py-2 px-2.5" style="font-size: 0.78rem;">
+                            <strong>Barang baru (belum ada di katalog).</strong>
+                            Pastikan <strong>kategori</strong> sudah tersedia &mdash; bila belum, buat dulu di
+                            <a href="{{ route('master-data.kategori-barang.index') }}" target="_blank" rel="noopener">Master Data &rarr; Kategori</a>,
+                            lalu pilih kategorinya di sini. Isi stok sesuai jumlah yang disetujui Kasubbag TU.
+                        </div>
+
                         <div id="detailBarangInfo" class="alert alert-info d-none mb-2.5 py-2 px-2.5">
                             <div class="row g-2 text-center">
                                 <div class="col-3">
@@ -1074,6 +1090,7 @@
 
                 function resetModalBarang() {
                     $form[0].reset();
+                    $('#newItemNotice').addClass('d-none');
                     $form.attr('action', storeUrl);
                     $method.prop('disabled', true).val('');
                     $requestDetailId.val('');
@@ -1118,6 +1135,7 @@
                     const img = $btn.attr('data-image') || '';
 
                     $requestDetailId.val(detailId);
+                    $('#newItemNotice').toggleClass('d-none', String($btn.attr('data-new-item')) !== '1');
                     if (productId) {
                         const updateUrl = updateUrlTemplate.replace(':id', productId);
                         $form.attr('action', updateUrl);

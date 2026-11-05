@@ -124,8 +124,11 @@
 
 
 
+                    // Notifikasi yang hanya mengulang isi antrean gudang tidak dihitung dua kali di badge lonceng.
+                    $unreadNonQueueCount = $rawUserNotifications->whereNotIn('type', ['procurement_approved_examiner', 'stock_approved_warehouse', 'procurement_ready_distribution'])->count();
+
                     $navCacheKey = 'navbar_notif_' . ($currentUser->id ?? 'guest') . '_' . ($currentUser->role ?? 'none');
-                    $cachedNav = \Illuminate\Support\Facades\Cache::store('file')->remember($navCacheKey, 30, function () use ($currentUser, $isKasubagTU, $isPegawaiGudang, $isDistributorGudang, $userNotifications, $unreadNotifCount) {
+                    $cachedNav = \Illuminate\Support\Facades\Cache::store('file')->remember($navCacheKey, 30, function () use ($currentUser, $isKasubagTU, $isPegawaiGudang, $isDistributorGudang, $userNotifications, $unreadNotifCount, $unreadNonQueueCount) {
                         $pendingVerifications = collect();
                         $totalPendingVerifikasi = 0;
                         $pendingProcurementCount = 0;
@@ -334,7 +337,7 @@
 
                             : ($isPegawaiGudang
 
-                                ? ($unreadNotifCount + $totalPendingDistribusi + $totalPendingPengadaanGudang)
+                                ? ($unreadNonQueueCount + $totalPendingDistribusi + $totalPendingPengadaanGudang)
 
                                 : $unreadNotifCount));
 
