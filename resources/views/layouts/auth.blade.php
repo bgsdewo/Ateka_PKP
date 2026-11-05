@@ -6,8 +6,8 @@
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <title>@yield('title') | ATEKA — Kementerian PKP RI</title>
     <link rel="shortcut icon" href="{{ asset('hope-ui/assets/images/favicon.ico') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/ateka-auth.css') }}">
+    <link rel="stylesheet" href="{{ asset('fonts/fonts.css') }}?v={{ @filemtime(public_path('fonts/fonts.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/ateka-auth.css') }}?v={{ @filemtime(public_path('css/ateka-auth.css')) }}">
 </head>
 <body>
 <div class="au-shell">
@@ -25,15 +25,15 @@
             <p class="au-tag">Sistem Informasi Inventori Persediaan ATK</p>
             <ul class="au-feats">
                 <li>
-                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg></span>
+                    <span class="au-feat-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg></span>
                     <div><b>Pengajuan daring</b><span>Ajukan kebutuhan ATK tanpa formulir kertas.</span></div>
                 </li>
                 <li>
-                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></span>
+                    <span class="au-feat-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></span>
                     <div><b>Status terpantau</b><span>Lacak dari verifikasi hingga barang diterima.</span></div>
                 </li>
                 <li>
-                    <span class="au-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
+                    <span class="au-feat-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
                     <div><b>Persediaan tercatat</b><span>Stok, mutasi, dan laporan tersusun otomatis.</span></div>
                 </li>
             </ul>

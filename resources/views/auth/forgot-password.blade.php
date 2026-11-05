@@ -26,7 +26,7 @@
                 <div class="au-pass au-inwrap au-i-lock">
                     <input type="password" name="password" id="password" class="au-input"
                         placeholder="Minimal 6 karakter" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="au-eye" data-toggle-password="password" aria-label="Tampilkan atau sembunyikan kata sandi baru" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                    <button type="button" class="au-eye" data-toggle-password="password" aria-label="Tampilkan atau sembunyikan kata sandi baru" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
                 </div>
             </div>
             <div class="au-field">
@@ -34,7 +34,7 @@
                 <div class="au-pass au-inwrap au-i-lock">
                     <input type="password" name="password_confirmation" id="password_confirmation" class="au-input"
                         placeholder="Ketik ulang kata sandi" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="au-eye" data-toggle-password="password_confirmation" aria-label="Tampilkan atau sembunyikan ulang kata sandi" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                    <button type="button" class="au-eye" data-toggle-password="password_confirmation" aria-label="Tampilkan atau sembunyikan ulang kata sandi" tabindex="-1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
                 </div>
             </div>
         </div>
