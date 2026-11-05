@@ -215,6 +215,7 @@ class ProductController extends Controller
             'minimum_stock' => ['nullable', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'pack_size' => ['nullable', 'integer', 'min:1', 'max:100000'],
+            'pack_unit' => ['nullable', 'string', 'max:30'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
@@ -325,7 +326,7 @@ class ProductController extends Controller
                     'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
                     'transaction_date' => $request->transaction_date ?: now(),
                     'note'             => 'Pembelian ' . $product->name
-                        . ($packSize > 1 ? ' (' . (int) $request->stock . ' kemasan × isi ' . $packSize . ' = ' . $addedQty . ')' : '')
+                        . ($packSize > 1 ? ' (' . (int) $request->stock . ' ' . (trim((string) $request->pack_unit) ?: 'kemasan') . ' × isi ' . $packSize . ' = ' . $addedQty . ' ' . $product->unit . ')' : '')
                         . $priceChangeNote,
                 ]);
             }

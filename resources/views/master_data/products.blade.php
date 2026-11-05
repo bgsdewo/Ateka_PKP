@@ -826,7 +826,22 @@
                             <div class="col-12" id="boxPackSize">
                                 <div class="p-2 rounded border border-info-subtle bg-info-subtle">
                                     <label class="form-label mb-1">Isi per Kemasan Beli <small class="text-muted fw-normal">(opsional &mdash; isi bila membeli per Dus/Pak)</small></label>
-                                    <input type="number" name="pack_size" id="pack_size" class="form-control form-control-sm" min="1" value="1">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="number" name="pack_size" id="pack_size" class="form-control form-control-sm" min="1" value="1" placeholder="Isi, mis. 12">
+                                        </div>
+                                        <div class="col-6">
+                                            <select name="pack_unit" id="pack_unit" class="form-select form-select-sm">
+                                                <option value="Dus">Dus</option>
+                                                <option value="Pak">Pak</option>
+                                                <option value="Kotak">Kotak</option>
+                                                <option value="Box">Box</option>
+                                                <option value="Lusin">Lusin</option>
+                                                <option value="Set">Set</option>
+                                                <option value="Rim">Rim</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">
                                         Bila diisi lebih dari 1: <strong>Stok</strong> = jumlah kemasan yang dibeli, <strong>Harga</strong> = harga per kemasan, <strong>Satuan</strong> = satuan terkecil (mis. Buah).
                                     </small>
@@ -1114,11 +1129,11 @@
                     const total = qty * pack;
                     const per = price / pack;
                     $packPreview.removeClass('d-none').text(
-                        qty + ' kemasan × ' + pack + ' = ' + total + ' ' + unit + ' masuk stok; harga ≈ Rp ' +
+                        qty + ' ' + ($('#pack_unit').val() || 'kemasan') + ' × isi ' + pack + ' = ' + total + ' ' + unit + ' masuk stok; harga ≈ Rp ' +
                         Math.round(per).toLocaleString('id-ID') + ' / ' + unit
                     );
                 }
-                $packSize.add($stock).add($purchasePrice).add($unit).on('input change', updatePackPreview);
+                $packSize.add('#pack_unit').add($stock).add($purchasePrice).add($unit).on('input change', updatePackPreview);
                 $('#modalBarang').on('show.bs.modal shown.bs.modal', function() {
                     $packBox.toggleClass('d-none', $method.val() === 'PUT');
                     if ($method.val() === 'PUT') { $packSize.val(1); }

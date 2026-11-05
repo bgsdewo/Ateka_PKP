@@ -23,6 +23,7 @@ class PembelianPerKemasanTest extends TestCase
             'stock' => 1,
             'purchase_price' => 120000,
             'pack_size' => 12,
+            'pack_unit' => 'Dus',
         ], $over);
     }
 
@@ -39,6 +40,8 @@ class PembelianPerKemasanTest extends TestCase
         $p = Product::where('name', 'Rautan Kaca Uji Kemasan')->firstOrFail();
         $this->assertSame(12, (int) $p->stock);
         $this->assertEquals(10000.0, (float) $p->purchase_price);
+        $tx = StockTransaction::where('product_id', $p->id)->where('type', 'masuk')->first();
+        $this->assertStringContainsString('1 Dus × isi 12 = 12 Buah', (string) $tx->note);
     }
 
     public function test_harga_rata_rata_dan_catatan_perubahan_harga(): void
