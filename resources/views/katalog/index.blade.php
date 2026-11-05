@@ -274,6 +274,9 @@
                                 {{-- Judul Barang & Kategori --}}
                                 <h6 class="fw-bold text-dark mb-1" style="min-height: 40px; line-height: 1.35;" title="{{ $item->name }}">
                                     {{ $item->name }}
+                                    @if ($item->khusus_subdit)
+                                        <span class="badge bg-warning text-dark d-inline-block mt-1" style="font-size: 0.65rem;">Khusus Perwakilan Subdit</span>
+                                    @endif
                                 </h6>
                                 <small class="text-muted d-block mb-1" style="font-size: 0.78rem;">
                                     Kategori: <strong class="text-secondary">{{ $item->category->name ?? '-' }}</strong>

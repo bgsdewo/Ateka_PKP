@@ -86,6 +86,23 @@ class RequestController extends Controller
         return view('pengajuan.create', compact('products', 'categories', 'selectedProductId', 'selectedQuantity'));
     }
 
+    /**
+     * Barang bertanda "Khusus Perwakilan Subdit" hanya boleh diminta PIC Distribusi.
+     * Mengembalikan pesan error bila dilanggar, atau null bila aman.
+     */
+    private function khususSubditViolation($products): ?string
+    {
+        $user = Auth::user();
+        if ($user && $user->isPicDistribusi()) {
+            return null;
+        }
+        $names = $products->where('khusus_subdit', true)->pluck('name')->all();
+        if (empty($names)) {
+            return null;
+        }
+        return 'Barang berikut khusus diminta oleh Perwakilan Subdit: ' . implode(', ', $names) . '.';
+    }
+
     // Menyimpan data pengajuan baru ke database
     public function store(Request $request)
     {
@@ -99,6 +116,10 @@ class RequestController extends Controller
             'custom_unit' => 'nullable|array',
             'custom_unit.*' => 'nullable|string|max:50',
         ]);
+
+        if ($blocked = $this->khususSubditViolation(Product::whereIn('id', $request->product_id)->get())) {
+            return back()->withInput()->with('error', $blocked);
+        }
 
         // Cek apakah ada barang yang diajukan yang stoknya kosong atau kurang sehingga membutuhkan pengadaan
         $requiresProcurement = false;
@@ -172,6 +193,10 @@ class RequestController extends Controller
         ]);
 
         $product = Product::with('category')->findOrFail($request->product_id);
+
+        if ($blocked = $this->khususSubditViolation(collect([$product]))) {
+            return back()->withInput()->with('error', $blocked);
+        }
 
         $requestCode = 'REQ-BUY-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 

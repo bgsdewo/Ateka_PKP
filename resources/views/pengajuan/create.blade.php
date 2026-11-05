@@ -366,6 +366,7 @@
                 'stock' => (int) $product->stock,
                 'unit' => $product->unit ?: 'Buah',
                 'available_units' => implode(',', $product->unit_list ?? [$product->unit ?: 'Buah']),
+                'khusus_subdit' => (bool) $product->khusus_subdit,
                 'search_text' => strtolower(($product->code ?? '') . ' ' . ($product->category->name ?? '') . ' ' . $product->name),
             ];
         });
@@ -449,6 +450,7 @@
                             itemDiv.innerHTML = `
                                 <div class="product-item-title fw-bold text-dark" style="font-size: 0.88rem; line-height: 1.35; white-space: normal; word-break: break-word;">
                                     ${p.name}
+                                    ${p.khusus_subdit ? '<span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Khusus Perwakilan Subdit</span>' : ''}
                                 </div>
                                 <div class="d-flex flex-wrap align-items-center gap-1.5 mt-0.5">
                                     <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.7rem;">[${p.code || '-'}]</span>

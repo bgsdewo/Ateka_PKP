@@ -584,6 +584,9 @@
                                                     <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" style="width: 28px; height: 28px; object-fit: contain; background: #f8fafc; border-radius: 6px; padding: 2px; border: 1px solid #e2e8f0; flex-shrink: 0;" loading="lazy">
                                                     <div style="min-width: 0;">
                                                         <strong class="d-block" style="font-size: 0.78rem; line-height: 1.25;">{{ $product->name }}</strong>
+                                                        @if ($product->khusus_subdit)
+                                                            <span class="badge bg-warning text-dark" style="font-size: 0.62rem;">Khusus Perwakilan Subdit</span>
+                                                        @endif
                                                         @if ($product->description)
                                                             <small class="text-muted d-block text-truncate" style="font-size: 0.68rem; max-width: 170px;">{{ $product->description }}</small>
                                                         @endif
@@ -642,6 +645,7 @@
                                                         data-transaction-date="{{ $product->initial_transaction_date ?? '' }}"
                                                         data-uraian="{{ e($uraian ?? '') }}"
                                                         data-description="{{ e($product->description) }}"
+                                                        data-khusus-subdit="{{ $product->khusus_subdit ? 1 : 0 }}"
                                                         data-image="{{ asset($product->image_url) }}">
                                                         Edit
                                                     </button>
@@ -848,6 +852,13 @@
                                 <label class="form-label">Deskripsi</label>
                                 <textarea name="description" id="description" class="form-control form-control-sm" rows="2"
                                     placeholder="Tulis deskripsi singkat barang"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="khusus_subdit" id="khusus_subdit" value="1">
+                                    <label class="form-check-label" for="khusus_subdit">Khusus Perwakilan Subdit <small class="text-muted">(hanya bisa diminta oleh PIC Subdit)</small></label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1102,6 +1113,7 @@
                     $stock.prop('readonly', false).val(0);
                     $purchasePrice.prop('readonly', false).val(0);
                     $description.prop('readonly', false).val('');
+                    $('#khusus_subdit').prop('checked', false);
                     $detailInfo.addClass('d-none');
                     $quickBox.addClass('d-none');
                     $quickSelect.val('');
@@ -1279,6 +1291,7 @@
                     $stock.val($btn.attr('data-stock') || $btn.data('stock') || 0);
                     $purchasePrice.val($btn.attr('data-purchase-price') || $btn.data('purchase-price') || 0);
                     $description.val($btn.attr('data-description') || $btn.data('description') || '');
+                    $('#khusus_subdit').prop('checked', String($btn.attr('data-khusus-subdit')) === '1');
                     const img = $btn.attr('data-image') || '';
                     setProductImagePreview(img);
                     $('#boxProductImage').removeClass('d-none'); // Di Edit Barang tetap bisa upload foto

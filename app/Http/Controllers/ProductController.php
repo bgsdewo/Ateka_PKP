@@ -218,6 +218,7 @@ class ProductController extends Controller
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'khusus_subdit' => ['nullable', 'boolean'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
@@ -259,6 +260,7 @@ class ProductController extends Controller
                     'minimum_stock' => $request->minimum_stock ?? $existingProduct->minimum_stock ?? 0,
                     'purchase_price' => (float) $request->purchase_price > 0 ? $request->purchase_price : $existingProduct->purchase_price,
                     'description' => $request->description ?: $existingProduct->description,
+                    'khusus_subdit' => $request->boolean('khusus_subdit') || $existingProduct->khusus_subdit,
                 ];
                 if ($imagePath) {
                     if ($existingProduct->image && str_starts_with($existingProduct->image, 'storage/products/')) {
@@ -282,6 +284,7 @@ class ProductController extends Controller
                     'minimum_stock' => $request->minimum_stock ?? 0,
                     'purchase_price' => $request->purchase_price,
                     'description' => $request->description,
+                    'khusus_subdit' => $request->boolean('khusus_subdit') || Product::nameIsKhususSubdit($request->name),
                     'image' => $imagePath,
                 ]);
             }
@@ -357,6 +360,7 @@ class ProductController extends Controller
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'khusus_subdit' => ['nullable', 'boolean'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
@@ -388,6 +392,7 @@ class ProductController extends Controller
                 'minimum_stock'  => $request->minimum_stock ?? ($daftar_barang->minimum_stock ?? 0),
                 'purchase_price' => $request->purchase_price,
                 'description'    => $request->description,
+                'khusus_subdit'  => $request->boolean('khusus_subdit'),
             ];
 
             if ($request->hasFile('image')) {

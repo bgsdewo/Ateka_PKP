@@ -18,8 +18,34 @@ class Product extends Model
         'minimum_stock',
         'purchase_price',
         'description',
+        'khusus_subdit',
         'image',
     ];
+
+    protected $casts = [
+        'khusus_subdit' => 'boolean',
+    ];
+
+    /** Kata kunci nama barang yang otomatis ditandai "Khusus Perwakilan Subdit". */
+    public const KHUSUS_SUBDIT_KEYWORDS = [
+        'pembolong kertas',
+        'toner',
+        'epson ink printer',
+        'cannon blanck ink',
+        'canon black ink',
+        'canon blank ink',
+    ];
+
+    public static function nameIsKhususSubdit(?string $name): bool
+    {
+        $name = mb_strtolower((string) $name);
+        foreach (self::KHUSUS_SUBDIT_KEYWORDS as $kw) {
+            if ($name !== '' && str_contains($name, $kw)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public function getImageUrlAttribute(): string
     {
