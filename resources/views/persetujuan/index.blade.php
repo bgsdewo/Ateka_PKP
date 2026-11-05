@@ -613,7 +613,7 @@
                                                     @if ($req->is_procurement)
                                                         <div class="text-muted mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">Proses pembelian offline TU</div>
                                                     @else
-                                                        <div class="text-success fw-semibold mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">Siap diserahkan PIC</div>
+                                                        <div class="text-success fw-semibold mt-0.5" style="font-size: 0.66rem; line-height: 1.2;">Siap diserahkan Petugas Distribusi</div>
                                                     @endif
                                                 @elseif($req->status == 'distributed')
                                                     <span class="badge bg-primary px-1.5 py-0.5" style="font-size: 0.68rem;">Selesai</span>
