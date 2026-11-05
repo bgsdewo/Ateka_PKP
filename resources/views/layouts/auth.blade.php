@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="{{ asset('css/ateka-auth.css') }}?v={{ @filemtime(public_path('css/ateka-auth.css')) }}">
 </head>
 <body>
-<div class="au-shell">
+<div class="au-stage">
+<div class="au-master">
     <aside class="au-brand">
         <div class="au-org">
             <span class="au-logo-plate"><img src="{{ asset('hope-ui/assets/images/auth/kemenpkp-logo.png') }}" alt="Logo Kementerian PKP RI"></span>
@@ -76,6 +77,7 @@
         </div>
         <p class="au-help">Kendala akses akun? Hubungi Subbagian Tata Usaha.</p>
     </main>
+</div>
 </div>
 
 <script>
