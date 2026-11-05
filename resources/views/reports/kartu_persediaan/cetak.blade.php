@@ -95,14 +95,7 @@
             font-size: 8pt;
         }
 
-        .sub-col-num th {
-            font-size: 7.2pt;
-            font-weight: normal;
-            padding: 2px 4px;
-            background-color: #ffffff;
-        }
-
-        /* Pola Arsir Abu-abu untuk Sel Kosong / Non-Aktif (Seperti pada gambar) */
+/* Pola Arsir Abu-abu untuk Sel Kosong / Non-Aktif (Seperti pada gambar) */
         .cell-shaded {
             background-color: #64748b !important;
             -webkit-print-color-adjust: exact;
@@ -262,20 +255,6 @@
                     <tr>
                         <th style="width: 60px;">Jumlah</th>
                         <th style="width: 95px;">Nilai</th>
-                    </tr>
-                    <tr class="sub-col-num">
-                        <th>1</th>
-                        <th>2</th>
-                        <th>3</th>
-                        <th>4</th>
-                        <th>5</th>
-                        <th>6</th>
-                        <th>7</th>
-                        <th>8</th>
-                        <th>9 = (7-8)</th>
-                        <th>10 = (6x9)</th>
-                        <th>11</th>
-                        <th>12</th>
                     </tr>
                 </thead>
                 <tbody>
