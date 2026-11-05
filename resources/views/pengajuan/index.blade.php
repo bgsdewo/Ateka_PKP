@@ -238,15 +238,27 @@
                         </div>
                     </div>
                     <div class="card-body p-2.5 p-md-3">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle table-dashboard-compact mb-0 w-100">
+                        <style>
+        .riwayat-table thead th { padding: 0.3rem 0.5rem !important; }
+        .riwayat-table tbody td { padding: 0.32rem 0.5rem !important; }
+        .riwayat-table .badge { font-size: 0.62rem !important; padding: 0.1rem 0.38rem !important; }
+        .riwayat-table .riw-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 6px; line-height: 1.25; }
+        .riwayat-table .riw-name { font-size: 0.74rem; }
+        .riwayat-table .riw-qty { font-size: 0.68rem; font-weight: 600; }
+        .table.riwayat-table ul { list-style: none; padding-left: 0 !important; }
+        .riwayat-table li { margin-bottom: 0.2rem !important; }
+        .riwayat-table .btn-sm { padding: 0.12rem 0.5rem !important; }
+        .riwayat-table .ps-3 { padding-left: 0 !important; }
+    </style>
+                            <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle table-dashboard-compact riwayat-table mb-0 w-100">
                                 <colgroup>
-                                    <col style="width: 22%; min-width: 195px;">
-                                    <col style="width: 9%; min-width: 85px;">
-                                    <col style="width: 12%; min-width: 105px;">
-                                    <col style="width: 33%;">
-                                    <col style="width: 12%; min-width: 105px;">
-                                    <col style="width: 12%; min-width: 95px;">
+                                    <col style="width: 17%; min-width: 150px;">
+                                    <col style="width: 8%; min-width: 70px;">
+                                    <col style="width: 10%; min-width: 90px;">
+                                    <col style="width: 40%;">
+                                    <col style="width: 15%; min-width: 105px;">
+                                    <col style="width: 10%; min-width: 80px;">
                                 </colgroup>
                                 <thead>
                                     <tr>
@@ -282,19 +294,19 @@
                                                 <ul class="mb-0 ps-3" style="font-size: 0.75rem; word-break: break-word; white-space: normal;">
                                                     @foreach ($req->details as $detail)
                                                         <li class="mb-1" style="word-break: break-word;">
-                                                            <div class="fw-bold text-dark" style="line-height: 1.3;">{{ $detail->item_name }}</div>
-                                                            <div class="mt-0.5">
+                                                            <div class="riw-item">
+                                                                <span class="fw-bold text-dark riw-name">{{ $detail->item_name }}</span>
                                                                 @if (in_array($req->status, ['approved', 'distributed']))
                                                                     <span class="badge bg-success-subtle text-success border px-1.5 py-0.5" style="font-size: 0.64rem;">
                                                                         Disetujui: {{ $detail->effective_quantity }} {{ $detail->item_unit }}
                                                                     </span>
                                                                 @else
-                                                                    <span class="text-secondary small" style="font-size: 0.68rem;">({{ $detail->quantity }} {{ $detail->item_unit }})</span>
+                                                                    <span class="text-secondary riw-qty">&times; {{ $detail->quantity }} {{ $detail->item_unit }}</span>
                                                                 @endif
                                                             </div>
 
                                                             @if ($detail->specification)
-                                                                <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">Spesifikasi: {{ $detail->specification }}</div>
+                                                                <div class="text-muted fst-italic mt-0.5" style="font-size: 0.68rem; line-height: 1.25;">{{ $detail->specification }}</div>
                                                             @endif
 
                                                             @if ($detail->verification_note)
