@@ -822,6 +822,18 @@
                                 </div>
                             </div>
 
+                            <!-- Pembelian per kemasan (Dus/Pak) -> stok satuan terkecil -->
+                            <div class="col-12" id="boxPackSize">
+                                <div class="p-2 rounded border border-info-subtle bg-info-subtle">
+                                    <label class="form-label mb-1">Isi per Kemasan Beli <small class="text-muted fw-normal">(opsional &mdash; isi bila membeli per Dus/Pak)</small></label>
+                                    <input type="number" name="pack_size" id="pack_size" class="form-control form-control-sm" min="1" value="1">
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">
+                                        Bila diisi lebih dari 1: <strong>Stok</strong> = jumlah kemasan yang dibeli, <strong>Harga</strong> = harga per kemasan, <strong>Satuan</strong> = satuan terkecil (mis. Buah).
+                                    </small>
+                                    <div id="packPreview" class="small fw-semibold text-primary mt-1 d-none"></div>
+                                </div>
+                            </div>
+
                             <!-- Upload Foto / Gambar Barang (Katalog Persediaan) -->
                             <div class="col-12" id="boxProductImage">
                                 <label class="form-label">Foto / Gambar Barang (Katalog Persediaan)</label>
@@ -1087,6 +1099,31 @@
                     }
                     $categoryId.trigger('change');
                 }
+
+
+                // Pratinjau konversi kemasan -> satuan terkecil & tampilkan kolom hanya saat tambah/isi stok
+                const $packSize = $('#pack_size');
+                const $packBox = $('#boxPackSize');
+                const $packPreview = $('#packPreview');
+                function updatePackPreview() {
+                    const pack = Math.max(1, parseInt($packSize.val(), 10) || 1);
+                    const qty = parseInt($stock.val(), 10) || 0;
+                    const price = parseFloat($purchasePrice.val()) || 0;
+                    if (pack <= 1) { $packPreview.addClass('d-none').text(''); return; }
+                    const unit = $unit.val() || 'satuan';
+                    const total = qty * pack;
+                    const per = price / pack;
+                    $packPreview.removeClass('d-none').text(
+                        qty + ' kemasan × ' + pack + ' = ' + total + ' ' + unit + ' masuk stok; harga ≈ Rp ' +
+                        Math.round(per).toLocaleString('id-ID') + ' / ' + unit
+                    );
+                }
+                $packSize.add($stock).add($purchasePrice).add($unit).on('input change', updatePackPreview);
+                $('#modalBarang').on('show.bs.modal shown.bs.modal', function() {
+                    $packBox.toggleClass('d-none', $method.val() === 'PUT');
+                    if ($method.val() === 'PUT') { $packSize.val(1); }
+                    updatePackPreview();
+                });
 
                 function resetModalBarang() {
                     $form[0].reset();

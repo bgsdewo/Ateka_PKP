@@ -214,6 +214,7 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
             'minimum_stock' => ['nullable', 'integer', 'min:0'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
+            'pack_size' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'no_faktur' => ['nullable', 'string', 'max:255'],
             'transaction_date' => ['nullable', 'date'],
             'uraian' => ['nullable', 'string', 'max:255'],
@@ -223,6 +224,7 @@ class ProductController extends Controller
         ], [
             'category_id.required' => 'Kategori barang wajib dipilih.',
             'category_id.exists' => 'Kategori barang tidak valid.',
+            'pack_size.min' => 'Isi per kemasan minimal 1.',
             'code.required' => 'Kode barang wajib diisi.',
             'code.unique' => 'Kode barang sudah digunakan.',
             'name.required' => 'Nama barang wajib diisi.',
@@ -239,9 +241,14 @@ class ProductController extends Controller
             'image.max' => 'Ukuran gambar tidak boleh melebihi 2 MB.',
         ]);
 
+        $priceChangeNote = '';
         DB::beginTransaction();
         try {
-            $addedQty = (int) $request->stock;
+            // Pembelian per kemasan (mis. 1 Dus isi 12): stok & harga dikonversi ke satuan terkecil.
+            // Tanpa isi per kemasan (kosong/1) perilakunya sama seperti sebelumnya.
+            $packSize = max(1, (int) $request->input('pack_size', 1));
+            $addedQty = (int) $request->stock * $packSize;
+            $unitPrice = round((float) $request->purchase_price / $packSize, 2);
 
             $imagePath = null;
             if ($request->hasFile('image')) {
@@ -252,13 +259,29 @@ class ProductController extends Controller
             }
 
             if ($existingProduct) {
-                $newTotalStock = $addedQty > 0 ? ((int) $existingProduct->stock + $addedQty) : (int) $existingProduct->stock;
+                $oldStock = max(0, (int) $existingProduct->stock);
+                $oldPrice = (float) $existingProduct->purchase_price;
+                $newTotalStock = $addedQty > 0 ? ($oldStock + $addedQty) : (int) $existingProduct->stock;
+
+                // Harga rata-rata tertimbang: sisa stok lama (harga lama) + pembelian baru (harga baru).
+                if ($addedQty > 0 && $unitPrice > 0) {
+                    $newAvgPrice = ($oldStock > 0 && $oldPrice > 0)
+                        ? round((($oldStock * $oldPrice) + ($addedQty * $unitPrice)) / $newTotalStock, 2)
+                        : $unitPrice;
+                } else {
+                    $newAvgPrice = $oldPrice;
+                }
+                if ($oldStock > 0 && $oldPrice > 0 && $unitPrice > 0 && abs($oldPrice - $unitPrice) >= 0.01) {
+                    $priceChangeNote = ' · Harga berubah: Rp ' . number_format($oldPrice, 0, ',', '.')
+                        . ' → Rp ' . number_format($unitPrice, 0, ',', '.')
+                        . ' (rata-rata stok Rp ' . number_format($newAvgPrice, 0, ',', '.') . ')';
+                }
                 $updateData = [
                     'category_id' => $request->category_id ?: $existingProduct->category_id,
                     'unit' => $request->unit ?: $existingProduct->unit,
                     'stock' => $newTotalStock,
                     'minimum_stock' => $request->minimum_stock ?? $existingProduct->minimum_stock ?? 0,
-                    'purchase_price' => (float) $request->purchase_price > 0 ? $request->purchase_price : $existingProduct->purchase_price,
+                    'purchase_price' => $newAvgPrice,
                     'description' => $request->description ?: $existingProduct->description,
                     'khusus_subdit' => $request->boolean('khusus_subdit') || $existingProduct->khusus_subdit,
                 ];
@@ -282,7 +305,7 @@ class ProductController extends Controller
                     'unit' => $request->unit,
                     'stock' => $addedQty,
                     'minimum_stock' => $request->minimum_stock ?? 0,
-                    'purchase_price' => $request->purchase_price,
+                    'purchase_price' => $unitPrice,
                     'description' => $request->description,
                     'khusus_subdit' => $request->boolean('khusus_subdit') || Product::nameIsKhususSubdit($request->name),
                     'image' => $imagePath,
@@ -297,11 +320,13 @@ class ProductController extends Controller
                     'type'             => 'masuk',
                     'quantity'         => $addedQty,
                     'stock_after'      => $product->stock,
-                    'harga_perolehan'  => $product->purchase_price,
+                    'harga_perolehan'  => $unitPrice > 0 ? $unitPrice : $product->purchase_price,
                     'no_faktur'        => $request->no_faktur ?: '-',
                     'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
                     'transaction_date' => $request->transaction_date ?: now(),
                     'note'             => 'Pembelian ' . $product->name
+                        . ($packSize > 1 ? ' (' . (int) $request->stock . ' kemasan × isi ' . $packSize . ' = ' . $addedQty . ')' : '')
+                        . $priceChangeNote,
                 ]);
             }
 
