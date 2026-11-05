@@ -150,7 +150,7 @@ class ProductController extends Controller
         // Ambil usulan pengadaan yang disetujui / pending dan belum dibeli / ditambahkan stoknya di master data (3 item per halaman)
         $unfulfilledProcurements = RequestDetail::whereHas('requestItem', function ($q) {
             $q->where('is_procurement', true)
-              ->whereIn('status', ['pending', 'approved']);
+              ->where('status', 'approved');
         })
         ->where('is_fulfilled', false)
         ->with(['requestItem.user', 'product.category'])
@@ -670,13 +670,14 @@ class ProductController extends Controller
 
         if ($specificDetailId) {
             $chosenDetail = RequestDetail::with('requestItem.user')->find($specificDetailId);
-            if ($chosenDetail) {
+            // Hanya tiket pengadaan yang SUDAH disetujui Kasubbag TU yang boleh diisi stoknya.
+            if ($chosenDetail && $chosenDetail->requestItem && $chosenDetail->requestItem->is_procurement && $chosenDetail->requestItem->status === 'approved') {
                 $fulfilledReqDetails->push($chosenDetail);
             }
         } else {
             $openDetails = RequestDetail::whereHas('requestItem', function ($q) {
                 $q->where('is_procurement', true)
-                  ->whereIn('status', ['pending', 'approved']);
+                  ->where('status', 'approved');
             })
             ->where('is_fulfilled', false)
             ->where(function ($subQ) use ($product) {
@@ -719,7 +720,6 @@ class ProductController extends Controller
 
                 $updateData = [
                     'purchase_price'     => $newTotalPrice,
-                    'status'             => 'approved',
                     'verified_at'        => $reqItem->verified_at ?: now(),
                     'verified_by'        => $reqItem->verified_by ?: (Auth::id() ?? 1),
                 ];

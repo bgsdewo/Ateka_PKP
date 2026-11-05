@@ -41,7 +41,7 @@ Pegawai/PIC dialihkan ke dashboard bila membuka halaman gudang/laporan (itu norm
 ## 4. Alur bisnis (jangan diubah tanpa diminta)
 1. Pegawai/PIC membuat pengajuan (barang katalog; stok boleh 0) → tipe `individu` / `subdit`, bisa `is_procurement`.
 2. Kasubbag TU setujui (jumlah boleh dikurangi → `approved_quantity`) atau tolak dengan alasan (notifikasi lonceng ke pemohon berisi catatan). Pemohon hanya diberi notifikasi: disetujui, ditolak (+catatan), dan barang diserahkan — tidak ada notifikasi "stok terisi".
-3. Pengadaan: pemeriksa gudang mengisi stok → notifikasi ke petugas distribusi.
+3. Pengadaan: **hanya tiket yang sudah disetujui Kasubbag TU** muncul di kartu "Menunggu Penambahan Barang" dan boleh diisi stoknya (pemeriksa gudang); status tiket tidak dinaikkan otomatis oleh isi stok → notifikasi ke petugas distribusi.
 4. Distribusi menyerahkan barang → **otomatis tercatat barang keluar** (`StockTransaction` type `keluar`, `no_faktur` = kode tiket).
 5. Selesai ketika `signed_proof` (bukti TTD) diunggah. Status tiket: `pending → approved → distributed` (atau `rejected`).
 
