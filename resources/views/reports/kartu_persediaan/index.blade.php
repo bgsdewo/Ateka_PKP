@@ -314,7 +314,7 @@
                                 <tr>
                                     <td class="fw-bold text-muted ps-0">JENIS BARANG</td>
                                     <td class="fw-bold">:</td>
-                                    <td class="fw-bold text-dark">{{ $selectedProduct->name }}</td>
+                                    <td class="fw-bold text-dark">{{ $selectedProduct->nama_jenis }}</td>
                                 </tr>
                                 <tr>
                                     <td class="fw-bold text-muted ps-0">SATUAN</td>

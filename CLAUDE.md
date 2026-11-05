@@ -21,6 +21,7 @@ php artisan migrate                    # migrasi
 php artisan migrate:fresh --seed       # reset total + data awal (kategori/barang BMN + akun Kasubbag TU)
 php artisan view:clear && php artisan cache:clear   # setelah mengubah Blade/konfigurasi
 php artisan atk:pulihkan-mutasi-keluar [--simpan]   # pulihkan mutasi barang keluar yang hilang (simulasi dulu)
+php artisan atk:rapikan-catatan-kemasan [--simpan]  # ubah catatan pembelian kemasan lama ke format baru (simulasi dulu)
 php artisan test                       # test fitur (tests/Feature, 20 file) — butuh MySQL, lihat §8
 ```
 Akun seed: `utami@gmail.com` / `password123` (Kasubbag TU). Akun lain dibuat lewat Master Data → Manajemen Pengguna.

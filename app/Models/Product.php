@@ -209,6 +209,17 @@ class Product extends Model
      * Kode Barang untuk laporan: mengikuti Kode Barang pada KATEGORI (mis. 1010302004),
      * bukan Kode Rincian per barang. Cadangan: kode BMN barang, lalu kode barang itu sendiri.
      */
+    /**
+     * Nama jenis barang untuk judul kartu persediaan: tanpa keterangan isi kemasan,
+     * mis. "Amplop Coklat A4 Air Mail (isi 10)" -> "Amplop Coklat A4 Air Mail".
+     * Keterangan isi cukup tampil di kolom Keterangan.
+     */
+    public function getNamaJenisAttribute(): string
+    {
+        $nama = trim(preg_replace('/\s*\(\s*isi\b[^)]*\)/i', '', (string) $this->name));
+        return $nama !== '' ? $nama : (string) $this->name;
+    }
+
     public function getKodeBarangLaporanAttribute(): string
     {
         return $this->category?->kode_barang

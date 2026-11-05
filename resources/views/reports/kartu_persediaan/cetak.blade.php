@@ -224,7 +224,7 @@
                             <tr>
                                 <td style="border: none; font-weight: normal;">JENIS BARANG</td>
                                 <td style="border: none;">:</td>
-                                <td style="border: none; font-weight: normal;">{{ $product->name ?? '-' }}</td>
+                                <td style="border: none; font-weight: normal;">{{ $product->nama_jenis ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <td style="border: none; font-weight: normal;">SATUAN</td>
