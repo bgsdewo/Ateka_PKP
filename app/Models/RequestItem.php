@@ -265,4 +265,29 @@ class RequestItem extends Model
 
         return $count;
     }
+
+    /**
+     * Hapus cache ringkasan permintaan/dashboard setelah status tiket berubah.
+     */
+    public static function flushRequestCaches(): void
+    {
+        try {
+            $store = \Illuminate\Support\Facades\Cache::store('file');
+            foreach ([
+                'requests_pending_summary',
+                'requests_ready_distribusi_count',
+                'navbar_pending_items_preview',
+                'approval_category_stats',
+                'dashboard_product_stats',
+                'dashboard_low_stock_products',
+                'dashboard_pending_summary',
+                'dashboard_ready_distribusi_count',
+                'dashboard_pending_pengadaan_gudang_count',
+            ] as $key) {
+                $store->forget($key);
+            }
+        } catch (\Throwable $e) {
+            // abaikan kegagalan cache
+        }
+    }
 }
