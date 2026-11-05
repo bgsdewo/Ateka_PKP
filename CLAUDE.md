@@ -46,7 +46,7 @@ Pegawai/PIC dialihkan ke dashboard bila membuka halaman gudang/laporan (itu norm
 5. Selesai ketika `signed_proof` (bukti TTD) diunggah. Status tiket: `pending → approved → distributed` (atau `rejected`).
 
 Tracker dashboard (`resources/views/dashboard/tracker.blade.php` + `tracker_steps.blade.php`):
-pengadaan & stok-tersedia sama-sama 4 langkah (Pengajuan → Verifikasi TU → Penyerahan → Selesai/TTD); tracker **hanya untuk PIC Subdit** (pegawai perorangan tidak punya tracker; yang ditolak tidak masuk tracker, cukup notifikasi + catatan Kasubbag).
+pengadaan & stok-tersedia sama-sama 4 langkah (Pengajuan → Verifikasi TU → Penyerahan → Selesai/TTD); tracker tampil untuk pegawai & PIC. **Pegawai perorangan tanpa langkah bukti TTD** (3 langkah, selesai saat barang diserahkan); langkah Selesai/TTD hanya untuk PIC Subdit. Yang ditolak tidak masuk tracker, cukup notifikasi + catatan Kasubbag.
 Menampilkan pengajuan **aktif lintas periode** (tidak dibatasi bulan dashboard).
 
 ## 5. Peta kode penting

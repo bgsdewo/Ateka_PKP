@@ -35,6 +35,9 @@
             return $item ? ($q . ' ' . $trkUnit($item)) : ($q . ' unit');
         };
 
+        // Pegawai perorangan: selesai ketika barang diserahkan petugas distribusi (tanpa langkah bukti TTD).
+        $isIndividual = !($trkUser && $trkUser->isPicDistribusi()) && $r->type !== 'subdit';
+
         $steps = [];
 
         // 1. Pengajuan dibuat
@@ -64,7 +67,7 @@
         // 3. Penyerahan barang
         $readyToHandOver = $approved && (!$isProc || $allFilled);
         if ($distributed) {
-            $steps[] = ['icon' => 'truck', 'state' => 'done', 'title' => 'Barang Diserahkan',
+            $steps[] = ['icon' => 'truck', 'state' => $isIndividual ? 'final' : 'done', 'title' => 'Barang Diserahkan',
                 'subtitle' => '(Penerima: ' . ($r->receiver_name ?: ($r->user->name ?? '-')) . ')',
                 'time' => $trkTime($r->distributed_at ?? $r->updated_at)];
         } elseif ($readyToHandOver) {
@@ -73,6 +76,10 @@
         } else {
             $steps[] = ['icon' => 'truck', 'state' => 'upcoming', 'title' => 'Penyerahan Barang',
                 'subtitle' => $approved ? '(Menunggu Barang Tersedia)' : '(Menunggu Persetujuan)', 'time' => null];
+        }
+
+        if ($isIndividual) {
+            return $steps;
         }
 
         // 4. Selesai: bukti serah terima ditandatangani & diunggah
@@ -99,6 +106,7 @@
         if ($st === 'rejected') return ['Ditolak Kasubbag TU', 'bg-danger text-white'];
         if ($st === 'pending') return ['Menunggu Review Kasubbag TU', 'bg-warning text-dark'];
         if ($st === 'distributed') {
+            if (!(auth()->user() && auth()->user()->isPicDistribusi()) && $r->type !== 'subdit') return ['Selesai - Barang Diserahkan', 'bg-success text-white'];
             return empty($r->signed_proof)
                 ? ['Diserahkan - Menunggu Bukti TTD', 'bg-warning text-dark']
                 : ['Selesai', 'bg-success text-white'];
