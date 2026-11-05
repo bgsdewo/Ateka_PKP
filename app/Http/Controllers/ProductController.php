@@ -330,7 +330,11 @@ class ProductController extends Controller
                     'uraian'           => $request->uraian ?: 'Pencatatan Stok Master Barang',
                     'transaction_date' => $request->transaction_date ?: now(),
                     'note'             => 'Pembelian ' . $product->name
-                        . ($packSize > 1 ? ' (' . (int) $request->stock . ' ' . (trim((string) $request->pack_unit) ?: 'kemasan') . ' × isi ' . $packSize . ' = ' . $addedQty . ' ' . $product->unit . ')' : '')
+                        . ($packSize > 1
+                            ? ' ' . (int) $request->stock . ' ' . (trim((string) $request->pack_unit) ?: 'kemasan')
+                                . ((int) $request->stock > 1 ? ' masing-masing' : '')
+                                . ' berisi ' . $packSize . ' ' . mb_strtolower((string) $product->unit)
+                            : '')
                         . $priceChangeNote,
                 ]);
             }
