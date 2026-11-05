@@ -122,7 +122,7 @@ Prompt awal untuk sesi baru (salin):
 > Baca CLAUDE.md, lalu `git status` dan `git log --oneline -10`. Ringkas posisi pekerjaan dan sisa backlog, lalu tanyakan prioritas saya sebelum mengubah apa pun.
 
 ## 11. Status terakhir
-_Diperbarui: 2026-11-05 · branch `deploy` · semua perubahan sudah di-push (commit terakhir: satuan permintaan = satuan terkecil)._
+_Diperbarui: 2026-11-05 · branch `deploy` · semua perubahan sudah di-push (commit terakhir: label status tiket stok gudang)._
 _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khusus_subdit_to_products_table` dan `2026_11_06_100000_flag_baterai_khusus_subdit` (`php artisan migrate`)._
 
 **Selesai (urut waktu):**
@@ -138,6 +138,8 @@ _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khu
 - **Halaman auth** (login/register/lupa-password): kartu besar dua panel, muat satu layar tanpa scroll (`ateka-auth-fit.css`, skala mengikuti tinggi layar); gelar akademik wajib di Register dan Manajemen Pengguna.
 - Profil & Ubah Password: header seragam, warna hijau merek; dropdown pilih barang di form pengajuan diringkas.
 - **Satuan permintaan = satuan terkecil** barang (`Product::request_unit`); fitur konversi satuan sempat dibuat lalu **dibatalkan** karena alur beli per permintaan.
+- **Pembelian per kemasan** di Isi Stok (kolom `pack_size` + nama kemasan): stok masuk dikonversi ke satuan terkecil, sisa jadi stok umum, harga rata-rata tertimbang, perubahan harga tercatat di Catatan laporan. Tombol "+ Isi Stok" pengadaan kini selalu lewat `store()` (menambah stok, tidak menimpa).
+- **Hitungan "Siap Diserahkan"** (dashboard/sidebar gudang) diperbaiki: ikut menghitung tiket pengadaan yang stoknya sudah terisi (`RequestItem::getReadyDistribusiCount`). Label tiket stok gudang: "Siap diserahkan Petugas Distribusi".
 
 **Keputusan pemilik terbaru (jangan dilanggar):**
 - Sistem bukan stok murni: TU membeli barang saat ada pengajuan. Pegawai/PIC meminta per satuan terkecil; barang satu satuan memakai satuan itu (data: Excel "LIST ATK 2026", sheet Lembar3).
@@ -145,6 +147,7 @@ _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khu
 
 **Backlog / belum dikerjakan (tunggu keputusan pemilik):**
 - Pemilik akan **mengecek** hasil satuan terkecil di lapangan (204 barang hanya "Dus" dan 53 hanya "Set" di Excel: apakah memang diminta per Dus/Set atau ada satuan lebih kecil; "Selotip 12 mm Nachi" Set/Roll ditebak Roll).
+- Jalur "Tambah/Isi Stok Barang → pilih cepat dari standar ATK" masih memakai `update()` (menimpa stok, tanpa kemasan); belum diubah.
 - Satuan di Daftar Barang (`products.unit`) belum diselaraskan dengan satuan permintaan (hanya satuan di form pengajuan/katalog yang berubah).
 - Pencatatan pembelian dari supplier (satuan beli × isi per kemasan → satuan terkecil) belum ada UI-nya: backend `inventory.transaction.store` sudah ada tetapi halaman Barang Masuk hanya tabel. Opsi dibahas (formulir di Barang Masuk, alokasi ke tiket terlama, harga terakhir vs rata-rata) — belum diputuskan.
 - Harga per tiket (bukan per barang) bila satu barang dibeli di harga berbeda — belum dikerjakan.
