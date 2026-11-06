@@ -11,7 +11,9 @@
     <style>
         @page {
             size: A4 landscape;
-            margin: 10mm 12mm;
+            /* Margin 0 = browser tidak mencetak header/footer (tanggal, judul, URL, nomor halaman).
+               Jarak tepi kertas diberikan lewat padding .paper pada @media print. */
+            margin: 0;
         }
 
         body {
@@ -135,9 +137,10 @@
             .paper {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 10mm 12mm !important;
                 width: 100% !important;
                 min-height: auto !important;
+                box-sizing: border-box !important;
             }
 
             .signature-block {
