@@ -124,8 +124,8 @@ Prompt awal untuk sesi baru (salin):
 > Baca CLAUDE.md, lalu `git status` dan `git log --oneline -10`. Ringkas posisi pekerjaan dan sisa backlog, lalu tanyakan prioritas saya sebelum mengubah apa pun.
 
 ## 11. Status terakhir
-_Diperbarui: 2026-11-05 · branch `deploy` · semua perubahan sudah di-push (commit terakhir: label status tiket stok gudang)._
-_Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khusus_subdit_to_products_table` dan `2026_11_06_100000_flag_baterai_khusus_subdit` (`php artisan migrate`)._
+_Diperbarui: 2026-11-06 · branch `deploy` · semua perubahan sudah di-push (commit terakhir: cetak Kartu Persediaan tanpa header/footer browser)._
+_Migrasi `2026_11_06_090000_add_khusus_subdit_to_products_table` & `2026_11_06_100000_flag_baterai_khusus_subdit`: sudah jalan di lokal pemilik ("Nothing to migrate"); di hosting jalankan `php artisan migrate`. Perubahan setelahnya tidak butuh migrasi — cukup `git pull` + `php artisan view:clear && php artisan cache:clear`._
 
 **Selesai (urut waktu):**
 - UI responsif global (`ateka-responsive.css`): skala laptop, sidebar HP off-canvas, tabel, modal, notifikasi, monitor besar. Sapuan 45 halaman × 8 ukuran layar: 0 overflow.
@@ -143,6 +143,10 @@ _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khu
 - **Pembelian per kemasan** di Isi Stok (kolom `pack_size` + nama kemasan): stok masuk dikonversi ke satuan terkecil, sisa jadi stok umum, harga rata-rata tertimbang, perubahan harga tercatat di Catatan laporan. Tombol "+ Isi Stok" pengadaan kini selalu lewat `store()` (menambah stok, tidak menimpa).
 - **Aturan tiket pengadaan siap diserahkan = SEMUA barangnya sudah terisi stok** (`RequestItem::is_waiting_stock`; dipakai dashboard, lonceng, halaman Distribusi, dan dijaga di server `DistributionController::confirmHandover`). Sebagian terisi = tetap "Menunggu Stok Masuk".
 - **Hitungan "Siap Diserahkan"** (dashboard/sidebar gudang) diperbaiki: ikut menghitung tiket pengadaan yang stoknya sudah terisi (`RequestItem::getReadyDistribusiCount`). Label tiket stok gudang: "Siap diserahkan Petugas Distribusi".
+- **Isi Stok — pratinjau rumus**: di bawah kotak kemasan tampil Total bayar (jumlah × harga), Stok masuk (jumlah kemasan × isi), dan Harga per satuan terkecil (harga kemasan ÷ isi). Label kolom: "Isi per kemasan" & "Nama kemasan" (Dus/Pak/…). Satuan sama (mis. Pak = Pak) → isi per kemasan tetap 1.
+- **Catatan Barang Masuk** format baru: "Pembelian <barang> 1 Dus berisi 12 buah" (>1 kemasan: "… 2 Dus masing-masing berisi 12 buah"). Catatan lama dirapikan dengan `php artisan atk:rapikan-catatan-kemasan [--simpan]`.
+- **Kartu Persediaan**: judul JENIS BARANG tanpa "(isi N)" (`Product::nama_jenis`; teks isi cukup di Keterangan); baris nomor kolom (1–12, `9=(7-8)`, `10=(6x9)`) dihapus di cetak **dan** layar; tampilan layar disamakan dengan cetak (garis hitam, teks polos tanpa warna/badge, format "Rp."). Cetak: lebar kolom dikunci `<colgroup>` + `table-layout:fixed`, Keterangan panjang turun baris (`white-space:normal`), tabel pas di kertas A4 landscape; `@page { margin:0 }` + padding `.paper` agar header/footer browser (tanggal, URL, nomor halaman) tidak tercetak.
+- **Laporan**: total rekapitulasi dihitung per barang (lihat §7) — nilai saldo kini sama dengan valuasi dashboard.
 
 **Keputusan pemilik terbaru (jangan dilanggar):**
 - Sistem bukan stok murni: TU membeli barang saat ada pengajuan. Pegawai/PIC meminta per satuan terkecil; barang satu satuan memakai satuan itu (data: Excel "LIST ATK 2026", sheet Lembar3).
@@ -158,5 +162,7 @@ _Migrasi baru yang harus dijalankan di lokal/hosting: `2026_11_06_090000_add_khu
 - Rute & halaman cetak `reports.print` masih ada di kode meski tombolnya dihapus.
 - Bukti Serah Terima memakai kode rincian (bukan kode kategori).
 - Belum ada fitur menonaktifkan akun (hanya hapus, yang diblokir bila punya riwayat).
-- `php artisan test` belum dijalankan di MySQL setelah perubahan terakhir — jalankan di lokal.
+- `php artisan test` belum dijalankan di MySQL setelah perubahan terakhir — jalankan di lokal (di sqlite 5 test lama gagal karena `YEAR()/MONTH()`, bukan regresi; test baru `PembelianPerKemasanTest` & `ReadyDistribusiCountTest` lulus).
+- Label dashboard "Saldo 2026" / "Saldo Buku Tahun" pada Valuasi Persediaan BMN hanya label: nilainya selalu stok saat ini × harga (tidak terfilter bulan/tahun). Usulan ganti label belum diputuskan.
+- Arsiran cetak Kartu Persediaan untuk baris keluar masih selang-seling (kolom Nilai/Keterangan bergantian) — di layar semua baris keluar diarsir pada kolom Nilai; belum diminta diseragamkan.
 - Perlu uji manual di HP sungguhan (iOS/Android): dropdown kustom, keyboard layar, unggah foto.
