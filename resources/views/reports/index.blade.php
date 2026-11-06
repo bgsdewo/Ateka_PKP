@@ -773,7 +773,10 @@
                                             $formattedHarga = 'Rp ' . number_format($harga, 0, ',', '.');
                                             $formattedTotal = 'Rp ' . number_format($nilaiSaldo, 0, ',', '.');
                                         @endphp
-                                        <tr>
+                                        <tr data-product-id="{{ $transaction->product_id }}"
+                                            data-tx-key="{{ \Carbon\Carbon::parse($transaction->transaction_date ?? $transaction->created_at)->format('Ymd') }}{{ str_pad((string) $transaction->id, 10, '0', STR_PAD_LEFT) }}"
+                                            data-awal="{{ $stockAwal }}" data-keluar="{{ $stockDipinjam }}"
+                                            data-sisa="{{ $stockSisa }}" data-nilai="{{ (int) round($nilaiSaldo) }}">
                                             {{-- 1. No --}}
                                             <td class="text-center text-muted fw-semibold col-nowrap">
                                                 {{ $loop->iteration }}
@@ -965,19 +968,25 @@
                             return clean ? parseInt(clean, 10) : 0;
                         };
 
-                        var totalAwal = api.column(7, { search: 'applied' }).data().reduce(function(a, b) {
-                            return a + intVal(b);
-                        }, 0);
-                        var totalDipinjam = api.column(8, { search: 'applied' }).data().reduce(function(a, b) {
-                            return a + intVal(b);
-                        }, 0);
-                        var totalSisa = api.column(9, { search: 'applied' }).data().reduce(function(a, b) {
-                            return a + intVal(b);
-                        }, 0);
-                        var totalNilai = api.column(11, { search: 'applied' }).data().reduce(function(a, b) {
-                            return a + intVal(b);
-                        }, 0);
-
+                        // Total per BARANG, bukan per baris: ambil saldo awal dari transaksi pertama dan
+                        // saldo akhir (sisa & nilai) dari transaksi terakhir tiap barang yang tampil,
+                        // agar saldo antara tidak terhitung ganda. Stok dipinjam = jumlah semua keluar.
+                        var perBarang = {};
+                        var totalDipinjam = 0;
+                        api.rows({ search: 'applied' }).nodes().to$().each(function() {
+                            var d = this.dataset;
+                            if (!d.productId) return;
+                            totalDipinjam += parseInt(d.keluar, 10) || 0;
+                            var g = perBarang[d.productId] || (perBarang[d.productId] = { first: null, last: null });
+                            if (!g.first || d.txKey < g.first.txKey) g.first = d;
+                            if (!g.last || d.txKey > g.last.txKey) g.last = d;
+                        });
+                        var totalAwal = 0, totalSisa = 0, totalNilai = 0;
+                        Object.keys(perBarang).forEach(function(k) {
+                            totalAwal += parseInt(perBarang[k].first.awal, 10) || 0;
+                            totalSisa += parseInt(perBarang[k].last.sisa, 10) || 0;
+                            totalNilai += parseInt(perBarang[k].last.nilai, 10) || 0;
+                        });
                         $('#footerTotalStokAwal').html(totalAwal.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
                         $('#footerTotalStokDipinjam').html(totalDipinjam.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
                         $('#footerTotalStokSisa').html(totalSisa.toLocaleString('id-ID') + ' <span class="text-muted small">Pcs</span>');
