@@ -88,28 +88,20 @@
         }
 
         .card-table-official th, .card-table-official td {
-            border: 1px solid #cbd5e1;
+            border: 1px solid #111111;
             padding: 8px 10px;
             vertical-align: middle;
         }
 
         .card-table-official thead th {
-            background-color: #f1f5f9;
-            color: #0f172a;
+            background-color: #ffffff;
+            color: #111111;
             font-weight: 700;
             text-align: center;
         }
 
-        .sub-header-num th {
-            background-color: #e2e8f0 !important;
-            font-size: 0.75rem;
-            color: #475569;
-            padding: 4px 6px;
-        }
-
-        .pattern-shaded {
-            background-color: #f1f5f9;
-            background-image: repeating-linear-gradient(45deg, #e2e8f0 0, #e2e8f0 2px, transparent 0, transparent 8px);
+.pattern-shaded {
+            background-color: #64748b;
         }
 
         .active-item-pill {
@@ -346,20 +338,6 @@
                                     <th style="width: 75px;">Jumlah</th>
                                     <th style="width: 115px;">Nilai</th>
                                 </tr>
-                                <tr class="sub-header-num text-center">
-                                    <th>1</th>
-                                    <th>2</th>
-                                    <th>3</th>
-                                    <th>4</th>
-                                    <th>5</th>
-                                    <th>6</th>
-                                    <th>7</th>
-                                    <th>8</th>
-                                    <th>9 = (7-8)</th>
-                                    <th>10 = (6x9)</th>
-                                    <th>11</th>
-                                    <th>12</th>
-                                </tr>
                             </thead>
                             <tbody>
                                 @php
@@ -383,7 +361,7 @@
                                         <td class="text-center fw-semibold">
                                             {{ $t->type === 'masuk' ? $rowNo++ : '' }}
                                         </td>
-                                        <td class="text-center font-monospace small">
+                                        <td class="text-center small">
                                             {{ $displayFaktur }}
                                         </td>
                                         {{-- Tanggal Faktur: hanya untuk barang masuk, sebaris dengan penerima dikosongkan --}}
@@ -392,33 +370,33 @@
                                         </td>
                                         <td>
                                             @if ($t->type === 'masuk')
-                                                <span class="fw-bold text-primary">{{ $t->uraian ?: ($t->note ?: 'Penerimaan Barang') }}</span>
+                                                {{ $t->uraian ?: ($t->note ?: 'Penerimaan Barang') }}
                                             @else
-                                                <span class="fw-bold text-dark">{{ $t->recipient_name }}</span>
+                                                {{ $t->recipient_name }}
                                             @endif
                                         </td>
                                         <td class="text-center">
                                             @if ($t->type === 'masuk')
-                                                <span class="badge bg-success-subtle text-success">{{ $t->kondisi ?: 'Baru' }}</span>
+                                                {{ $t->kondisi ?: 'Baru' }}
                                             @endif
                                         </td>
                                         <td class="text-end font-monospace">
                                             @if ($t->type === 'masuk')
-                                                Rp {{ number_format($hargaSatuan, 0, ',', '.') }}
+                                                Rp. {{ number_format($hargaSatuan, 0, ',', '.') }}
                                             @endif
                                         </td>
-                                        <td class="text-center font-monospace fw-bold {{ $inQty > 0 ? 'text-success' : 'text-muted' }}">
+                                        <td class="text-center fw-bold">
                                             {{ $inQty > 0 ? $inQty : '0' }}
                                         </td>
-                                        <td class="text-center font-monospace fw-bold {{ $outQty > 0 ? 'text-danger' : 'text-muted' }}">
+                                        <td class="text-center fw-bold">
                                             {{ $outQty > 0 ? $outQty : '0' }}
                                         </td>
-                                        <td class="text-center font-monospace fw-bold bg-light">
+                                        <td class="text-center fw-bold">
                                             {{ $runningStock }}
                                         </td>
-                                        <td class="text-end font-monospace {{ $t->type === 'keluar' ? 'pattern-shaded' : 'fw-bold bg-light' }}">
+                                        <td class="text-end font-monospace {{ $t->type === 'keluar' ? 'pattern-shaded' : 'fw-bold' }}">
                                             @if ($t->type === 'masuk')
-                                                Rp {{ number_format($nilaiSaldo, 0, ',', '.') }}
+                                                Rp. {{ number_format($nilaiSaldo, 0, ',', '.') }}
                                             @else
                                                 &nbsp;
                                             @endif
@@ -428,7 +406,7 @@
                                             &nbsp;
                                         </td>
                                         {{-- Kolom 12: Keterangan (Penyerahan "jenis barang" kepada "nama") --}}
-                                        <td class="small text-muted {{ $t->type === 'keluar' && empty($t->note) ? 'pattern-shaded' : '' }}">
+                                        <td class="small">
                                             @if ($t->type === 'keluar')
                                                 Penyerahan {{ $selectedProduct->name }} kepada {{ $t->recipient_name }}
                                             @else
