@@ -76,6 +76,7 @@
         /* Tabel 12 Kolom Resmi */
         .table-stock-card {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-size: 8pt;
             margin-top: 6px;
@@ -86,9 +87,14 @@
             border: 1px solid #111111;
             padding: 3px 5px;
             vertical-align: middle;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .table-stock-card th {
+            overflow-wrap: normal;
+            word-break: normal;
             text-align: center;
             font-weight: 700;
             background-color: #ffffff;
@@ -238,23 +244,26 @@
 
             <!-- TABEL KARTU PERSEDIAAN 12 KOLOM SESUAI FORMAT GAMBAR 1 -->
             <table class="table-stock-card">
+                <colgroup>
+                    <col style="width: 30px;"><col style="width: 86px;"><col style="width: 104px;"><col style="width: 120px;"><col style="width: 62px;"><col style="width: 88px;"><col style="width: 58px;"><col style="width: 60px;"><col style="width: 50px;"><col style="width: 88px;"><col style="width: 52px;"><col>
+                </colgroup>
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 35px;">NO</th>
-                        <th rowspan="2" style="width: 130px;">NO. FAKTUR</th>
-                        <th rowspan="2" style="width: 95px;">TANGGAL<br>FAKTUR</th>
-                        <th rowspan="2" style="min-width: 160px;">URAIAN</th>
-                        <th rowspan="2" style="width: 80px;">KONDISI<br>BARANG</th>
-                        <th rowspan="2" style="width: 100px;">HARGA<br>PEROLEHAN</th>
-                        <th rowspan="2" style="width: 55px;">MASUK</th>
-                        <th rowspan="2" style="width: 55px;">KELUAR</th>
+                        <th rowspan="2" style="width: 30px;">NO</th>
+                        <th rowspan="2" style="width: 86px;">NO. FAKTUR</th>
+                        <th rowspan="2" style="width: 104px;">TANGGAL<br>FAKTUR</th>
+                        <th rowspan="2" style="width: 120px;">URAIAN</th>
+                        <th rowspan="2" style="width: 62px;">KONDISI<br>BARANG</th>
+                        <th rowspan="2" style="width: 88px;">HARGA<br>PEROLEHAN</th>
+                        <th rowspan="2" style="width: 58px;">MASUK</th>
+                        <th rowspan="2" style="width: 60px;">KELUAR</th>
                         <th colspan="2">SALDO</th>
-                        <th rowspan="2" style="width: 65px;">PARAF</th>
-                        <th rowspan="2" style="width: 110px;">KETERANGAN</th>
+                        <th rowspan="2" style="width: 52px;">PARAF</th>
+                        <th rowspan="2">KETERANGAN</th>
                     </tr>
                     <tr>
-                        <th style="width: 60px;">Jumlah</th>
-                        <th style="width: 95px;">Nilai</th>
+                        <th style="width: 50px;">Jumlah</th>
+                        <th style="width: 88px;">Nilai</th>
                     </tr>
                 </thead>
                 <tbody>
